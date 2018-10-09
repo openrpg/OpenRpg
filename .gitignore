@@ -1,0 +1,10 @@
+obj
+bin
+packages/
+
+.idea/
+*.user
+*.suo
+*.nupkg
+/src/.vs
+/src/**/BenchmarkDotNet.Artifacts
