@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using OpenRpg.Items.Modifications;
+using OpenRpg.Core.Modifications;
+using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Items
 {

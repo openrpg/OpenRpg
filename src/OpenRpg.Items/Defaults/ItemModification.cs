@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using OpenRpg.Effects;
-using OpenRpg.Items.Modifications;
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Modifications;
 
 namespace OpenRpg.Items.Defaults
 {

@@ -1,4 +1,4 @@
-namespace OpenRpg.Items
+namespace OpenRpg.Items.Templates
 {
     public interface IStackableItemTemplate : IItemTemplate
     {

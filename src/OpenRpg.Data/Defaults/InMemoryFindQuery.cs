@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using OpenRpg.Core.Common;
-using OpenRpg.Core.Data.Queries;
+using OpenRpg.Data.Queries;
 
-namespace OpenRpg.Core.Data.Defaults
+namespace OpenRpg.Data.Defaults
 {
-    public abstract class InMemoryFindQuery<T> : IFindQuery<T> where T : IHasDataId
+    public abstract class InMemoryFindQuery<T> : IFindQuery<T>
     {
         public IEnumerable<T> Find(object dataSource) => Find(dataSource as List<T>);
 

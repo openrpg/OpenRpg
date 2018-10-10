@@ -1,4 +1,4 @@
-namespace OpenRpg.Core.Types
+namespace OpenRpg.Core.Requirements
 {
     public static class DefaultRequirementTypes
     {

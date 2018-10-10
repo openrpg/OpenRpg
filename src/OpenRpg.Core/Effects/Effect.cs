@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Requirements;
 
-namespace OpenRpg.Effects
+namespace OpenRpg.Core.Effects
 {
     public class Effect : IHasRequirements
     {

@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Modifications;
 using OpenRpg.Core.Requirements;
-using OpenRpg.Effects;
-using OpenRpg.Items.Modifications;
+using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Items.Defaults
 {
@@ -15,6 +16,6 @@ namespace OpenRpg.Items.Defaults
         public string DescriptionLocaleId { get; set; }
         public IEnumerable<Requirement> Requirements { get; set; }
         public IEnumerable<Effect> Effects { get; set; }
-        public IEnumerable<IModificationAllowance> ModificationAllowances { get; set; }
+        public IEnumerable<ModificationAllowance> ModificationAllowances { get; set; }
     }
 }

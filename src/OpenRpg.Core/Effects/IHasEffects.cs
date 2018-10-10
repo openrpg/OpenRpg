@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace OpenRpg.Effects
+namespace OpenRpg.Core.Effects
 {
     public interface IHasEffects
     {

@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Core", "OpenRpg.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Items", "OpenRpg.Items\OpenRpg.Items.csproj", "{AB5563B9-CE48-49A4-BE3C-793351C7377F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Data", "OpenRpg.Data\OpenRpg.Data.csproj", "{BB417DEC-B2C9-4F60-9E87-2E674ACAD06F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Localization", "OpenRpg.Localization\OpenRpg.Localization.csproj", "{5C2FF42D-8E29-4EDE-84D0-47D24FFFFBB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{AB5563B9-CE48-49A4-BE3C-793351C7377F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB5563B9-CE48-49A4-BE3C-793351C7377F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB5563B9-CE48-49A4-BE3C-793351C7377F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB417DEC-B2C9-4F60-9E87-2E674ACAD06F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB417DEC-B2C9-4F60-9E87-2E674ACAD06F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB417DEC-B2C9-4F60-9E87-2E674ACAD06F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB417DEC-B2C9-4F60-9E87-2E674ACAD06F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C2FF42D-8E29-4EDE-84D0-47D24FFFFBB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C2FF42D-8E29-4EDE-84D0-47D24FFFFBB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C2FF42D-8E29-4EDE-84D0-47D24FFFFBB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C2FF42D-8E29-4EDE-84D0-47D24FFFFBB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
