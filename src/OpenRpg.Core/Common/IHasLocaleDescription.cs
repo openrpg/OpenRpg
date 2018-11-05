@@ -1,4 +1,4 @@
-namespace OpenRpg.Core.Localization
+namespace OpenRpg.Core.Common
 {
     public interface IHasLocaleDescription
     {

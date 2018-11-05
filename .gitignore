@@ -8,3 +8,4 @@ packages/
 *.nupkg
 /src/.vs
 /src/**/BenchmarkDotNet.Artifacts
+/_dist

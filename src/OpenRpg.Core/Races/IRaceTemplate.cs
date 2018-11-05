@@ -1,9 +1,8 @@
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
-using OpenRpg.Core.Localization;
 using OpenRpg.Core.Requirements;
 
-namespace OpenRpg.Core.Characters
+namespace OpenRpg.Core.Races
 {
     public interface IRaceTemplate : IHasDataId, IHasAssetCode, IHasEffects, IHasRequirements, IHasLocaleDescription
     {

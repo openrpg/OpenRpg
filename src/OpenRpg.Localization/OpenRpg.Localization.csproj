@@ -1,7 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <Version>0.0.0</Version>
+        <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+        <Title>OpenRpg.Localization</Title>
+        <Authors>Grofit (LP)</Authors>
+        <PackageLicenseUrl>https://github.com/openrpg/OpenRpg/blob/master/LICENSE</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/openrpg/OpenRpg</PackageProjectUrl>
+        <Description>Basic classes to assist in management of multi language content</Description>
+        <PackageTags>rpg game-development xna monogame unity godot</PackageTags>
     </PropertyGroup>
 
 </Project>

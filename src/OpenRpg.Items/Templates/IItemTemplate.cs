@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
-using OpenRpg.Core.Localization;
 using OpenRpg.Core.Modifications;
 using OpenRpg.Core.Requirements;
 

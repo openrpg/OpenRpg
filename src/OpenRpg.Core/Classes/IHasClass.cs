@@ -1,4 +1,4 @@
-namespace OpenRpg.Core.Characters
+namespace OpenRpg.Core.Classes
 {
     public interface IHasClass
     {

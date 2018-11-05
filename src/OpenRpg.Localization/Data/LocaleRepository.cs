@@ -1,4 +1,4 @@
-namespace OpenRpg.Core.Localization
+namespace OpenRpg.Localization.Data
 {
     public interface ILocaleRegistry 
     {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace OpenRpg.Core.Characters
+namespace OpenRpg.Core.Classes
 {
     public interface IHasMultiClass
     {
