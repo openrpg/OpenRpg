@@ -11,16 +11,17 @@ namespace OpenRpg.Genres.Fantasy.Types
         public static byte MagicDefenseBonus = 4;
             
         // General
-        public static byte DexterityBonus = 5;
-        public static byte IntelligenceBonus = 6;
-        public static byte StrengthBonus = 7;
-        public static byte ConstitutionBonus = 8;
-        public static byte CharismaBonus = 9;
-        public static byte HealthBonus = 10;
-        public static byte HealthRestore = 11;
-        public static byte MagicRestore = 12;
-        public static byte ExperienceRestore = 13;
-        public static byte MagicBonus = 14;
+        public static byte DexterityBonus = 10;
+        public static byte IntelligenceBonus = 11;
+        public static byte WisdomeBonus = 12;
+        public static byte StrengthBonus = 13;
+        public static byte ConstitutionBonus = 14;
+        public static byte CharismaBonus = 15;
+        public static byte HealthBonus = 16;
+        public static byte HealthRestore = 17;
+        public static byte MagicRestore = 18;
+        public static byte ExperienceRestore = 19;
+        public static byte MagicBonus = 20;
 
         // Melee Damage (Raw Damage)
         public static byte SlashingDamage = 25;

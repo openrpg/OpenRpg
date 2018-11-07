@@ -2,9 +2,9 @@ using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items;
 using OpenRpg.Items.Defaults;
 
-namespace OpenRpg.Genres.Fantasy.Equipment
+namespace OpenRpg.Genres.Fantasy.Equipment.Slots
 {
-    public class BackArmourSlot : DefaultEquipmentSlot<IItem>
+    public class BackSlot : DefaultEquipmentSlot<IItem>
     {
         public override int SlotType => ItemTypes.BackArmour;
     }

@@ -2,7 +2,7 @@ using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items;
 using OpenRpg.Items.Defaults;
 
-namespace OpenRpg.Genres.Fantasy.Equipment
+namespace OpenRpg.Genres.Fantasy.Equipment.Slots
 {
     public class LowerBodySlot : DefaultEquipmentSlot<IItem>
     {
