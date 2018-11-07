@@ -8,7 +8,7 @@ namespace OpenRpg.Items.Templates
 {
     public interface IItemTemplate : IHasDataId, IHasAssetCode, IHasLocaleDescription, IHasRequirements, IHasEffects, IAllowsModification
     {
-        int Type { get; }
-        int Value { get; }
+        int ItemType { get; }
+        int ItemValue { get; }
     }
 }

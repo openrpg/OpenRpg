@@ -21,7 +21,7 @@ namespace OpenRpg.Items.Defaults
         public bool EquipItemToSlot(TItem item)
         {
             if (item == null) { return false; }
-            if(item.ItemTemplate.Type != SlotType) { return false; }
+            if(item.ItemTemplate.ItemType != SlotType) { return false; }
             if (SlottedItem != null) { return false; }
 
             SlottedItem = item;

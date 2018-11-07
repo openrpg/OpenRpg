@@ -1,4 +1,4 @@
-set version=0.1.1
+set version=0.2.0
 dotnet pack ../src/OpenRpg.Core -c Release -o ../../_dist /p:version=%version%
 dotnet pack ../src/OpenRpg.Items -c Release -o ../../_dist /p:version=%version%
 dotnet pack ../src/OpenRpg.Localization -c Release -o ../../_dist /p:version=%version%

@@ -14,8 +14,10 @@ namespace OpenRpg.Genres.Fantasy.Types
         public static byte NeckItem = 8;
         public static byte RingItem = 9;
         public static byte Potions = 10;
-        public static byte GenericItem = 11;
-        public static byte GenericWeapon = 12;
-        public static byte OffhandItem = 13;
+        public static byte GenericWeapon = 11;
+        public static byte OffhandItem = 12;
+        public static byte GenericItem = 13;
+        public static byte CraftingMaterial = 14;
+
     }
 }
