@@ -1,6 +1,6 @@
 namespace OpenRpg.Genres.Fantasy.Types
 {
-    public static class BonusTypes
+    public class BonusTypes
     {
         public static byte UnknownBonus = 0;
             

@@ -1,6 +1,6 @@
 namespace OpenRpg.Genres.Fantasy.Types
 {
-    public static class RequirementTypes
+    public class RequirementTypes
     {
         public static byte UnknownRequirement = 0;
         

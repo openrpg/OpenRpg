@@ -1,6 +1,6 @@
 namespace OpenRpg.Genres.Fantasy.Types
 {
-    public static class DamageTypes
+    public class DamageTypes
     {
         public static byte UnknownDamage = 0;
 

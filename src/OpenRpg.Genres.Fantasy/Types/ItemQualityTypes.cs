@@ -1,6 +1,6 @@
 namespace OpenRpg.Genres.Fantasy.Types
 {
-    public static class ItemQualityTypes
+    public class ItemQualityTypes
     {
         public static byte UnknownQuality = 0;
 

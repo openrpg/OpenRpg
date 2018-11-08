@@ -1,6 +1,6 @@
 namespace OpenRpg.Genres.Fantasy.Types
 {
-    public static class ModificationTypes
+    public class ModificationTypes
     {
         public static byte UnknownModification = 0;
 
