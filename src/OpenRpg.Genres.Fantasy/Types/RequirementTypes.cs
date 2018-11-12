@@ -18,7 +18,7 @@ namespace OpenRpg.Genres.Fantasy.Types
         public static byte StrengthRequirement = 12;
         public static byte DexterityRequirement = 13;
         public static byte ConstitutionRequirement = 14;
-        public static byte byteelligenceRequirement = 15;
+        public static byte IntlligenceRequirement = 15;
         public static byte GenderRequirement = 16;
         public static byte QuestActiveRequirement = 17;
     }
