@@ -12,8 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Items", "Items", "{7C187634-FF6B-4A6E-AAD2-FCA3C97C1E5A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Combat", "Combat", "{10FFBEDF-00E5-44C4-AB81-05F2CA83CE1E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Genres", "Genres", "{C1690CB5-AF8E-4657-992B-5069FCCABD1E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Genres.Fantasy", "OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj", "{9F45DCD0-D4E9-4632-8E43-993953BC2010}"

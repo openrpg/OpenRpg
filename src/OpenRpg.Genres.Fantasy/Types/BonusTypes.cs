@@ -13,7 +13,7 @@ namespace OpenRpg.Genres.Fantasy.Types
         // General
         public static byte DexterityBonus = 10;
         public static byte IntelligenceBonus = 11;
-        public static byte WisdomeBonus = 12;
+        public static byte WisdomBonus = 12;
         public static byte StrengthBonus = 13;
         public static byte ConstitutionBonus = 14;
         public static byte CharismaBonus = 15;
