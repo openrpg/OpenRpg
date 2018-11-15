@@ -2,11 +2,11 @@ namespace OpenRpg.Genres.Fantasy.Stats.Attributes
 {
     public interface IAttributeStats
     {
-        byte Strength { get; }
-        byte Dexterity { get; }
-        byte Constitution { get; }
-        byte Intelligence { get; }
-        byte Wisdom { get; }
-        byte Charisma { get; }
+        int Strength { get; }
+        int Dexterity { get; }
+        int Constitution { get; }
+        int Intelligence { get; }
+        int Wisdom { get; }
+        int Charisma { get; }
     }
 }

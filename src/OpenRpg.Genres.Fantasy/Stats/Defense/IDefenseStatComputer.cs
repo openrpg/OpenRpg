@@ -6,6 +6,6 @@ namespace OpenRpg.Genres.Fantasy.Stats.Defense
 {
     public interface IDefenseStatComputer
     {
-        IDefenseStats ComputeStats(IDefenseStats baseDefenseStats, IAttributeStats baseAttributeStats, ICollection<Effect> effects);
+        IDefenseStats ComputeStats(IAttributeStats baseAttributeStats, ICollection<Effect> effects);
     }
 }

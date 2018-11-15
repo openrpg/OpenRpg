@@ -29,8 +29,8 @@ namespace OpenRpg.Genres.Fantasy.Defaults
             return new CharacterStats
             {
                 AttributeStats = attributeStats,
-                DefenseStats = DefenseStatComputer.ComputeStats(DefenseStats.Default, attributeStats, effects),
-                DamageStats = DamageStatComputer.ComputeStats(DamageStats.Default, attributeStats, effects),
+                DefenseStats = DefenseStatComputer.ComputeStats(attributeStats, effects),
+                DamageStats = DamageStatComputer.ComputeStats(attributeStats, effects),
                 VitalStats = VitalStatsComputer.ComputeStats(VitalStats.Default, attributeStats, effects)
             };
         }

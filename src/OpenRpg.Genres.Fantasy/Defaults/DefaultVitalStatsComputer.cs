@@ -12,7 +12,7 @@ namespace OpenRpg.Genres.Fantasy.Defaults
         public IVitalStats ComputeStats(IVitalStats baseVitalStats, IAttributeStats baseAttributeStats, ICollection<Effect> effects)
         {
             var constitutionBonus = baseAttributeStats.Constitution * 5;
-            var effectBonus = effects.GetPotencyFor(BonusTypes.HealthBonus);
+            var effectBonus = effects.GetPotencyFor(EffectTypes.HealthBonusAmount);
             var maxHealthStat = baseVitalStats.MaxHealth + constitutionBonus + effectBonus;
 
             return new VitalStats

@@ -2,12 +2,12 @@ namespace OpenRpg.Genres.Fantasy.Stats.Attributes
 {
     public class AttributeStats : IAttributeStats
     {
-        public byte Strength { get; set; }
-        public byte Dexterity { get; set; }
-        public byte Constitution { get; set; }
-        public byte Intelligence { get; set; }
-        public byte Wisdom { get; set; }
-        public byte Charisma { get; set; }
+        public int Strength { get; set; }
+        public int Dexterity { get; set; }
+        public int Constitution { get; set; }
+        public int Intelligence { get; set; }
+        public int Wisdom { get; set; }
+        public int Charisma { get; set; }
 
         public static IAttributeStats Default { get; } = new AttributeStats
         {

@@ -2,10 +2,10 @@ namespace OpenRpg.Genres.Fantasy.Types
 {
     public class ModificationTypes
     {
-        public static byte UnknownModification = 0;
+        public static int UnknownModification = 0;
 
-        public static byte EnchantmentModification = 1;
-        public static byte GemModification = 2;
-        public static byte RuneModification = 3;
+        public static int EnchantmentModification = 1;
+        public static int GemModification = 2;
+        public static int RuneModification = 3;
     }
 }

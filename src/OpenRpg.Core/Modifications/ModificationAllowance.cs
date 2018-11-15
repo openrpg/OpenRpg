@@ -5,7 +5,7 @@ namespace OpenRpg.Core.Modifications
         public int AmountAllowed { get; }
         public int ModificationType { get; }
 
-        public ModificationAllowance(int amountAllowed, int modificationType)
+        public ModificationAllowance(int modificationType, int amountAllowed)
         {
             AmountAllowed = amountAllowed;
             ModificationType = modificationType;

@@ -6,18 +6,10 @@ namespace OpenRpg.Core.Extensions
 {
     public static class EffectExtensions
     {
-        public static byte GetPotencyFor(this IEnumerable<Effect> effects, byte effectType)
-        { return (byte)effects.Where(x => x.EffectType == effectType).Sum(x => x.Potency); }
-
-        public static float GetTotalFor(this ICollection<Effect> effects, byte valueType, byte bonusType)
-        {
-            var baseValue = effects.GetPotencyFor(valueType);
-            if(baseValue == 0) { return 0; }
-
-            var bonus = effects.GetPotencyFor(bonusType);
-            if(bonus == 0){ bonus = 1; }
-            
-            return baseValue * bonus;
-        }
+        public static int GetPotencyFor(this IEnumerable<Effect> effects, int effectType)
+        { return (int)effects.Where(x => x.EffectType == effectType).Sum(x => x.Potency); }
+        
+        public static int GetPotencyFor(this IEnumerable<Effect> effects, params int[] effectTypes)
+        { return (int)effects.Where(x => effectTypes.Contains(x.EffectType)).Sum(x => x.Potency); }
     }
 }

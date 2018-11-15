@@ -2,22 +2,22 @@ namespace OpenRpg.Genres.Fantasy.Types
 {
     public class ItemTypes
     {
-        public static byte UnknownItem = 0;
+        public static int UnknownItem = 0;
 
-        public static byte QuestItem = 1;
-        public static byte HeadItem = 2;
-        public static byte UpperBodyArmour = 3;
-        public static byte LowerBodyArmour = 4;
-        public static byte BackArmour = 5;
-        public static byte FootArmour = 6;
-        public static byte WristItem = 7;
-        public static byte NeckItem = 8;
-        public static byte RingItem = 9;
-        public static byte Potions = 10;
-        public static byte GenericWeapon = 11;
-        public static byte OffhandItem = 12;
-        public static byte GenericItem = 13;
-        public static byte CraftingMaterial = 14;
+        public static int QuestItem = 1;
+        public static int HeadItem = 2;
+        public static int UpperBodyArmour = 3;
+        public static int LowerBodyArmour = 4;
+        public static int BackArmour = 5;
+        public static int FootArmour = 6;
+        public static int WristItem = 7;
+        public static int NeckItem = 8;
+        public static int RingItem = 9;
+        public static int Potions = 10;
+        public static int GenericWeapon = 11;
+        public static int OffhandItem = 12;
+        public static int GenericItem = 13;
+        public static int CraftingMaterial = 14;
 
     }
 }

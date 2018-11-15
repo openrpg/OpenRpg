@@ -7,10 +7,10 @@ namespace OpenRpg.Genres.Fantasy.Extensions
 {
     public struct StatReference
     {
-        public byte StatType;
+        public int StatType;
         public float StatValue;
 
-        public StatReference(byte statType, float statValue)
+        public StatReference(int statType, float statValue)
         {
             StatType = statType;
             StatValue = statValue;

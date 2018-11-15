@@ -8,14 +8,23 @@ namespace OpenRpg.Genres.Fantasy.Defaults
 {
     public class DefaultAttributeStatComputer : IAttributeStatComputer
     {
-        public IAttributeStats ComputeStats(IAttributeStats baseAttributeStats, ICollection<Effect> activeEffects)
+        public int CalculateBonusFor(int baseStat, int amountBonusType, int percentageBonusType, ICollection<Effect> activeEffects)
         {
-            var strengthAugmentation = activeEffects.GetPotencyFor(BonusTypes.StrengthBonus);
-            var dexterityAugmentation = activeEffects.GetPotencyFor(BonusTypes.DexterityBonus);
-            var constitutionAugmentation = activeEffects.GetPotencyFor(BonusTypes.ConstitutionBonus);
-            var intelligenceAugmentation = activeEffects.GetPotencyFor(BonusTypes.IntelligenceBonus);
-            var wisdomAugmentation = activeEffects.GetPotencyFor(BonusTypes.WisdomBonus);
-            var charismaAugmentation = activeEffects.GetPotencyFor(BonusTypes.CharismaBonus);
+            var percentageBonus = activeEffects.GetPotencyFor(percentageBonusType);
+            if(percentageBonus != 0) { percentageBonus = percentageBonusType / 100; }
+
+            var amountAugmentation = baseStat * percentageBonus;
+            return activeEffects.GetPotencyFor(amountBonusType) + amountAugmentation;
+        }
+        
+        public IAttributeStats ComputeStats(IAttributeStats baseAttributeStats, ICollection<Effect> activeEffects)
+        {           
+            var strengthAugmentation = CalculateBonusFor(baseAttributeStats.Strength, EffectTypes.StrengthBonusAmount, EffectTypes.StrengthBonusPercentage, activeEffects);
+            var dexterityAugmentation = CalculateBonusFor(baseAttributeStats.Strength, EffectTypes.DexterityBonusAmount, EffectTypes.DexterityBonusPercentage, activeEffects);
+            var constitutionAugmentation = CalculateBonusFor(baseAttributeStats.Strength, EffectTypes.ConstitutionBonusAmount, EffectTypes.ConstitutionBonusPercentage, activeEffects);
+            var intelligenceAugmentation = CalculateBonusFor(baseAttributeStats.Strength, EffectTypes.IntelligenceBonusAmount, EffectTypes.IntelligenceBonusPercentage, activeEffects);
+            var wisdomAugmentation = CalculateBonusFor(baseAttributeStats.Strength, EffectTypes.WisdomBonusAmount, EffectTypes.WisdomBonusPercentage, activeEffects);
+            var charismaAugmentation = CalculateBonusFor(baseAttributeStats.Strength, EffectTypes.CharismaBonusAmount, EffectTypes.CharismaBonusPercentage, activeEffects);
 
             return new AttributeStats
             {

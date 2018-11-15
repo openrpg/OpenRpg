@@ -2,14 +2,16 @@ namespace OpenRpg.Genres.Fantasy.Types
 {
     public class ObjectiveTypes
     {
-        public static byte UnknownObjective = 0;
+        public static int UnknownObjective = 0;
        
-        public static byte ItemObjective = 1;
-        public static byte GoldObjective = 2;
-        public static byte TriggerObjective = 3;
-        public static byte LevelObjective = 4;
-        public static byte ClassObjective = 5;
-        public static byte EffectObjective = 6;
-        public static byte QuestObjective = 6;
+        public static int ItemObjective = 1;
+        public static int GoldObjective = 2;
+        public static int TriggerObjective = 3;
+        public static int LevelObjective = 4;
+        public static int ClassObjective = 5;
+        public static int EffectObjective = 6;
+        public static int QuestObjective = 6;
+        public static int EnemyDefeatedObjective = 7;
+        public static int EnemySightedObjective = 8;
     }
 }
