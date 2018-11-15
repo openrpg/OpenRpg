@@ -8,23 +8,16 @@ namespace OpenRpg.Core.Effects
         /// <summary>
         /// The effect type to apply
         /// </summary>
-        public int EffectType { get; }
+        public int EffectType { get; set; }
         
         /// <summary>
         /// The potency of the effect
         /// </summary>
-        public float Potency { get; }
+        public float Potency { get; set; }
 
         /// <summary>
         /// The applicable requirements for this effect to be active
         /// </summary>
-        public IEnumerable<Requirement> Requirements { get; }
-
-        public Effect(int effectType, float potency, IEnumerable<Requirement> requirements = null)
-        {
-            EffectType = effectType;
-            Potency = potency;
-            Requirements = requirements ?? new Requirement[0];
-        }
+        public IEnumerable<Requirement> Requirements { get; set; } = new Requirement[0];
     }
 }
