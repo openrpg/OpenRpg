@@ -17,6 +17,21 @@ namespace OpenRpg.Genres.Fantasy.Extensions
             return item.ItemTemplate.Effects.Union(item.Modifications.SelectMany(x => x.Effects));
         }
 
+        public static IEnumerable<IEquipmentSlot<IItem>> GetEquipmentSlots(this IEquipment equipment)
+        {
+            yield return equipment.BackSlot;
+            yield return equipment.FootSlot;
+            yield return equipment.HeadSlot;
+            yield return equipment.NeckSlot;
+            yield return equipment.Ring1Slot;
+            yield return equipment.Ring2Slot;
+            yield return equipment.WristSlot;
+            yield return equipment.OffHandSlot;
+            yield return equipment.MainHandSlot;
+            yield return equipment.LowerBodySlot;
+            yield return equipment.UpperBodySlot;
+        }
+
         private static void ProcessEquipmentSlot(IEquipmentSlot<IItem> equipmentSlot, List<Effect> effectList)
         {
             if(equipmentSlot.SlottedItem == null) { return; }

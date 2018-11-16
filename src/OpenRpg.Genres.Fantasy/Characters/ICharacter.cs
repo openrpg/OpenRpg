@@ -8,6 +8,7 @@ namespace OpenRpg.Genres.Fantasy.Characters
 {
     public interface ICharacter : IHasDataId, IHasAssetCode, IHasLocaleDescription
     {
+        byte GenderType { get; }
         ActiveStats ActiveStats { get; }
         IClass Class { get; }
         IRaceTemplate Race { get; }

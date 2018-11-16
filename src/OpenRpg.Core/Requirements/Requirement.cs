@@ -1,9 +1,11 @@
+using OpenRpg.Core.Common;
+
 namespace OpenRpg.Core.Requirements
 {
     /// <summary>
     /// Represents a requirement that must be met 
     /// </summary>
-    public class Requirement
+    public class Requirement : IHasAssociation
     {
         /// <summary>
         /// The type of requirement that needs to be met
@@ -11,10 +13,16 @@ namespace OpenRpg.Core.Requirements
         public int RequirementType { get; set; }
         
         /// <summary>
-        /// The required value for the given type
+        /// The associated id for the requirement
+        /// i.e Requires item id 1
+        /// </summary>
+        /// <remarks>This may be empty in some cases depending on requirement type</remarks>
+        public int AssociatedId { get; set; }
+        
+        /// <summary>
+        /// The associated value for the associated type (or requirement type)
         /// i.e Requires Level > 5, with the requirement type indicating level, and the value being 5
         /// </summary>
-        /// <remarks>The value is an int so it can be used for ids, as well as numeric values</remarks>
-        public int RequirementValue { get; set; }
+        public int AssociatedValue { get; set; }
     }
 }
