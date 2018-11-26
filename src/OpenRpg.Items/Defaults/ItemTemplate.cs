@@ -6,10 +6,11 @@ using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Items.Defaults
 {
-    public class ItemTemplate : IItemTemplate
+    public class ItemTemplate : IItemTemplate, IWithItemQuality
     {
         public int Id { get; set; }
         public int ItemType { get; set;  }
+        public int ItemQualityType { get; }
         public int ItemValue { get; set; }
         public string AssetCode { get; set; }
         public string NameLocaleId { get; set; }
