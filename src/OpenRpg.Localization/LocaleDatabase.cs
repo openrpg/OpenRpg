@@ -4,8 +4,7 @@ namespace OpenRpg.Localization
 {
     public class LocaleDatabase : ILocaleDatabase
     {
-        public IDictionary<string, ILocaleDataset> LocaleDatasets { get; set; }
-        public string LocaleCode { get; set; }
+        public IDictionary<string, ILocaleDataset> LocaleDatasets { get; set; } = new Dictionary<string, ILocaleDataset>();
 
         public ILocaleDataset GetDataset(string localeCode)
         { 
