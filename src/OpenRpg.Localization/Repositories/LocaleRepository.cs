@@ -11,6 +11,9 @@ namespace OpenRpg.Localization.Repositories
         public string Retrieve(string id)
         { return LocaleDatastore[id]; }
 
+        public bool Has(string id)
+        { return LocaleDatastore.ContainsKey(id); }
+
         public IEnumerable<string> Find(IFindQuery<string> query)
         { return query.Find(LocaleDatastore); }
 
