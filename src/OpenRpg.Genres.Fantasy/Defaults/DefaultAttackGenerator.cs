@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using OpenRpg.Combat.Attacks;
 using OpenRpg.Core.Utils;
 using OpenRpg.Genres.Fantasy.Combat;
 using OpenRpg.Genres.Fantasy.Extensions;

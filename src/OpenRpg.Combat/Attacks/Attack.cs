@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace OpenRpg.Genres.Fantasy.Combat
+namespace OpenRpg.Combat.Attacks
 {
     public class Attack
     {
