@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using OpenRpg.Combat.Attacks;
+using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Genres.Fantasy.Combat;
+using OpenRpg.Genres.Fantasy.Effects;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Stats.Attributes;
 using OpenRpg.Genres.Fantasy.Stats.Defense;

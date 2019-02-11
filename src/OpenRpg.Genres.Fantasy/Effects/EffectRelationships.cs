@@ -1,6 +1,7 @@
+using OpenRpg.Combat.Attacks;
 using OpenRpg.Genres.Fantasy.Types;
 
-namespace OpenRpg.Genres.Fantasy.Combat
+namespace OpenRpg.Genres.Fantasy.Effects
 {
     public class EffectRelationships
     {

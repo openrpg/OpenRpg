@@ -1,4 +1,4 @@
-namespace OpenRpg.Genres.Fantasy.Combat
+namespace OpenRpg.Combat.Attacks
 {
     public class Damage
     {

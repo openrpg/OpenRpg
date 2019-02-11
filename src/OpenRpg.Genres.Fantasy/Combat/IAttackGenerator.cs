@@ -1,3 +1,4 @@
+using OpenRpg.Combat.Attacks;
 using OpenRpg.Genres.Fantasy.Stats.Damage;
 
 namespace OpenRpg.Genres.Fantasy.Combat
