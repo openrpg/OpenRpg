@@ -11,8 +11,4 @@
         <PackageTags>rpg game-development xna monogame unity godot</PackageTags>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="Contexts" />
-    </ItemGroup>
-
 </Project>

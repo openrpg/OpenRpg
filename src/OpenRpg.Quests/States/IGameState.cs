@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-namespace OpenRpg.Genres.Fantasy.Player
+namespace OpenRpg.Quests.States
 {
-    public interface IPlayerState
+    public interface IGameState
     {
         IDictionary<int, bool> Triggers { get; }
         IDictionary<int, int> QuestStates { get; }

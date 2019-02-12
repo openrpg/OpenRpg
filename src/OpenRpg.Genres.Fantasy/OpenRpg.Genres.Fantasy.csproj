@@ -14,6 +14,11 @@
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.Combat\OpenRpg.Combat.csproj" />
       <ProjectReference Include="..\OpenRpg.Items\OpenRpg.Items.csproj" />
+      <ProjectReference Include="..\OpenRpg.Quests\OpenRpg.Quests.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Combat" />
     </ItemGroup>
 
 </Project>

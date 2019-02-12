@@ -3,7 +3,7 @@ using OpenRpg.Genres.Fantasy.Types;
 
 namespace OpenRpg.Genres.Fantasy.Effects
 {
-    public class EffectRelationships
+    public static class EffectRelationships
     {
         public static EffectRelationship IceDamageRelationship => new EffectRelationship
         {

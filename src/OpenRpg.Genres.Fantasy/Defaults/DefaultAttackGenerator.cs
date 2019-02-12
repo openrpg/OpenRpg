@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Combat.Attacks;
+using OpenRpg.Combat.Processors;
+using OpenRpg.Core.Stats;
 using OpenRpg.Core.Utils;
-using OpenRpg.Genres.Fantasy.Combat;
 using OpenRpg.Genres.Fantasy.Extensions;
-using OpenRpg.Genres.Fantasy.Stats.Damage;
 
 namespace OpenRpg.Genres.Fantasy.Defaults
 {
@@ -20,10 +20,10 @@ namespace OpenRpg.Genres.Fantasy.Defaults
         public float GenerateRandomFrom(float maximumValue, float startFrom = 0.75f)
         { return Randomizer.Random(maximumValue * startFrom, maximumValue); }
 
-        public Attack GenerateAttack(IDamageStats damageStats)
+        public Attack GenerateAttack(IEntityStats stats)
         {
             var damages = new List<Damage>();
-            var applicableDamages = damageStats.AsList().Where(x => x.StatValue != 0);
+            var applicableDamages = stats.GetDamageReferences().Where(x => x.StatValue != 0);
 
             foreach (var applicableDamage in applicableDamages)
             {
