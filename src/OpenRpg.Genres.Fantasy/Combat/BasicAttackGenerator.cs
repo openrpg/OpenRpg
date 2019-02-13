@@ -6,13 +6,13 @@ using OpenRpg.Core.Stats;
 using OpenRpg.Core.Utils;
 using OpenRpg.Genres.Fantasy.Extensions;
 
-namespace OpenRpg.Genres.Fantasy.Defaults
+namespace OpenRpg.Genres.Fantasy.Combat
 {
-    public class DefaultAttackGenerator : IAttackGenerator
+    public class BasicAttackGenerator : IAttackGenerator
     {
         public IRandomizer Randomizer { get; }
 
-        public DefaultAttackGenerator(IRandomizer randomizer)
+        public BasicAttackGenerator(IRandomizer randomizer)
         {
             Randomizer = randomizer;
         }

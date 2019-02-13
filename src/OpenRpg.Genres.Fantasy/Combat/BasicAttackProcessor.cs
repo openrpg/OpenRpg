@@ -5,7 +5,7 @@ using OpenRpg.Combat.Processors;
 using OpenRpg.Core.Stats;
 using OpenRpg.Genres.Fantasy.Extensions;
 
-namespace OpenRpg.Genres.Fantasy.Defaults
+namespace OpenRpg.Genres.Fantasy.Combat
 {
     public class DefaultAttackProcessor : IAttackProcessor
     {
