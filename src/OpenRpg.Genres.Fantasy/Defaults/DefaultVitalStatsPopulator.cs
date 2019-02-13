@@ -14,7 +14,10 @@ namespace OpenRpg.Genres.Fantasy.Defaults
         {
             var constitutionBonus = stats.Constitution() * 5;
             var effectBonus = activeEffects.GetPotencyFor(EffectTypes.HealthBonusAmount);
-            var maxHealthStat = stats.MaxHealth() + constitutionBonus + effectBonus;
+            var effectBonusPercentage = activeEffects.GetPotencyFor(EffectTypes.HealthBonusPercentage);
+            var maxHealthStat = constitutionBonus + effectBonus;
+            var additionalHealth = maxHealthStat * effectBonusPercentage;
+            maxHealthStat += additionalHealth;
 
             stats.Health(maxHealthStat);
             stats.MaxHealth(maxHealthStat);

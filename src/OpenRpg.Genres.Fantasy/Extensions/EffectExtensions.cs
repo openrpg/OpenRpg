@@ -11,7 +11,7 @@ namespace OpenRpg.Genres.Fantasy.Extensions
             var totalAmount = activeEffects.GetPotencyFor(amountBonusType) + miscBonus;
             var percentageBonus = activeEffects.GetPotencyFor(percentageBonusType);
             var totalBonus = totalAmount * percentageBonus;
-            return totalAmount * totalBonus;
+            return totalAmount + totalBonus;
         }
     }
 }
