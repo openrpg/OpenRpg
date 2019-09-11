@@ -6,6 +6,7 @@ namespace OpenRpg.Quests
 {
     public interface IQuest : IHasDataId, IHasRequirements, IHasLocaleDescription, IHasAssetCode
     {
+        bool IsRepeatable { get; }
         IEnumerable<Objective> Objectives { get; }
         IEnumerable<Reward> Rewards { get; }
         IEnumerable<Reward> Gifts { get; }
