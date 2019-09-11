@@ -3,7 +3,7 @@ using OpenRpg.Core.Requirements;
 
 namespace OpenRpg.Quests.Defaults.Conventions
 {
-    public class ConventionalQuest
+    public class ConventionalQuest : IConventionalQuest
     {
         public int Id { get; set; }
         public string AssetCode { get; set; }
