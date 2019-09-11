@@ -5,6 +5,6 @@ namespace OpenRpg.Core.Stats
 {
     public interface IStatPopulator
     {
-        void PopulateStats(IEntityStats stats, ICustomStatData customStatData, IReadOnlyCollection<Effect> activeEffects);
+        void PopulateStats(IEntityStats stats, IReadOnlyCollection<Effect> activeEffects);
     }
 }
