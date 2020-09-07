@@ -9,13 +9,20 @@ namespace OpenRpg.Data.Defaults
     /// <summary>
     /// A simple implementation of a repository 
     /// </summary>
+    /// <remarks>
+    /// It is expected that you would provide a populated enumerable to the constructor for most use cases here as the
+    /// data source, however you can extend it and built up the data internally if required for hard coded scenarios.
+    /// </remarks>
     /// <typeparam name="T">Entity type</typeparam>
     public abstract class InMemoryRepository<T,K> : IRepository<T,K>
     {
-        public List<T> Data { get; }
+        public List<T> Data { get; protected set; }
 
         public InMemoryRepository(IEnumerable<T> data)
         { Data = data.ToList(); }
+        
+        protected InMemoryRepository() 
+        { Data = new List<T>(); }
 
         protected abstract K GetKeyFromEntity(T entity);
         
