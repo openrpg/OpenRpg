@@ -4,6 +4,7 @@ An attempt to provide some out of the box models/logic for RPG games.
 
 [![Build Status][build-status-image]][build-status-url]
 [![Nuget Version][nuget-image]][nuget-url]
+[![Join Discord Chat][discord-image]][discord-url]
 
 The hope is that they can be mixed and matched to allow you to get on with just making the game without worrying about the infrastructure. This way rather than providing one solution for everything, it just provides the building blocks for you to compose as you wish, so you can make your own character class which has a race, class and an inventory that is weight based, or you could make a character class which has no race, a list of classes so they can multi class and an inventory that is slot based.
 
@@ -35,6 +36,11 @@ Contains models around common quest data such as rewards, gifts, triggers etc
 
 This is still very much a work in progress, so feel free to make requests or PRs if you think more scenarios could be supported, going forward more stuff will be added and improved around combat, buffs, skills and other genres etc.
 
+## HALP! HOW DO I USE IT?
+
+You can join the discord link at the top or you can go over to the web demos
+- [OpenRpg.Demos.Web](https://openrpg.github.io/OpenRpg.Demos.Web)
+
 ## Related Libs
 
 There are a few other related libraries/applications which may be of use, such as pre-made genre libraries.
@@ -57,3 +63,5 @@ So hopefully the same models/data and approaches can be of use to anyone else wa
 [build-status-url]: https://ci.appveyor.com/project/grofit/openrpg/branch/master
 [nuget-image]: https://img.shields.io/nuget/v/openrpg.core.svg
 [nuget-url]: https://www.nuget.org/packages/OpenRpg.Core/
+[discord-image]: https://img.shields.io/discord/488609938399297536.svg
+[discord-url]: https://discord.gg/nKejjgT
