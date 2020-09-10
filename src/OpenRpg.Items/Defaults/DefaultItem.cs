@@ -9,7 +9,7 @@ namespace OpenRpg.Items.Defaults
     {
         public string NameOverride { get; set; }
         public int Amount { get; set; }
-        public IItemTemplate ItemTemplate { get; } = new ConventionalItemTemplate();
-        public IEnumerable<IModification> Modifications { get; } = new List<IModification>();
+        public IItemTemplate ItemTemplate { get; set; } = new ConventionalItemTemplate();
+        public IEnumerable<IModification> Modifications { get; set;} = new List<IModification>();
     }
 }
