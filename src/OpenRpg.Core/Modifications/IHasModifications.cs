@@ -6,9 +6,4 @@ namespace OpenRpg.Core.Modifications
     {
         IEnumerable<IModification> Modifications { get; }
     }
-
-    public interface IAllowsModification
-    {
-        IEnumerable<ModificationAllowance> ModificationAllowances { get; }
-    }
 }

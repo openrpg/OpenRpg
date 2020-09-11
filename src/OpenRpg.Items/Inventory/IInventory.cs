@@ -8,5 +8,6 @@ namespace OpenRpg.Items.Inventory
         bool RemoveItem(IItem itemToRemove);
 
         IReadOnlyCollection<IItem> Items { get; }
+        IInventoryVariables Variables { get; }
     }
 }

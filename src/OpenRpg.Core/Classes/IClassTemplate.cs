@@ -6,6 +6,6 @@ namespace OpenRpg.Core.Classes
 {
     public interface IClassTemplate : IHasDataId, IHasAssetCode, IHasEffects, IHasRequirements, IHasLocaleDescription
     {
-
+        IClassTemplateVariables Variables { get; }
     }
 }

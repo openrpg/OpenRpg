@@ -5,6 +5,6 @@ namespace OpenRpg.Core.Stats
 {
     public interface IStatsComputer
     {
-        IEntityStats ComputeStats(IReadOnlyCollection<Effect> effects);
+        IStatsVariables ComputeStats(IReadOnlyCollection<Effect> effects);
     }
 }

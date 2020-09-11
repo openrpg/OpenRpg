@@ -6,6 +6,6 @@ namespace OpenRpg.Core.Races
 {
     public interface IRaceTemplate : IHasDataId, IHasAssetCode, IHasEffects, IHasRequirements, IHasLocaleDescription
     {
-        
+        IRaceTemplateVariables Variables { get; }
     }
 }

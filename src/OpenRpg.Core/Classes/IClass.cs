@@ -4,5 +4,6 @@ namespace OpenRpg.Core.Classes
     {
         int Level { get; }
         IClassTemplate ClassTemplate { get; }
+        IClassVariables Variables { get; }
     }
 }

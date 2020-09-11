@@ -5,6 +5,6 @@ namespace OpenRpg.Combat.Processors
 {
     public interface IAttackProcessor
     {
-        ProcessedAttack ProcessAttack(Attack attack, IEntityStats stats);
+        ProcessedAttack ProcessAttack(Attack attack, IStatsVariables stats);
     }
 }

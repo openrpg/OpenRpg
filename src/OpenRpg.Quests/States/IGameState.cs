@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Variables;
 
 namespace OpenRpg.Quests.States
 {
     public interface IGameState
     {
-        IDictionary<int, bool> Triggers { get; }
-        IDictionary<int, int> QuestStates { get; }
+        IVariables<bool> Triggers { get; }
+        IVariables<int> QuestStates { get; }
     }
 }

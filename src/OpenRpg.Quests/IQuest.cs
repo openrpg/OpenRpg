@@ -10,5 +10,6 @@ namespace OpenRpg.Quests
         IEnumerable<Objective> Objectives { get; }
         IEnumerable<Reward> Rewards { get; }
         IEnumerable<Reward> Gifts { get; }
+        IQuestVariables Variables { get; }
     }
 }
