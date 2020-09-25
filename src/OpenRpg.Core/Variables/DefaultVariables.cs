@@ -6,6 +6,8 @@ namespace OpenRpg.Core.Variables
     {
         public IDictionary<int, T> InternalVariables { get; set; } = new Dictionary<int, T>();
         
+        public event VariableChangedEventHandler<T> OnVariableChanged;
+
         public T GetVariable(int key) => InternalVariables[key];
         public void AddVariable(int key, T value) => InternalVariables.Add(key, value);
         public void RemoveVariable(int key) => InternalVariables.Remove(key);
@@ -14,7 +16,12 @@ namespace OpenRpg.Core.Variables
         public T this[int index]
         {
             get => InternalVariables[index];
-            set => InternalVariables[index] = value;
+            set
+            {
+                var oldValue = InternalVariables.ContainsKey(index) ? InternalVariables[index] : default;
+                InternalVariables[index] = value;
+                OnVariableChanged?.Invoke(this, new VariableChangedEventArgs<T>(index, oldValue, value));
+            }
         }
     }
 }

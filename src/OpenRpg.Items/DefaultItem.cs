@@ -8,6 +8,6 @@ namespace OpenRpg.Items
     {
         public IItemTemplate ItemTemplate { get; set; } = new DefaultItemTemplate();
         public IEnumerable<IModification> Modifications { get; set;} = new List<IModification>();
-        public IItemVariables Variables { get; set; }
+        public IItemVariables Variables { get; set; } = new DefaultItemVariables();
     }
 }
