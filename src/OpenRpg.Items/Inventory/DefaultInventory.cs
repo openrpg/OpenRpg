@@ -23,7 +23,7 @@ namespace OpenRpg.Items.Inventory
 
             if(item.Variables.HasVariable(ItemVariableTypes.Amount))
             { duplicatedVariables.Amount(item.Variables.Amount()); }
-
+            
             return new DefaultItem
             {
                 Modifications = item.Modifications.ToArray(),
@@ -34,33 +34,34 @@ namespace OpenRpg.Items.Inventory
 
         public bool AddItem(IItem itemToAdd)
         {
-            if (itemToAdd.ItemTemplate.Variables.HasVariable(ItemTemplateVariableTypes.MaxStacks))
-            { return AttemptAddAmountItem(itemToAdd); }
+            var item = CloneItem(itemToAdd);
+            
+            if (item.ItemTemplate.Variables.HasVariable(ItemTemplateVariableTypes.MaxStacks))
+            { return AttemptAddAmountItem(item); }
 
-            if (itemToAdd.ItemTemplate.Variables.HasVariable(ItemTemplateVariableTypes.Weight))
-            { return HasWeightCapacity(itemToAdd.ItemTemplate.Variables.Weight()) && AttemptAddWeightedItem(itemToAdd); }
+            if (item.ItemTemplate.Variables.HasVariable(ItemTemplateVariableTypes.Weight))
+            { return HasWeightCapacity(item.ItemTemplate.Variables.Weight()) && AttemptAddWeightedItem(item); }
 
             if (!HasSlotCapacity())
             { return false; }
 
-            _items.Add(itemToAdd);
+            _items.Add(item);
             return true;
         }
 
         private bool AttemptAddAmountItem(IItem itemToAdd)
         {
-            var item = CloneItem(itemToAdd);
-            if (!item.Variables.HasVariable(ItemVariableTypes.Amount))
+            if (!itemToAdd.Variables.HasVariable(ItemVariableTypes.Amount))
             {
                 if (!HasSlotCapacity())
                 { return false; }
 
-                _items.Add(item);
+                _items.Add(itemToAdd);
                 return true;
             }
 
             var currentMinimumStackItem = _items
-                .Where(x => x.ItemTemplate.Id == item.ItemTemplate.Id)
+                .Where(x => x.ItemTemplate.Id == itemToAdd.ItemTemplate.Id)
                 .OrderBy(x => x.Variables.Amount())
                 .Take(1)
                 .SingleOrDefault();
@@ -70,12 +71,12 @@ namespace OpenRpg.Items.Inventory
                 if (!HasSlotCapacity())
                 { return false; }
 
-                _items.Add(item);
+                _items.Add(itemToAdd);
                 return true;
             }
 
-            var maxStack = item.ItemTemplate.Variables.MaxStacks();
-            var newTotalAmount = currentMinimumStackItem.Variables.Amount() + item.Variables.Amount();
+            var maxStack = itemToAdd.ItemTemplate.Variables.MaxStacks();
+            var newTotalAmount = currentMinimumStackItem.Variables.Amount() + itemToAdd.Variables.Amount();
             if (newTotalAmount <= maxStack)
             {
                 currentMinimumStackItem.Variables.Amount(newTotalAmount);
@@ -87,8 +88,8 @@ namespace OpenRpg.Items.Inventory
 
             var remainder = newTotalAmount - maxStack;
             currentMinimumStackItem.Variables.Amount(maxStack);
-            item.Variables.Amount(remainder);
-            _items.Add(item);
+            itemToAdd.Variables.Amount(remainder);
+            _items.Add(itemToAdd);
             return true;
         }
 
