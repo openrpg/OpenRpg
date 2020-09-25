@@ -18,7 +18,7 @@ namespace OpenRpg.Core.Variables
             get => InternalVariables[index];
             set
             {
-                var oldValue = InternalVariables.ContainsKey(index) ? InternalVariables[index] : default;
+                var oldValue = InternalVariables.ContainsKey(index) ? InternalVariables[index] : default(T);
                 InternalVariables[index] = value;
                 OnVariableChanged?.Invoke(this, new VariableChangedEventArgs<T>(index, oldValue, value));
             }
