@@ -9,7 +9,7 @@ namespace OpenRpg.Items.Extensions
         public static void MaxWeight(this IInventoryVariables variables, float value) => variables[InventoryVariableTypes.MaxWeight] = value;
         public static float Weight(this IInventoryVariables variables) => variables[InventoryVariableTypes.Weight];
         public static void Weight(this IInventoryVariables variables, float value) => variables[InventoryVariableTypes.Weight] = value;
-        public static float MaxSlots(this IInventoryVariables variables) => variables[InventoryVariableTypes.MaxSlots];
-        public static void MaxSlots(this IInventoryVariables variables, float value) => variables[InventoryVariableTypes.MaxSlots] = value;
+        public static int MaxSlots(this IInventoryVariables variables) => (int)variables[InventoryVariableTypes.MaxSlots];
+        public static void MaxSlots(this IInventoryVariables variables, int value) => variables[InventoryVariableTypes.MaxSlots] = value;
     }
 }
