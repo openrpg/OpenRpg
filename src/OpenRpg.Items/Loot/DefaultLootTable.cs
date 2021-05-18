@@ -3,6 +3,8 @@ using System.Linq;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Utils;
 using OpenRpg.Items.Extensions;
+using OpenRpg.Items.Templates;
+using OpenRpg.Items.Types;
 
 namespace OpenRpg.Items.Loot
 {
@@ -19,29 +21,23 @@ namespace OpenRpg.Items.Loot
             AvailableLoot = availableLoot;
         }
         
-        public ILootTableEntry GetNextLootEntry(List<ILootTableEntry> currentlyTaken)
-        {
-            var randomChance = Randomizer.Random(0, 100);
-            var applicableLoot = AvailableLoot.Where(x => x.Variables.DropRate() >= randomChance && !currentlyTaken.Contains(x));
-            var randomEntry = applicableLoot.TakeRandom(Randomizer);
-            return randomEntry;
-        }
-
         public IEnumerable<IItem> GetLoot()
         {
-            var lootList = new List<ILootTableEntry>();
+            var uniqueItems = new List<IItemTemplate>();
 
-            while (true)
+            foreach (var loot in AvailableLoot)
             {
-                if (lootList.Count == AvailableLoot.Count)
-                { yield break; }
+                var randomChance = Randomizer.Random(0f, 1f);
+                if (!(loot.Variables.DropRate() >= randomChance)) { continue; }
                 
-                var drop = GetNextLootEntry(lootList);
+                if (loot.Variables.HasVariable(LootTableEntryVariableTypes.IsUnique) && loot.Variables.IsUnique())
+                {
+                    if(uniqueItems.Contains(loot.Item.ItemTemplate))
+                    { continue; }
+                    uniqueItems.Add(loot.Item.ItemTemplate);
+                }
 
-                if(drop.Variables.IsUnique())
-                { lootList.Add(drop); }
-
-                yield return drop.Item;
+                yield return (loot.Item as DefaultItem).Clone();
             }
         }
     }

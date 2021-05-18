@@ -9,6 +9,5 @@ namespace OpenRpg.Items
         IItemTemplate ItemTemplate { get; }
         IEnumerable<IModification> Modifications { get; }
         IItemVariables Variables { get; }
-        
     }
 }
