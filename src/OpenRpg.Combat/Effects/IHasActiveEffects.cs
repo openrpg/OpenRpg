@@ -4,6 +4,6 @@ namespace OpenRpg.Combat.Effects
 {
     public interface IHasActiveEffects
     {
-        IEnumerable<ActiveEffect> ActiveEffects { get; }
+        IList<ActiveEffect> ActiveEffects { get; }
     }
 }
