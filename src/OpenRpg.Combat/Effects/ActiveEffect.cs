@@ -8,6 +8,11 @@ namespace OpenRpg.Combat.Effects
         public TimedEffect Effect { get; set; }
         
         /// <summary>
+        /// The amount of stacks of this effect active
+        /// </summary>
+        public int Stacks { get; set; }
+        
+        /// <summary>
         /// The amount of time the effect has been active in seconds
         /// </summary>
         public float ActiveTime { get; set; }
