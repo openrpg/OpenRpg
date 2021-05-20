@@ -21,5 +21,16 @@ namespace OpenRpg.Combat.Extensions
 
         public static int TicksSoFar(this ActiveEffect activeEffect)
         { return (int)(activeEffect.ActiveTime / activeEffect.Effect.Frequency); }
+
+        public static bool AttemptToStackEffectFor(this IHasActiveEffects entity, int timedEffectId)
+        {
+            var existingEffect = entity.ActiveEffects.SingleOrDefault(x => x.Effect.Id == timedEffectId);
+            if (existingEffect == null) { return false; }
+            if (existingEffect.Stacks >= existingEffect.Effect.MaxStack) { return false; }
+            
+            existingEffect.Stacks++;
+            existingEffect.ActiveTime = 0;
+            return true;
+        }
     }
 }
