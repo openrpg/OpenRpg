@@ -2,6 +2,6 @@ using OpenRpg.Core.Variables;
 
 namespace OpenRpg.Items.Inventory
 {
-    public interface IInventoryVariables : IVariables<float>
+    public interface IInventoryVariables : IVariables<object>
     {}
 }
