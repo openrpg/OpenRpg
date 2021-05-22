@@ -2,7 +2,7 @@ using OpenRpg.Core.Variables;
 
 namespace OpenRpg.Items
 {
-    public interface IItemVariables : IVariables<float>
+    public interface IItemVariables : IVariables<object>
     {
         
     }

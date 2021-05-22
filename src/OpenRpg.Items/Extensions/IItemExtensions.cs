@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using OpenRpg.Core.Effects;
 using OpenRpg.Core.Modifications;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Items.Loot;
@@ -34,6 +36,14 @@ namespace OpenRpg.Items.Extensions
                 Requirements = requirements ?? new Requirement[0],
                 Variables = variables
             };
+        }
+        
+        public static IEnumerable<Effect> GetItemEffects(this IItem item)
+        {
+            if(!item.Modifications.Any())
+            { return item.ItemTemplate.Effects; }
+         
+            return item.ItemTemplate.Effects.Union(item.Modifications.SelectMany(x => x.Effects));
         }
     }
 }

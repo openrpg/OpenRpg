@@ -4,7 +4,7 @@ using OpenRpg.Core.Requirements;
 
 namespace OpenRpg.Quests
 {
-    public interface IQuest : IHasDataId, IHasRequirements, IHasLocaleDescription, IHasAssetCode
+    public interface IQuest : IHasDataId, IHasRequirements, IHasLocaleDescription
     {
         bool IsRepeatable { get; }
         IEnumerable<Objective> Objectives { get; }

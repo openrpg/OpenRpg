@@ -7,7 +7,7 @@ namespace OpenRpg.Items.Extensions
     {
         public static IItemVariables Clone(this DefaultItemVariables itemVariables)
         {
-            return new DefaultItemVariables { InternalVariables = new Dictionary<int, float>(itemVariables.InternalVariables) };
+            return new DefaultItemVariables { InternalVariables = new Dictionary<int, object>(itemVariables.InternalVariables) };
         }
         
         public static int Amount(this IItemVariables variables) => (int)variables[ItemVariableTypes.Amount];

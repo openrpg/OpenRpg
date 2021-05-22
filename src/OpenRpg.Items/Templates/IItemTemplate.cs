@@ -6,7 +6,7 @@ using OpenRpg.Core.Requirements;
 
 namespace OpenRpg.Items.Templates
 {
-    public interface IItemTemplate : IHasDataId, IHasAssetCode, IHasLocaleDescription, IHasRequirements, IHasEffects, IAllowsModification
+    public interface IItemTemplate : IHasDataId, IHasLocaleDescription, IHasRequirements, IHasEffects, IAllowsModification
     {
         int ItemType { get; }
         IItemTemplateVariables Variables { get; set; }
