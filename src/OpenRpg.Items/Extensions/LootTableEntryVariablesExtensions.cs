@@ -15,7 +15,7 @@ namespace OpenRpg.Items.Extensions
         /// <returns>The drop chance can be as low as needed i.e a 1 in 1000 can be represented as 0.001</returns>
         public static void DropRate(this ILootTableEntryVariables variables, float value) => variables[LootTableEntryVariableTypes.DropRate] = value;
         
-        public static bool IsUnique(this ILootTableEntryVariables variables) => (float)variables[LootTableEntryVariableTypes.IsUnique] == 1;
+        public static bool IsUnique(this ILootTableEntryVariables variables) => (bool)variables[LootTableEntryVariableTypes.IsUnique];
         
         /// <summary>
         /// This indicates that the template associated with this item can only be dropped once
@@ -23,6 +23,6 @@ namespace OpenRpg.Items.Extensions
         /// <param name="variables"></param>
         /// <param name="value">a true or false</param>
         /// <remarks>This still needs to be rolled on so even though something is unique it may not be looted</remarks>
-        public static void IsUnique(this ILootTableEntryVariables variables, bool value) => variables[LootTableEntryVariableTypes.IsUnique] = (value ? 1 : 0);
+        public static void IsUnique(this ILootTableEntryVariables variables, bool value) => variables[LootTableEntryVariableTypes.IsUnique] = value;
     }
 }
