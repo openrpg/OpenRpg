@@ -9,5 +9,6 @@
         public static readonly int ItemCard = 3;
         public static readonly int EquipmentCard = 4;
         public static readonly int EffectCard = 5;
+        public static readonly int AbilityCard = 6;
     }
 }

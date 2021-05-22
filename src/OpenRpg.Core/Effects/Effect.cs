@@ -3,6 +3,13 @@ using OpenRpg.Core.Requirements;
 
 namespace OpenRpg.Core.Effects
 {
+    /// <summary>
+    /// The effect object indicates a type of effect with a potency that can be applied to anything
+    /// </summary>
+    /// <remarks>
+    /// Generally some parent object like a Character will have various effects all combined together to drive the
+    /// stats, but can be used any way required
+    /// </remarks>
     public class Effect : IHasRequirements
     {
         /// <summary>
@@ -18,6 +25,6 @@ namespace OpenRpg.Core.Effects
         /// <summary>
         /// The applicable requirements for this effect to be active
         /// </summary>
-        public IEnumerable<Requirement> Requirements { get; set; } = new List<Requirement>();
+        public IEnumerable<Requirement> Requirements { get; set; } = new Requirement[0];
     }
 }

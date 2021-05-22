@@ -9,13 +9,12 @@ namespace OpenRpg.Items.Templates
     {
         public int Id { get; set; }
         public int ItemType { get; set;  }
-        public string AssetCode { get; set; }
         public string NameLocaleId { get; set; }
         public string DescriptionLocaleId { get; set; }
         
-        public IEnumerable<Requirement> Requirements { get; set; } = new List<Requirement>();
-        public IEnumerable<Effect> Effects { get; set; } = new List<Effect>();
-        public IEnumerable<ModificationAllowance> ModificationAllowances { get; set; } = new List<ModificationAllowance>();
+        public IEnumerable<Requirement> Requirements { get; set; } = new Requirement[0];
+        public IEnumerable<Effect> Effects { get; set; } = new Effect[0];
+        public IEnumerable<ModificationAllowance> ModificationAllowances { get; set; } = new ModificationAllowance[0];
         public IItemTemplateVariables Variables { get; set; } = new DefaultItemTemplateVariables();
     }
 }

@@ -12,6 +12,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\OpenRpg.Combat\OpenRpg.Combat.csproj" />
       <ProjectReference Include="..\OpenRpg.Core\OpenRpg.Core.csproj" />
       <ProjectReference Include="..\OpenRpg.Items\OpenRpg.Items.csproj" />
     </ItemGroup>

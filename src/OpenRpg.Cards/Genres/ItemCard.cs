@@ -9,9 +9,8 @@ namespace OpenRpg.Cards.Genres
 {
     public class ItemCard : ICard
     {
-        public int CardType => CardTypes.ItemCard;
-        public ICardVariables Variables { get; protected set; } = new DefaultCardVariables();
-        
+        public virtual int CardType => CardTypes.ItemCard;
+        public ICardVariables Variables { get; set; } = new DefaultCardVariables();
         public IItem Data { get; }
 
         public ItemCard(IItem item)
@@ -20,6 +19,5 @@ namespace OpenRpg.Cards.Genres
         public string NameLocaleId => Data.ItemTemplate.NameLocaleId;
         public string DescriptionLocaleId => Data.ItemTemplate.DescriptionLocaleId;
         public IEnumerable<Effect> Effects => Data.GetItemEffects();
-        public string AssetCode { get; set; }
     }
 }

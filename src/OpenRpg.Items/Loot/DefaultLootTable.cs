@@ -11,11 +11,11 @@ namespace OpenRpg.Items.Loot
     public class DefaultLootTable : ILootTable
     {
         public IRandomizer Randomizer { get; set; }
-        public IReadOnlyCollection<ILootTableEntry> AvailableLoot { get; set; }
+        public ICollection<ILootTableEntry> AvailableLoot { get; set; } = new List<ILootTableEntry>();
 
         public DefaultLootTable(){}
         
-        public DefaultLootTable(IReadOnlyCollection<ILootTableEntry> availableLoot, IRandomizer randomizer)
+        public DefaultLootTable(ICollection<ILootTableEntry> availableLoot, IRandomizer randomizer)
         {
             Randomizer = randomizer;
             AvailableLoot = availableLoot;
