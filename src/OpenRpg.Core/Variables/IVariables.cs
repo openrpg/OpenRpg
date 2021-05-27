@@ -4,7 +4,7 @@ namespace OpenRpg.Core.Variables
 {
     public delegate void VariableChangedEventHandler<T>(object sender, VariableChangedEventArgs<T> e);
     
-    public interface IVariables<T>
+    public interface IVariables<T> : IEnumerable<KeyValuePair<int, T>>
     {
         event VariableChangedEventHandler<T> OnVariableChanged;
         

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 
 namespace OpenRpg.Core.Variables
@@ -23,5 +24,11 @@ namespace OpenRpg.Core.Variables
                 OnVariableChanged?.Invoke(this, new VariableChangedEventArgs<T>(index, oldValue, value));
             }
         }
+
+        public IEnumerator<KeyValuePair<int, T>> GetEnumerator()
+        { return InternalVariables.GetEnumerator(); }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        { return GetEnumerator(); }
     }
 }
