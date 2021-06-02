@@ -12,10 +12,10 @@ namespace OpenRpg.Localization.Queries
 
         public IEnumerable<string> Find(object dataSource)
         {
-            var localeStore = dataSource as LocaleDatastore;
+            var localeStore = dataSource as LocaleDataset;
             
             for (var i = 0; i < Ids.Count; i++)
-            { yield return localeStore[Ids[i]]; }
+            { yield return localeStore.LocaleData[Ids[i]]; }
         }
     }
 }
