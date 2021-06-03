@@ -9,7 +9,7 @@ namespace OpenRpg.Localization.Repositories
         public LocaleDataset LocaleDataset { get; protected set; }
 
         public LocaleRepository(LocaleDataset localeDataset)
-        { LocaleDataset = new LocaleDataset(); }
+        { LocaleDataset = localeDataset; }
 
         public string Retrieve(string id)
         { return LocaleDataset.LocaleData[id]; }
