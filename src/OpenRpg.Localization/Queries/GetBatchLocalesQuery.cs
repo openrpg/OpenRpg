@@ -3,14 +3,14 @@ using OpenRpg.Data.Queries;
 
 namespace OpenRpg.Localization.Queries
 {
-    public class GetBatchLocalesQuery : IFindQuery<string>
+    public class GetBatchLocalesQuery : IFindAllQuery<string>
     {
         public IReadOnlyList<string> Ids { get;}
 
         public GetBatchLocalesQuery(IReadOnlyList<string> ids)
         { Ids = ids; }
 
-        public IEnumerable<string> Find(object dataSource)
+        public IEnumerable<string> Execute(object dataSource)
         {
             var localeStore = dataSource as LocaleDataset;
             

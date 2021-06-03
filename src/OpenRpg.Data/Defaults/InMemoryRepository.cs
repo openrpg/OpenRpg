@@ -26,15 +26,13 @@ namespace OpenRpg.Data.Defaults
 
         protected abstract K GetKeyFromEntity(T entity);
         
-        public T Retrieve(K id) => Data.SingleOrDefault(x => GetKeyFromEntity(x).Equals(id));
-        
-        public IEnumerable<T> Find(IFindQuery<T> dataQuery) => dataQuery.Find(Data);
-        public IEnumerable<T2> Find<T2>(IFindQuery<T2> dataQuery) => dataQuery.Find(Data);
-
         public void Create(T entry) =>  Data.Add(entry);
-
+        public T Retrieve(K id) => Data.SingleOrDefault(x => GetKeyFromEntity(x).Equals(id));
         public void Update(T entry) {}
-
         public void Delete(T entry) => Data.Remove(entry);
+        
+        public IEnumerable<T> FindAll(IFindAllQuery<T> dataQuery) => dataQuery.Execute(Data);
+        public T2 Find<T2>(IFindQuery<T2> dataQuery) => dataQuery.Execute(Data);
+        public object Execute(IExecuteQuery query) => query.Execute(Data);
     }
 }

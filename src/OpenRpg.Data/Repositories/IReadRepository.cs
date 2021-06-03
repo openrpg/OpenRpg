@@ -7,7 +7,7 @@ namespace OpenRpg.Data.Repositories
     {
         T Retrieve(K id);
 
-        IEnumerable<T> Find(IFindQuery<T> query);
-        IEnumerable<T2> Find<T2>(IFindQuery<T2> query);
+        IEnumerable<T> FindAll(IFindAllQuery<T> query);
+        T2 Find<T2>(IFindQuery<T2> query);
     }
 }

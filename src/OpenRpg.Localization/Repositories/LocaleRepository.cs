@@ -20,11 +20,11 @@ namespace OpenRpg.Localization.Repositories
         public bool Has(string id)
         { return LocaleDataset.LocaleData.ContainsKey(id); }
 
-        public IEnumerable<string> Find(IFindQuery<string> query)
-        { return query.Find(LocaleDataset); }
+        public IEnumerable<string> FindAll(IFindAllQuery<string> query)
+        { return query.Execute(LocaleDataset); }
 
-        public IEnumerable<T2> Find<T2>(IFindQuery<T2> query)
-        { return query.Find(LocaleDataset); }
+        public T2 Find<T2>(IFindQuery<T2> query)
+        { return query.Execute(LocaleDataset); }
 
         public void Create(string id, string text)
         { LocaleDataset.LocaleData.Add(id, text); }
