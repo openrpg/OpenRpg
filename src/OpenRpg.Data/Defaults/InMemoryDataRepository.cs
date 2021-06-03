@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Common;
+using OpenRpg.Data.Repositories;
 
 namespace OpenRpg.Data.Defaults
 {
@@ -7,7 +8,8 @@ namespace OpenRpg.Data.Defaults
     /// This is a layer on top of the InMemoryRepository that has awareness of the IHasDataId for Id lookup purposes
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class InMemoryDataRepository<T> : InMemoryRepository<T, int> where T : IHasDataId
+    public class InMemoryDataRepository<T> : InMemoryRepository<T, int>, IDataRepository<T>
+        where T : IHasDataId
     {
         protected override int GetKeyFromEntity(T entity) => entity.Id;
         
