@@ -30,7 +30,7 @@ namespace OpenRpg.Items.Loot
                 var randomChance = Randomizer.Random(0f, 1f);
                 if (!(loot.Variables.DropRate() >= randomChance)) { continue; }
                 
-                if (loot.Variables.HasVariable(LootTableEntryVariableTypes.IsUnique) && loot.Variables.IsUnique())
+                if (loot.Variables.ContainsKey(LootTableEntryVariableTypes.IsUnique) && loot.Variables.IsUnique())
                 {
                     if(uniqueItems.Contains(loot.Item.ItemTemplate))
                     { continue; }

@@ -21,7 +21,7 @@ namespace OpenRpg.Items.Inventory
         {
             var duplicatedVariables = new DefaultItemVariables();
 
-            if(item.Variables.HasVariable(ItemVariableTypes.Amount))
+            if(item.Variables.ContainsKey(ItemVariableTypes.Amount))
             { duplicatedVariables.Amount(item.Variables.Amount()); }
             
             return new DefaultItem
@@ -36,10 +36,10 @@ namespace OpenRpg.Items.Inventory
         {
             var item = CloneItem(itemToAdd);
             
-            if (item.ItemTemplate.Variables.HasVariable(ItemTemplateVariableTypes.MaxStacks))
+            if (item.ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.MaxStacks))
             { return AttemptAddAmountItem(item); }
 
-            if (item.ItemTemplate.Variables.HasVariable(ItemTemplateVariableTypes.Weight))
+            if (item.ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.Weight))
             { return HasWeightCapacity(item.ItemTemplate.Variables.Weight()) && AttemptAddWeightedItem(item); }
 
             if (!HasSlotCapacity())
@@ -51,7 +51,7 @@ namespace OpenRpg.Items.Inventory
 
         private bool AttemptAddAmountItem(IItem itemToAdd)
         {
-            if (!itemToAdd.Variables.HasVariable(ItemVariableTypes.Amount))
+            if (!itemToAdd.Variables.ContainsKey(ItemVariableTypes.Amount))
             {
                 if (!HasSlotCapacity())
                 { return false; }
@@ -101,7 +101,7 @@ namespace OpenRpg.Items.Inventory
 
         private bool HasSlotCapacity()
         {
-            if (!Variables.HasVariable(InventoryVariableTypes.MaxSlots))
+            if (!Variables.ContainsKey(InventoryVariableTypes.MaxSlots))
             { return true; }
 
             return _items.Count < (int)Variables.MaxSlots();
@@ -109,7 +109,7 @@ namespace OpenRpg.Items.Inventory
 
         private bool HasWeightCapacity(float weightToAdd)
         {
-            if (!Variables.HasVariable(InventoryVariableTypes.MaxWeight))
+            if (!Variables.ContainsKey(InventoryVariableTypes.MaxWeight))
             { return true; }
 
             var proposedWeight = Items.Sum(x => x.ItemTemplate.Variables.Weight()) + weightToAdd;
@@ -119,10 +119,10 @@ namespace OpenRpg.Items.Inventory
 
         public bool RemoveItem(IItem itemToRemove)
         {
-            if (itemToRemove.ItemTemplate.Variables.HasVariable(ItemTemplateVariableTypes.MaxStacks))
+            if (itemToRemove.ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.MaxStacks))
             { return AttemptRemoveAmountItem(itemToRemove); }
 
-            if (itemToRemove.ItemTemplate.Variables.HasVariable(ItemTemplateVariableTypes.Weight))
+            if (itemToRemove.ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.Weight))
             { return AttemptRemoveWeightedItem(itemToRemove); }
 
             if (!_items.Contains(itemToRemove))
@@ -134,7 +134,7 @@ namespace OpenRpg.Items.Inventory
 
         private bool AttemptRemoveAmountItem(IItem itemToRemove)
         {
-            if (!itemToRemove.Variables.HasVariable(ItemVariableTypes.Amount))
+            if (!itemToRemove.Variables.ContainsKey(ItemVariableTypes.Amount))
             {
                 if (_items.Contains(itemToRemove))
                 {
