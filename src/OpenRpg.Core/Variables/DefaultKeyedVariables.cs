@@ -25,7 +25,7 @@ namespace OpenRpg.Core.Variables
             set
             {
                 var containsKey = InternalVariables.ContainsKey(index);
-                var oldValue = containsKey ? InternalVariables[index] : default;
+                var oldValue = containsKey ? InternalVariables[index] : default(T);
                 InternalVariables[index] = value;
                 
                 if(containsKey)
@@ -38,14 +38,14 @@ namespace OpenRpg.Core.Variables
         public void AddVariable(K key, T value)
         {
             InternalVariables.Add(key, value);
-            OnVariableAdded?.Invoke(this, new VariableEventArgs<K, T>(key, default, value));
+            OnVariableAdded?.Invoke(this, new VariableEventArgs<K, T>(key, default(T), value));
         }
 
         public void RemoveVariable(K key)
         {
             var value = InternalVariables[key];
             InternalVariables.Remove(key);
-            OnVariableRemoved?.Invoke(this, new VariableEventArgs<K, T>(key, value, default));
+            OnVariableRemoved?.Invoke(this, new VariableEventArgs<K, T>(key, value, default(T)));
         }
 
         public IEnumerable<K> Keys => InternalVariables.Keys;
