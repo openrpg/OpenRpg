@@ -35,7 +35,7 @@ namespace OpenRpg.Core.Variables
             }
         }
 
-        public T GetVariable(K key) => ContainsKey(key) ? InternalVariables[key] : default;
+        public T GetVariable(K key) => ContainsKey(key) ? InternalVariables[key] : default(T);
         
         public void AddVariable(K key, T value)
         {
