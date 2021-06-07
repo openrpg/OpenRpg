@@ -34,6 +34,8 @@ namespace OpenRpg.Core.Variables
                 { OnVariableAdded?.Invoke(this, new VariableEventArgs<K, T>(index, oldValue, value));}
             }
         }
+
+        public T GetVariable(K key) => ContainsKey(key) ? InternalVariables[key] : default;
         
         public void AddVariable(K key, T value)
         {
