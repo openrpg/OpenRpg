@@ -7,3 +7,4 @@ dotnet pack ../src/OpenRpg.Data -c Release -o ../../_dist /p:version=%version%
 dotnet pack ../src/OpenRpg.Quests -c Release -o ../../_dist /p:version=%version%
 dotnet pack ../src/OpenRpg.Genres.Fantasy -c Release -o ../../_dist /p:version=%version%
 dotnet pack ../src/OpenRpg.Cards -c Release -o ../../_dist /p:version=%version%
+dotnet pack ../src/OpenRpg.CurveFunctions -c Release -o ../../_dist /p:version=%version%
