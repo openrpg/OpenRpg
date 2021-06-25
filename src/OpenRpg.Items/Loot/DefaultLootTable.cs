@@ -22,6 +22,9 @@ namespace OpenRpg.Items.Loot
         }
         
         public IEnumerable<IItem> GetLoot()
+        { return GetApplicableLootEntries().Select(x => (x.Item as DefaultItem).Clone()); }
+        
+        public IEnumerable<ILootTableEntry> GetApplicableLootEntries()
         {
             var uniqueItems = new List<IItemTemplate>();
 
@@ -37,7 +40,7 @@ namespace OpenRpg.Items.Loot
                     uniqueItems.Add(loot.Item.ItemTemplate);
                 }
 
-                yield return (loot.Item as DefaultItem).Clone();
+                yield return loot;
             }
         }
     }
