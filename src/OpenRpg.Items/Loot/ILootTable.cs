@@ -6,5 +6,6 @@ namespace OpenRpg.Items.Loot
     {
         ICollection<ILootTableEntry> AvailableLoot { get; }
         IEnumerable<IItem> GetLoot();
+        IEnumerable<ILootTableEntry> GetRandomLootEntries();
     }
 }

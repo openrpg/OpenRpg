@@ -22,9 +22,9 @@ namespace OpenRpg.Items.Loot
         }
         
         public IEnumerable<IItem> GetLoot()
-        { return GetApplicableLootEntries().Select(x => (x.Item as DefaultItem).Clone()); }
+        { return GetRandomLootEntries().Select(x => (x.Item as DefaultItem).Clone()); }
         
-        public IEnumerable<ILootTableEntry> GetApplicableLootEntries()
+        public IEnumerable<ILootTableEntry> GetRandomLootEntries()
         {
             var uniqueItems = new List<IItemTemplate>();
 
