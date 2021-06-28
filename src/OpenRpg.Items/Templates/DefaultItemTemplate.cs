@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Modifications;
@@ -12,9 +13,9 @@ namespace OpenRpg.Items.Templates
         public string NameLocaleId { get; set; }
         public string DescriptionLocaleId { get; set; }
         
-        public IEnumerable<Requirement> Requirements { get; set; } = new Requirement[0];
-        public IEnumerable<Effect> Effects { get; set; } = new Effect[0];
-        public IEnumerable<ModificationAllowance> ModificationAllowances { get; set; } = new ModificationAllowance[0];
+        public IEnumerable<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
+        public IEnumerable<Effect> Effects { get; set; } = Array.Empty<Effect>();
+        public IEnumerable<ModificationAllowance> ModificationAllowances { get; set; } = Array.Empty<ModificationAllowance>();
         public IItemTemplateVariables Variables { get; set; } = new DefaultItemTemplateVariables();
     }
 }

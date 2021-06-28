@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using OpenRpg.Core.Requirements;
 
@@ -25,6 +26,6 @@ namespace OpenRpg.Core.Effects
         /// <summary>
         /// The applicable requirements for this effect to be active
         /// </summary>
-        public IEnumerable<Requirement> Requirements { get; set; } = new Requirement[0];
+        public IEnumerable<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Core.Effects;
@@ -33,7 +34,7 @@ namespace OpenRpg.Items.Extensions
             return new DefaultLootTableEntry
             {
                 Item = item,
-                Requirements = requirements ?? new Requirement[0],
+                Requirements = requirements ?? Array.Empty<Requirement>(),
                 Variables = variables
             };
         }

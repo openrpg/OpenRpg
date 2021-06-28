@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using OpenRpg.Core.Requirements;
 
@@ -9,10 +10,10 @@ namespace OpenRpg.Quests
         public string NameLocaleId { get; set; }
         public string DescriptionLocaleId { get; set; }
         public bool IsRepeatable { get; set; }
-        public IEnumerable<Requirement> Requirements { get; set; } = new Requirement[0];
-        public IEnumerable<Objective> Objectives { get; set; } = new Objective[0];
-        public IEnumerable<Reward> Rewards { get; set; } = new Reward[0];
-        public IEnumerable<Reward> Gifts { get; set; } = new Reward[0];
+        public IEnumerable<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
+        public IEnumerable<Objective> Objectives { get; set; } = Array.Empty<Objective>();
+        public IEnumerable<Reward> Rewards { get; set; } = Array.Empty<Reward>();
+        public IEnumerable<Reward> Gifts { get; set; } = Array.Empty<Reward>();
         public IQuestVariables Variables { get; set; } = new DefaultQuestVariables();
     }
 }
