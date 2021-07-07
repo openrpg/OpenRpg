@@ -1,3 +1,5 @@
+using OpenRpg.CurveFunctions.Extensions;
+
 namespace OpenRpg.CurveFunctions.Curves
 {
     public class StepCurveFunction : ICurveFunction
@@ -14,6 +16,9 @@ namespace OpenRpg.CurveFunctions.Curves
         }
 
         public float Plot(float value)
-        { return value < StepValue ? MinValue : MaxValue; }
+        {
+            var utilityValue = value < StepValue ? MinValue : MaxValue;
+            return utilityValue.SanitizeAndClamp();
+        }
     }
 }

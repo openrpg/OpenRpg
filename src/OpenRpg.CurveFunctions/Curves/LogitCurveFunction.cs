@@ -19,7 +19,7 @@ namespace OpenRpg.CurveFunctions.Curves
         public float Plot(float value)
         {
             var outputValue = (float)(Slope * Math.Log((value - XShift) / (1.0 - (value - XShift))) / 5.0 + 0.5 + YShift);
-            return this.SanitizeValue(outputValue);
+            return outputValue.SanitizeAndClamp();
         }
     }
 }
