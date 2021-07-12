@@ -1,6 +1,6 @@
 using OpenRpg.Combat.Attacks;
 
-namespace OpenRpg.Genres.Fantasy.Combat.Modifiers
+namespace OpenRpg.Combat.Processors.Modifiers
 {
     public interface IAttackModifier
     {

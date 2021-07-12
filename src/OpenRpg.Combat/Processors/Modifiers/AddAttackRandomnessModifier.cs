@@ -1,7 +1,7 @@
 using OpenRpg.Combat.Attacks;
 using OpenRpg.Core.Utils;
 
-namespace OpenRpg.Genres.Fantasy.Combat.Modifiers
+namespace OpenRpg.Combat.Processors.Modifiers
 {
     public class AddAttackRandomnessModifier : IAttackModifier
     {
