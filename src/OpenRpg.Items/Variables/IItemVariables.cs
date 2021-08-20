@@ -1,9 +1,7 @@
 using OpenRpg.Core.Variables;
 
-namespace OpenRpg.Items
+namespace OpenRpg.Items.Variables
 {
     public interface IItemVariables : IVariables<object>
-    {
-        
-    }
+    {}
 }

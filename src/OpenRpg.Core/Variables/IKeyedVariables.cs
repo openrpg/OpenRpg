@@ -7,32 +7,32 @@ namespace OpenRpg.Core.Variables
     public interface IKeyedVariables<K, T> : IReadOnlyDictionary<K, T> where K : struct
     {
         /// <summary>
-        /// This is triggered when a variable value is changed
+        /// This is triggered when a value is changed
         /// </summary>
-        event VariableChangedEventHandler<K,T> OnVariableChanged;
+        event VariableChangedEventHandler<K,T> OnChanged;
         
         /// <summary>
-        /// This is triggered when a variable is added
+        /// This is triggered when a value is added
         /// </summary>
-        event VariableChangedEventHandler<K,T> OnVariableAdded;
+        event VariableChangedEventHandler<K,T> OnAdded;
         
         /// <summary>
-        /// This is added when a variable is removed
+        /// This is added when a value is removed
         /// </summary>
-        event VariableChangedEventHandler<K,T> OnVariableRemoved;
+        event VariableChangedEventHandler<K,T> OnRemoved;
 
         /// <summary>
         /// This will do a safe get of the value and will always return something even if the key does not exist
         /// </summary>
         /// <param name="key">The variable key to get</param>
         /// <returns>The value within the variable or a default implementation of T</returns>
-        T GetVariable(K key);
+        T Get(K key);
         
         /// <summary>
         /// Removes the variable if it exists
         /// </summary>
         /// <param name="key">The key to remove</param>
-        void RemoveVariable(K key);
+        void Remove(K key);
         
         /// <summary>
         /// The indexers provide the fastest lookup but is unsafe, so if the variable does not exist it will throw an exception

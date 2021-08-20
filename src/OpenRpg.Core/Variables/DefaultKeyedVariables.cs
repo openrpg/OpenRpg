@@ -10,9 +10,9 @@ namespace OpenRpg.Core.Variables
         public DefaultKeyedVariables(IDictionary<K, T> internalVariables = null)
         { InternalVariables = internalVariables ?? new Dictionary<K, T>(); }
 
-        public event VariableChangedEventHandler<K,T> OnVariableChanged;
-        public event VariableChangedEventHandler<K,T> OnVariableAdded;
-        public event VariableChangedEventHandler<K,T> OnVariableRemoved;
+        public event VariableChangedEventHandler<K,T> OnChanged;
+        public event VariableChangedEventHandler<K,T> OnAdded;
+        public event VariableChangedEventHandler<K,T> OnRemoved;
 
         public bool ContainsKey(K key) => InternalVariables.ContainsKey(key);
         public int Count => InternalVariables.Count;
@@ -29,25 +29,25 @@ namespace OpenRpg.Core.Variables
                 InternalVariables[index] = value;
                 
                 if(containsKey)
-                { OnVariableChanged?.Invoke(this, new VariableEventArgs<K,T>(index, oldValue, value)); }
+                { OnChanged?.Invoke(this, new VariableEventArgs<K,T>(index, oldValue, value)); }
                 else
-                { OnVariableAdded?.Invoke(this, new VariableEventArgs<K, T>(index, oldValue, value));}
+                { OnAdded?.Invoke(this, new VariableEventArgs<K, T>(index, oldValue, value));}
             }
         }
 
-        public T GetVariable(K key) => ContainsKey(key) ? InternalVariables[key] : default(T);
+        public T Get(K key) => ContainsKey(key) ? InternalVariables[key] : default(T);
         
         public void AddVariable(K key, T value)
         {
             InternalVariables.Add(key, value);
-            OnVariableAdded?.Invoke(this, new VariableEventArgs<K, T>(key, default(T), value));
+            OnAdded?.Invoke(this, new VariableEventArgs<K, T>(key, default(T), value));
         }
 
-        public void RemoveVariable(K key)
+        public void Remove(K key)
         {
             var value = InternalVariables[key];
             InternalVariables.Remove(key);
-            OnVariableRemoved?.Invoke(this, new VariableEventArgs<K, T>(key, value, default(T)));
+            OnRemoved?.Invoke(this, new VariableEventArgs<K, T>(key, value, default(T)));
         }
 
         public IEnumerable<K> Keys => InternalVariables.Keys;

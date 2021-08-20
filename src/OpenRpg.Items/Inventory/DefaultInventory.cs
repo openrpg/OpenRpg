@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Types;
+using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Inventory
 {

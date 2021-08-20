@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Variables;
 
-namespace OpenRpg.Items
+namespace OpenRpg.Items.Variables
 {
     public class DefaultItemVariables : DefaultVariables<object>, IItemVariables
     {

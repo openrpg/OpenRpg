@@ -6,6 +6,7 @@ using OpenRpg.Core.Modifications;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Items.Loot;
 using OpenRpg.Items.Templates;
+using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Extensions
 {
