@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using OpenRpg.Data.Queries;
-
 namespace OpenRpg.Localization.Repositories
 {
     public class LocaleRepository : ILocaleRepository
@@ -11,7 +8,7 @@ namespace OpenRpg.Localization.Repositories
         public LocaleRepository(LocaleDataset localeDataset)
         { LocaleDataset = localeDataset; }
 
-        public string Retrieve(string id)
+        public string Get(string id)
         { return LocaleDataset.LocaleData[id]; }
 
         public void ChangeLocale(LocaleDataset dataset)
@@ -19,13 +16,7 @@ namespace OpenRpg.Localization.Repositories
 
         public bool Has(string id)
         { return LocaleDataset.LocaleData.ContainsKey(id); }
-
-        public IEnumerable<string> FindAll(IFindAllQuery<string> query)
-        { return query.Execute(LocaleDataset); }
-
-        public T2 Find<T2>(IFindQuery<T2> query)
-        { return query.Execute(LocaleDataset); }
-
+        
         public void Create(string id, string text)
         { LocaleDataset.LocaleData.Add(id, text); }
 
