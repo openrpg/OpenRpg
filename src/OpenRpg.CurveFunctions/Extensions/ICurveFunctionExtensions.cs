@@ -16,8 +16,7 @@ namespace OpenRpg.CurveFunctions.Extensions
         /// <returns>The denormalized value from the curve</returns>
         public static float ScaledPlot(this ICurveFunction curve, float value, float maxValue)
         {
-            if (value == 0) { return 0; }
-            var normalizedValue = value / maxValue;
+            var normalizedValue = (value + float.Epsilon) / maxValue;
             var normalizedOutput = curve.Plot(normalizedValue);
             return normalizedOutput * maxValue;
         }

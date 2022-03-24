@@ -23,6 +23,6 @@ namespace OpenRpg.CurveFunctions
         public static SineCurveFunction InverseSineWave = new SineCurveFunction(-1.0f, 0, 0);
         public static StepCurveFunction GreaterThanHalf = new StepCurveFunction(0.5f);
         public static StepCurveFunction LessThanHalf = new StepCurveFunction(0.5f, 1.0f, 0.0f);
-        public static PassThroughlCurveFunction PassThrough = new PassThroughlCurveFunction();
+        public static PassThroughCurveFunction PassThrough = new PassThroughCurveFunction();
     }
 }
