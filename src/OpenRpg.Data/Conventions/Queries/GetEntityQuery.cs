@@ -2,12 +2,12 @@ namespace OpenRpg.Data.Conventions.Queries
 {
     public class GetEntityQuery<T> : IQuery<T>
     {
-        public object Key { get; }
+        public object Id { get; }
 
-        public GetEntityQuery(object key)
-        { Key = key; }
+        public GetEntityQuery(object id)
+        { Id = id; }
 
         public T Execute(IDataSource dataSource)
-        { return dataSource.Get<T>(Key); }
+        { return dataSource.Get<T>(Id); }
     }
 }

@@ -6,11 +6,11 @@ namespace OpenRpg.Data
     {
         object NativeSource { get; }
         
-        T Get<T>(object key); 
+        T Get<T>(object id); 
         IEnumerable<T> GetAll<T>();
-        void Create<T>(T data, object key = null);
-        void Update<T>(T data, object key);
-        bool Delete<T>(object key);
-        bool Exists<T>(object key);
+        void Create<T>(T data, object id = null);
+        void Update<T>(T data, object id);
+        bool Delete<T>(object id);
+        bool Exists<T>(object id);
     }
 }

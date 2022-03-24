@@ -3,17 +3,17 @@ namespace OpenRpg.Data.Conventions.Queries
     public class CreateEntityQuery<T> : IQuery<T>
     {
         public T Entity { get; }
-        public object Key { get; }
+        public object Id { get; }
 
-        public CreateEntityQuery(T entity, object key = null)
+        public CreateEntityQuery(T entity, object id = null)
         {
             Entity = entity;
-            Key = key;
+            Id = id;
         }
 
         public T Execute(IDataSource dataSource)
         {
-            dataSource.Create(Entity, Key);
+            dataSource.Create(Entity, Id);
             return Entity;
         }
     }

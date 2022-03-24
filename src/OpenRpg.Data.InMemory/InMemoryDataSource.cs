@@ -13,20 +13,16 @@ namespace OpenRpg.Data.InMemory
         public InMemoryDataSource(Dictionary<Type, Dictionary<object, object>> database = null)
         { Database = database ?? new Dictionary<Type, Dictionary<object, object>>(); }
 
-        public T Get<T>(object key) => (T)Database[typeof(T)][key];
-
+        public T Get<T>(object id) => (T)Database[typeof(T)][id];
         public IEnumerable<T> GetAll<T>() => Database[typeof(T)].Values.Cast<T>();
-
-        public void Create<T>(T data, object key = null)
+        public void Update<T>(T data, object id) => Database[typeof(T)][id] = data;
+        public bool Delete<T>(object id) => Database[typeof(T)].Remove(id);
+        public bool Exists<T>(object id) => Database[typeof(T)].ContainsKey(id);
+        
+        public void Create<T>(T data, object id = null)
         {
-            if(key == null) { throw new ArgumentNullException(nameof(key), "In Memory DB Requires explicit keys on creation"); }
-            Database[typeof(T)].Add(key, data);
+            if(id == null) { throw new ArgumentNullException(nameof(id), "In Memory DB Requires explicit keys on creation"); }
+            Database[typeof(T)].Add(id, data);
         }
-
-        public void Update<T>(T data, object key) => Database[typeof(T)][key] = data;
-
-        public bool Delete<T>(object key) => Database[typeof(T)].Remove(key);
-
-        public bool Exists<T>(object key) => Database[typeof(T)].ContainsKey(key);
     }
 }

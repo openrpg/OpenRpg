@@ -3,17 +3,17 @@ namespace OpenRpg.Data.Conventions.Queries
     public class UpdateEntityQuery<T> : IQuery<T>
     {
         public T Entity { get; }
-        public object Key { get; }
+        public object Id { get; }
 
-        public UpdateEntityQuery(T entity, object key)
+        public UpdateEntityQuery(T entity, object id)
         {
             Entity = entity;
-            Key = key;
+            Id = id;
         }
 
         public T Execute(IDataSource dataSource)
         {
-            dataSource.Update(Entity, Key);
+            dataSource.Update(Entity, Id);
             return Entity;
         }
     }

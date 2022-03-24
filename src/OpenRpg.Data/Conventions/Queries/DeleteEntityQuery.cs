@@ -2,12 +2,12 @@ namespace OpenRpg.Data.Conventions.Queries
 {
     public class DeleteEntityQuery<T> : IQuery<bool>
     {
-        public object Key { get; }
+        public object Id { get; }
 
-        public DeleteEntityQuery(object key)
-        { Key = key; }
+        public DeleteEntityQuery(object id)
+        { Id = id; }
 
         public bool Execute(IDataSource dataSource)
-        { return dataSource.Delete<T>(Key); }
+        { return dataSource.Delete<T>(Id); }
     }
 }
