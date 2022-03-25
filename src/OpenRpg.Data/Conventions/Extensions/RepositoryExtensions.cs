@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using OpenRpg.Data.Conventions.Queries;
 
 namespace OpenRpg.Data.Conventions.Extensions
@@ -8,7 +9,10 @@ namespace OpenRpg.Data.Conventions.Extensions
         { return repository.Query(new CreateEntityQuery<T>(entity, id)); }
         
         public static T Get<T>(this IRepository repository, object id) where T : class
-        { return repository.Query(new GetEntityQuery<T>(id)); }      
+        { return repository.Query(new GetEntityQuery<T>(id)); }           
+        
+        public static IEnumerable<T> GetAll<T>(this IRepository repository) where T : class
+        { return repository.Query(new GetAllEntityQuery<T>()); }      
         
         public static T Update<T>(this IRepository repository, T entity, object id) where T : class
         { return repository.Query(new UpdateEntityQuery<T>(entity, id)); }      
