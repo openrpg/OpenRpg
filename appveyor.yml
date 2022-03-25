@@ -3,7 +3,7 @@ branches:
   only:
   - master
   - build-test
-image: Previous Visual Studio 2017
+image: Visual Studio 2022
 configuration: Release
 dotnet_csproj:
   patch: true
@@ -19,6 +19,9 @@ build:
   project: src/OpenRpg.sln
   publish_nuget: true
   verbosity: minimal
+test:
+  assemblies:
+    - '**\*.UnitTests.dll'
 artifacts:
   - path: '**\*.nupkg'
 deploy:
