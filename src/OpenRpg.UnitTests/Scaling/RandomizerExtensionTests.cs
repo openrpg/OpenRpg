@@ -32,7 +32,6 @@ public class RandomizerExtensionTests
         Assert.Equal(expectedResult, actualResult);
     }
     
-        
     [Fact]
     public void should_correctly_plot_random_number_using_curve_extension_with_negative_min_max_floats()
     {
