@@ -8,5 +8,6 @@ namespace OpenRpg.Localization.Data.DataSources
         void Update(string localeCode, string text, string key);
         bool Delete(string localeCode, string key);
         bool Exists(string localeCode, string key);
+        LocaleDataset GetLocaleDataset(string localeCode);
     }
 }

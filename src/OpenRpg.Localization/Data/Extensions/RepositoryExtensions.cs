@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using OpenRpg.Localization.Data.Queries;
 using OpenRpg.Localization.Data.Queries.Conventions;
 using OpenRpg.Localization.Data.Repositories;
 
@@ -23,5 +24,11 @@ namespace OpenRpg.Localization.Data.Extensions
         
         public static bool Exists(this ILocaleRepository repository, string id)
         { return repository.Query(new LocaleExistsQuery(id)); }
+
+        public static LocaleDataset GetDataset(this ILocaleRepository repository)
+        { return repository.Query(new GetLocaleDatasetQuery()); }
+        
+        public static LocaleDataset GetDataset(this ILocaleRepository repository, string locale)
+        { return repository.Query(new GetLocaleDatasetQuery(locale)); }
     }
 }

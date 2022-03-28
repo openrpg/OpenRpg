@@ -19,5 +19,6 @@ namespace OpenRpg.Localization.Data.DataSources
         public void Update(string localeCode, string text, string key) => LocaleDatasets[localeCode].LocaleData[key] = text;
         public bool Delete(string localeCode, string key) => LocaleDatasets[localeCode].LocaleData.Remove(key);
         public bool Exists(string localeCode, string key) => LocaleDatasets[localeCode].LocaleData.ContainsKey(key);
+        public LocaleDataset GetLocaleDataset(string localeCode) => LocaleDatasets[localeCode];
     }
 }
