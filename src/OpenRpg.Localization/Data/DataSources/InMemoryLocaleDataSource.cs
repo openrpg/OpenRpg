@@ -5,7 +5,11 @@ namespace OpenRpg.Localization.Data.DataSources
 {
     public class InMemoryLocaleDataSource : ILocaleDataSource
     {
-        public Dictionary<string, LocaleDataset> LocaleDatasets { get; }
+        /// <summary>
+        /// Readonly for consumers but protected for inheritance scenarios to directly work with 
+        /// </summary>
+        public Dictionary<string, LocaleDataset> LocaleDatasets { get; protected set; }
+        
         public object NativeSource => LocaleDatasets;
 
         public InMemoryLocaleDataSource(IEnumerable<LocaleDataset> localeDatasets = null)
@@ -13,6 +17,12 @@ namespace OpenRpg.Localization.Data.DataSources
             LocaleDatasets = localeDatasets?.ToDictionary(x => x.LocaleCode, x => x) ?? 
                              new Dictionary<string, LocaleDataset>();
         }
+        
+        /// <summary>
+        /// For usage in inheritance scenarios where you internally set data
+        /// </summary>
+        protected InMemoryLocaleDataSource()
+        {}
 
         public string Get(string localeCode, string key) => LocaleDatasets[localeCode].LocaleData[key];
         public void Create(string localeCode, string text, string key) => LocaleDatasets[localeCode].LocaleData.Add(key, text);

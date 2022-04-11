@@ -6,12 +6,21 @@ namespace OpenRpg.Data.InMemory
 {
     public class InMemoryDataSource : IInMemoryDataSource
     {
-        public Dictionary<Type, Dictionary<object, object>> Database { get; }
+        /// <summary>
+        /// Read only for consumers but can be set directly in inheritance scenarios
+        /// </summary>
+        public Dictionary<Type, Dictionary<object, object>> Database { get; protected set; }
         
         public object NativeSource => Database;
 
         public InMemoryDataSource(Dictionary<Type, Dictionary<object, object>> database = null)
         { Database = database ?? new Dictionary<Type, Dictionary<object, object>>(); }
+        
+        /// <summary>
+        /// This constructor is for manual setting in an inherited scenario
+        /// </summary>
+        protected InMemoryDataSource()
+        {}
 
         public T Get<T>(object id) => (T)Database[typeof(T)][id];
         public IEnumerable<T> GetAll<T>() => Database[typeof(T)].Values.Cast<T>();
