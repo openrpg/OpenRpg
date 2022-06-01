@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Version>0.0.0</Version>
-        <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+        <TargetFramework>netstandard2.0</TargetFramework>
         <Title>OpenRpg.Combat</Title>
         <Authors>Grofit (LP)</Authors>
         <PackageLicenseUrl>https://github.com/openrpg/OpenRpg/blob/master/LICENSE</PackageLicenseUrl>
