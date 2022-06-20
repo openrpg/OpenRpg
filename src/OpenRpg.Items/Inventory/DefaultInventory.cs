@@ -22,7 +22,7 @@ namespace OpenRpg.Items.Inventory
         {
             var duplicatedVariables = new DefaultItemVariables();
 
-            if(item.Variables.ContainsKey(ItemVariableTypes.Amount))
+            if(item.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
             { duplicatedVariables.Amount(item.Variables.Amount()); }
             
             return new DefaultItem
@@ -52,7 +52,7 @@ namespace OpenRpg.Items.Inventory
 
         private bool AttemptAddAmountItem(IItem itemToAdd)
         {
-            if (!itemToAdd.Variables.ContainsKey(ItemVariableTypes.Amount))
+            if (!itemToAdd.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
             {
                 if (!HasSlotCapacity())
                 { return false; }
@@ -135,7 +135,7 @@ namespace OpenRpg.Items.Inventory
 
         private bool AttemptRemoveAmountItem(IItem itemToRemove)
         {
-            if (!itemToRemove.Variables.ContainsKey(ItemVariableTypes.Amount))
+            if (!itemToRemove.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
             {
                 if (_items.Contains(itemToRemove))
                 {

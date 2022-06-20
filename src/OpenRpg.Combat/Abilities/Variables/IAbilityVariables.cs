@@ -1,6 +1,6 @@
 using OpenRpg.Core.Variables;
 
-namespace OpenRpg.Combat.Abilities
+namespace OpenRpg.Combat.Abilities.Variables
 {
     public interface IAbilityVariables : IVariables<object>
     {}

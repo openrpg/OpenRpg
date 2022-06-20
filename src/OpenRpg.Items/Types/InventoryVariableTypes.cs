@@ -1,6 +1,6 @@
 namespace OpenRpg.Items.Types
 {
-    public static class InventoryVariableTypes
+    public interface InventoryVariableTypes
     {
         public static int Unknown = 0;
 

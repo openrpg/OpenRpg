@@ -20,7 +20,7 @@ namespace OpenRpg.CurveFunctions.Extensions
             var normalizedOutput = curve.Plot(normalizedValue);
             return normalizedOutput * maxValue;
         }
-
+        
         public static PolynomialCurveFunction Alter(this PolynomialCurveFunction curve, float? slope = null, float? xShift = null, float? yShift = null, float? exponent = null)
         {
             return new PolynomialCurveFunction(

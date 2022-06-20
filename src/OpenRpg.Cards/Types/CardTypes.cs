@@ -1,6 +1,6 @@
 ﻿namespace OpenRpg.Cards.Types
 {
-    public class CardTypes
+    public interface CardTypes
     {
         public static readonly int Unknown = 0;
 

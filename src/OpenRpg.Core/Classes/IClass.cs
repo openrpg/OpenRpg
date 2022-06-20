@@ -1,3 +1,5 @@
+using OpenRpg.Core.Classes.Variables;
+
 namespace OpenRpg.Core.Classes
 {
     public interface IClass

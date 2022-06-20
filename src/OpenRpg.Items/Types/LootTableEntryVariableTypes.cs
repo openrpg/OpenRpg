@@ -1,6 +1,6 @@
 namespace OpenRpg.Items.Types
 {
-    public static class LootTableEntryVariableTypes
+    public interface LootTableEntryVariableTypes
     {
         public static int Unknown = 0;
 

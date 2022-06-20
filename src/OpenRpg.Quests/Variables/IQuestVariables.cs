@@ -1,6 +1,6 @@
 using OpenRpg.Core.Variables;
 
-namespace OpenRpg.Quests
+namespace OpenRpg.Quests.Variables
 {
     public interface IQuestVariables : IVariables<object>
     {

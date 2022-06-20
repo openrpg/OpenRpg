@@ -1,4 +1,5 @@
-﻿using OpenRpg.Core.Common;
+﻿using OpenRpg.Cards.Variables;
+using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
 
 namespace OpenRpg.Cards

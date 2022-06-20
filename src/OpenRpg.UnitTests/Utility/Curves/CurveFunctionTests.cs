@@ -1,7 +1,7 @@
 using OpenRpg.CurveFunctions.Curves;
 using Xunit;
 
-namespace OpenRpg.UnitTests.Scaling;
+namespace OpenRpg.UnitTests.Utility.Curves;
 
 public class CurveFunctionTests
 {
