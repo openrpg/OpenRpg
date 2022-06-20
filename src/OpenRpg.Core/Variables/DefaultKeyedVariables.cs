@@ -6,9 +6,13 @@ namespace OpenRpg.Core.Variables
     public class DefaultKeyedVariables<K,T> : IKeyedVariables<K,T> where K : struct
     {
         public IDictionary<K, T> InternalVariables { get; set; }
+        public int VariableType { get; }
 
-        public DefaultKeyedVariables(IDictionary<K, T> internalVariables = null)
-        { InternalVariables = internalVariables ?? new Dictionary<K, T>(); }
+        public DefaultKeyedVariables(int variableType, IDictionary<K, T> internalVariables = null)
+        {
+            VariableType = variableType;
+            InternalVariables = internalVariables ?? new Dictionary<K, T>();
+        }
 
         public event VariableChangedEventHandler<K,T> OnChanged;
         public event VariableChangedEventHandler<K,T> OnAdded;

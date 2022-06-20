@@ -12,7 +12,7 @@ public class DefaultKeyedVariablesTests
         var expectedArgs = new VariableEventArgs<int, int>(1, default, 10);
         VariableEventArgs<int, int> actualArgs = null; 
         
-        var variables = new DefaultKeyedVariables<int, int>();
+        var variables = new DefaultKeyedVariables<int, int>(1);
         variables.OnAdded += (sender, args) => actualArgs = args;
         
         variables.AddVariable(expectedArgs.VariableType, expectedArgs.NewValue);
@@ -31,7 +31,7 @@ public class DefaultKeyedVariablesTests
         var expectedArgs = new VariableEventArgs<int, int>(1, 10, 100);
         VariableEventArgs<int, int> actualArgs = null;
         
-        var variables = new DefaultKeyedVariables<int, int>(new Dictionary<int, int> { {1, 10} });
+        var variables = new DefaultKeyedVariables<int, int>(1, new Dictionary<int, int> { {1, 10} });
         variables.OnChanged += (sender, args) => actualArgs = args;
         
         variables[expectedArgs.VariableType] = expectedArgs.NewValue;
@@ -50,7 +50,7 @@ public class DefaultKeyedVariablesTests
         var expectedArgs = new VariableEventArgs<int, int>(1, 10, default);
         VariableEventArgs<int, int> actualArgs = null; 
         
-        var variables = new DefaultKeyedVariables<int, int>(new Dictionary<int, int> { {1, 10} });
+        var variables = new DefaultKeyedVariables<int, int>(1, new Dictionary<int, int> { {1, 10} });
         variables.OnRemoved += (sender, args) => actualArgs = args;
         
         variables.Remove(expectedArgs.VariableType);
@@ -71,7 +71,7 @@ public class DefaultKeyedVariablesTests
         VariableEventArgs<int, int> actualAddArgs = null; 
         VariableEventArgs<int, int> actualChangedArgs = null; 
         
-        var variables = new DefaultKeyedVariables<int, int>();
+        var variables = new DefaultKeyedVariables<int, int>(1);
         variables.OnAdded += (sender, args) => actualAddArgs = args;
         variables.OnChanged += (sender, args) => actualChangedArgs = args;
 

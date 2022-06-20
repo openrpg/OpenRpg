@@ -3,7 +3,7 @@ using OpenRpg.CurveFunctions;
 using OpenRpg.CurveFunctions.Extensions;
 using Xunit;
 
-namespace OpenRpg.UnitTests.Scaling;
+namespace OpenRpg.UnitTests.Utility.Curves;
 
 public class CurveExtensionTests
 {

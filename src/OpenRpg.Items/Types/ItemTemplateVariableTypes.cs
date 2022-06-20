@@ -1,6 +1,6 @@
 namespace OpenRpg.Items.Types
 {
-    public static class ItemTemplateVariableTypes
+    public interface ItemTemplateVariableTypes
     {
         public static int Unknown = 0;
 

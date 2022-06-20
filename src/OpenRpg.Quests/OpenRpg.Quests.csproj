@@ -2,13 +2,14 @@
 
     <PropertyGroup>
         <Version>0.0.0</Version>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <Title>OpenRpg.Quests</Title>
         <Authors>Grofit (LP)</Authors>
         <PackageLicenseUrl>https://github.com/openrpg/OpenRpg/blob/master/LICENSE</PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/openrpg/OpenRpg</PackageProjectUrl>
         <Description>Adds the notion of quests to OpenRpg</Description>
         <PackageTags>rpg game-development xna monogame unity godot</PackageTags>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

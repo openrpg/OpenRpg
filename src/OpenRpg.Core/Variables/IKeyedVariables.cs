@@ -4,7 +4,7 @@ namespace OpenRpg.Core.Variables
 {
     public delegate void VariableChangedEventHandler<K,T>(object sender, VariableEventArgs<K,T> e) where K : struct;
 
-    public interface IKeyedVariables<K, T> : IReadOnlyDictionary<K, T> where K : struct
+    public interface IKeyedVariables<K, T> : IVariables, IReadOnlyDictionary<K, T> where K : struct
     {
         /// <summary>
         /// This is triggered when a value is changed

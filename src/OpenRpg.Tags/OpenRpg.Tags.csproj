@@ -2,13 +2,14 @@
 
     <PropertyGroup>
         <Version>0.0.0</Version>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <Title>OpenRpg.Tags</Title>
         <Authors>Grofit (LP)</Authors>
         <PackageLicenseUrl>https://github.com/openrpg/OpenRpg/blob/master/LICENSE</PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/openrpg/OpenRpg</PackageProjectUrl>
         <Description>Adds notion of tags that can be weighted against each other</Description>
         <PackageTags>rpg game-development xna monogame unity godot</PackageTags>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
     
 </Project>

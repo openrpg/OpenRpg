@@ -12,7 +12,7 @@ namespace OpenRpg.Items.Extensions
             return new DefaultItemVariables { InternalVariables = new Dictionary<int, object>(itemVariables.InternalVariables) };
         }
         
-        public static int Amount(this IItemVariables variables) => Convert.ToInt32(variables.Get(ItemVariableTypes.Amount));
-        public static void Amount(this IItemVariables variables, int value) => variables[ItemVariableTypes.Amount] = value;
+        public static int Amount(this IItemVariables variables) => Convert.ToInt32(variables.Get(DefaultItemVariableTypes.Amount));
+        public static void Amount(this IItemVariables variables, int value) => variables[DefaultItemVariableTypes.Amount] = value;
     }
 }

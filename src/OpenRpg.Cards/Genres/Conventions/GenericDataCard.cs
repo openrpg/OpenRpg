@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OpenRpg.Cards.Variables;
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
 using OpenRpg.Items;

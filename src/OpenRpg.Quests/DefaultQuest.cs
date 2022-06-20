@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using OpenRpg.Core.Requirements;
+using OpenRpg.Quests.Variables;
 
 namespace OpenRpg.Quests
 {

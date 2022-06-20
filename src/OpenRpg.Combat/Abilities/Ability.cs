@@ -1,3 +1,4 @@
+using OpenRpg.Combat.Abilities.Variables;
 using OpenRpg.Core.Common;
 
 namespace OpenRpg.Combat.Abilities

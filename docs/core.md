@@ -3,9 +3,19 @@
 
 The core library is really there to provide things that almost all RPG based games will require, as well as adding conventions for other libraries to build off.
 
+> It is recommended you check out the web demo version to see more use cases and explanations https://openrpg.github.io/OpenRpg.Demos.Web/
+
 --- 
 
 ## Generic Functionality
+
+### `Variables`
+
+Variables act as generic keyed data containers for you to put various data in that can be expanded upon downstream, i.e you can store your stats in them without stipulating what they are up front, then in your application decide which index should be which thing.
+
+There is also the notion of `ComputedVariables` which take effects and other variables and output computed results, this is kind of how we separate base and active stats, for example you may have a race with `+5 strength`, a class with `+4 strength` and a helmet that gives you `+1 strength`, so we can compute all this together using an `IComputedVariablePopulator` so then you can just look in the computed variables and see the strength is `10`.
+
+> In complex scenarios you may have multistage computed steps, i.e you compute the base stats from race/class, then pass that in with equipment effects, then pass that in with active spell effects allowing you to only regenerate the layer that has changed.
 
 ### `Localization`
 
