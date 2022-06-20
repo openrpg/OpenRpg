@@ -10,8 +10,5 @@ namespace OpenRpg.Core.Types
         public static int RaceTemplateVariables = 2;
         public static int ClassTemplateVariables = 3;
         public static int ClassVariables = 4;
-        
-        // Computed Types
-        public static int ComputedStatsVariables = 1000;
     }
 }

@@ -1,8 +1,8 @@
-using OpenRpg.Core.Variables.Computed;
+using OpenRpg.Core.Variables;
 
 namespace OpenRpg.Core.Stats.Variables
 {
-    public interface IStatPopulator : IComputedVariablePopulator<IComputedStatsVariables>
+    public interface IStatPopulator : IVariablePopulator<IStatsVariables>
     {
     }
 }
