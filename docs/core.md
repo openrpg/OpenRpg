@@ -13,7 +13,9 @@ The core library is really there to provide things that almost all RPG based gam
 
 Variables act as generic keyed data containers for you to put various data in that can be expanded upon downstream, i.e you can store your stats in them without stipulating what they are up front, then in your application decide which index should be which thing.
 
-There is also the notion of `ComputedVariables` which take effects and other variables and output computed results, this is kind of how we separate base and active stats, for example you may have a race with `+5 strength`, a class with `+4 strength` and a helmet that gives you `+1 strength`, so we can compute all this together using an `IComputedVariablePopulator` so then you can just look in the computed variables and see the strength is `10`.
+Variables can be manually set or computed by taking effects and other variables and output computed results, this is kind of how we separate base and active stats, for example you may have a race with `+5 strength`, a class with `+4 strength` and a helmet that gives you `+1 strength`, so we can compute all this together using an `IComputedVariablePopulator` so then you can just look in the computed variables and see the strength is `10`.
+
+![](diagrams/variable-population.png)
 
 > In complex scenarios you may have multistage computed steps, i.e you compute the base stats from race/class, then pass that in with equipment effects, then pass that in with active spell effects allowing you to only regenerate the layer that has changed.
 
@@ -46,3 +48,9 @@ In most RPG games you have a class, its up to you if you make your character hav
 ### `Races`
 
 Again most RPG games have the notion of races, be it fantasy races like elves, dwarves etc or sci fi alien races you make up yourself.
+
+## Higher Level Data
+
+This is more for the genres but you are free to compose your data however you see fit, the `Genres` libs provide some pre made conventions for a lot of this for you however you can bypass them and just use the bits you care about directly if you want, but regardless of your approach you will often end up with something like this.
+
+![](diagrams/character-composition.png)
