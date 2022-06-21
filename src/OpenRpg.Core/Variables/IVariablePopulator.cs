@@ -6,6 +6,6 @@ namespace OpenRpg.Core.Variables
 {
     public interface IVariablePopulator<T> where T : IVariables
     {
-        void Populate(T varsToPopulate, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> variables);
+        void Populate(T varsToPopulate, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars);
     }
 }
