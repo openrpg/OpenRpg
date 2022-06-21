@@ -14,7 +14,9 @@ There is a suite of `OpenRpg.Genre` based extensions which provide conventions o
 ---
 ## Important Bits
 
-There are 3 super important bits to this framework:
+There are 3 super important bits to this framework which make it nice to use, there is a lot more to it in terms of models etc and you can read about them more in the examples/docs etc, but this is a quick rundown on the key parts of the system.
+
+> There is FAR more to the system than these 3 bits but most of the other bits build on top of these bits so knowing this stuff shows the potential of how you can have really flexible and extensible data models to build off.
 
 ### Effects
 
@@ -155,5 +157,5 @@ So hopefully the same models/data and approaches can be of use to anyone else wa
 [nuget-url]: https://www.nuget.org/packages/OpenRpg.Core/
 [discord-image]: https://img.shields.io/discord/488609938399297536.svg
 [discord-url]: https://discord.gg/nKejjgT
-[demo-image]: https://img.shields.io/discord/488609938399297536.svg
+[demo-image]: https://img.shields.io/badge/Demo-Site-informational.svg
 [demo-url]: https://openrpg.github.io/OpenRpg.Demos.Web/
