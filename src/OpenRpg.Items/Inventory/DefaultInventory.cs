@@ -8,12 +8,17 @@ namespace OpenRpg.Items.Inventory
 {
     public class DefaultInventory : IInventory
     {
-        private readonly List<IItem> _items = new List<IItem>();
+        public List<IItem> InternalItems { get; }
+
+        public DefaultInventory(IEnumerable<IItem> items = null)
+        {
+            InternalItems = items?.ToList() ?? new List<IItem>();
+        }
 
         public IItem GetItem(int index)
-        { return _items[index]; }
+        { return InternalItems[index]; }
 
-        public IReadOnlyCollection<IItem> Items => _items;
+        public IReadOnlyCollection<IItem> Items => InternalItems;
 
         public IInventoryVariables Variables { get; set; } = new DefaultInventoryVariables();
 
@@ -46,7 +51,7 @@ namespace OpenRpg.Items.Inventory
             if (!HasSlotCapacity())
             { return false; }
 
-            _items.Add(item);
+            InternalItems.Add(item);
             return true;
         }
 
@@ -57,11 +62,11 @@ namespace OpenRpg.Items.Inventory
                 if (!HasSlotCapacity())
                 { return false; }
 
-                _items.Add(itemToAdd);
+                InternalItems.Add(itemToAdd);
                 return true;
             }
 
-            var currentMinimumStackItem = _items
+            var currentMinimumStackItem = InternalItems
                 .Where(x => x.ItemTemplate.Id == itemToAdd.ItemTemplate.Id)
                 .OrderBy(x => x.Variables.Amount())
                 .Take(1)
@@ -72,7 +77,7 @@ namespace OpenRpg.Items.Inventory
                 if (!HasSlotCapacity())
                 { return false; }
 
-                _items.Add(itemToAdd);
+                InternalItems.Add(itemToAdd);
                 return true;
             }
 
@@ -90,7 +95,7 @@ namespace OpenRpg.Items.Inventory
             var remainder = newTotalAmount - maxStack;
             currentMinimumStackItem.Variables.Amount(maxStack);
             itemToAdd.Variables.Amount(remainder);
-            _items.Add(itemToAdd);
+            InternalItems.Add(itemToAdd);
             return true;
         }
 
@@ -105,7 +110,7 @@ namespace OpenRpg.Items.Inventory
             if (!Variables.ContainsKey(InventoryVariableTypes.MaxSlots))
             { return true; }
 
-            return _items.Count < (int)Variables.MaxSlots();
+            return InternalItems.Count < (int)Variables.MaxSlots();
         }
 
         private bool HasWeightCapacity(float weightToAdd)
@@ -126,10 +131,10 @@ namespace OpenRpg.Items.Inventory
             if (itemToRemove.ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.Weight))
             { return AttemptRemoveWeightedItem(itemToRemove); }
 
-            if (!_items.Contains(itemToRemove))
+            if (!InternalItems.Contains(itemToRemove))
             { return false; }
 
-            _items.Remove(itemToRemove);
+            InternalItems.Remove(itemToRemove);
             return true;
         }
 
@@ -137,16 +142,16 @@ namespace OpenRpg.Items.Inventory
         {
             if (!itemToRemove.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
             {
-                if (_items.Contains(itemToRemove))
+                if (InternalItems.Contains(itemToRemove))
                 {
-                    _items.Remove(itemToRemove);
+                    InternalItems.Remove(itemToRemove);
                     return true;
                 }
 
                 return false;
             }
 
-            var currentMaximumStackItem = _items
+            var currentMaximumStackItem = InternalItems
                 .Where(x => x.ItemTemplate.Id == itemToRemove.ItemTemplate.Id)
                 .OrderByDescending(x => x.Variables.Amount())
                 .Take(1)
@@ -158,7 +163,7 @@ namespace OpenRpg.Items.Inventory
             var newAmount = currentMaximumStackItem.Variables.Amount() - 1;
             if (newAmount <= 0)
             {
-                _items.Remove(itemToRemove);
+                InternalItems.Remove(itemToRemove);
                 return true;
             }
 

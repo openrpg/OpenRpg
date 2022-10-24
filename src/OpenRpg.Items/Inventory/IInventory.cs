@@ -4,6 +4,9 @@ namespace OpenRpg.Items.Inventory
 {
     public interface IInventory
     {
+        IReadOnlyCollection<IItem> Items { get; }
+        IInventoryVariables Variables { get; }
+        
         /// <summary>
         /// This will attempt to add the item to the inventory in the best way possible, i.e adding to existing stacks
         /// </summary>
@@ -33,8 +36,5 @@ namespace OpenRpg.Items.Inventory
         /// <param name="index">The index of the item</param>
         /// <returns>The item instance or null</returns>
         IItem GetItem(int index);
-        
-        IReadOnlyCollection<IItem> Items { get; }
-        IInventoryVariables Variables { get; }
     }
 }
