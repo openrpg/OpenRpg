@@ -4,9 +4,9 @@ using OpenRpg.Items.Types;
 
 namespace OpenRpg.Items.Equipment
 {
-    public class DefaultEquipmentSlots : DefaultVariables<IEquipmentSlot<IItem>>, IEquipmentSlots
+    public class DefaultEquipmentSlots : DefaultVariables<IEquipmentSlot>, IEquipmentSlots
     {
-        public DefaultEquipmentSlots(IDictionary<int, IEquipmentSlot<IItem>> internalVariables = null) : base(ItemVariableTypes.EquipmentSlotVariables, internalVariables)
+        public DefaultEquipmentSlots(IDictionary<int, IEquipmentSlot> internalVariables = null) : base(ItemVariableTypes.EquipmentSlotVariables, internalVariables)
         {
         }
     }

@@ -23,6 +23,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.CurveFunctions\OpenRpg.CurveFunctions.csproj" />
+      <ProjectReference Include="..\OpenRpg.Items\OpenRpg.Items.csproj" />
       <ProjectReference Include="..\OpenRpg.Tags\OpenRpg.Tags.csproj" />
     </ItemGroup>
 

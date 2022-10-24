@@ -1,12 +1,12 @@
 namespace OpenRpg.Items.Equipment
 {
-    public abstract class DefaultEquipmentSlot<TItem> : IEquipmentSlot<TItem> 
-        where TItem : class, IItem
+    public abstract class DefaultEquipmentSlot : IEquipmentSlot
     {
-        public abstract int SlotType { get; }
-        public TItem SlottedItem { get; private set; }
+        public abstract bool CanEquipItemType(int itemType);
+        
+        public IItem SlottedItem { get; private set; }
 
-        public TItem UnequipItem()
+        public IItem UnequipItem()
         {
             if(SlottedItem == null) { return null; }
 
@@ -16,10 +16,10 @@ namespace OpenRpg.Items.Equipment
             return returningItem;
         }
 
-        public bool EquipItemToSlot(TItem item)
+        public bool EquipItemToSlot(IItem item)
         {
             if (item == null) { return false; }
-            if(item.ItemTemplate.ItemType != SlotType) { return false; }
+            if(!CanEquipItemType(item.ItemTemplate.ItemType)) { return false; }
             if (SlottedItem != null) { return false; }
 
             SlottedItem = item;
