@@ -6,6 +6,9 @@ namespace OpenRpg.Items.Equipment
         
         public IItem SlottedItem { get; private set; }
 
+        protected DefaultEquipmentSlot(IItem slottedItem = null)
+        { SlottedItem = slottedItem; }
+
         public IItem UnequipItem()
         {
             if(SlottedItem == null) { return null; }
