@@ -24,8 +24,11 @@ namespace OpenRpg.CurveFunctions.Extensions
             var result = curve.ScaledPlot(randomNumber, maxValue);
             return isNegative ? -result : result;
         }
-        
+
         public static int Random(this IRandomizer randomizer, ICurveFunction curve, int minValue, int maxValue)
-        { return (int)Random(randomizer, curve, minValue, (float)maxValue); }
+        {
+            var result = Random(randomizer, curve, (float)minValue, (float)maxValue);
+            return (int)Math.Round(result);
+        }
     }
 }
