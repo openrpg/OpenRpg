@@ -118,6 +118,33 @@ public class DefaultInventoryAmountTests
     }
     
     [Fact]
+    public void should_not_add_item_amount_when_existing_across_multiple_existing_stacks_if_slots_constrained()
+    {
+        var existingItemTemplate = new DefaultItemTemplate { Id = 1 };
+        existingItemTemplate.Variables.MaxStacks(10);
+        
+        var existingItem1 = new DefaultItem() { ItemTemplate = existingItemTemplate };
+        existingItem1.Variables.Amount(8);
+        
+        var existingItem2 = new DefaultItem() { ItemTemplate = existingItemTemplate };
+        existingItem2.Variables.Amount(8);
+        
+        var inventory = new DefaultInventory();
+        inventory.Variables.MaxSlots(2);
+        inventory.InternalItems.Add(existingItem1);
+        inventory.InternalItems.Add(existingItem2);
+        
+        var itemToAdd = new DefaultItem() { ItemTemplate = existingItemTemplate };
+        itemToAdd.Variables.Amount(5);
+        var isItemAdded = inventory.AddItem(itemToAdd);
+
+        Assert.False(isItemAdded);
+        Assert.Equal(2, inventory.InternalItems.Count);
+        Assert.Equal(8, existingItem1.Variables.Amount());
+        Assert.Equal(8, existingItem2.Variables.Amount());
+    }
+    
+    [Fact]
     public void should_remove_item_amount_when_existing()
     {
         var expectedAmount = 75;

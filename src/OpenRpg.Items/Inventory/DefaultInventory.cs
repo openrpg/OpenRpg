@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Items.Extensions;
@@ -94,9 +95,9 @@ namespace OpenRpg.Items.Inventory
                 
                 if (stackSize > 0)
                 {
-                    var availableSpace = existingItemsWithSpace.Sum(x => stackSize - requiredAmount);
+                    var availableSpace = existingItemsWithSpace.Sum(x => stackSize - x.Variables.Amount());
                     var overflowAmount = requiredAmount - availableSpace;
-                    var stacksRequired = overflowAmount / stackSize;
+                    var stacksRequired = (int)Math.Ceiling((float)overflowAmount / stackSize);
                     if(currentSlots + stacksRequired > maxSlots)
                     { return false; }
                 }
