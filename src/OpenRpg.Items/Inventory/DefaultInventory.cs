@@ -151,13 +151,7 @@ namespace OpenRpg.Items.Inventory
 
             return true;
         }
-
-        private bool AttemptAddWeightedItem(IItem item)
-        {
-            // TODO
-            return false;
-        }
-
+        
         private bool HasSlotCapacity()
         {
             if (!Variables.ContainsKey(InventoryVariableTypes.MaxSlots))
@@ -232,6 +226,12 @@ namespace OpenRpg.Items.Inventory
         }
 
         private bool AttemptRemoveWeightedItem(IItem item)
+        {
+            // TODO
+            return false;
+        }
+        
+        private bool AttemptAddWeightedItem(IItem item)
         {
             // TODO
             return false;
