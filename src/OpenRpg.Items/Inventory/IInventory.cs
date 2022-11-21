@@ -36,5 +36,13 @@ namespace OpenRpg.Items.Inventory
         /// <param name="index">The index of the item</param>
         /// <returns>The item instance or null</returns>
         IItem GetItem(int index);
+
+        /// <summary>
+        /// Checks to see if the given item exists in the inventory
+        /// </summary>
+        /// <param name="item">The item to check for</param>
+        /// <returns>True if it has the item false if not</returns>
+        /// <remarks>Implementations may also factor in variables like amounts/weights etc</remarks>
+        bool HasItem(IItem item);
     }
 }

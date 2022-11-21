@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Items.Extensions;
@@ -17,6 +18,29 @@ namespace OpenRpg.Items.Inventory
 
         public IItem GetItem(int index)
         { return InternalItems[index]; }
+
+        public bool HasItem(IItem item)
+        {
+            if (item.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
+            {
+                var totalAmount = InternalItems
+                    .Where(x => x.ItemTemplate.Id == item.ItemTemplate.Id)
+                    .Sum(x => x.Variables.Amount());
+                
+                return totalAmount >= item.Variables.Amount();
+            }
+
+            if (item.Variables.ContainsKey(DefaultItemVariableTypes.Weight))
+            {
+                var totalWeight = InternalItems
+                    .Where(x => x.ItemTemplate.Id == item.ItemTemplate.Id)
+                    .Sum(x => x.Variables.Weight());
+
+                return totalWeight >= item.Variables.Weight();
+            }
+
+            return InternalItems.Any(x => x.ItemTemplate.Id == item.ItemTemplate.Id);
+        }
 
         public IReadOnlyCollection<IItem> Items => InternalItems;
 
@@ -42,10 +66,10 @@ namespace OpenRpg.Items.Inventory
         {
             var item = CloneItem(itemToAdd);
             
-            if (item.ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.MaxStacks))
+            if (item.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
             { return AttemptAddAmountItem(item); }
 
-            if (item.ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.Weight))
+            if (item.Variables.ContainsKey(DefaultItemVariableTypes.Weight))
             { return HasWeightCapacity(item.ItemTemplate.Variables.Weight()) && AttemptAddWeightedItem(item); }
 
             if (!HasSlotCapacity())
@@ -57,54 +81,77 @@ namespace OpenRpg.Items.Inventory
 
         private bool AttemptAddAmountItem(IItem itemToAdd)
         {
-            if (!itemToAdd.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
-            {
-                if (!HasSlotCapacity())
-                { return false; }
+            var requiredAmount = itemToAdd.Variables.Amount();
+            var stackSize = itemToAdd.ItemTemplate.Variables.MaxStacks();
+            var existingItemsWithSpace = InternalItems
+                .Where(x => x.ItemTemplate.Id == itemToAdd.ItemTemplate.Id && (stackSize == 0 || x.Variables.Amount() <= stackSize))
+                .OrderByDescending(x => x.Variables.Amount())
+                .ToArray();
 
-                InternalItems.Add(itemToAdd);
-                return true;
+            var maxSlots = Variables.MaxSlots();
+            if (maxSlots > 0)
+            {
+                var currentSlots = InternalItems.Count;
+                
+                if (stackSize > 0)
+                {
+                    var availableSpace = existingItemsWithSpace.Sum(x => stackSize - x.Variables.Amount());
+                    var overflowAmount = requiredAmount - availableSpace;
+                    var stacksRequired = (int)Math.Ceiling((float)overflowAmount / stackSize);
+                    if(currentSlots + stacksRequired > maxSlots)
+                    { return false; }
+                }
+                else
+                {
+                    if(currentSlots >= maxSlots)
+                    { return false; }
+                }
+            }
+            
+            var amountLeft = requiredAmount;
+            var index = 0;
+            while (amountLeft > 0)
+            {
+                IItem itemWithSpace;
+                if (index < existingItemsWithSpace.Length)
+                { itemWithSpace = existingItemsWithSpace[index]; }
+                else
+                {
+                    itemWithSpace = new DefaultItem() { ItemTemplate = itemToAdd.ItemTemplate };
+                    InternalItems.Add(itemWithSpace);
+                }
+
+                var existingAmount = itemWithSpace.Variables.ContainsKey(DefaultItemVariableTypes.Amount)
+                    ? itemWithSpace.Variables.Amount()
+                    : 0;
+                
+                if (stackSize > 0)
+                {
+                    var spaceLeft = stackSize - existingAmount;
+                    if (amountLeft < spaceLeft)
+                    {
+                        itemWithSpace.Variables.Amount(existingAmount + amountLeft);
+                        amountLeft = 0;
+                    }
+                    else
+                    {
+                        itemWithSpace.Variables.Amount(existingAmount + spaceLeft);
+                        amountLeft -= spaceLeft;
+                    }
+                }
+                else
+                {
+                    itemWithSpace.Variables.Amount(existingAmount + amountLeft);
+                    amountLeft = 0;
+                }
+                
+
+                index++;
             }
 
-            var currentMinimumStackItem = InternalItems
-                .Where(x => x.ItemTemplate.Id == itemToAdd.ItemTemplate.Id)
-                .OrderBy(x => x.Variables.Amount())
-                .Take(1)
-                .SingleOrDefault();
-
-            if (currentMinimumStackItem == null)
-            {
-                if (!HasSlotCapacity())
-                { return false; }
-
-                InternalItems.Add(itemToAdd);
-                return true;
-            }
-
-            var maxStack = itemToAdd.ItemTemplate.Variables.MaxStacks();
-            var newTotalAmount = currentMinimumStackItem.Variables.Amount() + itemToAdd.Variables.Amount();
-            if (newTotalAmount <= maxStack)
-            {
-                currentMinimumStackItem.Variables.Amount(newTotalAmount);
-                return true;
-            }
-
-            if (!HasSlotCapacity())
-            { return false; }
-
-            var remainder = newTotalAmount - maxStack;
-            currentMinimumStackItem.Variables.Amount(maxStack);
-            itemToAdd.Variables.Amount(remainder);
-            InternalItems.Add(itemToAdd);
             return true;
         }
-
-        private bool AttemptAddWeightedItem(IItem item)
-        {
-            // TODO
-            return false;
-        }
-
+        
         private bool HasSlotCapacity()
         {
             if (!Variables.ContainsKey(InventoryVariableTypes.MaxSlots))
@@ -125,10 +172,10 @@ namespace OpenRpg.Items.Inventory
 
         public bool RemoveItem(IItem itemToRemove)
         {
-            if (itemToRemove.ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.MaxStacks))
+            if (itemToRemove.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
             { return AttemptRemoveAmountItem(itemToRemove); }
 
-            if (itemToRemove.ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.Weight))
+            if (itemToRemove.Variables.ContainsKey(DefaultItemVariableTypes.Weight))
             { return AttemptRemoveWeightedItem(itemToRemove); }
 
             if (!InternalItems.Contains(itemToRemove))
@@ -142,36 +189,49 @@ namespace OpenRpg.Items.Inventory
         {
             if (!itemToRemove.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
             {
-                if (InternalItems.Contains(itemToRemove))
-                {
-                    InternalItems.Remove(itemToRemove);
-                    return true;
-                }
-
-                return false;
-            }
-
-            var currentMaximumStackItem = InternalItems
-                .Where(x => x.ItemTemplate.Id == itemToRemove.ItemTemplate.Id)
-                .OrderByDescending(x => x.Variables.Amount())
-                .Take(1)
-                .SingleOrDefault();
-
-            if (currentMaximumStackItem == null)
-            { return false; }
-
-            var newAmount = currentMaximumStackItem.Variables.Amount() - 1;
-            if (newAmount <= 0)
-            {
+                if (!InternalItems.Contains(itemToRemove)) { return false; }
                 InternalItems.Remove(itemToRemove);
                 return true;
             }
 
-            currentMaximumStackItem.Variables.Amount(newAmount);
+            var amountToTake = itemToRemove.Variables.Amount();
+            var applicableItems = InternalItems
+                .Where(x => x.ItemTemplate.Id == itemToRemove.ItemTemplate.Id)
+                .OrderByDescending(x => x.Variables.Amount())
+                .ToList();
+
+            var maxAvailable = applicableItems.Sum(x => x.Variables.Amount());
+            if (maxAvailable < amountToTake)
+            { return false; }
+
+            var index = 0;
+            while (amountToTake > 0)
+            {
+                var currentItem = applicableItems[index];
+                var itemAmount = currentItem.Variables.Amount();
+                if (amountToTake >= itemAmount)
+                {
+                    InternalItems.Remove(currentItem);
+                    amountToTake -= itemAmount;
+                }
+                else
+                {
+                    currentItem.Variables.Amount(itemAmount - amountToTake);
+                    amountToTake -= itemAmount;
+                }
+                index++;
+            }
+            
             return true;
         }
 
         private bool AttemptRemoveWeightedItem(IItem item)
+        {
+            // TODO
+            return false;
+        }
+        
+        private bool AttemptAddWeightedItem(IItem item)
         {
             // TODO
             return false;
