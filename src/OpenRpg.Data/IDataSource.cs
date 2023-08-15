@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace OpenRpg.Data
 {
-    public interface IDataSource
+    public interface IDataSource : IDisposable
     {
         object NativeSource { get; }
         
