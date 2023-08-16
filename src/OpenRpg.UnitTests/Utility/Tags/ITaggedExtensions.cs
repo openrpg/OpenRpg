@@ -57,12 +57,12 @@ public class ITaggedExtensionTests
         var entitiesMatching1and2and3 = allEntities.ContainingTags(tag1, tag2, tag3).ToArray();
         
         Assert.Equal(3, entitiesMatching1and3.Length);
-        Assert.True(entitiesMatching1and3.Contains(entity13));
-        Assert.True(entitiesMatching1and3.Contains(entity123));
-        Assert.True(entitiesMatching1and3.Contains(entity1234));
+        Assert.Contains(entity13, entitiesMatching1and3);
+        Assert.Contains(entity123, entitiesMatching1and3);
+        Assert.Contains(entity1234, entitiesMatching1and3);
         
         Assert.Equal(2, entitiesMatching1and2and3.Length);
-        Assert.True(entitiesMatching1and2and3.Contains(entity123));
-        Assert.True(entitiesMatching1and2and3.Contains(entity1234));
+        Assert.Contains(entity123, entitiesMatching1and2and3);
+        Assert.Contains(entity1234, entitiesMatching1and2and3);
     }
 }

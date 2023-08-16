@@ -9,5 +9,9 @@ namespace OpenRpg.Core.Stats.Populators
         public CompositeStatPopulator(IEnumerable<IPartialStatPopulator> partialPopulators) : base(partialPopulators)
         {
         }
+
+        protected CompositeStatPopulator()
+        {
+        }
     }
 }
