@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Effects;
-using OpenRpg.Core.Stats.Variables;
 
-namespace OpenRpg.Core.Variables
+namespace OpenRpg.Core.Variables.Populators
 {
     /// <summary>
     /// A variable populators job is to take into account all related variables and effects then process that data

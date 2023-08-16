@@ -1,4 +1,4 @@
-version: 0.25.{build}
+version: 0.26.{build}
 branches:
   only:
   - master
