@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Combat.Effects;
+using OpenRpg.Core.Effects;
 
 namespace OpenRpg.Combat.Extensions
 {
@@ -18,23 +19,14 @@ namespace OpenRpg.Combat.Extensions
         public static int TicksSoFar(this ActiveEffect activeEffect)
         { return (int)(activeEffect.ActiveTime / activeEffect.Effect.Frequency); }
         
-        public static float SumPotencyFor(this IEnumerable<ActiveEffect> activeEffects, int effectType)
-        {
-            return activeEffects
-                .Where(x => x.Effect.EffectType == effectType)
-                .Sum(x => x.GetStackedPotency());
-        }
-        
-        public static bool AttemptToStackEffectFor(this IEnumerable<ActiveEffect> activeEffects, TimedEffect timedEffect)
-        {
-            if(timedEffect.MaxStack == 0) { return false; }
-            var existingEffect = activeEffects.SingleOrDefault(x => x.Effect.Id == timedEffect.Id);
-            if (existingEffect == null) { return false; }
-            if (existingEffect.Stacks >= existingEffect.Effect.MaxStack) { return false; }
-            
-            existingEffect.Stacks++;
-            existingEffect.ActiveTime = 0;
-            return true;
+        public static Effect ToEffect(this ActiveEffect activeEffect)
+        { 
+            return new Effect()
+            {
+                EffectType = activeEffect.Effect.EffectType,
+                Potency = activeEffect.GetStackedPotency(),
+                Requirements = activeEffect.Effect.Requirements
+            }; 
         }
     }
 }
