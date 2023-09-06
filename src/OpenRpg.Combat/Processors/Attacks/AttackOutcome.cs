@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using OpenRpg.Combat.Attacks;
 
-namespace OpenRpg.Combat.Processors
+namespace OpenRpg.Combat.Processors.Attacks
 {
     public class AttackOutcome
     {

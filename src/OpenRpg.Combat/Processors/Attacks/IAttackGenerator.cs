@@ -1,8 +1,7 @@
 using OpenRpg.Combat.Attacks;
-using OpenRpg.Core.Stats;
 using OpenRpg.Core.Stats.Variables;
 
-namespace OpenRpg.Combat.Processors
+namespace OpenRpg.Combat.Processors.Attacks
 {
     public interface IAttackGenerator
     {
