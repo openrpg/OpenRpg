@@ -8,7 +8,7 @@ namespace OpenRpg.Tags.Extensions
     public static class TagRegistryExtensions
     {
         public static IEnumerable<TagWeighting> GetRelatedTags(this ITagRegistry registry, params int[] sourceTags)
-            => GetRelatedTags(registry, (IReadOnlyCollection<int>)sourceTags);
+            => GetRelatedTags(registry, (IEnumerable<int>)sourceTags);
         
         public static IEnumerable<TagWeighting> GetRelatedTags(this ITagRegistry registry, IEnumerable<int> sourceTags)
         {
@@ -34,10 +34,10 @@ namespace OpenRpg.Tags.Extensions
 
         public static IEnumerable<TaggedWithScore> GetTaggedScoresFor(this ITagRegistry registry, 
             IEnumerable<ITagged> taggedElements, params int[] sourceTags)
-            => GetTaggedScoresFor(registry, taggedElements, (IReadOnlyCollection<int>)sourceTags);
+            => GetTaggedScoresFor(registry, taggedElements, (IEnumerable<int>)sourceTags);
         
         public static IEnumerable<TaggedWithScore> GetTaggedScoresFor(this ITagRegistry registry, 
-            IEnumerable<ITagged> taggedElements, IReadOnlyCollection<int> sourceTags)
+            IEnumerable<ITagged> taggedElements, IEnumerable<int> sourceTags)
         {
             var relatedTags = GetRelatedTags(registry, sourceTags).ToArray();
             return taggedElements

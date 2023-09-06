@@ -1,9 +1,12 @@
 namespace OpenRpg.Combat.Effects
 {
+    /// <summary>
+    /// Represents an active
+    /// </summary>
     public class ActiveEffect
     {
         /// <summary>
-        /// The timed effect details
+        /// The underlying timed effect that is active
         /// </summary>
         public TimedEffect Effect { get; set; }
         
@@ -21,5 +24,11 @@ namespace OpenRpg.Combat.Effects
         /// Time since the last tick in seconds
         /// </summary>
         public float TimeSinceTick { get; set; }
+
+        public ActiveEffect()
+        {}
+
+        public ActiveEffect(TimedEffect effect)
+        { Effect = effect; }
     }
 }

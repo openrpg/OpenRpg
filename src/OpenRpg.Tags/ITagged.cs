@@ -4,6 +4,6 @@ namespace OpenRpg.Tags
 {
     public interface ITagged
     {
-        IReadOnlyCollection<int> Tags { get; }
+        IReadOnlyList<int> Tags { get; }
     }
 }

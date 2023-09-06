@@ -18,10 +18,9 @@ namespace OpenRpg.Tags.Extensions
         { return !tags.Any(x => taggedEntity.Tags.Contains(x)); }
         
         public static IEnumerable<T> ContainingTags<T>(this IEnumerable<T> taggedEntities, 
-            params int[] tags) where T : ITagged => ContainingTags(taggedEntities, (IReadOnlyCollection<int>)tags);
+            params int[] tags) where T : ITagged => ContainingTags(taggedEntities, (IEnumerable<int>)tags);
 
-        public static IEnumerable<T> ContainingTags<T>(this IEnumerable<T> taggedEntities, 
-            IReadOnlyCollection<int> tags) where T : ITagged
+        public static IEnumerable<T> ContainingTags<T>(this IEnumerable<T> taggedEntities, IEnumerable<int> tags) where T : ITagged
         { return taggedEntities.Where(x => x.ContainsTags(tags)); }
     }
 }

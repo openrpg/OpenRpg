@@ -9,12 +9,13 @@ namespace OpenRpg.Items.Inventory
 {
     public class DefaultInventory : IInventory
     {
-        public List<IItem> InternalItems { get; }
+        public List<IItem> InternalItems { get; set; }
+        public IInventoryVariables Variables { get; set; } = new DefaultInventoryVariables();
 
+        public IReadOnlyList<IItem> Items => InternalItems;
+        
         public DefaultInventory(IEnumerable<IItem> items = null)
-        {
-            InternalItems = items?.ToList() ?? new List<IItem>();
-        }
+        { InternalItems = items?.ToList() ?? new List<IItem>(); }
 
         public IItem GetItem(int index)
         { return InternalItems[index]; }
@@ -41,11 +42,7 @@ namespace OpenRpg.Items.Inventory
 
             return InternalItems.Any(x => x.ItemTemplate.Id == item.ItemTemplate.Id);
         }
-
-        public IReadOnlyCollection<IItem> Items => InternalItems;
-
-        public IInventoryVariables Variables { get; set; } = new DefaultInventoryVariables();
-
+        
         // In future versions this will probably be split out into a framework level notion
         protected virtual IItem CloneItem(IItem item)
         {

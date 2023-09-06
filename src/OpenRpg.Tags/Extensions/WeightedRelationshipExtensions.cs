@@ -22,7 +22,7 @@ namespace OpenRpg.Tags.Extensions
         public static float GetTotalWeightFor(this IEnumerable<TagWeighting> tagWeightings, params int[] tags)
         { return GetTotalWeightFor(tagWeightings, (IReadOnlyCollection<int>)tags); }
         
-        public static float GetTotalWeightFor(this IEnumerable<TagWeighting> tagWeightings, IReadOnlyCollection<int> tags)
+        public static float GetTotalWeightFor(this IEnumerable<TagWeighting> tagWeightings, IEnumerable<int> tags)
         { return tagWeightings.Sum(x => tags.Contains(x.Tag) ? x.Weight : 0.0f); }
         
         public static IEnumerable<TagWeighting> WithWeightAbove(this IEnumerable<TagWeighting> tagWeightings, float minimumWeight)

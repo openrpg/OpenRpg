@@ -4,10 +4,9 @@ using OpenRpg.Items;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Inventory;
 using OpenRpg.Items.Templates;
-using OpenRpg.Items.Types;
 using Xunit;
 
-namespace OpenRpg.UnitTests.Framework.Items;
+namespace OpenRpg.UnitTests.Items;
 
 public class DefaultInventoryAmountTests
 {

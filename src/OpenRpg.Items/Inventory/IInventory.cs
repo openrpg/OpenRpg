@@ -2,9 +2,19 @@ using System.Collections.Generic;
 
 namespace OpenRpg.Items.Inventory
 {
+    /// <summary>
+    /// The inventory interface wraps up the responsibility of storing items and allowing them to be added/removed etc
+    /// </summary>
     public interface IInventory
     {
-        IReadOnlyCollection<IItem> Items { get; }
+        /// <summary>
+        /// All items within the inventory
+        /// </summary>
+        IReadOnlyList<IItem> Items { get; }
+        
+        /// <summary>
+        /// Variables specific to the inventory
+        /// </summary>
         IInventoryVariables Variables { get; }
         
         /// <summary>

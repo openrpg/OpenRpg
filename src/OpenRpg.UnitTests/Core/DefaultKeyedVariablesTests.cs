@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using OpenRpg.Core.Variables;
 using Xunit;
 
-namespace OpenRpg.UnitTests.Framework;
+namespace OpenRpg.UnitTests.Core;
 
 public class DefaultKeyedVariablesTests
 {
