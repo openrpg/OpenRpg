@@ -9,9 +9,12 @@ namespace OpenRpg.CurveFunctions.Extensions
     {
         public static IEnumerable<T> TakeEvery<T>(this IEnumerable<T> enumerable, int sampleRate)
         { return enumerable.Where((_, i) => i % sampleRate == 0); }
-
-        public static IEnumerable<float> Normalize(this IEnumerable<float> enumerable, int min, int max)
+       
+        public static IEnumerable<float> Normalize(this IEnumerable<float> enumerable, float min, float max)
         { return enumerable.Select(x => x.NormalizeBetween(min, max)); }
+        
+        public static IEnumerable<float> Denormalize(this IEnumerable<float> enumerable, float min, float max)
+        { return enumerable.Select(x => x.DenormalizeBetween(min, max)); }
 
         public static IEnumerable<float> PlotAgainst(this IEnumerable<float> enumerable, ICurveFunction curveFunction)
         { return enumerable.Select(curveFunction.Plot); }
