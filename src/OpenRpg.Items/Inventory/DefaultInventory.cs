@@ -16,39 +16,13 @@ namespace OpenRpg.Items.Inventory
         
         public DefaultInventory(IEnumerable<IItem> items = null)
         { InternalItems = items?.ToList() ?? new List<IItem>(); }
-
-        public IItem GetItem(int index)
-        { return InternalItems[index]; }
-
-        public bool HasItem(IItem item)
-        {
-            if (item.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
-            {
-                var totalAmount = InternalItems
-                    .Where(x => x.ItemTemplate.Id == item.ItemTemplate.Id)
-                    .Sum(x => x.Variables.Amount());
-                
-                return totalAmount >= item.Variables.Amount();
-            }
-
-            if (item.Variables.ContainsKey(DefaultItemVariableTypes.Weight))
-            {
-                var totalWeight = InternalItems
-                    .Where(x => x.ItemTemplate.Id == item.ItemTemplate.Id)
-                    .Sum(x => x.Variables.Weight());
-
-                return totalWeight >= item.Variables.Weight();
-            }
-
-            return InternalItems.Any(x => x.ItemTemplate.Id == item.ItemTemplate.Id);
-        }
         
         // In future versions this will probably be split out into a framework level notion
         protected virtual IItem CloneItem(IItem item)
         {
             var duplicatedVariables = new DefaultItemVariables();
 
-            if(item.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
+            if(item.Variables.HasAmount())
             { duplicatedVariables.Amount(item.Variables.Amount()); }
             
             return new DefaultItem
@@ -63,10 +37,10 @@ namespace OpenRpg.Items.Inventory
         {
             var item = CloneItem(itemToAdd);
             
-            if (item.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
+            if (item.Variables.HasAmount())
             { return AttemptAddAmountItem(item); }
 
-            if (item.Variables.ContainsKey(DefaultItemVariableTypes.Weight))
+            if (item.Variables.HasWeight())
             { return HasWeightCapacity(item.ItemTemplate.Variables.Weight()) && AttemptAddWeightedItem(item); }
 
             if (!HasSlotCapacity())
@@ -118,7 +92,7 @@ namespace OpenRpg.Items.Inventory
                     InternalItems.Add(itemWithSpace);
                 }
 
-                var existingAmount = itemWithSpace.Variables.ContainsKey(DefaultItemVariableTypes.Amount)
+                var existingAmount = itemWithSpace.Variables.HasAmount()
                     ? itemWithSpace.Variables.Amount()
                     : 0;
                 
@@ -151,10 +125,10 @@ namespace OpenRpg.Items.Inventory
         
         private bool HasSlotCapacity()
         {
-            if (!Variables.ContainsKey(InventoryVariableTypes.MaxSlots))
+            if (!Variables.HasMaxSlots())
             { return true; }
 
-            return InternalItems.Count < (int)Variables.MaxSlots();
+            return InternalItems.Count < Variables.MaxSlots();
         }
 
         private bool HasWeightCapacity(float weightToAdd)
@@ -169,10 +143,10 @@ namespace OpenRpg.Items.Inventory
 
         public bool RemoveItem(IItem itemToRemove)
         {
-            if (itemToRemove.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
+            if (itemToRemove.Variables.HasAmount())
             { return AttemptRemoveAmountItem(itemToRemove); }
 
-            if (itemToRemove.Variables.ContainsKey(DefaultItemVariableTypes.Weight))
+            if (itemToRemove.Variables.HasWeight())
             { return AttemptRemoveWeightedItem(itemToRemove); }
 
             if (!InternalItems.Contains(itemToRemove))
@@ -184,7 +158,7 @@ namespace OpenRpg.Items.Inventory
 
         private bool AttemptRemoveAmountItem(IItem itemToRemove)
         {
-            if (!itemToRemove.Variables.ContainsKey(DefaultItemVariableTypes.Amount))
+            if (!itemToRemove.Variables.HasAmount())
             {
                 if (!InternalItems.Contains(itemToRemove)) { return false; }
                 InternalItems.Remove(itemToRemove);

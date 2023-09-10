@@ -39,20 +39,5 @@ namespace OpenRpg.Items.Inventory
         /// <param name="itemToRemove">The item you want to remove</param>
         /// <returns>true if the item could be removed false if not (i.e it isnt in the inventory)</returns>
         bool RemoveItem(IItem itemToRemove);
-        
-        /// <summary>
-        /// Gets the item by its index in the inventory
-        /// </summary>
-        /// <param name="index">The index of the item</param>
-        /// <returns>The item instance or null</returns>
-        IItem GetItem(int index);
-
-        /// <summary>
-        /// Checks to see if the given item exists in the inventory
-        /// </summary>
-        /// <param name="item">The item to check for</param>
-        /// <returns>True if it has the item false if not</returns>
-        /// <remarks>Implementations may also factor in variables like amounts/weights etc</remarks>
-        bool HasItem(IItem item);
     }
 }

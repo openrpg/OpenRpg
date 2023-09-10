@@ -12,6 +12,9 @@ namespace OpenRpg.Items.Extensions
             return new DefaultItemVariables { InternalVariables = new Dictionary<int, object>(itemVariables.InternalVariables) };
         }
         
+        public static bool HasAmount(this IItemVariables variables)
+        { return variables.ContainsKey(DefaultItemVariableTypes.Amount); }
+        
         public static int Amount(this IItemVariables variables)
         {
             var amountObject = variables.Get(DefaultItemVariableTypes.Amount);
@@ -20,6 +23,9 @@ namespace OpenRpg.Items.Extensions
         }
 
         public static void Amount(this IItemVariables variables, int value) => variables[DefaultItemVariableTypes.Amount] = value;
+        
+        public static bool HasWeight(this IItemVariables variables)
+        { return variables.ContainsKey(DefaultItemVariableTypes.Weight); }
         
         public static int Weight(this IItemVariables variables) => Convert.ToInt32(variables.Get(DefaultItemVariableTypes.Weight));
         public static void Weight(this IItemVariables variables, int value) => variables[DefaultItemVariableTypes.Weight] = value;

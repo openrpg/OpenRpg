@@ -10,27 +10,6 @@ namespace OpenRpg.UnitTests.Items;
 
 public class DefaultInventoryAmountTests
 {
-    [Theory]
-    [InlineData(5,5,true)]
-    [InlineData(5,0,true)]
-    [InlineData(10,5,true)]
-    [InlineData(5,10,false)]
-    public void should_correctly_return_if_it_has_items_with_amounts(int startingAmount, int requestAmount, bool expected)
-    {
-        var existingItemTemplate = new DefaultItemTemplate { Id = 1 };
-        var existingItem = new DefaultItem() { UniqueId = Guid.Empty, ItemTemplate = existingItemTemplate };
-        existingItem.Variables.Amount(startingAmount);
-        
-        var inventory = new DefaultInventory();
-        inventory.InternalItems.Add(existingItem);
-
-        var itemToCheck = new DefaultItem() { UniqueId = Guid.Empty, ItemTemplate = existingItemTemplate };
-        itemToCheck.Variables.Amount(requestAmount);
-        var actual = inventory.HasItem(itemToCheck);
-
-        Assert.Equal(expected, actual);
-    }
-    
     [Fact]
     public void should_add_item_amount_when_not_existing()
     {

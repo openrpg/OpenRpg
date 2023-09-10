@@ -1,4 +1,6 @@
+using System.Linq;
 using OpenRpg.CurveFunctions;
+using OpenRpg.CurveFunctions.Extensions;
 using OpenRpg.CurveFunctions.Scaling;
 using Xunit;
 
@@ -34,5 +36,13 @@ public class ScalingFunctionTests
         var scalingFunction = new ScalingFunction(PresetCurves.InverseLinear, outputMin, outputMax, inputMin, inputMax);
         var actualValue = scalingFunction.Plot(input);
         Assert.Equal(expectedOutput.ToString("F"), actualValue.ToString("F"));
+    }
+
+    [Fact]
+    public void sanity_test()
+    {
+        var scalingFunction = new ScalingFunction(PresetCurves.QuadraticUpperLeft, 25, 100, 0, 50);
+        var points = Enumerable.Range(0, 50).Select(x => (float)x).PlotAgainst(scalingFunction).ToArray();
+        Assert.Equal(50, points.Length);
     }
 }
