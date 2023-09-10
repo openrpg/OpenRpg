@@ -6,7 +6,7 @@ namespace OpenRpg.Items.Loot
 {
     public class DefaultLootTableEntryVariables : DefaultVariables<object>, ILootTableEntryVariables
     {
-        public DefaultLootTableEntryVariables(IDictionary<int, object> internalVariables = null) : base(ItemVariableTypes.LootTableEntryVariables, internalVariables)
+        public DefaultLootTableEntryVariables(IDictionary<int, object> internalVariables = null) : base(ItemCoreVariableTypes.LootTableEntryVariables, internalVariables)
         {
         }
     }

@@ -6,7 +6,7 @@ namespace OpenRpg.Items.Equipment
 {
     public class DefaultEquipmentSlots : DefaultVariables<IEquipmentSlot>, IEquipmentSlots
     {
-        public DefaultEquipmentSlots(IDictionary<int, IEquipmentSlot> internalVariables = null) : base(ItemVariableTypes.EquipmentSlotVariables, internalVariables)
+        public DefaultEquipmentSlots(IDictionary<int, IEquipmentSlot> internalVariables = null) : base(ItemCoreVariableTypes.EquipmentSlotVariables, internalVariables)
         {
         }
     }

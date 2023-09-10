@@ -6,7 +6,7 @@ namespace OpenRpg.Items.Variables
 {
     public class DefaultEquipmentVariables : DefaultVariables<object>, IEquipmentVariables
     {
-        public DefaultEquipmentVariables(IDictionary<int, object> internalVariables = null) : base(ItemVariableTypes.EquipmentVariables, internalVariables)
+        public DefaultEquipmentVariables(IDictionary<int, object> internalVariables = null) : base(ItemCoreVariableTypes.EquipmentVariables, internalVariables)
         {
         }
     }

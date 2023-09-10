@@ -6,7 +6,7 @@ namespace OpenRpg.Cards.Variables
 {
     public class DefaultCardVariables : DefaultVariables<object>, ICardVariables
     {
-        public DefaultCardVariables(IDictionary<int, object> internalVariables = null) : base(CardVariableTypes.CardVariables, internalVariables)
+        public DefaultCardVariables(IDictionary<int, object> internalVariables = null) : base(ICardCoreVariableTypes.CardVariables, internalVariables)
         {
         }
     }
