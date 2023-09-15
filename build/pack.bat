@@ -1,4 +1,4 @@
-set version=0.19.00
+set version=0.29.00
 dotnet pack ../src/OpenRpg.Core -c Release -o ../../_dist /p:version=%version%
 dotnet pack ../src/OpenRpg.Items -c Release -o ../../_dist /p:version=%version%
 dotnet pack ../src/OpenRpg.Combat -c Release -o ../../_dist /p:version=%version%
@@ -11,3 +11,4 @@ dotnet pack ../src/OpenRpg.Genres.Fantasy -c Release -o ../../_dist /p:version=%
 dotnet pack ../src/OpenRpg.Cards -c Release -o ../../_dist /p:version=%version%
 dotnet pack ../src/OpenRpg.CurveFunctions -c Release -o ../../_dist /p:version=%version%
 dotnet pack ../src/OpenRpg.Tags -c Release -o ../../_dist /p:version=%version%
+dotnet pack ../src/OpenRpg.Items.TradeSkills -c Release -o ../../_dist /p:version=%version%

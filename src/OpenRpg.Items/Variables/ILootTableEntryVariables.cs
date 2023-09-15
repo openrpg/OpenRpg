@@ -1,6 +1,6 @@
 using OpenRpg.Core.Variables;
 
-namespace OpenRpg.Items.Loot
+namespace OpenRpg.Items.Variables
 {
     public interface ILootTableEntryVariables : IVariables<object>
     {}

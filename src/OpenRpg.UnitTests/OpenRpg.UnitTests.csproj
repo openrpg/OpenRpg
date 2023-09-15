@@ -24,8 +24,10 @@
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.Combat\OpenRpg.Combat.csproj" />
       <ProjectReference Include="..\OpenRpg.CurveFunctions\OpenRpg.CurveFunctions.csproj" />
+      <ProjectReference Include="..\OpenRpg.Items.TradeSkills\OpenRpg.Items.TradeSkills.csproj" />
       <ProjectReference Include="..\OpenRpg.Items\OpenRpg.Items.csproj" />
       <ProjectReference Include="..\OpenRpg.Tags\OpenRpg.Tags.csproj" />
     </ItemGroup>
+
 
 </Project>

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using OpenRpg.Core.Variables;
 using OpenRpg.Items.Types;
 
-namespace OpenRpg.Items.Loot
+namespace OpenRpg.Items.Variables
 {
     public class DefaultLootTableEntryVariables : DefaultVariables<object>, ILootTableEntryVariables
     {

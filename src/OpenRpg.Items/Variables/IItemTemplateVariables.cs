@@ -1,6 +1,6 @@
 using OpenRpg.Core.Variables;
 
-namespace OpenRpg.Items.Templates
+namespace OpenRpg.Items.Variables
 {
     public interface IItemTemplateVariables : IVariables<object>
     {}

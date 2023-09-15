@@ -2,6 +2,7 @@ using System;
 using OpenRpg.Items.Loot;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.Types;
+using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Extensions
 {

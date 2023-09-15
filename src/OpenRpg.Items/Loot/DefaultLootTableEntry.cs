@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Items.Templates;
+using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Loot
 {

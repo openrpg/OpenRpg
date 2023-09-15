@@ -31,7 +31,7 @@ namespace OpenRpg.Items.Extensions
         public static bool HasWeight(this IItemVariables variables)
         { return variables.ContainsKey(ItemVariableTypes.Weight); }
         
-        public static int Weight(this IItemVariables variables) => Convert.ToInt32(variables.Get(ItemVariableTypes.Weight));
-        public static void Weight(this IItemVariables variables, int value) => variables[ItemVariableTypes.Weight] = value;
+        public static float Weight(this IItemVariables variables) => Convert.ToSingle(variables.Get(ItemVariableTypes.Weight));
+        public static void Weight(this IItemVariables variables, float value) => variables[ItemVariableTypes.Weight] = value;
     }
 }
