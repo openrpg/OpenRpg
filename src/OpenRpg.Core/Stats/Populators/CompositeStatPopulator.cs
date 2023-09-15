@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using OpenRpg.Core.Stats.Variables;
 using OpenRpg.Core.Variables.Populators;
 
 namespace OpenRpg.Core.Stats.Populators
 {
-    public class CompositeStatPopulator : CompositeVariablePopulator<IStatsVariables>, IStatPopulator
+    public class CompositeStatPopulator<T> : CompositeVariablePopulator<T>, IStatPopulator<T> where T : IStatsVariables
     {
-        public CompositeStatPopulator(IEnumerable<IPartialStatPopulator> partialPopulators) : base(partialPopulators)
+        public CompositeStatPopulator(IEnumerable<IPartialStatPopulator<T>> partialPopulators) : base(partialPopulators)
         {
         }
 
