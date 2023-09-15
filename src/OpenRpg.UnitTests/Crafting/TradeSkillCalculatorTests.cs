@@ -1,3 +1,4 @@
+using OpenRpg.Items.TradeSkills.Calculator;
 using Xunit;
 
 namespace OpenRpg.UnitTests.Crafting;

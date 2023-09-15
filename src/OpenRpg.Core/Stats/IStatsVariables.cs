@@ -1,6 +1,6 @@
 using OpenRpg.Core.Variables;
 
-namespace OpenRpg.Core.Stats.Variables
+namespace OpenRpg.Core.Stats
 {
     /// <summary>
     /// Stat variables generally contain static stat data which is computed from effects active on the entity

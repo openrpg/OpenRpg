@@ -2,7 +2,9 @@ using OpenRpg.Core.Common;
 using OpenRpg.Core.State;
 using OpenRpg.Core.State.Entity;
 using OpenRpg.Core.Stats;
+using OpenRpg.Core.Stats.Entity;
 using OpenRpg.Core.Variables.Entity;
+using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Core.Entity
 {
@@ -14,11 +16,7 @@ namespace OpenRpg.Core.Entity
     /// to add additional requirements on but this gives a building block to allow more functionality in
     /// the base layers.
     /// </remarks>
-    public interface IEntity : IIsUnique, IHasLocaleDescription, IHasStats, IHasState<IEntityStateVariables>
-    {
-        /// <summary>
-        /// The variables for this entity
-        /// </summary>
-        IEntityVariables Variables { get; }
-    }
+    public interface IEntity : IIsUnique, IHasLocaleDescription, 
+        IHasState<IEntityStateVariables>, IHasStats<IEntityStatsVariables>, IHasVariables<IEntityVariables>
+    {}
 }

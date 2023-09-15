@@ -2,6 +2,7 @@ using System.Linq;
 using OpenRpg.Combat.Variables;
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
+using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Combat.Effects
 {
@@ -12,7 +13,7 @@ namespace OpenRpg.Combat.Effects
     /// This just describes how the effect should be processed, and is more akin to a template. It should be
     /// used in conjunction with ActiveEffect for actually tracking and processing the effect.
     /// </remarks>
-    public class TimedEffect : Effect, IHasDataId, IHasLocaleDescription
+    public class TimedEffect : Effect, IHasDataId, IHasLocaleDescription, IHasVariables<ITimedEffectVariables>
     {
         /// <inheritdoc />
         public int Id { get; set; }

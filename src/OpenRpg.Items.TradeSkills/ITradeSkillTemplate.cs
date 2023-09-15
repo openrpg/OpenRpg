@@ -1,10 +1,11 @@
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Requirements;
+using OpenRpg.Core.Variables.General;
 using OpenRpg.Items.TradeSkills.Variables;
 
 namespace OpenRpg.Items.TradeSkills
 {
-    public interface ITradeSkillTemplate : IHasDataId, IHasRequirements
+    public interface ITradeSkillTemplate : IHasDataId, IHasRequirements, IHasVariables<ITradeSkillTemplateVariables>
     {
         /// <summary>
         /// Time in seconds for the action to complete i.e gathered/created
@@ -20,10 +21,5 @@ namespace OpenRpg.Items.TradeSkills
         /// Indicates how difficult this is to get, effects gather/creation rates and level up rates
         /// </summary>
         public int SkillDifficulty { get; }
-        
-        /// <summary>
-        /// Variables for this template
-        /// </summary>
-        public ITradeSkillTemplateVariables Variables { get; }
     }
 }

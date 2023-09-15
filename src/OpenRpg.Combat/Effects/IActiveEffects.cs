@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using OpenRpg.Combat.Variables;
 using OpenRpg.Core.Effects;
+using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Combat.Effects
 {
@@ -9,7 +10,7 @@ namespace OpenRpg.Combat.Effects
     /// The active effects allows us to wrap up concerns for managing active effects and abstracting away certain details
     /// like the stacking etc
     /// </summary>
-    public interface IActiveEffects : IHasEffects
+    public interface IActiveEffects : IHasEffects, IHasVariables<IActiveEffectsVariables>
     {
         event EventHandler<ActiveEffect> EffectAdded;
         event EventHandler<ActiveEffect> EffectTriggered;
@@ -19,11 +20,6 @@ namespace OpenRpg.Combat.Effects
         /// All active effects
         /// </summary>
         IReadOnlyCollection<ActiveEffect> ActiveEffects { get; }
-        
-        /// <summary>
-        /// Variables specific to the active effects
-        /// </summary>
-        IActiveEffectsVariables Variables { get; }
         
         /// <summary>
         /// This will attempt to add an effect, each implementation may differ how stacking is handled etc

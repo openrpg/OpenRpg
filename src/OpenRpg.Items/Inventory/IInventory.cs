@@ -1,21 +1,17 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Items.Inventory
 {
     /// <summary>
     /// The inventory interface wraps up the responsibility of storing items and allowing them to be added/removed etc
     /// </summary>
-    public interface IInventory
+    public interface IInventory : IHasVariables<IInventoryVariables>
     {
         /// <summary>
         /// All items within the inventory
         /// </summary>
         IReadOnlyList<IItem> Items { get; }
-        
-        /// <summary>
-        /// Variables specific to the inventory
-        /// </summary>
-        IInventoryVariables Variables { get; }
         
         /// <summary>
         /// This will attempt to add the item to the inventory in the best way possible, i.e adding to existing stacks

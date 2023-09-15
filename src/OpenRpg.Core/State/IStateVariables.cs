@@ -1,6 +1,6 @@
 using OpenRpg.Core.Variables;
 
-namespace OpenRpg.Core.Stats.Variables
+namespace OpenRpg.Core.State
 {
     /// <summary>
     /// State variables are manually maintained state values which may depend upon Stat values but are tracked separately

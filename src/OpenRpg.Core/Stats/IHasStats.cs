@@ -2,8 +2,8 @@ using OpenRpg.Core.Stats.Variables;
 
 namespace OpenRpg.Core.Stats
 {
-    public interface IHasStats
+    public interface IHasStats<out T> where T : IStatsVariables
     {
-        IStatsVariables Stats { get; }
+        T Stats { get; }
     }
 }
