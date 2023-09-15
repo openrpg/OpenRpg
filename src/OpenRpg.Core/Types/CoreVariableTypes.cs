@@ -6,7 +6,7 @@ namespace OpenRpg.Core.Types
         public static int Unknown = 0;
         
         // Base Types
-        public static int StatsVariables = 1;
+        public static int EntityStatsVariables = 1;
         public static int RaceTemplateVariables = 2;
         public static int ClassTemplateVariables = 3;
         public static int ClassVariables = 4;

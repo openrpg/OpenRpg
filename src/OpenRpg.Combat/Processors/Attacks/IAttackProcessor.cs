@@ -1,11 +1,10 @@
 using OpenRpg.Combat.Attacks;
 using OpenRpg.Core.Stats;
-using OpenRpg.Core.Stats.Variables;
 
 namespace OpenRpg.Combat.Processors.Attacks
 {
-    public interface IAttackProcessor
+    public interface IAttackProcessor<in T> where T : IStatsVariables
     {
-        ProcessedAttack ProcessAttack(Attack attack, IStatsVariables stats);
+        ProcessedAttack ProcessAttack(Attack attack, T stats);
     }
 }
