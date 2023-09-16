@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using OpenRpg.Core.Variables;
 using OpenRpg.Core.Variables.General;
 using OpenRpg.Quests.Types;
 

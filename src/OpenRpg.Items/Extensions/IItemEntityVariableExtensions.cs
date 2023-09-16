@@ -1,6 +1,7 @@
 using OpenRpg.Core.Variables.Entity;
 using OpenRpg.Items.Equipment;
 using OpenRpg.Items.Inventory;
+using OpenRpg.Items.Loot;
 using OpenRpg.Items.Types;
 
 namespace OpenRpg.Items.Extensions
@@ -27,5 +28,14 @@ namespace OpenRpg.Items.Extensions
 
         public static void Inventory(this IEntityVariables vars, IInventory inventory)
         { vars[ItemEntityVariableTypes.Inventory] = inventory; }
+        
+        public static bool HasLootTable(this IEntityVariables vars) 
+        { return vars.ContainsKey(ItemEntityVariableTypes.LootTable); }
+        
+        public static ILootTable LootTable(this IEntityVariables vars)
+        { return vars[ItemEntityVariableTypes.LootTable] as ILootTable; }
+
+        public static void LootTable(this IEntityVariables vars, ILootTable lootTable)
+        { vars[ItemEntityVariableTypes.LootTable] = lootTable; }
     }
 }

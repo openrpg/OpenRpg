@@ -16,7 +16,7 @@ namespace OpenRpg.Core.Entity
     /// to add additional requirements on but this gives a building block to allow more functionality in
     /// the base layers.
     /// </remarks>
-    public interface IEntity : IIsUnique, IHasLocaleDescription, 
+    public interface IEntity : IHasLocaleDescription, 
         IHasState<IEntityStateVariables>, IHasStats<IEntityStatsVariables>, IHasVariables<IEntityVariables>
     {}
 }

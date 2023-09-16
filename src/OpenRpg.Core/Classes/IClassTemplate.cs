@@ -6,7 +6,7 @@ using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Core.Classes
 {
-    public interface IClassTemplate : IHasDataId, IHasEffects, IHasRequirements, IHasLocaleDescription, IHasVariables<IClassTemplateVariables>
+    public interface IClassTemplate : IDataTemplate, IHasEffects, IHasRequirements, IHasVariables<IClassTemplateVariables>
     {
     }
 }

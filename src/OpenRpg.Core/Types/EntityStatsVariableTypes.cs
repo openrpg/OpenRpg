@@ -1,6 +1,6 @@
 namespace OpenRpg.Core.Types
 {
-    public interface StatsVariableTypes
+    public interface EntityStatsVariableTypes
     {
         public static readonly int Unknown = 0;
     }

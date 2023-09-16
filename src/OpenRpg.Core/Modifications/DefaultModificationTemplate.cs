@@ -4,7 +4,7 @@ using OpenRpg.Core.Effects;
 
 namespace OpenRpg.Core.Modifications
 {
-    public class DefaultModification : IModification
+    public class DefaultModificationTemplate : IModificationTemplate
     {
         public int Id { get; set; }
         public IEnumerable<Effect> Effects { get; set; } = Array.Empty<Effect>();

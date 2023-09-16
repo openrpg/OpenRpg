@@ -22,7 +22,7 @@ namespace OpenRpg.Items.Extensions
             {
                 ItemTemplate = item.ItemTemplate,
                 Variables = (item.Variables as DefaultItemVariables).Clone(),
-                Modifications = new List<IModification>(item.Modifications)
+                Modifications = new List<IModificationTemplate>(item.Modifications)
             };
         }
 

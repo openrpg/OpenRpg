@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace OpenRpg.Quests.Factions
 {
-    public class FactionReputation : IFactionReputation
+    public class DefaultFactionReputation : IFactionReputation
     {
         public Dictionary<int, int> InternalFactionReputation { get; set; } = new Dictionary<int, int>();
 

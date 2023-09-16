@@ -4,6 +4,6 @@ namespace OpenRpg.Core.Modifications
 {
     public interface IHasModifications
     {
-        IEnumerable<IModification> Modifications { get; }
+        IEnumerable<IModificationTemplate> Modifications { get; }
     }
 }

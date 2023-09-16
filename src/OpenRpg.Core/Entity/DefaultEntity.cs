@@ -1,4 +1,3 @@
-using System;
 using OpenRpg.Core.State.Entity;
 using OpenRpg.Core.Stats.Entity;
 using OpenRpg.Core.Variables.Entity;
@@ -10,7 +9,6 @@ namespace OpenRpg.Core.Entity
     /// </summary>
     public class DefaultEntity : IEntity
     {
-        public Guid UniqueId { get; set; } = Guid.NewGuid();
         public string NameLocaleId { get; set; } = string.Empty;
         public string DescriptionLocaleId { get; set; } = string.Empty;
         public IEntityStatsVariables Stats { get; set; } = new DefaultEntityStatsVariables();

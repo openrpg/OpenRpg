@@ -8,7 +8,7 @@ namespace OpenRpg.Items
     public interface IItem
     {
         IItemTemplate ItemTemplate { get; }
-        IEnumerable<IModification> Modifications { get; }
+        IEnumerable<IModificationTemplate> Modifications { get; }
         IItemVariables Variables { get; }
     }
 }

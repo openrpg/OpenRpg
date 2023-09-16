@@ -14,5 +14,14 @@ namespace OpenRpg.Quests.Extensions
 
         public static void FactionReputation(this IEntityVariables vars, IFactionReputation factionReputation)
         { vars[QuestEntityVariableTypes.FactionReputation] = factionReputation; }
+        
+        public static bool HasQuestState(this IEntityVariables vars) 
+        { return vars.ContainsKey(QuestEntityVariableTypes.QuestState); }
+        
+        public static IQuestState QuestState(this IEntityVariables vars)
+        { return vars[QuestEntityVariableTypes.QuestState] as IQuestState; }
+
+        public static void QuestState(this IEntityVariables vars, IQuestState questState)
+        { vars[QuestEntityVariableTypes.QuestState] = questState; }
     }
 }

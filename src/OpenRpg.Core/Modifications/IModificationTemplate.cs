@@ -3,7 +3,7 @@ using OpenRpg.Core.Effects;
 
 namespace OpenRpg.Core.Modifications
 {
-    public interface IModification : IHasDataId, IHasEffects, IHasLocaleDescription
+    public interface IModificationTemplate : IDataTemplate, IHasEffects
     {
         int ModificationType { get; }
     }

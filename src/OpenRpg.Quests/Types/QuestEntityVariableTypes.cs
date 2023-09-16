@@ -4,6 +4,7 @@ namespace OpenRpg.Quests.Types
 {
     public interface QuestEntityVariableTypes : EntityVariableTypes
     {
-        public static int FactionReputation = 20;
+        public static int FactionReputation = 30;
+        public static int QuestState = 31;
     }
 }

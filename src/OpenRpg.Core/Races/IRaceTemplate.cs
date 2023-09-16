@@ -6,7 +6,7 @@ using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Core.Races
 {
-    public interface IRaceTemplate : IHasDataId, IHasEffects, IHasRequirements, IHasLocaleDescription, IHasVariables<IRaceTemplateVariables>
+    public interface IRaceTemplate : IDataTemplate, IHasEffects, IHasRequirements, IHasVariables<IRaceTemplateVariables>
     {
     }
 }

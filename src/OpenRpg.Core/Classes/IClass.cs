@@ -1,11 +1,10 @@
 using OpenRpg.Core.Classes.Variables;
+using OpenRpg.Core.Common;
 using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Core.Classes
 {
-    public interface IClass : IHasVariables<IClassVariables>
+    public interface IClass : IHasVariables<IClassVariables>, IHasTemplate<IClassTemplate>
     {
-        int Level { get; set; }
-        IClassTemplate ClassTemplate { get; }
     }
 }

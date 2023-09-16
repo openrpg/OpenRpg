@@ -6,7 +6,7 @@ namespace OpenRpg.Core.Stats.Entity
 {
     public class DefaultEntityStatsVariables : DefaultVariables<float>, IEntityStatsVariables
     {
-        public DefaultEntityStatsVariables(IDictionary<int, float> internalVariables = null) : base(CoreVariableTypes.EntityStateVariables, internalVariables)
+        public DefaultEntityStatsVariables(IDictionary<int, float> internalVariables = null) : base(CoreVariableTypes.EntityStatsVariables, internalVariables)
         {
         }
     }
