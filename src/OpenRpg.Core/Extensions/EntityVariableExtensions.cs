@@ -11,7 +11,7 @@ namespace OpenRpg.Core.Extensions
         { return vars.ContainsKey(EntityVariableTypes.Gender); }
         
         public static byte Gender(this IEntityVariables vars)
-        { return (byte)vars[EntityVariableTypes.Gender]; }
+        { return (byte)(vars[EntityVariableTypes.Gender] ?? 0); }
 
         public static void Gender(this IEntityVariables vars, byte gender)
         { vars[EntityVariableTypes.Gender] = gender; }
