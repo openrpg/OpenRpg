@@ -9,6 +9,18 @@ namespace OpenRpg.UnitTests.Core;
 public class EntityVariableExtensionTests
 {
     [Fact]
+    public void should_correctly_handle_gender_on_entity()
+    {
+        var entityVars = new DefaultEntityVariables();
+        Assert.False(entityVars.HasGender());
+        
+        var dummyGender = (byte)1;
+        entityVars.Gender(dummyGender);
+        Assert.True(entityVars.HasGender());
+        Assert.Equal(entityVars.Gender(), dummyGender);
+    }
+    
+    [Fact]
     public void should_correctly_handle_race_on_entity()
     {
         var entityVars = new DefaultEntityVariables();

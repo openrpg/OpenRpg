@@ -9,6 +9,12 @@ namespace OpenRpg.Quests
 
         public IReadOnlyDictionary<int, int> QuestStates => InternalQuestStates;
         
+        public DefaultQuestState()
+        {}
+        
+        public DefaultQuestState(Dictionary<int, int> questStates)
+        { InternalQuestStates = questStates; }
+        
         public int GetQuestState(int questId)
         {
             return InternalQuestStates.TryGetValue(questId, out var state) 
@@ -18,11 +24,5 @@ namespace OpenRpg.Quests
 
         public void SetQuestState(int questId, int questState)
         { InternalQuestStates[questId] = questState; }
-
-        public DefaultQuestState()
-        {}
-
-        public DefaultQuestState(Dictionary<int, int> questStates)
-        { InternalQuestStates = questStates; }
     }
 }

@@ -7,6 +7,15 @@ namespace OpenRpg.Core.Extensions
 {
     public static class EntityVariableExtensions
     {
+        public static bool HasGender(this IEntityVariables vars) 
+        { return vars.ContainsKey(EntityVariableTypes.Gender); }
+        
+        public static byte Gender(this IEntityVariables vars)
+        { return (byte)vars[EntityVariableTypes.Gender]; }
+
+        public static void Gender(this IEntityVariables vars, byte gender)
+        { vars[EntityVariableTypes.Gender] = gender; }
+        
         public static bool HasRace(this IEntityVariables vars) 
         { return vars.ContainsKey(EntityVariableTypes.Race); }
         
