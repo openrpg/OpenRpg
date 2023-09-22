@@ -102,10 +102,10 @@ public class TagRegistryExtensionTests
         var leatherTag = 6;
         var woodTag = 7;
         
-        var heavyMetalArmour = new TaggedEntity(armourTag, heavyTag, metalTag);
-        var heavyWoodArmour = new TaggedEntity(armourTag, heavyTag, woodTag);
-        var lightArmour = new TaggedEntity(armourTag, lightTag, leatherTag);
-        var leatherBag = new TaggedEntity(expensiveTag, leatherTag);
+        var heavyMetalArmour = new ContextualTags(1, new TagList(armourTag, heavyTag, metalTag));
+        var heavyWoodArmour = new ContextualTags(2, new TagList(armourTag, heavyTag, woodTag));
+        var lightArmour = new ContextualTags(3, new TagList(armourTag, lightTag, leatherTag));
+        var leatherBag = new ContextualTags(4, new TagList(expensiveTag, leatherTag));
         var taggedItems = new[] { heavyMetalArmour, heavyWoodArmour, lightArmour, leatherBag };
 
         var existingData = new Dictionary<int, ICollection<TagWeighting>>
@@ -129,9 +129,9 @@ public class TagRegistryExtensionTests
             .ToArray();
 
         Assert.Equal(2, taggedItemsWithScore.Length);
-        Assert.Equal(heavyMetalArmour, taggedItemsWithScore[0].Entity);
+        Assert.Equal(heavyMetalArmour, taggedItemsWithScore[0].ContextualTags);
         Assert.Equal(1.1f, taggedItemsWithScore[0].Score, 2);
-        Assert.Equal(heavyWoodArmour, taggedItemsWithScore[1].Entity);
+        Assert.Equal(heavyWoodArmour, taggedItemsWithScore[1].ContextualTags);
         Assert.Equal(0.85f, taggedItemsWithScore[1].Score, 2);
     }
     

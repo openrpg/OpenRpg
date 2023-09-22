@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Tags.Data;
@@ -32,17 +31,17 @@ namespace OpenRpg.Tags.Extensions
             return allRelated.AverageWeights();
         }
 
-        public static IEnumerable<TaggedWithScore> GetTaggedScoresFor(this ITagRegistry registry, 
-            IEnumerable<ITagged> taggedElements, params int[] sourceTags)
-            => GetTaggedScoresFor(registry, taggedElements, (IEnumerable<int>)sourceTags);
+        public static IEnumerable<ScoredTags> GetTaggedScoresFor(this ITagRegistry registry, 
+            IEnumerable<ContextualTags> taggedElements, params int[] sourceTags)
+            => GetTaggedScoresFor(registry, taggedElements, (IReadOnlyCollection<int>)sourceTags);
         
-        public static IEnumerable<TaggedWithScore> GetTaggedScoresFor(this ITagRegistry registry, 
-            IEnumerable<ITagged> taggedElements, IEnumerable<int> sourceTags)
+        public static IEnumerable<ScoredTags> GetTaggedScoresFor(this ITagRegistry registry, 
+            IEnumerable<ContextualTags> tagList, IReadOnlyCollection<int> sourceTags)
         {
             var relatedTags = GetRelatedTags(registry, sourceTags).ToArray();
-            return taggedElements
+            return tagList
                 .ContainingTags(sourceTags)
-                .Select(x => new TaggedWithScore(x, relatedTags.GetTotalWeightFor(x.Tags)));
+                .Select(x => new ScoredTags(x, relatedTags.GetTotalWeightFor(x.Tags)));
         }
     }
 }
