@@ -114,7 +114,7 @@ You can apply requirements to almost anything in the framework and then use an `
 
 ## HALP! I NEED MORE INFORMATION?
 
-You can join the discord server via link at the top or you can go over to the web demos or local docs:
+You can join the [discord server](https://discord.gg/nKejjgT) via the `Chat` button at the top or you can go over to the web demos or local docs:
 - [OpenRpg.Demos.Web](https://openrpg.github.io/OpenRpg.Demos.Web)
 - [Local Docs](docs/core.md)
 
