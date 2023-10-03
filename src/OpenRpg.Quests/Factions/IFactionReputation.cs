@@ -1,8 +1,8 @@
+using OpenRpg.Core.Variables;
+
 namespace OpenRpg.Quests.Factions
 {
-    public interface IFactionReputation
+    public interface IFactionReputation : IVariables<int>
     {
-        int GetReputation(int factionId);
-        int ChangeReputation(int factionId, int amount);
     }
 }

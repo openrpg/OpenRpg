@@ -12,7 +12,7 @@ namespace OpenRpg.Core.Extensions
         { return vars.ContainsKey(EntityVariableTypes.Gender); }
         
         public static byte Gender(this IEntityVariables vars)
-        { return Convert.ToByte(vars[EntityVariableTypes.Gender] ?? 0); }
+        { return vars.GetByteOrDefault(EntityVariableTypes.Gender, 0); }
 
         public static void Gender(this IEntityVariables vars, byte gender)
         { vars[EntityVariableTypes.Gender] = gender; }
@@ -21,7 +21,7 @@ namespace OpenRpg.Core.Extensions
         { return vars.ContainsKey(EntityVariableTypes.Race); }
         
         public static IRaceTemplate Race(this IEntityVariables vars)
-        { return vars[EntityVariableTypes.Race] as IRaceTemplate; }
+        { return vars.GetAs<IRaceTemplate>(EntityVariableTypes.Race); }
 
         public static void Race(this IEntityVariables vars, IRaceTemplate race)
         { vars[EntityVariableTypes.Race] = race; }
@@ -30,7 +30,7 @@ namespace OpenRpg.Core.Extensions
         { return vars.ContainsKey(EntityVariableTypes.Class); }
         
         public static IClass Class(this IEntityVariables vars)
-        { return vars[EntityVariableTypes.Class] as IClass; }
+        { return vars.GetAs<IClass>(EntityVariableTypes.Class); }
 
         public static void Class(this IEntityVariables vars, IClass classToUse)
         { vars[EntityVariableTypes.Class] = classToUse; }
@@ -39,7 +39,7 @@ namespace OpenRpg.Core.Extensions
         { return vars.ContainsKey(EntityVariableTypes.MultiClasses); }
         
         public static IMultiClass MultiClass(this IEntityVariables vars)
-        { return vars[EntityVariableTypes.MultiClasses] as IMultiClass; }
+        { return vars.GetAs<IMultiClass>(EntityVariableTypes.MultiClasses); }
 
         public static void MultiClass(this IEntityVariables vars, IMultiClass multiClass)
         { vars[EntityVariableTypes.MultiClasses] = multiClass; }

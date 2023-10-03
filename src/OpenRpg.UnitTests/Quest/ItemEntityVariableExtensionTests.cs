@@ -2,6 +2,7 @@ using OpenRpg.Core.Variables.Entity;
 using OpenRpg.Quests;
 using OpenRpg.Quests.Extensions;
 using OpenRpg.Quests.Factions;
+using OpenRpg.Quests.State;
 using Xunit;
 
 namespace OpenRpg.UnitTests.Quest;

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using OpenRpg.Core.Variables;
 using OpenRpg.Quests.Types;
 
-namespace OpenRpg.Quests.Variables
+namespace OpenRpg.Quests.State
 {
     public class DefaultTriggerStateVariables : DefaultVariables<bool>, ITriggerStateVariables
     {
