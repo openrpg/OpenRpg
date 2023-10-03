@@ -32,4 +32,16 @@ public class QuestEntityVariableExtensionTests
         Assert.True(entityVars.HasQuestState());
         Assert.Equal(entityVars.QuestState(), dummyQuestState);
     }
+    
+    [Fact]
+    public void should_correctly_handle_trigger_state_on_entity()
+    {
+        var entityVars = new DefaultEntityVariables();
+        Assert.False(entityVars.HasTriggerState());
+        
+        var dummyQuestState = new DefaultTriggerState();
+        entityVars.TriggerState(dummyQuestState);
+        Assert.True(entityVars.HasTriggerState());
+        Assert.Equal(entityVars.TriggerState(), dummyQuestState);
+    }
 }

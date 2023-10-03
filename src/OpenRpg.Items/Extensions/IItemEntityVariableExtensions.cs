@@ -1,3 +1,4 @@
+using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Variables.Entity;
 using OpenRpg.Items.Equipment;
 using OpenRpg.Items.Inventory;
@@ -15,7 +16,7 @@ namespace OpenRpg.Items.Extensions
         { return vars.ContainsKey(ItemEntityVariableTypes.Equipment); }
         
         public static IEquipment Equipment(this IEntityVariables vars)
-        { return vars[ItemEntityVariableTypes.Equipment] as IEquipment; }
+        { return vars.GetAs<IEquipment>(ItemEntityVariableTypes.Equipment); }
 
         public static void Equipment(this IEntityVariables vars, IEquipment equipment)
         { vars[ItemEntityVariableTypes.Equipment] = equipment; }
@@ -24,7 +25,7 @@ namespace OpenRpg.Items.Extensions
         { return vars.ContainsKey(ItemEntityVariableTypes.Inventory); }
         
         public static IInventory Inventory(this IEntityVariables vars)
-        { return vars[ItemEntityVariableTypes.Inventory] as IInventory; }
+        { return vars.GetAs<IInventory>(ItemEntityVariableTypes.Inventory); }
 
         public static void Inventory(this IEntityVariables vars, IInventory inventory)
         { vars[ItemEntityVariableTypes.Inventory] = inventory; }
@@ -33,7 +34,7 @@ namespace OpenRpg.Items.Extensions
         { return vars.ContainsKey(ItemEntityVariableTypes.LootTable); }
         
         public static ILootTable LootTable(this IEntityVariables vars)
-        { return vars[ItemEntityVariableTypes.LootTable] as ILootTable; }
+        { return vars.GetAs<ILootTable>(ItemEntityVariableTypes.LootTable); }
 
         public static void LootTable(this IEntityVariables vars, ILootTable lootTable)
         { vars[ItemEntityVariableTypes.LootTable] = lootTable; }
