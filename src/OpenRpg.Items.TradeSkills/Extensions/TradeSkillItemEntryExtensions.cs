@@ -1,5 +1,6 @@
-using System;
 using OpenRpg.Core.Extensions;
+using OpenRpg.Items.Extensions;
+using OpenRpg.Items.Templates;
 using OpenRpg.Items.TradeSkills.Types;
 using OpenRpg.Items.TradeSkills.Variables;
 
@@ -7,6 +8,27 @@ namespace OpenRpg.Items.TradeSkills.Extensions
 {
     public static class TradeSkillItemEntryExtensions
     {
+        /// <summary>
+        /// This provides a way to get an item that can be used for inventory interactions
+        /// </summary>
+        /// <param name="tradeSkillItemEntry"></param>
+        /// <returns></returns>
+        public static IItem AsItem(this TradeSkillItemEntry tradeSkillItemEntry)
+        {
+            var wrapperItem = new DefaultItem()
+            {
+                Template = tradeSkillItemEntry.Template
+            };
+
+            if (tradeSkillItemEntry.Variables.HasAmount())
+            { wrapperItem.Variables.Amount(tradeSkillItemEntry.Variables.Amount()); }
+
+            if (wrapperItem.Variables.HasWeight())
+            { wrapperItem.Variables.Weight(tradeSkillItemEntry.Variables.Weight()); }
+
+            return wrapperItem;
+        }
+        
         public static bool HasAmount(this TradeSkillItemEntryVariables variables)
         { return variables.ContainsKey(TradeSkillItemEntryVariableTypes.Amount); }
         

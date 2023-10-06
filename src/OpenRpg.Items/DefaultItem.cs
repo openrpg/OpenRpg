@@ -10,7 +10,7 @@ namespace OpenRpg.Items
     {
         public Guid UniqueId { get; set; } = Guid.NewGuid();
 
-        public IItemTemplate ItemTemplate { get; set; } = new DefaultItemTemplate();
+        public IItemTemplate Template { get; set; } = new DefaultItemTemplate();
         public IEnumerable<IModificationTemplate> Modifications { get; set;} = new List<IModificationTemplate>();
         public IItemVariables Variables { get; set; } = new DefaultItemVariables();
     }

@@ -8,7 +8,7 @@ using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Templates
 {
-    public interface IItemTemplate : IHasDataId, IHasLocaleDescription, IHasRequirements, IHasEffects, IAllowsModification, IHasVariables<IItemTemplateVariables>
+    public interface IItemTemplate : IDataTemplate, IHasRequirements, IHasEffects, IAllowsModification, IHasVariables<IItemTemplateVariables>
     {
         int ItemType { get; }
     }

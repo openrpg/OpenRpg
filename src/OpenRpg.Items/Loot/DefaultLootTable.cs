@@ -34,9 +34,9 @@ namespace OpenRpg.Items.Loot
                 
                 if (loot.Variables.ContainsKey(LootTableEntryVariableTypes.IsUnique) && loot.Variables.IsUnique())
                 {
-                    if(uniqueItems.Contains(loot.Item.ItemTemplate))
+                    if(uniqueItems.Contains(loot.Item.Template))
                     { continue; }
-                    uniqueItems.Add(loot.Item.ItemTemplate);
+                    uniqueItems.Add(loot.Item.Template);
                 }
 
                 yield return loot;

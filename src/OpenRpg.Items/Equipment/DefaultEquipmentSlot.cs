@@ -22,7 +22,7 @@ namespace OpenRpg.Items.Equipment
         public bool EquipItemToSlot(IItem item)
         {
             if (item == null) { return false; }
-            if(!CanEquipItemType(item.ItemTemplate.ItemType)) { return false; }
+            if(!CanEquipItemType(item.Template.ItemType)) { return false; }
             if (SlottedItem != null) { return false; }
 
             SlottedItem = item;

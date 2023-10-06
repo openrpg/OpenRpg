@@ -1,13 +1,13 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Common;
 using OpenRpg.Core.Modifications;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items
 {
-    public interface IItem
+    public interface IItem : IHasTemplate<IItemTemplate>
     {
-        IItemTemplate ItemTemplate { get; }
         IEnumerable<IModificationTemplate> Modifications { get; }
         IItemVariables Variables { get; }
     }
