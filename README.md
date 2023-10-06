@@ -36,7 +36,8 @@ var classEffects = new[]
     new Effect {Potency = 50, EffectType = EffectTypes.HealthBonusAmount}
 };
 
-var stats = statsPopulator.Populate(new [] { raceEffects, classEffects });
+var stats = new DefaultStats();
+statsPopulator.Populate(stats, new [] { raceEffects, classEffects });
 // stats contains variables str 11, dex 1, health 150
 ```
 > Normally you would use `IRaceTemplate` and `IClassTemplate` objects which wrap up the effects and subsequent related data for re-use via `IRepository` objects etc.
