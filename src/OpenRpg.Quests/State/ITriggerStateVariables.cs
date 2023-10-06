@@ -1,6 +1,6 @@
 using OpenRpg.Core.Variables;
 
-namespace OpenRpg.Quests.Variables
+namespace OpenRpg.Quests.State
 {
     public interface ITriggerStateVariables : IVariables<bool>
     {}

@@ -28,7 +28,9 @@
       <ProjectReference Include="..\OpenRpg.Items\OpenRpg.Items.csproj" />
       <ProjectReference Include="..\OpenRpg.Quests\OpenRpg.Quests.csproj" />
       <ProjectReference Include="..\OpenRpg.Tags\OpenRpg.Tags.csproj" />
+
     </ItemGroup>
+
 
 
 

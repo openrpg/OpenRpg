@@ -5,7 +5,6 @@ using OpenRpg.Core.Effects;
 using OpenRpg.Core.Modifications;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Items.Loot;
-using OpenRpg.Items.Templates;
 using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Extensions
@@ -20,7 +19,7 @@ namespace OpenRpg.Items.Extensions
         {
             return new DefaultItem
             {
-                ItemTemplate = item.ItemTemplate,
+                Template = item.Template,
                 Variables = (item.Variables as DefaultItemVariables).Clone(),
                 Modifications = new List<IModificationTemplate>(item.Modifications)
             };
@@ -43,9 +42,9 @@ namespace OpenRpg.Items.Extensions
         public static IEnumerable<Effect> GetItemEffects(this IItem item)
         {
             if(!item.Modifications.Any())
-            { return item.ItemTemplate.Effects; }
+            { return item.Template.Effects; }
          
-            return item.ItemTemplate.Effects.Union(item.Modifications.SelectMany(x => x.Effects));
+            return item.Template.Effects.Union(item.Modifications.SelectMany(x => x.Effects));
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Linq;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Inventory;
 using OpenRpg.Items.TradeSkills.Crafting;
@@ -8,28 +9,23 @@ namespace OpenRpg.Items.TradeSkills.Extensions
     {
         public static bool HasItemsRequiredFor(this IInventory inventory, ItemCraftingTemplate craftingTemplate)
         {
-            foreach (var itemEntry in craftingTemplate.InputItems)
-            {
-                if (itemEntry.Variables.HasAmount())
-                {
-                    var amount = itemEntry.Variables.Amount();
-                    if (!inventory.HasItem(itemEntry.ItemTemplateId, amount))
-                    { return false; }
-                }
-                else if (itemEntry.Variables.HasWeight())
-                {
-                    var weight = itemEntry.Variables.Weight();
-                    if (!inventory.HasItem(itemEntry.ItemTemplateId, weight))
-                    { return false; }
-                }
-                else
-                {
-                    if (!inventory.HasItem(itemEntry.ItemTemplateId))
-                    { return false; }
-                }
-            }
-
-            return true;
+            return craftingTemplate.InputItems
+                .Select(x => x.AsItem())
+                .All(inventory.HasItem);
+        }
+        
+        /// <summary>
+        /// This attempts to craft the item into the inventory, it only supports amounts currently
+        /// </summary>
+        /// <param name="craftingTemplate"></param>
+        /// <param name="inventory"></param>
+        /// <returns></returns>
+        public static bool CraftFrom(this ItemCraftingTemplate craftingTemplate, IInventory inventory)
+        {
+            return inventory.CreateTransaction()
+                .AddItems(craftingTemplate.OutputItems.Select(x => x.AsItem()))
+                .RemoveItems(craftingTemplate.InputItems.Select(x => x.AsItem()))
+                .ApplyChanges();
         }
     }
 }

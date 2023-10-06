@@ -17,8 +17,8 @@ namespace OpenRpg.Cards.Genres
         public ItemCard(IItem item)
         { Data = item; }
 
-        public string NameLocaleId => Data.ItemTemplate.NameLocaleId;
-        public string DescriptionLocaleId => Data.ItemTemplate.DescriptionLocaleId;
+        public string NameLocaleId => Data.Template.NameLocaleId;
+        public string DescriptionLocaleId => Data.Template.DescriptionLocaleId;
         public IEnumerable<Effect> Effects => Data.GetItemEffects();
     }
 }

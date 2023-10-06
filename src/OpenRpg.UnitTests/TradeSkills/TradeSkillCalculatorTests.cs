@@ -1,7 +1,7 @@
 using OpenRpg.Items.TradeSkills.Calculator;
 using Xunit;
 
-namespace OpenRpg.UnitTests.Crafting;
+namespace OpenRpg.UnitTests.TradeSkills;
 
 public class TradeSkillCalculatorTests
 {

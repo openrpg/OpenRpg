@@ -1,26 +1,13 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Variables;
+using OpenRpg.Quests.Types;
 
 namespace OpenRpg.Quests.Factions
 {
-    public class DefaultFactionReputation : IFactionReputation
+    public class DefaultFactionReputation : DefaultVariables<int>, IFactionReputation
     {
-        public Dictionary<int, int> InternalFactionReputation { get; set; } = new Dictionary<int, int>();
-
-        public int GetReputation(int factionId)
-        { return InternalFactionReputation.TryGetValue(factionId, out var value) ? value : 0; }
-
-        public int ChangeReputation(int factionId, int amount)
+        public DefaultFactionReputation(IDictionary<int, int> internalVariables = null) : base(QuestVariableTypes.FactionReputationVariables, internalVariables)
         {
-            if (!InternalFactionReputation.ContainsKey(factionId))
-            {
-                InternalFactionReputation.Add(factionId, amount);
-                return amount;
-            }
-
-            var current = InternalFactionReputation[factionId];
-            var newTotal = current + amount;
-            InternalFactionReputation[factionId] = newTotal;
-            return newTotal;
         }
     }
 }

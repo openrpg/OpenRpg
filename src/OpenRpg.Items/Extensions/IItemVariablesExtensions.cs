@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using OpenRpg.Core.Extensions;
 using OpenRpg.Items.Types;
 using OpenRpg.Items.Variables;
 
@@ -19,11 +20,7 @@ namespace OpenRpg.Items.Extensions
         { return variables.ContainsKey(ItemVariableTypes.Amount); }
         
         public static int Amount(this IItemVariables variables)
-        {
-            var amountObject = variables.Get(ItemVariableTypes.Amount);
-            var amount = Convert.ToInt32(amountObject);
-            return amount == 0 ? 1 : amount;
-        }
+        { return variables.GetIntOrDefault(ItemVariableTypes.Amount, 1); }
 
         public static void Amount(this IItemVariables variables, int value)
         { variables[ItemVariableTypes.Amount] = value; }
@@ -31,7 +28,7 @@ namespace OpenRpg.Items.Extensions
         public static bool HasWeight(this IItemVariables variables)
         { return variables.ContainsKey(ItemVariableTypes.Weight); }
         
-        public static float Weight(this IItemVariables variables) => Convert.ToSingle(variables.Get(ItemVariableTypes.Weight));
+        public static float Weight(this IItemVariables variables) => variables.GetFloat(ItemVariableTypes.Weight);
         public static void Weight(this IItemVariables variables, float value) => variables[ItemVariableTypes.Weight] = value;
     }
 }

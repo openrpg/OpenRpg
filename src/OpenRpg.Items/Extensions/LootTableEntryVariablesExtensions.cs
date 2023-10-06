@@ -1,4 +1,5 @@
 using System;
+using OpenRpg.Core.Extensions;
 using OpenRpg.Items.Loot;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.Types;
@@ -8,7 +9,7 @@ namespace OpenRpg.Items.Extensions
 {
     public static class LootTableEntryVariablesExtensions
     {
-        public static float DropRate(this ILootTableEntryVariables variables) => Convert.ToSingle(variables.Get(LootTableEntryVariableTypes.DropRate));
+        public static float DropRate(this ILootTableEntryVariables variables) => variables.GetFloat(LootTableEntryVariableTypes.DropRate);
         
         /// <summary>
         /// The DropRate should be a value between 0-1 in which 0 is no drop chance, 0.5 is 50% drop chance, 1 is 100% drop chance
@@ -18,7 +19,7 @@ namespace OpenRpg.Items.Extensions
         /// <returns>The drop chance can be as low as needed i.e a 1 in 1000 can be represented as 0.001</returns>
         public static void DropRate(this ILootTableEntryVariables variables, float value) => variables[LootTableEntryVariableTypes.DropRate] = value;
         
-        public static bool IsUnique(this ILootTableEntryVariables variables) => Convert.ToBoolean(variables.Get(LootTableEntryVariableTypes.IsUnique));
+        public static bool IsUnique(this ILootTableEntryVariables variables) => variables.GetBool(LootTableEntryVariableTypes.IsUnique);
         
         /// <summary>
         /// This indicates that the template associated with this item can only be dropped once
