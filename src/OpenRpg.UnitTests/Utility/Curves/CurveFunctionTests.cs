@@ -1,3 +1,4 @@
+using OpenRpg.CurveFunctions;
 using OpenRpg.CurveFunctions.Curves;
 using Xunit;
 
