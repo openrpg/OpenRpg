@@ -37,7 +37,7 @@ namespace OpenRpg.Items.TradeSkills.Extensions
         /// <param name="inventory">The inventory to gather into</param>
         /// <returns>true if succeeded, false if failed</returns>
         /// <remarks>An inventory could be full so most false returns are due to full inventories</remarks>
-        public static bool GatherFrom(this ItemGatheringTemplate gatheringTemplate, IInventory inventory)
+        public static bool GatherInto(this ItemGatheringTemplate gatheringTemplate, IInventory inventory)
         {
             return inventory.CreateTransaction()
                 .AddItems(gatheringTemplate.OutputItems.Select(x => x.AsItem()))
