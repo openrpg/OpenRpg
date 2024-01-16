@@ -1,3 +1,5 @@
+using Moq;
+using OpenRpg.Core.Utils;
 using OpenRpg.Items.TradeSkills.Calculator;
 using Xunit;
 
@@ -15,7 +17,9 @@ public class TradeSkillCalculatorTests
     [InlineData(10, 100, 90, true)]
     public void should_correctly_work_out_skill_use(int skillScore, int skillDifficulty, int maxSkillDifference, bool shouldBeAbleToUse)
     {
-        var tradeSkillCalculator = new TradeSkillCalculator() { MaximumSkillDifference = maxSkillDifference };
+        var mockRandomizer = new Mock<IRandomizer>();
+        mockRandomizer.Setup(x => x.Random(It.IsAny<float>(), It.IsAny<float>())).Returns(0.0f);
+        var tradeSkillCalculator = new TradeSkillCalculator(mockRandomizer.Object) { MaximumSkillDifference = maxSkillDifference };
         var canUse = tradeSkillCalculator.CanUseSkill(skillScore, skillDifficulty);
         Assert.Equal(shouldBeAbleToUse, canUse);
     }
@@ -28,7 +32,9 @@ public class TradeSkillCalculatorTests
     [InlineData(1, 5, 10, 0.1f, 5, 3)]
     public void should_correctly_work_out_skill_up_points(int skillScore, int skillDifficulty, int maxSkillDifference, float minimumPointThreshold, float pointMultiplier, int expectedPoints)
     {
-        var tradeSkillCalculator = new TradeSkillCalculator()
+        var mockRandomizer = new Mock<IRandomizer>();
+        mockRandomizer.Setup(x => x.Random(It.IsAny<float>(), It.IsAny<float>())).Returns(0.0f);
+        var tradeSkillCalculator = new TradeSkillCalculator(mockRandomizer.Object)
         {
             MinimumPointThreshold = minimumPointThreshold,
             PointMultiplier = pointMultiplier,

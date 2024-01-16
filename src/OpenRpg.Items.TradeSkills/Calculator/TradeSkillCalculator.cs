@@ -1,20 +1,48 @@
 ﻿using System;
+using OpenRpg.Core.Utils;
 using OpenRpg.CurveFunctions;
 using OpenRpg.CurveFunctions.Scaling;
 
 namespace OpenRpg.Items.TradeSkills.Calculator
 {
+    /// <summary>
+    /// This is a default extensible calculator that can be used for most common use cases
+    /// </summary>
     public class TradeSkillCalculator : ITradeSkillCalculator
     {
+        /// <summary>
+        /// This is the gated minimum threshold of the 0-1 plot check, defaults to 0.5f
+        /// </summary>
         public float MinimumPointThreshold { get; set; } = 0.5f;
+        
+        /// <summary>
+        /// This is the multiplier added to the resulting value post randomness calculations, defaults to 1.0f
+        /// </summary>
         public float PointMultiplier { get; set; } = 1.0f;
+        
+        /// <summary>
+        /// This is the threshold for skill calculating skill points, defaults to 10.0f
+        /// </summary>
         public float MaximumSkillDifference { get; set; } = 10.0f;
+        
+        /// <summary>
+        /// This is the additional randomness applied, defaults to 0.0f
+        /// </summary>
+        /// <remarks>The variance is applied negatively for low bound and positively for high bound</remarks>
+        public float RandomnessVariance { get; set; } = 0.0f;
     
         public IScalingFunction SkillPointCurve { get; }
+        public IRandomizer Randomizer { get; }
 
-        public TradeSkillCalculator()
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="randomizer">The randomizer to use</param>
+        /// <param name="scalingFunction">The optional scaling function to apply, by default uses inverse linear ones based off skill difference</param>
+        public TradeSkillCalculator(IRandomizer randomizer, IScalingFunction scalingFunction = null)
         {
-            SkillPointCurve = new ScalingFunction(PresetCurves.InverseLinear, 0, 1, 0, MaximumSkillDifference);
+            SkillPointCurve = scalingFunction ?? new ScalingFunction(PresetCurves.InverseLinear, 0, 1, 0, MaximumSkillDifference);
+            Randomizer = randomizer;
         }
 
         public bool CanUseSkill(int skillScore, int skillDifficulty)
@@ -31,6 +59,7 @@ namespace OpenRpg.Items.TradeSkills.Calculator
             if (absoluteScore > MaximumSkillDifference) { return 0; }
 
             var result = SkillPointCurve.Plot(absoluteScore);
+            var randomVariance = Randomizer.Random(-RandomnessVariance, RandomnessVariance);
             if (result < MinimumPointThreshold) { return 0; }
             return (int)Math.Round(result * PointMultiplier);
         }
