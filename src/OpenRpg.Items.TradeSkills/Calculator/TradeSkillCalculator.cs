@@ -38,10 +38,10 @@ namespace OpenRpg.Items.TradeSkills.Calculator
         /// Default constructor
         /// </summary>
         /// <param name="randomizer">The randomizer to use</param>
-        /// <param name="scalingFunction">The optional scaling function to apply, by default uses inverse linear ones based off skill difference</param>
-        public TradeSkillCalculator(IRandomizer randomizer, IScalingFunction scalingFunction = null)
+        /// <param name="curveFunction">The optional curve function to apply, by default uses inverse linear</param>
+        public TradeSkillCalculator(IRandomizer randomizer, ICurveFunction curveFunction = null)
         {
-            SkillPointCurve = scalingFunction ?? new ScalingFunction(PresetCurves.InverseLinear, 0, 1, 0, MaximumSkillDifference);
+            SkillPointCurve = new ScalingFunction(curveFunction ?? PresetCurves.InverseLinear, 0, 1, 0, MaximumSkillDifference);
             Randomizer = randomizer;
         }
 
@@ -61,7 +61,7 @@ namespace OpenRpg.Items.TradeSkills.Calculator
             var result = SkillPointCurve.Plot(absoluteScore);
             var randomVariance = Randomizer.Random(-RandomnessVariance, RandomnessVariance);
             if (result < MinimumPointThreshold) { return 0; }
-            return (int)Math.Round(result * PointMultiplier);
+            return (int)Math.Round((result + randomVariance) * PointMultiplier);
         }
     }
 }

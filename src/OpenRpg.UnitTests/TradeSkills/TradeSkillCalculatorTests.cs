@@ -43,4 +43,14 @@ public class TradeSkillCalculatorTests
         var actualPoints = tradeSkillCalculator.CalculateSkillUpPointsFor(skillScore, skillDifficulty);
         Assert.Equal(expectedPoints, actualPoints);
     }
+
+    [Fact]
+    public void should_factor_in_random_variance()
+    {
+        var mockRandomizer = new Mock<IRandomizer>();
+        mockRandomizer.Setup(x => x.Random(It.IsAny<float>(), It.IsAny<float>())).Returns(0.1f);
+        var tradeSkillCalculator = new TradeSkillCalculator(mockRandomizer.Object);
+        var actualPoints = tradeSkillCalculator.CalculateSkillUpPointsFor(10, 15);
+        Assert.Equal(1, actualPoints);
+    }
 }
