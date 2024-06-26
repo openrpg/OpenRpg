@@ -1,4 +1,5 @@
 using OpenRpg.Core.Common;
+using OpenRpg.Core.Templates;
 using OpenRpg.Core.Variables.General;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.TradeSkills.Variables;

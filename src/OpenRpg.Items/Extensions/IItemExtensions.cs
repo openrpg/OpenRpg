@@ -5,6 +5,7 @@ using OpenRpg.Core.Effects;
 using OpenRpg.Core.Modifications;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Items.Loot;
+using OpenRpg.Items.Templates;
 using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Extensions
@@ -21,7 +22,7 @@ namespace OpenRpg.Items.Extensions
             {
                 Template = item.Template,
                 Variables = (item.Variables as DefaultItemVariables).Clone(),
-                Modifications = new List<IModificationTemplate>(item.Modifications)
+                Modifications = new List<IItemModificationTemplate>(item.Modifications)
             };
         }
 

@@ -1,5 +1,6 @@
 using OpenRpg.Core.Classes.Variables;
 using OpenRpg.Core.Common;
+using OpenRpg.Core.Templates;
 using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Core.Classes

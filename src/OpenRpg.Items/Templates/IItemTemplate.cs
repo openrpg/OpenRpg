@@ -3,6 +3,7 @@ using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Modifications;
 using OpenRpg.Core.Requirements;
+using OpenRpg.Core.Templates;
 using OpenRpg.Core.Variables.General;
 using OpenRpg.Items.Variables;
 

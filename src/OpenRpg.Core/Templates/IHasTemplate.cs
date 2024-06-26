@@ -1,4 +1,4 @@
-namespace OpenRpg.Core.Common
+namespace OpenRpg.Core.Templates
 {
     public interface IHasTemplate<out T> where T : IDataTemplate
     {

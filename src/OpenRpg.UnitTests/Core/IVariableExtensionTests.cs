@@ -1,4 +1,6 @@
+using System.Linq;
 using OpenRpg.Core.Extensions;
+using OpenRpg.Core.Stats.Entity;
 using OpenRpg.Core.Variables;
 using OpenRpg.Items.Inventory;
 using Xunit;
