@@ -1,4 +1,4 @@
-using OpenRpg.Core.Variables.Populators;
+using OpenRpg.Core.State.Populators.Variables;
 
 namespace OpenRpg.Core.State.Populators
 {

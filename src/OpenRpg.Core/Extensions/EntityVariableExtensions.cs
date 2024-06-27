@@ -1,8 +1,10 @@
 using System;
 using OpenRpg.Core.Classes;
+using OpenRpg.Core.Classes.Templates;
+using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Core.Races;
+using OpenRpg.Core.Races.Templates;
 using OpenRpg.Core.Types;
-using OpenRpg.Core.Variables.Entity;
 
 namespace OpenRpg.Core.Extensions
 {

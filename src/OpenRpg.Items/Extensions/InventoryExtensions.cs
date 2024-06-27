@@ -25,7 +25,7 @@ namespace OpenRpg.Items.Extensions
         /// <returns>true if has any, false if not</returns>
         /// <remarks>The same functionality is contained within HasItems but this ONLY checks type not amounts/weight</remarks>
         public static bool HasItem(this IInventory inventory, int itemTemplateId)
-        { return inventory.Items.Any(x => x.Template.Id == itemTemplateId); }
+        { return inventory.Items.Any(x => x.Instance.TemplateId == itemTemplateId); }
         
         /// <summary>
         /// Checks that you have at least the given amount of an item in the inventory
@@ -38,8 +38,8 @@ namespace OpenRpg.Items.Extensions
         public static bool HasItem(this IInventory inventory, int itemTemplateId, int amount)
         {
             var itemAmounts= inventory.Items
-                .Where(x => x.Template.Id == itemTemplateId)
-                .Sum(x => x.Variables.Amount());
+                .Where(x => x.Instance.TemplateId == itemTemplateId)
+                .Sum(x => x.Instance.Variables.Amount());
             
             return itemAmounts >= amount;
         }
@@ -53,7 +53,7 @@ namespace OpenRpg.Items.Extensions
         /// <returns>true if it can be removed, false if not</returns>
         public static bool RemoveItem(this IInventory inventory, int itemTemplateId, int amount)
         {
-            var proxyItem = new DefaultItem() { Template = new DefaultItemTemplate() { Id = itemTemplateId } };
+            var proxyItem = new DefaultItemTemplateInstance() { TemplateId = itemTemplateId  };
             proxyItem.Variables.Amount(amount);
             return inventory.RemoveItem(proxyItem);
         }
@@ -66,7 +66,7 @@ namespace OpenRpg.Items.Extensions
         /// <returns>true if it can be removed, false if not</returns>
         public static bool RemoveItem(this IInventory inventory, int itemTemplateId)
         {
-            var proxyItem = new DefaultItem() { Template = new DefaultItemTemplate() { Id = itemTemplateId } };
+            var proxyItem = new DefaultItemTemplateInstance() { TemplateId = itemTemplateId };
             return inventory.RemoveItem(proxyItem);
         }
 
@@ -89,8 +89,10 @@ namespace OpenRpg.Items.Extensions
         public static bool HasItem(this IInventory inventory, int itemTemplateId, float weight)
         {
             var itemWeights= inventory.Items
-                .Where(x => x.Template.Id == itemTemplateId)
-                .Sum(x => x.Variables.HasAmount() ? x.Variables.Weight() * x.Variables.Amount() : x.Variables.Weight());
+                .Where(x => x.Instance.TemplateId == itemTemplateId)
+                .Sum(x => x.Instance.Variables.HasAmount() 
+                    ? x.Instance.Variables.Weight() * x.Instance.Variables.Amount()
+                    : x.Instance.Variables.Weight());
             
             return itemWeights >= weight;
         }
@@ -98,18 +100,18 @@ namespace OpenRpg.Items.Extensions
         /// <summary>
         /// Checks to see if the given item exists in the inventory
         /// </summary>
-        /// <param name="item">The item to check for</param>
+        /// <param name="itemTemplate">The item to check for</param>
         /// <returns>True if it has the item false if not</returns>
         /// <remarks>Implementations may also factor in variables like amounts/weights etc</remarks>
-        public static bool HasItem(this IInventory inventory, IItem item)
+        public static bool HasItem(this IInventory inventory, IItemTemplateInstance itemTemplate)
         {
-            if (item.Variables.HasAmount())
-            { return inventory.HasItem(item.Template.Id, item.Variables.Amount()); }
+            if (itemTemplate.Variables.HasAmount())
+            { return inventory.HasItem(itemTemplate.TemplateId, itemTemplate.Variables.Amount()); }
 
-            if (item.Variables.HasWeight())
-            { return inventory.HasItem(item.Template.Id, item.Variables.Weight()); }
+            if (itemTemplate.Variables.HasWeight())
+            { return inventory.HasItem(itemTemplate.TemplateId, itemTemplate.Variables.Weight()); }
 
-            return inventory.HasItem(item.Template.Id);
+            return inventory.HasItem(itemTemplate.TemplateId);
         }
         
         /// <summary>
@@ -128,6 +130,6 @@ namespace OpenRpg.Items.Extensions
         /// <param name="itemId">The item id to check for</param>
         /// <returns>All items of the given type</returns>
         public static IEnumerable<IItem> GetItemsOfType(this IInventory inventory, int itemTemplateId)
-        { return inventory.Items.Where(x => x.Template.Id == itemTemplateId); }
+        { return inventory.Items.Where(x => x.Instance.TemplateId == itemTemplateId); }
     }
 }

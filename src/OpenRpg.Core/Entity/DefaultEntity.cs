@@ -1,6 +1,6 @@
+using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Core.State.Entity;
 using OpenRpg.Core.Stats.Entity;
-using OpenRpg.Core.Variables.Entity;
 
 namespace OpenRpg.Core.Entity
 {

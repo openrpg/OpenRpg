@@ -1,6 +1,7 @@
 ﻿using OpenRpg.Cards.Genres.Conventions;
 using OpenRpg.Cards.Types;
 using OpenRpg.Core.Races;
+using OpenRpg.Core.Races.Templates;
 
 namespace OpenRpg.Cards.Genres
 {

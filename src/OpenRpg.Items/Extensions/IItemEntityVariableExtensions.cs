@@ -1,5 +1,5 @@
+using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Core.Extensions;
-using OpenRpg.Core.Variables.Entity;
 using OpenRpg.Items.Equipment;
 using OpenRpg.Items.Inventory;
 using OpenRpg.Items.Loot;

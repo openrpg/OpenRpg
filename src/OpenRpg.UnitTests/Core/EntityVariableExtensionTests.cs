@@ -1,7 +1,9 @@
 using OpenRpg.Core.Classes;
+using OpenRpg.Core.Classes.Templates;
+using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Races;
-using OpenRpg.Core.Variables.Entity;
+using OpenRpg.Core.Races.Templates;
 using Xunit;
 
 namespace OpenRpg.UnitTests.Core;

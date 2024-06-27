@@ -1,3 +1,5 @@
+using OpenRpg.Items.Templates;
+
 namespace OpenRpg.Items.Equipment
 {
     /// <summary>
@@ -15,19 +17,19 @@ namespace OpenRpg.Items.Equipment
         /// <summary>
         /// The current item within this slot
         /// </summary>
-        IItem SlottedItem { get; }
+        IItemTemplateInstance SlottedItem { get; }
 
         /// <summary>
         /// Unequip an item from the slot
         /// </summary>
         /// <returns>Returns the item that was equipped, or null if nothing was equipped</returns>
-        IItem UnequipItem();
+        IItemTemplateInstance UnequipItem();
         
         /// <summary>
         /// Equips and item to the slot, if an item is already in the slot it needs unequipping explicitly first
         /// </summary>
         /// <param name="item">The item to equip</param>
         /// <returns>True if it was empty and can be equipped, false if it cannot be equipped or an item is already equipped</returns>
-        bool EquipItemToSlot(IItem item);
+        bool EquipItemToSlot(IItemTemplateInstance item);
     }
 }

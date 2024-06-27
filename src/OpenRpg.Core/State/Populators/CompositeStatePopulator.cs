@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using OpenRpg.Core.State.Populators.Variables;
 using OpenRpg.Core.Stats;
 using OpenRpg.Core.Stats.Populators;
-using OpenRpg.Core.Variables.Populators;
 
 namespace OpenRpg.Core.State.Populators
 {

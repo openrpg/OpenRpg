@@ -6,10 +6,7 @@ using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Types;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.TradeSkills.Extensions;
-using OpenRpg.Quests;
 using OpenRpg.Quests.State;
-using OpenRpg.Quests.Types;
-using OpenRpg.Quests.Variables;
 
 namespace OpenRpg.Genres.Requirements
 {
@@ -31,7 +28,7 @@ namespace OpenRpg.Genres.Requirements
                 {
                     var classDetails = character.Variables.Class();
                     if (classDetails.Template.Id == requirement.AssociatedId)
-                    { return classDetails.Variables.Level() >= requirement.AssociatedValue; }
+                    { return classDetails.Instance.Variables.Level() >= requirement.AssociatedValue; }
                 }
 
                 if (character.Variables.HasMultiClass())
@@ -39,7 +36,7 @@ namespace OpenRpg.Genres.Requirements
                     var multiClass = character.Variables.MultiClass();
                     var possibleClass = multiClass.GetClass(requirement.AssociatedId);
                     if (possibleClass != null)
-                    { return possibleClass.Variables.Level() >= requirement.AssociatedValue; }
+                    { return possibleClass.Instance.Variables.Level() >= requirement.AssociatedValue; }
                 }
 
                 return false;
@@ -59,7 +56,7 @@ namespace OpenRpg.Genres.Requirements
                 { return false; }
 
                 return character.Variables.Equipment().Slots.Values
-                    .Any(x => x.SlottedItem?.Template.Id == requirement.AssociatedId);
+                    .Any(x => x.SlottedItem?.TemplateId == requirement.AssociatedId);
             }
             
             if (requirement.RequirementType == GenreRequirementTypes.TradeSkillRequirement)

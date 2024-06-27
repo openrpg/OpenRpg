@@ -1,4 +1,5 @@
 using OpenRpg.Core.Races;
+using OpenRpg.Core.Races.Templates;
 using OpenRpg.Genres.Persistence.Characters;
 using OpenRpg.Genres.Persistence.Classes;
 using OpenRpg.Genres.Persistence.Items;

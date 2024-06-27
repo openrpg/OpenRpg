@@ -10,6 +10,6 @@ namespace OpenRpg.Items.Loot
     {
         public IEnumerable<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
         public ILootTableEntryVariables Variables { get; set; } = new DefaultLootTableEntryVariables();
-        public IItem Item { get; set; }
+        public IItemTemplateInstance Item { get; set; }
     }
 }

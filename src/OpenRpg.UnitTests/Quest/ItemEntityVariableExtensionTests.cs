@@ -1,4 +1,4 @@
-using OpenRpg.Core.Variables.Entity;
+using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Quests;
 using OpenRpg.Quests.Extensions;
 using OpenRpg.Quests.Factions;

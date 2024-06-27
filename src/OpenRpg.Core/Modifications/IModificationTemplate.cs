@@ -4,7 +4,7 @@ using OpenRpg.Core.Templates;
 
 namespace OpenRpg.Core.Modifications
 {
-    public interface IModificationTemplate : IDataTemplate, IHasEffects
+    public interface IModificationTemplate : ITemplate, IHasEffects
     {
         int ModificationType { get; }
     }

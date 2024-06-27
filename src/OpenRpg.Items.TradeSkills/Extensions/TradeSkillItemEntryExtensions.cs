@@ -13,11 +13,11 @@ namespace OpenRpg.Items.TradeSkills.Extensions
         /// </summary>
         /// <param name="tradeSkillItemEntry"></param>
         /// <returns></returns>
-        public static IItem AsItem(this TradeSkillItemEntry tradeSkillItemEntry)
+        public static IItemTemplateInstance AsItem(this TradeSkillItemEntry tradeSkillItemEntry)
         {
-            var wrapperItem = new DefaultItem()
+            var wrapperItem = new DefaultItemTemplateInstance()
             {
-                Template = tradeSkillItemEntry.Template
+                TemplateId = tradeSkillItemEntry.Template.Id
             };
 
             if (tradeSkillItemEntry.Variables.HasAmount())

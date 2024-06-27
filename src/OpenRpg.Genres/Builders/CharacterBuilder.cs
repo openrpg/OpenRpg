@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenRpg.Core.Classes.Templates;
 using OpenRpg.Core.Types;
 using OpenRpg.Core.Utils;
 using OpenRpg.Genres.Characters;
-using OpenRpg.Genres.Extensions;
-using OpenRpg.Genres.Persistence.Characters;
-using OpenRpg.Genres.Persistence.Classes;
-using OpenRpg.Genres.Persistence.Items.Equipment;
-using OpenRpg.Genres.Persistence.Items.Inventory;
 using OpenRpg.Genres.Types;
-using OpenRpg.Items;
-using OpenRpg.Items.Equipment;
+using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Genres.Builders
 {
     public class CharacterBuilder
     {
-        public ICharacterMapper CharacterMapper { get; }
         public IRandomizer Randomizer { get; }
 
         protected int _raceId, _classId, _classLevels;
@@ -25,14 +19,13 @@ namespace OpenRpg.Genres.Builders
         protected string _name, _description;
         protected Dictionary<int, float> _state;
 
-        protected Dictionary<int, IUniqueItem> _equipment;
-        protected List<IUniqueItem> _inventory;
+        protected Dictionary<int, IItemTemplateInstance> _equipment;
+        protected List<IItemTemplateInstance> _inventory;
         
         protected Dictionary<int,object> _variables;
 
-        public CharacterBuilder(ICharacterMapper characterMapper, IRandomizer randomizer)
+        public CharacterBuilder(IRandomizer randomizer)
         {
-            CharacterMapper = characterMapper;
             Randomizer = randomizer;
         }
 
@@ -41,8 +34,8 @@ namespace OpenRpg.Genres.Builders
             _raceId = _classId = _classLevels = _genderId = 0;
             _name = _description = string.Empty;
             _state = new Dictionary<int, float>();
-            _equipment = new Dictionary<int, IUniqueItem>();
-            _inventory = new List<IUniqueItem>();
+            _equipment = new Dictionary<int, IItemTemplateInstance>();
+            _inventory = new List<IItemTemplateInstance>();
             _variables = new Dictionary<int, object>();
             return this;
         }
@@ -96,13 +89,13 @@ namespace OpenRpg.Genres.Builders
             return this;
         }
 
-        public CharacterBuilder WithEquipment(int slotType, IUniqueItem item)
+        public CharacterBuilder WithEquipment(int slotType, IItemTemplateInstance item)
         {
             _equipment[slotType] = item;
             return this;
         }
         
-        public CharacterBuilder WithInventoryItem(IUniqueItem item)
+        public CharacterBuilder WithInventoryItem(IItemTemplateInstance item)
         {
             _inventory.Add(item);
             return this;
@@ -126,7 +119,7 @@ namespace OpenRpg.Genres.Builders
             if (_equipment.Count == 0) { return; }
             
             var equipmentStore = _equipment
-                .ToDictionary(x => x.Key, x => x.Value?.ToDataModel() ?? null);
+                .ToDictionary(x => x.Key, x => x.Value? ?? null);
                 
             _variables.Add(GenreEntityVariableTypes.Equipment, new EquipmentData(equipmentStore));
         }
@@ -156,7 +149,7 @@ namespace OpenRpg.Genres.Builders
             if (_classId == 0) { return; }
             var classVars = new Dictionary<int, object>();
             classVars.Add(ClassVariableTypes.Level, _classLevels);
-            _variables.Add(GenreEntityVariableTypes.Class, new ClassData(_classId, classVars));
+            _variables.Add(GenreEntityVariableTypes.Class, new DefaultClassTemplateInstance(_classId, classVars));
         }
         
         public virtual CharacterData CreateCharacterData()

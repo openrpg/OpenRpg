@@ -1,3 +1,5 @@
+using OpenRpg.Items.Templates;
+
 namespace OpenRpg.Items.Inventory
 {
     /// <summary>
@@ -8,7 +10,7 @@ namespace OpenRpg.Items.Inventory
     {
         public bool ApplyChanges();
         
-        void AddItem(IItem item);
-        void RemoveItem(IItem item);
+        void AddItem(IItemTemplateInstance itemTemplate);
+        void RemoveItem(IItemTemplateInstance itemTemplate);
     }
 }

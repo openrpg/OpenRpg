@@ -1,15 +1,17 @@
+using OpenRpg.Items.Templates;
+
 namespace OpenRpg.Items.Equipment
 {
     public abstract class DefaultEquipmentSlot : IEquipmentSlot
     {
         public abstract bool CanEquipItemType(int itemType);
         
-        public IItem SlottedItem { get; private set; }
+        public IItemTemplateInstance SlottedItem { get; private set; }
 
-        protected DefaultEquipmentSlot(IItem slottedItem = null)
+        protected DefaultEquipmentSlot(IItemTemplateInstance slottedItem = null)
         { SlottedItem = slottedItem; }
 
-        public IItem UnequipItem()
+        public IItemTemplateInstance UnequipItem()
         {
             if(SlottedItem == null) { return null; }
 
@@ -19,7 +21,7 @@ namespace OpenRpg.Items.Equipment
             return returningItem;
         }
 
-        public bool EquipItemToSlot(IItem item)
+        public bool EquipItemToSlot(IItemTemplateInstance item)
         {
             if (item == null) { return false; }
             if(!CanEquipItemType(item.Template.ItemType)) { return false; }

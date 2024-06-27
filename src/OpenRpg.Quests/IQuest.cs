@@ -7,7 +7,7 @@ using OpenRpg.Quests.Variables;
 
 namespace OpenRpg.Quests
 {
-    public interface IQuest : IDataTemplate, IHasRequirements, IHasVariables<IQuestVariables>
+    public interface IQuest : ITemplate, IHasRequirements, IHasVariables<IQuestVariables>
     {
         bool IsRepeatable { get; }
         IEnumerable<Objective> Objectives { get; }

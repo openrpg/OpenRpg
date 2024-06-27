@@ -1,4 +1,5 @@
 using OpenRpg.Core.Classes;
+using OpenRpg.Core.Classes.Templates;
 using OpenRpg.Genres.Persistence.Classes;
 
 namespace OpenRpg.UnitTests.Genres.Persistence.TestImplementations

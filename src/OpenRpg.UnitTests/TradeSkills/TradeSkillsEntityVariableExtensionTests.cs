@@ -1,4 +1,4 @@
-using OpenRpg.Core.Variables.Entity;
+using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Items.TradeSkills.Extensions;
 using OpenRpg.Items.TradeSkills.State;
 using Xunit;

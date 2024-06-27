@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Classes.Templates;
 
 namespace OpenRpg.Core.Classes
 {

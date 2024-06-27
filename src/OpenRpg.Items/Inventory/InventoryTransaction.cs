@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Items.Extensions;
+using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Items.Inventory
 {
@@ -8,11 +9,11 @@ namespace OpenRpg.Items.Inventory
     {
         public IInventory Inventory { get; }
 
-        public List<IItem> Additions { get; } = new List<IItem>();
-        public List<IItem> Removals { get; } = new List<IItem>();
+        public List<IItemTemplateInstance> Additions { get; } = new List<IItemTemplateInstance>();
+        public List<IItemTemplateInstance> Removals { get; } = new List<IItemTemplateInstance>();
 
-        public void AddItem(IItem item) => Additions.Add(item);
-        public void RemoveItem(IItem item) => Removals.Add(item);
+        public void AddItem(IItemTemplateInstance itemTemplate) => Additions.Add(itemTemplate);
+        public void RemoveItem(IItemTemplateInstance itemTemplate) => Removals.Add(itemTemplate);
 
         public InventoryTransaction(IInventory inventory)
         {

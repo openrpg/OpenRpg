@@ -1,12 +1,12 @@
 using OpenRpg.Genres.Fantasy.Types;
-using OpenRpg.Items;
 using OpenRpg.Items.Equipment;
+using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Genres.Fantasy.Equipment.Slots
 {
     public class FootSlot : DefaultEquipmentSlot
     {
-        public FootSlot(IItem slottedItem = null) : base(slottedItem)
+        public FootSlot(IItemTemplateInstance slottedItem = null) : base(slottedItem)
         {}
 
         public override bool CanEquipItemType(int itemType)

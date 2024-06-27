@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenRpg.Core.Templates;
 using OpenRpg.Items.Extensions;
+using OpenRpg.Items.Templates;
 using OpenRpg.Items.Types;
 using OpenRpg.Items.Variables;
 
@@ -9,60 +11,68 @@ namespace OpenRpg.Items.Inventory
 {
     public class DefaultInventory : IInventory
     {
-        public List<IItem> InternalItems { get; set; }
-        public IInventoryVariables Variables { get; set; } = new DefaultInventoryVariables();
-
-        public IReadOnlyList<IItem> Items => InternalItems;
+        public ITemplateAccessor TemplateAccessor { get; }
+        public IInventoryInstance InventoryInstance { get; }
         
-        public DefaultInventory(IEnumerable<IItem> items = null)
-        { InternalItems = items?.ToList() ?? new List<IItem>(); }
+        public IEnumerable<IItem> Items => InventoryInstance.Items.Select(x => new DefaultItem { Instance = x, Template = TemplateAccessor.Get<IItemTemplate>(x.TemplateId)});
+
+        public DefaultInventory(ITemplateAccessor templateAccessor, IInventoryInstance inventoryInstance)
+        {
+            TemplateAccessor = templateAccessor;
+            InventoryInstance = inventoryInstance;
+        }
         
         // In future versions this will probably be split out into a framework level notion
-        protected virtual IItem CloneItem(IItem item)
+        protected virtual IItemTemplateInstance CloneItem(IItemTemplateInstance itemTemplate)
         {
             var duplicatedVariables = new DefaultItemVariables();
 
-            if(item.Variables.HasAmount())
-            { duplicatedVariables.Amount(item.Variables.Amount()); }
+            if(itemTemplate.Variables.HasAmount())
+            { duplicatedVariables.Amount(itemTemplate.Variables.Amount()); }
             
-            return new DefaultItem
+            return new DefaultItemTemplateInstance
             {
-                Modifications = item.Modifications.ToArray(),
-                Template = item.Template,
+                Modifications = itemTemplate.Modifications.ToArray(),
+                TemplateId = itemTemplate.TemplateId,
                 Variables = duplicatedVariables
             };
         }
 
-        public bool AddItem(IItem itemToAdd)
+        public bool AddItem(IItemTemplateInstance itemInstance)
         {
-            var item = CloneItem(itemToAdd);
+            var item = CloneItem(itemInstance);
             
             if (item.Variables.HasAmount())
             { return AttemptAddAmountItem(item); }
 
             if (item.Variables.HasWeight())
-            { return HasWeightCapacity(item.Template.Variables.Weight()) && AttemptAddWeightedItem(item); }
+            {
+                var template = TemplateAccessor.Get<IItemTemplate>(itemInstance.TemplateId);
+                return HasWeightCapacity(template.Variables.Weight()) && AttemptAddWeightedItem(item);
+            }
 
             if (!HasSlotCapacity())
             { return false; }
 
-            InternalItems.Add(item);
+            InventoryInstance.Items.Add(item);
             return true;
         }
 
-        private bool AttemptAddAmountItem(IItem itemToAdd)
+        private bool AttemptAddAmountItem(IItemTemplateInstance itemTemplateToAdd)
         {
-            var requiredAmount = itemToAdd.Variables.Amount();
-            var stackSize = itemToAdd.Template.Variables.MaxStacks();
-            var existingItemsWithSpace = InternalItems
-                .Where(x => x.Template.Id == itemToAdd.Template.Id && (stackSize == 0 || x.Variables.Amount() <= stackSize))
+            var requiredAmount = itemTemplateToAdd.Variables.Amount();
+            var template = TemplateAccessor.Get<IItemTemplate>(itemTemplateToAdd.TemplateId);
+            var stackSize = template.Variables.MaxStacks();
+            
+            var existingItemsWithSpace = InventoryInstance.Items
+                .Where(x => x.TemplateId == itemTemplateToAdd.TemplateId && (stackSize == 0 || x.Variables.Amount() <= stackSize))
                 .OrderByDescending(x => x.Variables.Amount())
                 .ToArray();
 
-            var maxSlots = Variables.MaxSlots();
+            var maxSlots = InventoryInstance.Variables.MaxSlots();
             if (maxSlots > 0)
             {
-                var currentSlots = InternalItems.Count;
+                var currentSlots = InventoryInstance.Items.Count;
                 
                 if (stackSize > 0)
                 {
@@ -83,13 +93,13 @@ namespace OpenRpg.Items.Inventory
             var index = 0;
             while (amountLeft > 0)
             {
-                IItem itemWithSpace;
+                IItemTemplateInstance itemWithSpace;
                 if (index < existingItemsWithSpace.Length)
                 { itemWithSpace = existingItemsWithSpace[index]; }
                 else
                 {
-                    itemWithSpace = new DefaultItem() { Template = itemToAdd.Template };
-                    InternalItems.Add(itemWithSpace);
+                    itemWithSpace = new DefaultItemTemplateInstance() { TemplateId = itemTemplateToAdd.TemplateId };
+                    InventoryInstance.Items.Add(itemWithSpace);
                 }
 
                 var existingAmount = itemWithSpace.Variables.HasAmount()
@@ -125,49 +135,49 @@ namespace OpenRpg.Items.Inventory
         
         private bool HasSlotCapacity()
         {
-            if (!Variables.HasMaxSlots())
+            if (!InventoryInstance.Variables.HasMaxSlots())
             { return true; }
 
-            return InternalItems.Count < Variables.MaxSlots();
+            return InventoryInstance.Items.Count < InventoryInstance.Variables.MaxSlots();
         }
 
         private bool HasWeightCapacity(float weightToAdd)
         {
-            if (!Variables.ContainsKey(InventoryVariableTypes.MaxWeight))
+            if (!InventoryInstance.Variables.ContainsKey(InventoryVariableTypes.MaxWeight))
             { return true; }
 
             var proposedWeight = Items.Sum(x => x.Template.Variables.Weight()) + weightToAdd;
-            return proposedWeight < Variables.MaxWeight();
+            return proposedWeight < InventoryInstance.Variables.MaxWeight();
 
         }
 
-        public bool RemoveItem(IItem itemToRemove)
+        public bool RemoveItem(IItemTemplateInstance itemInstance)
         {
-            if (itemToRemove.Variables.HasAmount())
-            { return AttemptRemoveAmountItem(itemToRemove); }
+            if (itemInstance.Variables.HasAmount())
+            { return AttemptRemoveAmountItem(itemInstance); }
 
-            if (itemToRemove.Variables.HasWeight())
-            { return AttemptRemoveWeightedItem(itemToRemove); }
+            if (itemInstance.Variables.HasWeight())
+            { return AttemptRemoveWeightedItem(itemInstance); }
 
-            if (!InternalItems.Contains(itemToRemove))
+            if (!InventoryInstance.Items.Contains(itemInstance))
             { return false; }
 
-            InternalItems.Remove(itemToRemove);
+            InventoryInstance.Items.Remove(itemInstance);
             return true;
         }
 
-        private bool AttemptRemoveAmountItem(IItem itemToRemove)
+        private bool AttemptRemoveAmountItem(IItemTemplateInstance itemTemplateToRemove)
         {
-            if (!itemToRemove.Variables.HasAmount())
+            if (!itemTemplateToRemove.Variables.HasAmount())
             {
-                if (!InternalItems.Contains(itemToRemove)) { return false; }
-                InternalItems.Remove(itemToRemove);
+                if (!InventoryInstance.Items.Contains(itemTemplateToRemove)) { return false; }
+                InventoryInstance.Items.Remove(itemTemplateToRemove);
                 return true;
             }
 
-            var amountToTake = itemToRemove.Variables.Amount();
-            var applicableItems = InternalItems
-                .Where(x => x.Template.Id == itemToRemove.Template.Id)
+            var amountToTake = itemTemplateToRemove.Variables.Amount();
+            var applicableItems = InventoryInstance.Items
+                .Where(x => x.TemplateId == itemTemplateToRemove.TemplateId)
                 .OrderByDescending(x => x.Variables.Amount())
                 .ToArray();
 
@@ -182,7 +192,7 @@ namespace OpenRpg.Items.Inventory
                 var itemAmount = currentItem.Variables.Amount();
                 if (amountToTake >= itemAmount)
                 {
-                    InternalItems.Remove(currentItem);
+                    InventoryInstance.Items.Remove(currentItem);
                     amountToTake -= itemAmount;
                 }
                 else
@@ -196,13 +206,13 @@ namespace OpenRpg.Items.Inventory
             return true;
         }
 
-        private bool AttemptRemoveWeightedItem(IItem item)
+        private bool AttemptRemoveWeightedItem(IItemTemplateInstance item)
         {
             // TODO
             return false;
         }
         
-        private bool AttemptAddWeightedItem(IItem item)
+        private bool AttemptAddWeightedItem(IItemTemplateInstance item)
         {
             // TODO
             return false;
