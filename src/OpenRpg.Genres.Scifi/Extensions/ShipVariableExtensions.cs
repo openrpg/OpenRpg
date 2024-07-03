@@ -1,7 +1,7 @@
-using OpenRpg.Genres.Scifi.Equipment;
+using OpenRpg.Genres.Scifi.Equippables.ShipSlots;
 using OpenRpg.Genres.Scifi.Types;
 using OpenRpg.Genres.Scifi.Variables;
-using OpenRpg.Items.Inventory;
+using OpenRpg.Items.Inventories;
 
 namespace OpenRpg.Genres.Scifi.Extensions
 {
@@ -10,22 +10,22 @@ namespace OpenRpg.Genres.Scifi.Extensions
     /// </summary>
     public static class ShipVariableExtensions
     {
-        public static bool HasEquipment(this IShipVariables vars) 
+        public static bool HasEquipment(this ShipVariables vars) 
         { return vars.ContainsKey(ShipVariableTypes.Equipment); }
         
-        public static IShipEquipment Equipment(this IShipVariables vars)
-        { return vars[ShipVariableTypes.Equipment] as IShipEquipment; }
+        public static ShipEquipment Equipment(this ShipVariables vars)
+        { return vars[ShipVariableTypes.Equipment] as ShipEquipment; }
 
-        public static void Equipment(this IShipVariables vars, IShipEquipment equipment)
+        public static void Equipment(this ShipVariables vars, ShipEquipment equipment)
         { vars[ShipVariableTypes.Equipment] = equipment; }
         
-        public static bool HasInventory(this IShipVariables vars) 
+        public static bool HasInventory(this ShipVariables vars) 
         { return vars.ContainsKey(ShipVariableTypes.Inventory); }
         
-        public static IInventory Inventory(this IShipVariables vars)
-        { return vars[ShipVariableTypes.Inventory] as IInventory; }
+        public static Inventory Inventory(this ShipVariables vars)
+        { return vars[ShipVariableTypes.Inventory] as Inventory; }
 
-        public static void Inventory(this IShipVariables vars, IInventory inventory)
+        public static void Inventory(this ShipVariables vars, Inventory inventory)
         { vars[ShipVariableTypes.Inventory] = inventory; }
     }
 }

@@ -6,9 +6,9 @@ using OpenRpg.Genres.Scifi.Variables;
 
 namespace OpenRpg.Genres.Scifi.Combat
 {
-    public class ShipAttackGenerator : IAttackGenerator<IShipStatsVariables>
+    public class ShipAttackGenerator : IAttackGenerator<ShipStatsVariables>
     {
-        public Attack GenerateAttack(IShipStatsVariables stats)
+        public Attack GenerateAttack(ShipStatsVariables stats)
         {
             var damages = stats.GetDamageReferences()
                 .Where(x => x.StatValue != 0)

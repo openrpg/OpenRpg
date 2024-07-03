@@ -10,22 +10,22 @@ namespace OpenRpg.Items.Loot
     public class DefaultLootTable : ILootTable
     {
         public IRandomizer Randomizer { get; set; }
-        public ICollection<ILootTableEntry> AvailableLoot { get; set; } = new List<ILootTableEntry>();
+        public ICollection<LootTableEntry> AvailableLoot { get; set; } = new List<LootTableEntry>();
 
         public DefaultLootTable(){}
         
-        public DefaultLootTable(ICollection<ILootTableEntry> availableLoot, IRandomizer randomizer)
+        public DefaultLootTable(ICollection<LootTableEntry> availableLoot, IRandomizer randomizer)
         {
             Randomizer = randomizer;
             AvailableLoot = availableLoot;
         }
         
-        public IEnumerable<IItemTemplateInstance> GetLoot()
+        public IEnumerable<Item> GetLoot()
         { return GetRandomLootEntries().Select(x => x.Item.Clone()); }
         
-        public IEnumerable<ILootTableEntry> GetRandomLootEntries()
+        public IEnumerable<LootTableEntry> GetRandomLootEntries()
         {
-            var uniqueItems = new List<IItemTemplateInstance>();
+            var uniqueItems = new List<Item>();
 
             foreach (var loot in AvailableLoot)
             {

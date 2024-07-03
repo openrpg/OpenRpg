@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using OpenRpg.Core.Variables;
+using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Core.Extensions
 {
@@ -65,7 +67,6 @@ namespace OpenRpg.Core.Extensions
         public static bool GetBoolOrDefault(this IVariables<object> vars, int variableKey, bool defaultValue)
         { return vars.ContainsKey(variableKey) ? vars.GetBool(variableKey) : defaultValue; }
         
-                
         public static T GetAs<T>(this IVariables<object> vars, int variableKey) where T : class
         { return vars.Get(variableKey) as T; }
 

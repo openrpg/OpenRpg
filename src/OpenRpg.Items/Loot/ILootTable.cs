@@ -5,8 +5,8 @@ namespace OpenRpg.Items.Loot
 {
     public interface ILootTable
     {
-        ICollection<ILootTableEntry> AvailableLoot { get; }
-        IEnumerable<IItemTemplateInstance> GetLoot();
-        IEnumerable<ILootTableEntry> GetRandomLootEntries();
+        ICollection<LootTableEntry> AvailableLoot { get; }
+        IEnumerable<Item> GetLoot();
+        IEnumerable<LootTableEntry> GetRandomLootEntries();
     }
 }

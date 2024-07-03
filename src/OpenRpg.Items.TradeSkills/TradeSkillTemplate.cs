@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using OpenRpg.Core.Common;
 using OpenRpg.Core.Requirements;
+using OpenRpg.Core.Variables.General;
 using OpenRpg.Items.TradeSkills.Variables;
 
 namespace OpenRpg.Items.TradeSkills
 {
-    public class TradeSkillTemplate : ITradeSkillTemplate
+    public class TradeSkillTemplate : IHasDataId, IHasRequirements, IHasVariables<TradeSkillTemplateVariables>
     {
         /// <summary>
         /// The Id for this template
@@ -30,11 +32,11 @@ namespace OpenRpg.Items.TradeSkills
         /// <summary>
         /// Requirements needed before this tradeskill is allowed
         /// </summary>
-        public IEnumerable<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
+        public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
 
         /// <summary>
         /// Variables for this template
         /// </summary>
-        public ITradeSkillTemplateVariables Variables { get; set; } = new DefaultTradeSkillTemplateVariables();
+        public TradeSkillTemplateVariables Variables { get; set; } = new TradeSkillTemplateVariables();
     }
 }

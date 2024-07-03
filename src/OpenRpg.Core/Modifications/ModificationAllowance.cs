@@ -9,6 +9,6 @@ namespace OpenRpg.Core.Modifications
         public int AmountAllowed { get; set; }
         public int ModificationType { get; set; }
         
-        public IEnumerable<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
+        public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
     }
 }

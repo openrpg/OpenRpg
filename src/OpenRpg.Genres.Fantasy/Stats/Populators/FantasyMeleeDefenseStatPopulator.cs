@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Effects;
-using OpenRpg.Core.Stats.Entity;
 using OpenRpg.Core.Stats.Populators;
+using OpenRpg.Core.Stats.Variables;
 using OpenRpg.Core.Variables;
 using OpenRpg.Genres.Fantasy.Effects;
 using OpenRpg.Genres.Fantasy.Extensions;
@@ -11,7 +11,7 @@ using OpenRpg.Genres.Populators.Entity.Stats;
 
 namespace OpenRpg.Genres.Fantasy.Stats.Populators
 {
-    public class FantasyMeleeDefenseStatPopulator : CompositeStatPopulator<IEntityStatsVariables>, IEntityPartialStatPopulator
+    public class FantasyMeleeDefenseStatPopulator : CompositeStatPopulator<EntityStatsVariables>, IEntityPartialStatPopulator
     {
         public int Priority => 10;
         
@@ -33,15 +33,15 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators
             };
         }
 
-        public static float GetBluntModBonus(IEntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects,
+        public static float GetBluntModBonus(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects,
             IReadOnlyCollection<IVariables> relatedVars)
         { return stats.Strength() / 100.0f; }
 
-        public static float GetPiercingModBonus(IEntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects,
+        public static float GetPiercingModBonus(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects,
             IReadOnlyCollection<IVariables> relatedVars)
         { return stats.Dexterity() / 100.0f; }
 
-        public static float GetSlashingOrUnarmedModBonus(IEntityStatsVariables stats,
+        public static float GetSlashingOrUnarmedModBonus(EntityStatsVariables stats,
             IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             var strengthBonus = stats.Strength() / 200.0f;

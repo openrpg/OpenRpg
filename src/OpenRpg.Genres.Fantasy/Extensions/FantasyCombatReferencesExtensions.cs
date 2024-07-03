@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using OpenRpg.Core.Stats;
-using OpenRpg.Core.Stats.Entity;
+using OpenRpg.Core.Stats.Variables;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
 
@@ -8,7 +8,7 @@ namespace OpenRpg.Genres.Fantasy.Extensions
 {
     public static class FantasyCombatReferencesExtensions
     {
-        public static ICollection<StatReference> GetDamageReferences(this IEntityStatsVariables stats)
+        public static ICollection<StatReference> GetDamageReferences(this EntityStatsVariables stats)
         {
             return new[]
             {
@@ -26,7 +26,7 @@ namespace OpenRpg.Genres.Fantasy.Extensions
             };
         }
         
-        public static ICollection<StatReference> GetDefenseReferences(this IEntityStatsVariables stats)
+        public static ICollection<StatReference> GetDefenseReferences(this EntityStatsVariables stats)
         {
             return new[]
             {
@@ -44,7 +44,7 @@ namespace OpenRpg.Genres.Fantasy.Extensions
             };
         }
         
-        public static float GetDefenseFor(this IEntityStatsVariables stats, int effectType)
+        public static float GetDefenseFor(this EntityStatsVariables stats, int effectType)
         {
             if (effectType == FantasyEffectTypes.PiercingBonusAmount) { return stats.PiercingDefense(); }
             if (effectType == FantasyEffectTypes.SlashingBonusAmount) { return stats.SlashingDefense(); }
@@ -75,7 +75,7 @@ namespace OpenRpg.Genres.Fantasy.Extensions
             return 0;
         }
         
-        public static float GetDefenseFromDamageType(this IEntityStatsVariables stats, int damageType)
+        public static float GetDefenseFromDamageType(this EntityStatsVariables stats, int damageType)
         {
             if (damageType == FantasyDamageTypes.PiercingDamage) { return stats.PiercingDefense(); }
             if (damageType == FantasyDamageTypes.SlashingDamage) { return stats.SlashingDefense(); }
@@ -91,7 +91,7 @@ namespace OpenRpg.Genres.Fantasy.Extensions
             return 0;
         }
 
-        public static float GetDamageFor(this IEntityStatsVariables stats, int effectType)
+        public static float GetDamageFor(this EntityStatsVariables stats, int effectType)
         {
             if (effectType == FantasyEffectTypes.PiercingBonusAmount) { return stats.PiercingDamage(); }
             if (effectType == FantasyEffectTypes.SlashingBonusAmount) { return stats.SlashingDamage(); }
@@ -122,7 +122,7 @@ namespace OpenRpg.Genres.Fantasy.Extensions
             return 0;
         }
         
-        public static float GetDamageFromDamageType(this IEntityStatsVariables stats, int damageType)
+        public static float GetDamageFromDamageType(this EntityStatsVariables stats, int damageType)
         {
             if (damageType == FantasyDamageTypes.PiercingDamage) { return stats.PiercingDamage(); }
             if (damageType == FantasyDamageTypes.SlashingDamage) { return stats.SlashingDamage(); }

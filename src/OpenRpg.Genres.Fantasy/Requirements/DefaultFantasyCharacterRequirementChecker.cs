@@ -8,7 +8,7 @@ namespace OpenRpg.Genres.Fantasy.Requirements
 {
     public class DefaultFantasyCharacterRequirementChecker : DefaultCharacterRequirementChecker
     {
-        public override bool IsRequirementMet(ICharacter character, Requirement requirement)
+        public override bool IsRequirementMet(Character character, Requirement requirement)
         {
             if(requirement.RequirementType == FantasyRequirementTypes.StrengthRequirement)
             { return character.Stats.Strength() >= requirement.AssociatedValue; }

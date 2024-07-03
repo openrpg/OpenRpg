@@ -1,9 +1,9 @@
-using OpenRpg.Core.State.Entity;
 using OpenRpg.Core.State.Populators;
+using OpenRpg.Core.State.Variables;
 
 namespace OpenRpg.Genres.Populators.Entity.State
 {
-    public interface IEntityPartialStatePopulator : IPartialStatePopulator<IEntityStateVariables>
+    public interface IEntityPartialStatePopulator : IPartialStatePopulator<EntityStateVariables>
     {
         
     }

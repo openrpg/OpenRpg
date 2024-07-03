@@ -8,31 +8,31 @@ namespace OpenRpg.Quests.Extensions
 {
     public static class QuestEntityVariableExtensions
     {
-        public static bool HasFactionReputation(this IEntityVariables vars) 
+        public static bool HasFactionReputation(this EntityVariables vars) 
         { return vars.ContainsKey(QuestEntityVariableTypes.FactionReputation); }
         
-        public static IFactionReputation FactionReputation(this IEntityVariables vars)
-        { return vars.GetAs<IFactionReputation>(QuestEntityVariableTypes.FactionReputation); }
+        public static FactionReputation FactionReputation(this EntityVariables vars)
+        { return vars.GetAs<FactionReputation>(QuestEntityVariableTypes.FactionReputation); }
 
-        public static void FactionReputation(this IEntityVariables vars, IFactionReputation factionReputation)
+        public static void FactionReputation(this EntityVariables vars, FactionReputation factionReputation)
         { vars[QuestEntityVariableTypes.FactionReputation] = factionReputation; }
         
-        public static bool HasQuestState(this IEntityVariables vars) 
+        public static bool HasQuestState(this EntityVariables vars) 
         { return vars.ContainsKey(QuestEntityVariableTypes.QuestState); }
         
-        public static IQuestState QuestState(this IEntityVariables vars)
+        public static IQuestState QuestState(this EntityVariables vars)
         { return vars.GetAs<IQuestState>(QuestEntityVariableTypes.QuestState); }
 
-        public static void QuestState(this IEntityVariables vars, IQuestState questState)
+        public static void QuestState(this EntityVariables vars, IQuestState questState)
         { vars[QuestEntityVariableTypes.QuestState] = questState; }
         
-        public static bool HasTriggerState(this IEntityVariables vars) 
+        public static bool HasTriggerState(this EntityVariables vars) 
         { return vars.ContainsKey(QuestEntityVariableTypes.TriggerState); }
         
-        public static ITriggerStateVariables TriggerState(this IEntityVariables vars)
+        public static ITriggerStateVariables TriggerState(this EntityVariables vars)
         { return vars.GetAs<ITriggerStateVariables>(QuestEntityVariableTypes.TriggerState); }
 
-        public static void TriggerState(this IEntityVariables vars, ITriggerStateVariables triggerState)
+        public static void TriggerState(this EntityVariables vars, ITriggerStateVariables triggerState)
         { vars[QuestEntityVariableTypes.TriggerState] = triggerState; }
     }
 }

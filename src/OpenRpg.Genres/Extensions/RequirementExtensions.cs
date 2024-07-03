@@ -8,7 +8,7 @@ namespace OpenRpg.Genres.Extensions
 {
     public static class RequirementExtensions
     {
-        public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, ICharacter character, IHasRequirements hasRequirements)
+        public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, Character character, IHasRequirements hasRequirements)
         { return hasRequirements.Requirements.All(x => characterRequirementChecker.IsRequirementMet(character, x)); }
         
         public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, IQuestState questState, IHasRequirements hasRequirements)
@@ -18,7 +18,7 @@ namespace OpenRpg.Genres.Extensions
         { return hasRequirements.Requirements.All(x => characterRequirementChecker.IsRequirementMet(triggerState, x)); }
 
         public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, IQuestState questState, ITriggerStateVariables triggerState,
-            ICharacter character, IHasRequirements hasRequirements)
+            Character character, IHasRequirements hasRequirements)
         {
             return AreRequirementsMet(characterRequirementChecker, character, hasRequirements) &&
                    AreRequirementsMet(characterRequirementChecker, questState, hasRequirements) &&

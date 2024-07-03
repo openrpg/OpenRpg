@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using OpenRpg.Core.Stats;
-using OpenRpg.Core.Stats.Entity;
-using OpenRpg.Genres.Extensions;
+using OpenRpg.Core.Stats.Variables;
 using OpenRpg.Genres.Scifi.Types;
 using OpenRpg.Genres.Scifi.Variables;
 
@@ -9,7 +8,7 @@ namespace OpenRpg.Genres.Scifi.Extensions
 {
     public static class ScifiCombatReferencesExtensions
     {
-        public static ICollection<StatReference> GetDamageReferences(this IShipStatsVariables stats)
+        public static ICollection<StatReference> GetDamageReferences(this ShipStatsVariables stats)
         {
             return new[]
             {
@@ -21,7 +20,7 @@ namespace OpenRpg.Genres.Scifi.Extensions
             };
         }
         
-        public static ICollection<StatReference> GetDefenseReferences(this IShipStatsVariables stats)
+        public static ICollection<StatReference> GetDefenseReferences(this ShipStatsVariables stats)
         {
             return new[]
             {
@@ -33,7 +32,7 @@ namespace OpenRpg.Genres.Scifi.Extensions
             };
         }
         
-        public static float GetDefenseFor(this IShipStatsVariables stats, int effectType)
+        public static float GetDefenseFor(this ShipStatsVariables stats, int effectType)
         {
             if (effectType == ScifiEffectTypes.BallisticDamageAmount) { return stats.BallisticDefense(); }
             if (effectType == ScifiEffectTypes.ExplosiveDamageAmount) { return stats.ExplosiveDefense(); }
@@ -43,7 +42,7 @@ namespace OpenRpg.Genres.Scifi.Extensions
             return 0;
         }
         
-        public static float GetDefenseFromDamageType(this IEntityStatsVariables stats, int damageType)
+        public static float GetDefenseFromDamageType(this EntityStatsVariables stats, int damageType)
         {
             if (damageType == ScifiDamageTypes.Ballistic) { return stats.BallisticDamage(); }
             if (damageType == ScifiDamageTypes.Explosive) { return stats.ExplosiveDamage(); }
@@ -53,7 +52,7 @@ namespace OpenRpg.Genres.Scifi.Extensions
             return 0;
         }
 
-        public static float GetDamageFor(this IEntityStatsVariables stats, int effectType)
+        public static float GetDamageFor(this EntityStatsVariables stats, int effectType)
         {
             if (effectType == ScifiEffectTypes.BallisticDamageAmount) { return stats.BallisticDamage(); }
             if (effectType == ScifiEffectTypes.ExplosiveDamageAmount) { return stats.ExplosiveDamage(); }

@@ -4,20 +4,17 @@ using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
-using OpenRpg.Genres.Persistence.Characters;
 
 namespace OpenRpg.Genres.Fantasy.Builders
 {
     public class FantasyCharacterBuilder : CharacterBuilder
     {
-        public FantasyCharacterBuilder(ICharacterMapper characterMapper, IRandomizer randomizer) : base(characterMapper, randomizer)
+        public FantasyCharacterBuilder(IRandomizer randomizer) : base(randomizer)
         {
         }
 
-        protected override void PreCreateCharacterData()
+        protected override void PreProcessCharacter()
         {
-            base.PreCreateCharacterData();
-            
             _equipment.TryAdd(FantasyEquipmentSlotTypes.HeadSlot, null);
             _equipment.TryAdd(FantasyEquipmentSlotTypes.BackSlot, null);
             _equipment.TryAdd(FantasyEquipmentSlotTypes.UpperBodySlot, null);
@@ -29,9 +26,11 @@ namespace OpenRpg.Genres.Fantasy.Builders
             _equipment.TryAdd(FantasyEquipmentSlotTypes.Ring1Slot, null);
             _equipment.TryAdd(FantasyEquipmentSlotTypes.Ring2Slot, null);
             _equipment.TryAdd(FantasyEquipmentSlotTypes.WristSlot, null);
+
+            base.PreProcessCharacter();
         }
 
-        protected override void PostProcessCharacter(ICharacter character)
+        protected override void PostProcessCharacter(Character character)
         {
             if (!character.State.ContainsKey(FantasyEntityStateVariableTypes.Health))
             { character.State.Health(character.Stats.MaxHealth()); }

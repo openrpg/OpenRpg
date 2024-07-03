@@ -1,12 +1,12 @@
-using OpenRpg.Core.Stats.Entity;
 using OpenRpg.Core.Stats.Populators;
+using OpenRpg.Core.Stats.Variables;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Genres.Populators.Entity.Stats;
 using OpenRpg.Genres.Populators.Entity.Stats.Conventions;
 
 namespace OpenRpg.Genres.Fantasy.Stats.Populators
 {
-    public class FantasyAttributeStatPopulator : CompositeStatPopulator<IEntityStatsVariables>, IEntityPartialStatPopulator
+    public class FantasyAttributeStatPopulator : CompositeStatPopulator<EntityStatsVariables>, IEntityPartialStatPopulator
     {
         public int Priority => 100;
 

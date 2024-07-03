@@ -1,9 +1,9 @@
-using OpenRpg.Core.Stats.Entity;
 using OpenRpg.Core.Stats.Populators;
+using OpenRpg.Core.Stats.Variables;
 
 namespace OpenRpg.Genres.Populators.Entity.Stats
 {
-    public interface IEntityPartialStatPopulator : IPartialStatPopulator<IEntityStatsVariables>
+    public interface IEntityPartialStatPopulator : IPartialStatPopulator<EntityStatsVariables>
     {
         
     }

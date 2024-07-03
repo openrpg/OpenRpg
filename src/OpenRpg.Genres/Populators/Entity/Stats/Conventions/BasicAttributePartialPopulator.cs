@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using OpenRpg.Core.Effects;
-using OpenRpg.Core.Stats;
-using OpenRpg.Core.Stats.Entity;
+using OpenRpg.Core.Stats.Variables;
 using OpenRpg.Core.Variables;
 using OpenRpg.Genres.Extensions;
 
@@ -14,7 +13,7 @@ namespace OpenRpg.Genres.Populators.Entity.Stats.Conventions
         public int EffectBonusAmountType { get; }
         public int EffectBonusPercentageType { get; }
         public int StatType { get; }
-        public Func<IEntityStatsVariables, IReadOnlyCollection<Effect>, IReadOnlyCollection<IVariables>, int> MiscGetter { get; } = null;
+        public Func<EntityStatsVariables, IReadOnlyCollection<Effect>, IReadOnlyCollection<IVariables>, int> MiscGetter { get; } = null;
 
         public BasicAttributePartialPopulator(int effectBonusAmountType, int effectBonusPercentageType, int statType, int priority = 100)
         {
@@ -25,14 +24,14 @@ namespace OpenRpg.Genres.Populators.Entity.Stats.Conventions
         }
         
         public BasicAttributePartialPopulator(int effectBonusAmountType, int effectBonusPercentageType, int statType,
-            Func<IEntityStatsVariables, IReadOnlyCollection<Effect>, IReadOnlyCollection<IVariables>, int> miscGetter,  
+            Func<EntityStatsVariables, IReadOnlyCollection<Effect>, IReadOnlyCollection<IVariables>, int> miscGetter,  
             int priority = 100)
             : this(effectBonusAmountType, effectBonusPercentageType, statType)
         {
             MiscGetter = miscGetter;
         }
 
-        public void Populate(IEntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public void Populate(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             var miscBonus = MiscGetter?.Invoke(stats, activeEffects, relatedVars) ?? 0;
             var attributeValue = (int)activeEffects.CalculateAttributeValueFor(EffectBonusAmountType, EffectBonusPercentageType, miscBonus);

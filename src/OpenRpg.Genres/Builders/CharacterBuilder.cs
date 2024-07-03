@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using OpenRpg.Core.Classes.Templates;
-using OpenRpg.Core.Types;
+using OpenRpg.Core.Classes;
+using OpenRpg.Core.Entity.Variables;
+using OpenRpg.Core.Extensions;
+using OpenRpg.Core.State.Variables;
+using OpenRpg.Core.Templates;
 using OpenRpg.Core.Utils;
 using OpenRpg.Genres.Characters;
-using OpenRpg.Genres.Types;
+using OpenRpg.Items.Equippables;
+using OpenRpg.Items.Equippables.Slots;
+using OpenRpg.Items.Extensions;
+using OpenRpg.Items.Inventories;
 using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Genres.Builders
@@ -19,10 +24,10 @@ namespace OpenRpg.Genres.Builders
         protected string _name, _description;
         protected Dictionary<int, float> _state;
 
-        protected Dictionary<int, IItemTemplateInstance> _equipment;
-        protected List<IItemTemplateInstance> _inventory;
+        protected Dictionary<int, Item> _equipment;
+        protected List<Item> _inventory;
         
-        protected Dictionary<int,object> _variables;
+        protected EntityVariables _variables;
 
         public CharacterBuilder(IRandomizer randomizer)
         {
@@ -34,9 +39,9 @@ namespace OpenRpg.Genres.Builders
             _raceId = _classId = _classLevels = _genderId = 0;
             _name = _description = string.Empty;
             _state = new Dictionary<int, float>();
-            _equipment = new Dictionary<int, IItemTemplateInstance>();
-            _inventory = new List<IItemTemplateInstance>();
-            _variables = new Dictionary<int, object>();
+            _equipment = new Dictionary<int, Item>();
+            _inventory = new List<Item>();
+            _variables = new EntityVariables();
             return this;
         }
 
@@ -89,15 +94,15 @@ namespace OpenRpg.Genres.Builders
             return this;
         }
 
-        public CharacterBuilder WithEquipment(int slotType, IItemTemplateInstance item)
+        public CharacterBuilder WithEquipment(int slotType, Item itemHas)
         {
-            _equipment[slotType] = item;
+            _equipment[slotType] = itemHas;
             return this;
         }
         
-        public CharacterBuilder WithInventoryItem(IItemTemplateInstance item)
+        public CharacterBuilder WithInventoryItem(Item itemHas)
         {
-            _inventory.Add(item);
+            _inventory.Add(itemHas);
             return this;
         }
         
@@ -111,70 +116,58 @@ namespace OpenRpg.Genres.Builders
         { return this as T; }
         
         protected virtual void RandomizeDefaults() {}
-        protected virtual void PostProcessCharacter(ICharacter character){}
-        protected virtual void PreCreateCharacterData(){}
 
-        protected void ProcessEquipmentToVariables()
+        protected virtual Equipment ProcessEquipment()
         {
-            if (_equipment.Count == 0) { return; }
-            
-            var equipmentStore = _equipment
-                .ToDictionary(x => x.Key, x => x.Value? ?? null);
-                
-            _variables.Add(GenreEntityVariableTypes.Equipment, new EquipmentData(equipmentStore));
+            return new Equipment() { Slots = new EquipmentSlots(_equipment) };
         }
         
-        protected void ProcessInventoryToVariables()
+        protected virtual Inventory ProcessInventory()
         {
-            if (_inventory.Count == 0) { return; }
-            
-            var persistedInventory = _inventory.Select(x => x.ToDataModel()).ToArray();
-            _variables.Add(GenreEntityVariableTypes.Inventory, new InventoryData(persistedInventory));
+            return new Inventory() { Items = _inventory };
         }
         
-        protected void ProcessRaceToVariables()
+        protected virtual Class ProcessClass()
         {
-            if (_raceId == 0) { return; }
-            _variables.Add(GenreEntityVariableTypes.Race, _raceId);
-        }        
-        
-        protected void ProcessGenderToVariables()
-        {
-            if (_genderId == 0) { return; }
-            _variables.Add(GenreEntityVariableTypes.Gender, _genderId);
-        }
-        
-        protected void ProcessClassToVariables()
-        {
-            if (_classId == 0) { return; }
-            var classVars = new Dictionary<int, object>();
-            classVars.Add(ClassVariableTypes.Level, _classLevels);
-            _variables.Add(GenreEntityVariableTypes.Class, new DefaultClassTemplateInstance(_classId, classVars));
-        }
-        
-        public virtual CharacterData CreateCharacterData()
-        {
-            ProcessEquipmentToVariables();
-            ProcessInventoryToVariables();
-            ProcessRaceToVariables();
-            ProcessClassToVariables();
-            ProcessGenderToVariables();
+            var classData = new Class();
+            if (_classId == 0) { return classData; }
 
-            return new CharacterData(Guid.NewGuid(), _name, _description, _state, _variables);
+            classData.TemplateId = _classId;
+            classData.Variables.Level(_classLevels);
+            return classData;
         }
         
-        public ICharacter Build()
+        protected virtual void PreProcessCharacter() {}
+        protected virtual void PostProcessCharacter(Character character) {}
+        
+        public virtual Character CreateCharacter()
+        {
+            _variables.Class(ProcessClass());
+            _variables.Equipment(ProcessEquipment());
+            _variables.Inventory(ProcessInventory());
+            _variables.Gender(_genderId);
+            _variables.Race(_raceId);
+
+            return new Character()
+            {
+                UniqueId = Guid.NewGuid(),
+                NameLocaleId = _name,
+                DescriptionLocaleId = _description,
+                Variables = _variables,
+                State = new EntityStateVariables(_state)
+            };
+        }
+        
+        public Character Build()
         {
             RandomizeDefaults();
             
             if (string.IsNullOrEmpty(_name))
             { _name = "Unknown Name"; }
 
-            PreCreateCharacterData();
-            var characterData = CreateCharacterData();
-            var character = CharacterMapper.Map(characterData);
+            PreProcessCharacter();
+            var character = CreateCharacter();
             PostProcessCharacter(character);
-
             return character;
         }
     }

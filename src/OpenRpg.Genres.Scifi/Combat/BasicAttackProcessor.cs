@@ -7,9 +7,9 @@ using OpenRpg.Genres.Scifi.Variables;
 
 namespace OpenRpg.Genres.Scifi.Combat
 {
-    public class ShipAttackProcessor : IAttackProcessor<IShipStatsVariables>
+    public class ShipAttackProcessor : IAttackProcessor<ShipStatsVariables>
     {
-        public ProcessedAttack ProcessAttack(Attack attack, IShipStatsVariables stats)
+        public ProcessedAttack ProcessAttack(Attack attack, ShipStatsVariables stats)
         {
             var applicableDefenses = stats.GetDefenseReferences().Where(x => x.StatValue != 0);
             var damageLookups = attack.Damages.ToDictionary(x => x.Type, x => x.Value);

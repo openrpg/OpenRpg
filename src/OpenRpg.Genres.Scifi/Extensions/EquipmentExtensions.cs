@@ -1,13 +1,15 @@
-using OpenRpg.Genres.Scifi.Equipment;
-using OpenRpg.Genres.Scifi.Equipment.CharacterSlots;
 using OpenRpg.Genres.Scifi.Types;
-using OpenRpg.Items.Equipment;
+using OpenRpg.Items.Equippables;
+using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Genres.Scifi.Extensions
 {
     public static class EquipmentExtensions
     {
-        public static WeaponSlot WeaponSlot(this IEquipment equipment) => equipment.Slots.Get(ScifiEntityEquipmentSlotTypes.WeaponSlot) as WeaponSlot;
-        public static ArmourSlot ArmourSlot(this IEquipment equipment) => equipment.Slots.Get(ScifiEntityEquipmentSlotTypes.ArmourSlot) as ArmourSlot;
+        public static Item WeaponSlot(this Equipment equipment) => equipment.Slots.Get(ScifiEntityEquipmentSlotTypes.WeaponSlot);
+        public static Item ArmourSlot(this Equipment equipment) => equipment.Slots.Get(ScifiEntityEquipmentSlotTypes.ArmourSlot);
+        
+        public static void WeaponSlot(this Equipment equipment, Item item) => equipment.Slots[ScifiEntityEquipmentSlotTypes.WeaponSlot] = item;
+        public static void ArmourSlot(this Equipment equipment, Item item) => equipment.Slots[ScifiEntityEquipmentSlotTypes.ArmourSlot] = item;
     }
 }

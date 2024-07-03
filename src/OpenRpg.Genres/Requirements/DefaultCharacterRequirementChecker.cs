@@ -12,14 +12,14 @@ namespace OpenRpg.Genres.Requirements
 {
     public class DefaultCharacterRequirementChecker : ICharacterRequirementChecker
     {
-        public virtual bool IsRequirementMet(ICharacter character, Requirement requirement)
+        public virtual bool IsRequirementMet(Character character, Requirement requirement)
         {
             if (requirement.RequirementType == GenreRequirementTypes.RaceRequirement)
             {
                 if (!character.Variables.HasRace())
                 { return false; }
                 
-                return character.Variables.Race().Id == requirement.AssociatedId;
+                return character.Variables.Race() == requirement.AssociatedId;
             }
 
             if (requirement.RequirementType == GenreRequirementTypes.ClassRequirement)
@@ -27,8 +27,8 @@ namespace OpenRpg.Genres.Requirements
                 if (character.Variables.HasRace())
                 {
                     var classDetails = character.Variables.Class();
-                    if (classDetails.Template.Id == requirement.AssociatedId)
-                    { return classDetails.Instance.Variables.Level() >= requirement.AssociatedValue; }
+                    if (classDetails.TemplateId == requirement.AssociatedId)
+                    { return classDetails.Variables.Level() >= requirement.AssociatedValue; }
                 }
 
                 if (character.Variables.HasMultiClass())
@@ -36,7 +36,7 @@ namespace OpenRpg.Genres.Requirements
                     var multiClass = character.Variables.MultiClass();
                     var possibleClass = multiClass.GetClass(requirement.AssociatedId);
                     if (possibleClass != null)
-                    { return possibleClass.Instance.Variables.Level() >= requirement.AssociatedValue; }
+                    { return possibleClass.Variables.Level() >= requirement.AssociatedValue; }
                 }
 
                 return false;
@@ -56,7 +56,7 @@ namespace OpenRpg.Genres.Requirements
                 { return false; }
 
                 return character.Variables.Equipment().Slots.Values
-                    .Any(x => x.SlottedItem?.TemplateId == requirement.AssociatedId);
+                    .Any(x => x?.TemplateId == requirement.AssociatedId);
             }
             
             if (requirement.RequirementType == GenreRequirementTypes.TradeSkillRequirement)

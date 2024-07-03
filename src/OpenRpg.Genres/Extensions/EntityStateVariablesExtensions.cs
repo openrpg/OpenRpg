@@ -2,17 +2,17 @@ using System;
 using System.Linq;
 using OpenRpg.Combat.Processors.Attacks;
 using OpenRpg.Core.Extensions;
-using OpenRpg.Core.State.Entity;
+using OpenRpg.Core.State.Variables;
 using OpenRpg.Genres.Types;
 
 namespace OpenRpg.Genres.Extensions
 {
     public static class EntityStateVariablesExtensions
     {
-        public static int Health(this IEntityStateVariables state) => (int)state.Get(GenreEntityStateVariableTypes.Health);
-        public static void Health(this IEntityStateVariables state, int value) => state[GenreEntityStateVariableTypes.Health] = value;
+        public static int Health(this EntityStateVariables state) => (int)state.Get(GenreEntityStateVariableTypes.Health);
+        public static void Health(this EntityStateVariables state, int value) => state[GenreEntityStateVariableTypes.Health] = value;
         
-        public static void AddHealth(this IEntityStateVariables state, int change, int? maxHealth = null)
+        public static void AddHealth(this EntityStateVariables state, int change, int? maxHealth = null)
         {
             var newValue = state.Health() + change;
             if(newValue <= 0) { newValue = 0; }
@@ -23,7 +23,7 @@ namespace OpenRpg.Genres.Extensions
             { state.AddValue(GenreEntityStateVariableTypes.Health, newValue, 0, maxHealth.Value); }
         }
 
-        public static void DeductHealth(this IEntityStateVariables state, int change, int? maxHealth = null)
+        public static void DeductHealth(this EntityStateVariables state, int change, int? maxHealth = null)
         {
             var newValue = state.Health() - change;
             if(newValue <= 0) { newValue = 0; }
@@ -34,7 +34,7 @@ namespace OpenRpg.Genres.Extensions
             { state.AddValue(GenreEntityStateVariableTypes.Health, newValue, 0, maxHealth.Value); }
         }
         
-        public static void ApplyDamageToTarget(this IEntityStateVariables state, ProcessedAttack attack)
+        public static void ApplyDamageToTarget(this EntityStateVariables state, ProcessedAttack attack)
         {
             var summedAttack = attack.DamageDone.Sum(x => x.Value);
             var totalDamage = (int)Math.Round(summedAttack);
@@ -42,7 +42,7 @@ namespace OpenRpg.Genres.Extensions
             state.DeductHealth(totalDamage);
         }
         
-        public static bool IsDead(this IEntityStateVariables state)
+        public static bool IsDead(this EntityStateVariables state)
         { return state.Health() <= 0; }
     }
 }

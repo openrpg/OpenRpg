@@ -4,7 +4,7 @@ using OpenRpg.Combat.Attacks;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Extensions;
-using OpenRpg.Core.Stats.Entity;
+using OpenRpg.Core.Stats.Variables;
 using OpenRpg.Core.Variables;
 using OpenRpg.Genres.Populators.Entity.Stats;
 
@@ -17,10 +17,10 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators.Conventions
         public int EffectAllBonusPercentageType { get; }
         public int StatType { get; }
         public EffectRelationship EffectRelationship { get; }
-        public Func<IEntityStatsVariables, IReadOnlyCollection<Effect>, IReadOnlyCollection<IVariables>, float> ModBonusGetter { get; }
+        public Func<EntityStatsVariables, IReadOnlyCollection<Effect>, IReadOnlyCollection<IVariables>, float> ModBonusGetter { get; }
         
         public DamageOrDefenseStatPartialPopulator(int effectAllBonusAmountType, int effectAllBonusPercentageType, int statType, EffectRelationship effectRelationship,
-            Func<IEntityStatsVariables, IReadOnlyCollection<Effect>, IReadOnlyCollection<IVariables>, float> modBonusGetter, int priority = 100)
+            Func<EntityStatsVariables, IReadOnlyCollection<Effect>, IReadOnlyCollection<IVariables>, float> modBonusGetter, int priority = 100)
         {
             Priority = priority;
             EffectAllBonusAmountType = effectAllBonusAmountType;
@@ -30,7 +30,7 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators.Conventions
             ModBonusGetter = modBonusGetter;
         }
         
-        public void Populate(IEntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public void Populate(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             var baseTotal = activeEffects.CalculateTotal(EffectRelationship);
             baseTotal += activeEffects.GetPotencyFor(EffectAllBonusAmountType);

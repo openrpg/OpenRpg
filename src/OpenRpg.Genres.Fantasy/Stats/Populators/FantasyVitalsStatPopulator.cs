@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Effects;
-using OpenRpg.Core.Stats.Entity;
 using OpenRpg.Core.Stats.Populators;
+using OpenRpg.Core.Stats.Variables;
 using OpenRpg.Core.Variables;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
@@ -10,7 +10,7 @@ using OpenRpg.Genres.Populators.Entity.Stats.Conventions;
 
 namespace OpenRpg.Genres.Fantasy.Stats.Populators
 {
-    public class FantasyVitalsStatPopulator : CompositeStatPopulator<IEntityStatsVariables>, IEntityPartialStatPopulator
+    public class FantasyVitalsStatPopulator : CompositeStatPopulator<EntityStatsVariables>, IEntityPartialStatPopulator
     {
         public int Priority => 10;
         
@@ -23,12 +23,12 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators
             };
         }
         
-        public static int GetMiscHealthBonus(IEntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public static int GetMiscHealthBonus(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             return stats.Constitution() * 5;
         }
         
-        public static int GetMiscMagicBonus(IEntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public static int GetMiscMagicBonus(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             return stats.Intelligence() * 5;
         }

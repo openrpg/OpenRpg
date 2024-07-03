@@ -4,6 +4,6 @@ namespace OpenRpg.Core.Requirements
 {
     public interface IHasRequirements
     {
-        IEnumerable<Requirement> Requirements { get; }
+        IReadOnlyCollection<Requirement> Requirements { get; }
     }
 }

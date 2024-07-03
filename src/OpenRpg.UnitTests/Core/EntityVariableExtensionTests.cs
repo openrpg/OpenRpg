@@ -13,7 +13,7 @@ public class EntityVariableExtensionTests
     [Fact]
     public void should_correctly_handle_gender_on_entity()
     {
-        var entityVars = new DefaultEntityVariables();
+        var entityVars = new EntityVariables();
         Assert.False(entityVars.HasGender());
         
         var dummyGender = (byte)1;
@@ -25,22 +25,22 @@ public class EntityVariableExtensionTests
     [Fact]
     public void should_correctly_handle_race_on_entity()
     {
-        var entityVars = new DefaultEntityVariables();
+        var entityVars = new EntityVariables();
         Assert.False(entityVars.HasRace());
         
-        var dummyRaceTemplate = new DefaultRaceTemplate();
-        entityVars.Race(dummyRaceTemplate);
+        var dummyRaceTemplate = new RaceTemplate();
+        entityVars.Race(dummyRaceTemplate.Id);
         Assert.True(entityVars.HasRace());
-        Assert.Equal(entityVars.Race(), dummyRaceTemplate);
+        Assert.Equal(entityVars.Race(), dummyRaceTemplate.Id);
     }
     
     [Fact]
     public void should_correctly_handle_class_on_entity()
     {
-        var entityVars = new DefaultEntityVariables();
+        var entityVars = new EntityVariables();
         Assert.False(entityVars.HasClass());
         
-        var dummyClass = new DefaultClass();
+        var dummyClass = new Class();
         entityVars.Class(dummyClass);
         Assert.True(entityVars.HasClass());
         Assert.Equal(entityVars.Class(), dummyClass);
@@ -49,10 +49,10 @@ public class EntityVariableExtensionTests
     [Fact]
     public void should_correctly_handle_multiclass_on_entity()
     {
-        var entityVars = new DefaultEntityVariables();
+        var entityVars = new EntityVariables();
         Assert.False(entityVars.HasMultiClass());
         
-        var dummyMultiClass = new DefaultMultiClass();
+        var dummyMultiClass = new MultiClasses();
         entityVars.MultiClass(dummyMultiClass);
         Assert.True(entityVars.HasMultiClass());
         Assert.Equal(entityVars.MultiClass(), dummyMultiClass);
