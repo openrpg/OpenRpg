@@ -22,8 +22,8 @@ namespace OpenRpg.Core.Extensions
             return new ClassView() { Instance = classData, Template = template };
         }
         
-        public static IEnumerable<ClassView> ToView(this ITemplateAccessor templateAccessor, IEnumerable<Class> classData)
-        { return classData.Select(x => ToView(templateAccessor, x)); }
+        public static IReadOnlyCollection<ClassView> ToView(this ITemplateAccessor templateAccessor, IReadOnlyCollection<Class> classData)
+        { return classData.Select(x => ToView(templateAccessor, x)).ToArray(); }
 
         
         public static RaceView ToView(this ITemplateAccessor templateAccessor, Race raceData)

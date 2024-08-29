@@ -15,7 +15,7 @@
         @foreach (var _class in @Classes)
          {
              <div class="column">
-                 <TagLabel Label="@($"Level {ClassView?.Instance.Variables.Level().ToString() ?? "1"}")" Content="@($"{ClassView?.Template?.NameLocaleId ?? "Unknown Class"}")" Centered="true"></TagLabel>
+                 <TagLabel Label="@($"Level {_class?.Instance.Variables.Level().ToString() ?? "1"}")" Content="@($"{_class?.Template?.NameLocaleId ?? "Unknown Class"}")" Centered="true"></TagLabel>
              </div>
          }
         </div>

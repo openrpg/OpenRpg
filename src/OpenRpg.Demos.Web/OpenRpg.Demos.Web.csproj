@@ -33,15 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenRpg.Combat" Version="0.33.248" />
-    <PackageReference Include="OpenRpg.Core" Version="0.33.248" />
-    <PackageReference Include="OpenRpg.Data" Version="0.33.248" />
-    <PackageReference Include="OpenRpg.Items" Version="0.33.248" />
-    <PackageReference Include="OpenRpg.Localization" Version="0.33.248" />
-    <PackageReference Include="OpenRpg.Quests" Version="0.33.248" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="wwwroot\images\items\" />
   </ItemGroup>
 

@@ -5,11 +5,7 @@
 @using OpenRpg.Core.Entity
 @using OpenRpg.Core.Extensions
 @using OpenRpg.Core.Races.Templates
-@using OpenRpg.Core.Templates
-@using OpenRpg.Items.Extensions
 @using OpenRpg.Core.Races
-
-@inject ITemplateAccessor TemplateAccessor;
 
 <Markdown>
    ## Basic Entity Components
@@ -85,7 +81,10 @@
   </div>
   <div class="column is-half">
       <CardSection>
-          <CharacterDetails Name="@SimpleEntity.NameLocaleId" RaceView="TemplateAccessor.ToView(SimpleEntity.Variables.Race())" ClassView="TemplateAccessor.ToView(SimpleEntity.Variables.Class())"></CharacterDetails>
+          <CharacterDetails Name="@SimpleEntity.NameLocaleId"
+                            RaceView="new RaceView { Instance = MultiClassEntity.Variables.Race(), Template = HobbitRace }"
+                            ClassView="@GetClassView(SimpleEntity.Variables.Class())">
+          </CharacterDetails>
       </CardSection>
   </div>
 </div>
@@ -130,8 +129,8 @@
     <div class="column is-half">
         <CardSection>
             <CharacterDetails Name="@MultiClassEntity.NameLocaleId"
-                              RaceView="@TemplateAccessor.ToView(MultiClassEntity.Variables.Race())"
-                              Classes="TemplateAccessor.ToView(MultiClassEntity.Variables.MultiClass().Classes)">
+                              RaceView="new RaceView { Instance = MultiClassEntity.Variables.Race(), Template = HobbitRace }"
+                              Classes="@MultiClassEntity.Variables.MultiClass().Classes.Select(GetClassView)">
             </CharacterDetails>
         </CardSection>
     </div>
@@ -141,34 +140,40 @@
     
     private Entity SimpleEntity = new Entity();
     private Entity MultiClassEntity = new Entity();
+    
+    private RaceTemplate HobbitRace = new RaceTemplate { Id = 1, NameLocaleId = "Hobbit" };
+    
+    private ClassTemplate FighterClass = new ClassTemplate { Id = 1, NameLocaleId = "Fighter" };
+    private ClassTemplate WraithClass = new ClassTemplate { Id = 2, NameLocaleId = "Wraith" };
+    private ClassTemplate RingBearerClass = new ClassTemplate { Id = 3, NameLocaleId = "Ring Bearer" };
 
+    public ClassView GetClassView(Class classInstance)
+    {
+        if (classInstance.TemplateId == FighterClass.Id) { return new ClassView { Instance = classInstance, Template = FighterClass }; }
+        if (classInstance.TemplateId == WraithClass.Id) { return new ClassView { Instance = classInstance, Template = WraithClass }; }
+        if (classInstance.TemplateId == RingBearerClass.Id) { return new ClassView { Instance = classInstance, Template = RingBearerClass }; }
+
+        return null;
+    }
+    
     protected override void OnInitialized()
     {
         SimpleEntity.NameLocaleId = "Frodo Baggins";
-
-        var hobbitRace = new RaceTemplate { Id = 1, NameLocaleId = "Hobbit" };
-        
-        var fighterClass = new ClassTemplate { Id = 1, NameLocaleId = "Fighter" };
-        SimpleEntity.Variables.Race(new Race() { TemplateId = hobbitRace.Id });
-
-        var level1Fighter = new Class { TemplateId = fighterClass.Id };
-        SimpleEntity.Variables.Class(level1Fighter);
-
-        var wraithClass = new ClassTemplate { Id = 2, NameLocaleId = "Wraith" };
-        var ringBearerClass = new ClassTemplate { Id = 3, NameLocaleId = "Ring Bearer" };
+        SimpleEntity.Variables.Race(new Race { TemplateId = HobbitRace.Id });
+        SimpleEntity.Variables.Class(new Class { TemplateId = FighterClass.Id });
         
         MultiClassEntity.NameLocaleId = "Frodo Baggins";
-        MultiClassEntity.Variables.Race(new Race() { TemplateId = hobbitRace.Id });
+        MultiClassEntity.Variables.Race(new Race { TemplateId = HobbitRace.Id });
 
         var multiClass = new MultiClasses();
-        var level2Fighter = new Class { TemplateId = fighterClass.Id };
+        var level2Fighter =new Class { TemplateId = FighterClass.Id };
         level2Fighter.Variables.Level(2);
         multiClass.AddClass(level2Fighter);
         
-        var level1Wraith = new Class { TemplateId = wraithClass.Id };
+        var level1Wraith = new Class { TemplateId = WraithClass.Id };
         multiClass.AddClass(level1Wraith);
         
-        var level3RingBearer = new Class { TemplateId = ringBearerClass.Id };
+        var level3RingBearer = new Class { TemplateId = RingBearerClass.Id };
         level3RingBearer.Variables.Level(3);
         multiClass.AddClass(level3RingBearer);
 

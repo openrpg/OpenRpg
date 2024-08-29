@@ -10,6 +10,7 @@
     <ProjectReference Include="..\OpenRpg.Cards\OpenRpg.Cards.csproj" />
     <ProjectReference Include="..\OpenRpg.Combat\OpenRpg.Combat.csproj" />
     <ProjectReference Include="..\OpenRpg.CurveFunctions\OpenRpg.CurveFunctions.csproj" />
+    <ProjectReference Include="..\OpenRpg.Data.InMemory\OpenRpg.Data.InMemory.csproj" />
     <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
     <ProjectReference Include="..\OpenRpg.Items.TradeSkills\OpenRpg.Items.TradeSkills.csproj" />
     <ProjectReference Include="..\OpenRpg.Items\OpenRpg.Items.csproj" />
