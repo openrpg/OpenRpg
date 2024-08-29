@@ -18,8 +18,9 @@ namespace OpenRpg.Genres.Requirements
             {
                 if (!character.Variables.HasRace())
                 { return false; }
-                
-                return character.Variables.Race() == requirement.AssociatedId;
+
+                var race = character.Variables.Race();
+                return race.TemplateId == requirement.AssociatedId;
             }
 
             if (requirement.RequirementType == GenreRequirementTypes.ClassRequirement)

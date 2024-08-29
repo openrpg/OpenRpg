@@ -12,5 +12,6 @@ namespace OpenRpg.Core.Types
         public static int ClassVariables = 4;
         public static int EntityVariables = 5;
         public static int EntityStateVariables = 6;
+        public static int RaceVariables = 7;
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using OpenRpg.Core.Classes.Variables;
 using OpenRpg.Core.Types;
 

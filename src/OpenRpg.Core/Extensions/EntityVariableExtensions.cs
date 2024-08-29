@@ -22,11 +22,11 @@ namespace OpenRpg.Core.Extensions
         public static bool HasRace(this EntityVariables vars) 
         { return vars.ContainsKey(EntityVariableTypes.Race); }
         
-        public static int Race(this EntityVariables vars)
-        { return (int)vars.Get(EntityVariableTypes.Race); }
+        public static Race Race(this EntityVariables vars)
+        { return vars.GetAs<Race>(EntityVariableTypes.Race); }
 
-        public static void Race(this EntityVariables vars, int raceTemplateId)
-        { vars[EntityVariableTypes.Race] = raceTemplateId; }
+        public static void Race(this EntityVariables vars, Race raceData)
+        { vars[EntityVariableTypes.Race] = raceData; }
         
         public static bool HasClass(this EntityVariables vars) 
         { return vars.ContainsKey(EntityVariableTypes.Class); }

@@ -28,10 +28,10 @@ public class EntityVariableExtensionTests
         var entityVars = new EntityVariables();
         Assert.False(entityVars.HasRace());
         
-        var dummyRaceTemplate = new RaceTemplate();
-        entityVars.Race(dummyRaceTemplate.Id);
+        var dummyRace = new Race();
+        entityVars.Race(dummyRace);
         Assert.True(entityVars.HasRace());
-        Assert.Equal(entityVars.Race(), dummyRaceTemplate.Id);
+        Assert.Equal(entityVars.Race(), dummyRace);
     }
     
     [Fact]

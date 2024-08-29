@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenRpg.Core.Classes;
 using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Core.Extensions;
+using OpenRpg.Core.Races;
 using OpenRpg.Core.State.Variables;
 using OpenRpg.Core.Templates;
 using OpenRpg.Core.Utils;
@@ -137,16 +138,25 @@ namespace OpenRpg.Genres.Builders
             return classData;
         }
         
+        protected virtual Race ProcessRace()
+        {
+            var raceData = new Race();
+            if (_raceId == 0) { return raceData; }
+
+            raceData.TemplateId = _raceId;
+            return raceData;
+        }
+        
         protected virtual void PreProcessCharacter() {}
         protected virtual void PostProcessCharacter(Character character) {}
         
         public virtual Character CreateCharacter()
         {
             _variables.Class(ProcessClass());
+            _variables.Race(ProcessRace());
             _variables.Equipment(ProcessEquipment());
             _variables.Inventory(ProcessInventory());
             _variables.Gender(_genderId);
-            _variables.Race(_raceId);
 
             return new Character()
             {

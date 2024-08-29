@@ -22,8 +22,8 @@ namespace OpenRpg.Genres.Extensions
 
             if (entity.Variables.HasRace())
             {
-                var raceId = entity.Variables.Race();
-                var raceTemplate = templateAccessor.GetRaceTemplate(raceId);
+                var race = entity.Variables.Race();
+                var raceTemplate = templateAccessor.GetRaceTemplate(race.TemplateId);
                 effects.AddRange(raceTemplate.Effects);
             }
 
