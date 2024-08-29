@@ -12,9 +12,7 @@
 @using OpenRpg.Core.Races.Templates
 @using OpenRpg.Core.Classes.Templates
 @using OpenRpg.Core.Stats.Variables
-@using OpenRpg.Core.Templates
-
-@inject ITemplateAccessor TemplateAccessor
+@using OpenRpg.Demos.Infrastructure.Templates
 
 <Markdown>
     ## Stats Components
@@ -56,7 +54,9 @@
     </div>
     <div class="column is-half">
         <CardSection>
-            <CharacterDetails Name="@ManualStatsExample.NameLocaleId" RaceTemplate="@ManualStatsExample.Variables.Race()" Class="@ManualStatsExample.Variables.Class()" />
+            <CharacterDetails Name="@ManualStatsExample.NameLocaleId" 
+                              RaceView="@ManualStatTemplateAccessor.ToView(ManualStatsExample.Variables.Race())" 
+                              ClassView="@ManualStatTemplateAccessor.ToView(ManualStatsExample.Variables.Class())" />
             <br />
             <CharacterVitals Stats="@ManualStatsExample.Stats" />
             <br />
@@ -151,7 +151,9 @@
     </div>
     <div class="column is-half">
         <CardSection>
-            <CharacterDetails Name="@AutoStatsExample.NameLocaleId" RaceTemplate="@AutoStatsExample.Variables.Race()" Class="@AutoStatsExample.Variables.Class()" />
+            <CharacterDetails Name="@AutoStatsExample.NameLocaleId" 
+                              RaceView="@AutoStatTemplateAccessor.ToView(AutoStatsExample.Variables.Race())" 
+                              ClassView="@AutoStatTemplateAccessor.ToView(AutoStatsExample.Variables.Class())" />
             <br />
             <CharacterVitals Stats="@AutoStatsExample.Stats" />
             <br />
@@ -160,17 +162,19 @@
             <div class="columns">
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
-                    <EffectList Effects="@TemplateAccessor.GetRaceTemplate(AutoStatsExample.Variables.Race().TemplateId).Effects" />
+                    <EffectList Effects="@AutoStatTemplateAccessor.GetRaceTemplate(AutoStatsExample.Variables.Race().TemplateId).Effects" />
                 </div>
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
-                    <EffectList Effects="@TemplateAccessor.GetClassTemplate(AutoStatsExample.Variables.Class().TemplateId).Effects" />
+                    <EffectList Effects="@AutoStatTemplateAccessor.GetClassTemplate(AutoStatsExample.Variables.Class().TemplateId).Effects" />
                 </div>
             </div>
         </CardSection>
         <br />
         <CardSection>
-            <CharacterDetails Name="@AutoStatsExample2.NameLocaleId" RaceTemplate="@AutoStatsExample2.Variables.Race()" Class="@AutoStatsExample2.Variables.Class()" />
+            <CharacterDetails Name="@AutoStatsExample2.NameLocaleId" 
+                              RaceView="@AutoStatTemplateAccessor.ToView(AutoStatsExample2.Variables.Race())" 
+                              ClassView="@AutoStatTemplateAccessor.ToView(AutoStatsExample2.Variables.Class())" />
             <br />
             <CharacterVitals Stats="@AutoStatsExample2.Stats" />
             <br />
@@ -179,11 +183,11 @@
             <div class="columns">
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
-                    <EffectList Effects="@TemplateAccessor.GetRaceTemplate(AutoStatsExample2.Variables.Race().TemplateId).Effects" />
+                    <EffectList Effects="@AutoStatTemplateAccessor.GetRaceTemplate(AutoStatsExample2.Variables.Race().TemplateId).Effects" />
                 </div>
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
-                    <EffectList Effects="@TemplateAccessor.GetClassTemplate(AutoStatsExample2.Variables.Class().TemplateId).Effects" />
+                    <EffectList Effects="@AutoStatTemplateAccessor.GetClassTemplate(AutoStatsExample2.Variables.Class().TemplateId).Effects" />
                 </div>
             </div>
         </CardSection>
@@ -196,13 +200,19 @@
     private Entity ManualStatsExample = new Entity();
     private Entity AutoStatsExample = new Entity();
     private Entity AutoStatsExample2 = new Entity();
-
+    
+    public ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new ManualTemplateAccessor();
+    public ManualTemplateAccessor AutoStatTemplateAccessor { get; } = new ManualTemplateAccessor();
+    
     protected void SetupManualStats()
     {
-        ManualStatsExample.NameLocaleId = "Frodo Baggins";
-
         var hobbitRace = new RaceTemplate { Id = 1,  NameLocaleId = "Hobbit" };
         var fighterClass = new ClassTemplate { Id = 1, NameLocaleId = "Fighter" };
+    
+        ManualStatTemplateAccessor.AddTemplate(hobbitRace);
+        ManualStatTemplateAccessor.AddTemplate(fighterClass);
+        
+        ManualStatsExample.NameLocaleId = "Frodo Baggins";
         
         ManualStatsExample.Variables.Race(new Race { TemplateId = hobbitRace.Id });
         ManualStatsExample.Variables.Class(new Class { TemplateId = fighterClass.Id });
@@ -254,6 +264,9 @@
         var hobbitRace = new RaceTemplate { NameLocaleId = "Hobbit", Effects = raceEffects };
         var fighterClass = new ClassTemplate { NameLocaleId = "Fighter", Effects = classEffects };
 
+        AutoStatTemplateAccessor.AddTemplate(hobbitRace);
+        AutoStatTemplateAccessor.AddTemplate(fighterClass);
+        
         AutoStatsExample.NameLocaleId = "Frodo Baggins";
         AutoStatsExample.Variables.Race(new Race { TemplateId = hobbitRace.Id });
         AutoStatsExample.Variables.Class(new Class{ TemplateId = fighterClass.Id });
@@ -263,8 +276,8 @@
         AutoStatsExample2.Variables.Class(new Class { TemplateId = fighterClass.Id });
         
         var statsCalculator = new FantasyStatsPopulator();
-        statsCalculator.Populate(AutoStatsExample.Stats, AutoStatsExample.GetEffects(TemplateAccessor), null);
-        statsCalculator.Populate(AutoStatsExample2.Stats, AutoStatsExample.GetEffects(TemplateAccessor), null);
+        statsCalculator.Populate(AutoStatsExample.Stats, AutoStatsExample.GetEffects(AutoStatTemplateAccessor), null);
+        statsCalculator.Populate(AutoStatsExample2.Stats, AutoStatsExample.GetEffects(AutoStatTemplateAccessor), null);
     }
 
     protected override void OnInitialized()

@@ -5,6 +5,8 @@
 @using OpenRpg.Core.Entity
 @using OpenRpg.Core.Extensions
 @using OpenRpg.Core.Races.Templates
+@using OpenRpg.Demos.Infrastructure.Templates
+@using OpenRpg.Items.Extensions
 @using OpenRpg.Core.Races
 
 <Markdown>
@@ -82,8 +84,8 @@
   <div class="column is-half">
       <CardSection>
           <CharacterDetails Name="@SimpleEntity.NameLocaleId"
-                            RaceView="new RaceView { Instance = MultiClassEntity.Variables.Race(), Template = HobbitRace }"
-                            ClassView="@GetClassView(SimpleEntity.Variables.Class())">
+                            RaceView="@TemplateAccessor.ToView(MultiClassEntity.Variables.Race())"
+                            ClassView="@TemplateAccessor.ToView(SimpleEntity.Variables.Class())">
           </CharacterDetails>
       </CardSection>
   </div>
@@ -129,15 +131,14 @@
     <div class="column is-half">
         <CardSection>
             <CharacterDetails Name="@MultiClassEntity.NameLocaleId"
-                              RaceView="new RaceView { Instance = MultiClassEntity.Variables.Race(), Template = HobbitRace }"
-                              Classes="@MultiClassEntity.Variables.MultiClass().Classes.Select(GetClassView)">
+                              RaceView="@TemplateAccessor.ToView(MultiClassEntity.Variables.Race())"
+                              Classes="@TemplateAccessor.ToView(MultiClassEntity.Variables.MultiClass().Classes)">
             </CharacterDetails>
         </CardSection>
     </div>
 </div>
 
 @code {
-    
     private Entity SimpleEntity = new Entity();
     private Entity MultiClassEntity = new Entity();
     
@@ -147,17 +148,15 @@
     private ClassTemplate WraithClass = new ClassTemplate { Id = 2, NameLocaleId = "Wraith" };
     private ClassTemplate RingBearerClass = new ClassTemplate { Id = 3, NameLocaleId = "Ring Bearer" };
 
-    public ClassView GetClassView(Class classInstance)
-    {
-        if (classInstance.TemplateId == FighterClass.Id) { return new ClassView { Instance = classInstance, Template = FighterClass }; }
-        if (classInstance.TemplateId == WraithClass.Id) { return new ClassView { Instance = classInstance, Template = WraithClass }; }
-        if (classInstance.TemplateId == RingBearerClass.Id) { return new ClassView { Instance = classInstance, Template = RingBearerClass }; }
-
-        return null;
-    }
+    private ManualTemplateAccessor TemplateAccessor { get; } = new ManualTemplateAccessor();
     
     protected override void OnInitialized()
     {
+        TemplateAccessor.AddTemplate(HobbitRace);
+        TemplateAccessor.AddTemplate(FighterClass);
+        TemplateAccessor.AddTemplate(WraithClass);
+        TemplateAccessor.AddTemplate(RingBearerClass);
+        
         SimpleEntity.NameLocaleId = "Frodo Baggins";
         SimpleEntity.Variables.Race(new Race { TemplateId = HobbitRace.Id });
         SimpleEntity.Variables.Class(new Class { TemplateId = FighterClass.Id });
