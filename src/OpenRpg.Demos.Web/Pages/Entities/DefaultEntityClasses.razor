@@ -4,16 +4,16 @@
 @using OpenRpg.Genres.Fantasy.Extensions
 @using OpenRpg.Genres.Extensions
 @using OpenRpg.Core.Classes
-@using OpenRpg.Core.Classes.Templates
 @using OpenRpg.Core.Extensions
-@using OpenRpg.Core.Races.Templates
 @using OpenRpg.Core.Templates
+@using OpenRpg.Core.Utils
+@using OpenRpg.Demos.Infrastructure.Lookups
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Populators.Entity.Stats
 
-@inject ITemplateAccessor TemplateAccessor;
-@inject DemoCharacterBuilder CharacterBuilder;
+@inject IRandomizer Randomizer;
 @inject IEntityStatPopulator StatPopulator;
+@inject ITemplateAccessor TemplateAccessor;
 
 <Markdown>
     ## Custom Scenarios
@@ -61,7 +61,7 @@
         </Markdown>
     </div>
     <div class="column is-half">
-        <BasicCharacter Character="@_manualCharacter"></BasicCharacter>
+        <BasicCharacter Character="@_manualCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
     </div>
 </div>
 
@@ -99,7 +99,7 @@
         </CardSection>
     </div>
     <div class="column is-half has-text-centered">
-        <BasicCharacter Character="@_randomCharacter"></BasicCharacter>
+        <BasicCharacter Character="@_randomCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
     </div>
 </div>
 
@@ -134,16 +134,16 @@
 @code {
     private Character _manualCharacter;
     private Character _randomCharacter;
-
+    private DemoCharacterBuilder CharacterBuilder { get; set; }
+    
     protected override void OnInitialized()
     {
-        var raceTemplate = new RaceTemplate { NameLocaleId = "Human" };
-        var classTemplate = new ClassTemplate { NameLocaleId = "Fighter" };
+        CharacterBuilder = new DemoCharacterBuilder(Randomizer, StatPopulator, TemplateAccessor);
         
         _manualCharacter = new Character();
         _manualCharacter.NameLocaleId = "John Doe";
-        _manualCharacter.Variables.Race(new Race { TemplateId = raceTemplate.Id });
-        _manualCharacter.Variables.Class(new Class { TemplateId = classTemplate.Id });
+        _manualCharacter.Variables.Race(new Race { TemplateId = RaceTypeLookups.Human });
+        _manualCharacter.Variables.Class(new Class { TemplateId = ClassTypeLookups.Fighter });
 
         _manualCharacter.Stats.MaxHealth(100);
         _manualCharacter.State.Health(50);
@@ -169,8 +169,6 @@
     public void RandomizeCharacter()
     {
         _randomCharacter = CharacterBuilder.CreateNew().Build();
-        StatPopulator.Populate(_randomCharacter.Stats, _randomCharacter.GetEffects(TemplateAccessor), null);
         StateHasChanged();
     }
-
 }

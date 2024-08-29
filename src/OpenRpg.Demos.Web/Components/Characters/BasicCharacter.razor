@@ -7,7 +7,9 @@
     <div class="container">
         @if (Character != null)
         {
-            <CharacterDetails Name="@Character.NameLocaleId" RaceTemplate="@Character.Variables.Race()" Class="@Character.Variables.Class()" />
+            <CharacterDetails Name="@Character.NameLocaleId" 
+                              RaceView="@TemplateAccessor.ToView(Character.Variables.Race())"
+                              ClassView="@TemplateAccessor.ToView(Character.Variables.Class())" />
             <br/>
             <CharacterVitals Stats="@Character.Stats" State="@Character.State" />
             <br/>
