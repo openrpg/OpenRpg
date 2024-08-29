@@ -1,0 +1,138 @@
+﻿@page "/curves/create-scaling-function"
+@using OpenRpg.CurveFunctions
+@using System.Reflection
+@using OpenRpg.CurveFunctions.Scaling
+
+<CardSection>
+   <Markdown Containerless>
+      ## Make Your Own Scaling Function
+      Given everything we have covered about scaling functions and their underlying curve functions you can go ahead and create any type of scaling function you want here.
+   </Markdown>
+   
+   <div class="columns">
+      <div class="column is-one-quarter">
+         <div class="field">
+            <label class="label">Curve Type</label>
+            <div class="control">
+               <select @bind="CurveType">
+                  @foreach (var curveType in CurveTypes)
+                  {
+                      <option value="@curveType.Key">@curveType.Key</option>
+                  }
+               </select>
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Output Max</label>
+            <div class="control">
+               <input class="input" type="text" @bind="OutputMax">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Output Min</label>
+            <div class="control">
+               <input class="input" type="text" @bind="OutputMin">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Input Max</label>
+            <div class="control">
+               <input class="input" type="text" @bind="InputMax">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Input Min</label>
+            <div class="control">
+               <input class="input" type="text" @bind="InputMin">
+            </div>
+         </div>
+         <div class="field">
+            <div class="control">
+               <a class="button is-primary" @onclick="RefreshCustomChart">Refresh Chart</a>
+            </div>
+         </div>
+      </div>
+      <div class="column is-two-quarters">
+         <ScalingFunctionChart ScalingFunction="@ScalingFunction" Title="Custom Scaling Function" @ref="ChartRefresher"/>
+         <div class="field">
+            <label class="label">Example Source Code</label>
+            <div>
+               <code class="content">
+                  var myScalingFunction = new ScalingFunction(CurvePresents.@(CurveType), @(OutputMax)f, @(OutputMin)f, @(InputMin)f, @(InputMax)f);
+               </code>
+            </div>
+            <div>
+               <code class="content">
+                  var output = myScalingFunction.Plot(0.5f);
+               </code>
+            </div>
+         </div>
+      </div>
+      <div class="column is-one-quarter">
+         <div class="field">
+            <label class="label">Input</label>
+            <div class="control">
+               <input class="input" type="text" @bind="InputValue">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Output</label>
+            <div class="control">
+               <a class="button is-primary" @onclick="RefreshOutputValue">Plot Value</a>
+               <label class="label">@OutputValue</label>
+            </div>
+         </div>
+      </div>
+   </div>
+</CardSection>
+
+@code {
+   public Dictionary<string, ICurveFunction> CurveTypes { get; set; }
+   
+   public IRefreshable ChartRefresher { get; set; }
+   public ScalingFunction ScalingFunction { get; set; }
+   public float InputValue { get; set; } = 5.0f;
+   public float OutputValue { get; set; }
+
+   public string CurveType { get; set; } = nameof(PresetCurves.Linear);
+   public float OutputMin { get; set; } = 0;
+   public float OutputMax { get; set; } = 10000;
+   public float InputMin { get; set; } = 0;
+   public float InputMax { get; set; } = 10;
+
+   public async Task RefreshCustomChart()
+   {
+      RefreshCurve();
+      
+      // TODO: No idea why it needs to do this, but it wont work otherwise
+      await ChartRefresher.Refresh();
+      StateHasChanged();
+      await ChartRefresher.Refresh();
+      StateHasChanged();
+   }
+
+   public void RefreshCurve()
+   {
+      var curveFunction = CurveTypes[CurveType];
+      ScalingFunction = new ScalingFunction(curveFunction, OutputMin, OutputMax, InputMin, InputMax);
+   }
+   
+   public Dictionary<string, ICurveFunction> GetCurveTypes()
+   {
+      return typeof(PresetCurves).GetFields(BindingFlags.Static | BindingFlags.Public)
+         .ToDictionary(x => x.Name, x => (ICurveFunction)x.GetValue(null));
+   }
+
+   protected override void OnInitialized()
+   {
+      base.OnInitialized();
+      CurveTypes = GetCurveTypes();
+      RefreshCurve();
+   }
+   
+   public void RefreshOutputValue()
+   {
+      OutputValue = ScalingFunction.Plot(InputValue);
+   }
+
+}

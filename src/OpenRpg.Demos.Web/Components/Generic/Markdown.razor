@@ -1,0 +1,30 @@
+@inject IJSRuntime JSRuntime
+
+@if (Containerless)
+{
+    <div class="content" @ref="MyContentRef"><textarea>@ChildContent</textarea></div>
+}
+else
+{
+    <CardSection>
+        <div class="content" @ref="MyContentRef"><textarea>@ChildContent</textarea></div>
+    </CardSection>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool Containerless { get; set; }
+
+    ElementReference MyContentRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("toMarkdown", MyContentRef);
+        }
+    }
+}

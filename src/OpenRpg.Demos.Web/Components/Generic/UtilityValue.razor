@@ -1,0 +1,18 @@
+<div class="control">
+    <div class="tags has-addons">
+        <span class="tag is-dark">@Text</span>
+        <span class="tag @GetValueClass(Value)">@Value.ToString("F2")</span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Text { get; set; }
+    [Parameter] public float Value { get; set; }
+    
+    public string GetValueClass(float value)
+    {
+        if(value > 0.75f) { return "is-danger"; }  
+        if(value < 0.25f) { return "is-success"; }
+        return "is-info"; 
+    }
+}

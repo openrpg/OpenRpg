@@ -1,11 +1,11 @@
+using System.Linq;
 using OpenRpg.Core.Classes;
-using OpenRpg.Core.Classes.Templates;
 
 namespace OpenRpg.Core.Extensions
 {
     public static class MultiClassesExtensions
     {
-        public static bool HasClass(this MultiClasses multiClasses, int classTemplateId) => multiClasses.Classes.ContainsKey(classTemplateId);
+        public static bool HasClass(this MultiClasses multiClasses, int classTemplateId) => multiClasses.Classes.Any(x => x.TemplateId == classTemplateId);
 
         public static Class AddClass(this MultiClasses multiClasses, int classTemplateId)
         {
@@ -15,23 +15,23 @@ namespace OpenRpg.Core.Extensions
         
         public static Class AddClass(this MultiClasses multiClasses, Class classToAdd)
         {
-            if (multiClasses.Classes.ContainsKey(classToAdd.TemplateId))
+            if (multiClasses.HasClass(classToAdd.TemplateId))
             { return multiClasses.Classes[classToAdd.TemplateId]; }
             
-            multiClasses.Classes.Add(classToAdd.TemplateId, classToAdd);
+            multiClasses.Classes.Add(classToAdd);
             return classToAdd;
         } 
         
         public static bool RemoveClass(this MultiClasses multiClasses, int classTemplateId)
         {
-            if (!multiClasses.Classes.ContainsKey(classTemplateId))
-            { return false; }
+            var relatedClass = multiClasses.GetClass(classTemplateId);
+            if(relatedClass == null) { return false; }
             
-            multiClasses.Classes.Remove(classTemplateId);
+            multiClasses.Classes.Remove(relatedClass);
             return true;
         }
         
         public static Class GetClass(this MultiClasses multiClasses, int classTemplateId)
-        { return multiClasses.Classes.ContainsKey(classTemplateId) ? multiClasses.Classes[classTemplateId] : null; }
+        { return multiClasses.HasClass(classTemplateId) ? multiClasses.Classes.Single(x => x.TemplateId == classTemplateId) : null; }
     }
 }

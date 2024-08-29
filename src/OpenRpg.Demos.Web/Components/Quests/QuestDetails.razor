@@ -1,0 +1,97 @@
+@using OpenRpg.Core.Templates
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+@using OpenRpg.Items.Variables
+@using OpenRpg.Quests
+@using OpenRpg.Quests.Types
+
+<CardSection>
+    <div class="has-text-centered">
+        <h2 class="title is-6 has-text-dark">@(Quest.NameLocaleId ?? "Unnamed Quest")</h2>
+        <h2 class="subtitle is-6 has-text-dark">@(Quest.DescriptionLocaleId ?? "No Description")</h2>
+    </div>
+    @if (Quest.Requirements.Any())
+    {
+        <br />
+        <div class="has-text-centered">
+            <h2 class="title is-6 has-text-dark">Requirements</h2>
+            <RequirementList Requirements="Quest.Requirements.ToArray()" Character="Character"></RequirementList>
+        </div>
+    }
+    @if (Quest.Gifts.Any())
+    {
+        <br />
+        <div class="has-text-centered">
+            <h2 class="title is-6 has-text-dark">Items Provided</h2>
+            @foreach (var gift in Quest.Gifts)
+            {
+                if (gift.RewardType == FantasyRewardTypes.ItemReward)
+                {
+                    <ItemIcon Item="GetItemFor(gift.AssociatedId, gift.AssociatedValue)" Character="Character"></ItemIcon>
+                }
+            }
+        </div>
+    }
+    @if (Quest.Objectives.Any())
+    {
+        <br />
+        <div class="has-text-centered">
+            <h2 class="title is-6 has-text-dark">Objectives</h2>
+            <div>
+                @foreach (var objective in Quest.Objectives)
+                {
+                    if (objective.ObjectiveType == ObjectiveTypes.ItemObjective)
+                    {
+                        <ItemIcon Item="GetItemFor(objective.AssociatedId, objective.AssociatedValue)" Character="Character"></ItemIcon>
+                    }
+                    else if (objective.ObjectiveType == ObjectiveTypes.TriggerObjective)
+                    {
+                        <div class="subtitle is-6">Must complete &lt;Get Trigger Text&gt;</div>
+                    }
+                }
+            </div>
+        </div>
+    }
+    @if (Quest.Rewards.Any())
+    {
+        <br />
+        <div class="has-text-centered">
+            <h2 class="title is-6 has-text-dark">Rewards</h2>
+            @foreach (var reward in Quest.Rewards)
+            {
+                if (reward.RewardType == FantasyRewardTypes.ItemReward)
+                {
+                    <ItemIcon Item="@GetItemFor(reward.AssociatedId, reward.AssociatedValue)" Character="Character"></ItemIcon>
+                }
+                else if (reward.RewardType == FantasyRewardTypes.CurrencyReward)
+                {
+                    <div class="subtitle is-6 has-text-dark">@(reward.AssociatedValue) Gold</div>
+                }
+                else if (reward.RewardType == FantasyRewardTypes.ExperienceReward)
+                {
+                    <div class="subtitle is-6 has-text-dark">@(reward.AssociatedValue) Experience</div>
+                }
+            }
+        </div>
+    }
+</CardSection>
+
+@code {
+    [Parameter] public Quest Quest { get; set; }
+    [Parameter] public Character Character { get; set; }
+    [Parameter] public ITemplateAccessor TemplateAccessor { get; set; }
+
+    public ItemView GetItemFor(int itemId, int itemAmount)
+    {
+        var item = new Item
+        {
+            TemplateId = itemId,
+            Variables = new ItemVariables()
+        };
+        item.Variables.Amount(itemAmount);
+        return TemplateAccessor.ToView(item);
+    }
+}

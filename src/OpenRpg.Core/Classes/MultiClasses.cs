@@ -4,6 +4,6 @@ namespace OpenRpg.Core.Classes
 {
     public class MultiClasses
     {
-        public Dictionary<int, Class> Classes { get; set; } = new Dictionary<int, Class>();
+        public List<Class> Classes { get; set; } = new List<Class>();
     }
 }

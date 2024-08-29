@@ -1,0 +1,77 @@
+﻿@page "/overview/common-components"
+<Markdown>
+  ## Common Components
+  
+  While OpenRpg contains loads of bits related to Characters, Items, Combat etc it also contains a few common components
+  which are used frequently all over the place, such as `Requirement`, `Effect`, `Modifier` as well as some interfaces
+  like `IHasLocaleDescription`, `IHasDataId` etc.
+</Markdown>
+<br/>
+<Markdown>
+  ## `Requirement` component
+  This is one of the most common components and basically indicates something cannot be used without meeting the requirements.
+  A good example of this would be an item that you can only equip if you are a `Fighter`. It can be applied to almost
+  everything, so you can have effects with requirements, races with requirements, classes with requirements and many other
+  objects.
+  
+  [See Source Here](https://github.com/openrpg/OpenRpg/blob/master/src/OpenRpg.Core/Requirements/Requirement.cs)
+  
+  It contains a `RequirementType` property which can be anything, a required race, class, item, quest or anything else. 
+  There is also a `AssociatedId` which represents a linked Id if needed, such as if you had a quest requirement for you
+  to have 2 loaves of bread, you would use the `AssociatedId` to be the item id of `Bread` and the `AssociatedValue` would
+  be 2. You may not always have an `AssociatedId` AND an `AssociatedValue` depending on the requirement type, but its
+  common to have at least one populated.
+  
+  Common examples of using this would be locking Race choices until trigger has been met (i.e game completed) or you 
+  can only pick advanced classes once a basic class in that tree has been completed (i.e Fighter -> Gladiator -> Warlord).
+</Markdown>
+<br/>
+<Markdown>
+  ## `Effect` component
+  Effects are almost as prevelant as `Requirement` components, but represents that something gives you an effect.
+  
+  It is primarily meant to act as a mechanism for you to dynamically populate/alter stats, such as an `Item` which gives you
+  +5 to strength when equipped. However you can also make all stats dynamic by using effects on `Race` and `Class` components
+  so you can compose all your characters stats from their race/class bonuses.
+  
+  Effects can also have `Requirements`, so you may have an item that has multiple effects but certain ones are locked to a
+  given race, or for a level, quest, stat requirement etc.
+</Markdown>
+<br/>
+<Markdown>
+    ## `Modification` components
+    Modifications allow you to alter existing objects in a dynamic way, so a common example would be like how in games you can 
+    enchant/gem items.
+  
+    The modification system is split into `ModificationAllowance` components which indicate that you can modify an object 
+    (usually an item) and expresses the type of modification allowed as well as how many times it can be modified, and can
+    optionally have requirements. An example would be if you wanted to have 2 gem slots but they were locked until you had
+    reached item affinity level 10.
+  
+    [See ModificationAllowance here](https://github.com/openrpg/OpenRpg/blob/master/src/OpenRpg.Core/Modifications/ModificationAllowance.cs)
+  
+    The last part of modifications is `IModification` which expresses the type of modification and the effects it has,
+    this may be a gem or an enchantment or even something else like a blacksmithing effect or a rune. It is up to you to
+    define what modification types can be used, the system just uses ids to look up links etc.
+  
+    [See IModification source here](https://github.com/openrpg/OpenRpg/blob/master/src/OpenRpg.Core/Modifications/IModification.cs)
+</Markdown>
+<br/>
+<Markdown>
+    ## `IVariables&lt;T&gt;` components
+    Variables act as an extensible place for custom variables to be stored on object, so for example on a character you may want to store
+    their *str*, *dex*, *con* etc stats in a fantasy setting, but in a sci-fi setting or custom setting you may not need those so want another
+    set of stats. However you look at it all genres would want the notion of *stats* its just what stats there are available that would be different.
+
+    So we have this notion to allow a streamlined way to store your own custom data on objects without having to worry about interfaces. Another example
+    would be that in some settings you may want your `ItemTemplate` objects to contain information on weight of the item if you have a weight based inventory,
+    but as thats not always applicable we make it so you can apply whatever you want to a dictionary-like structure.
+
+    The fantasy genre has a great example of this as it has helpers to add stats in a fairly seamless way, and you can add whatever you want to it in same sort of way.
+    - [Stat Variable Keys](https://github.com/openrpg/OpenRpg.Fantasy/blob/master/src/OpenRpg.Genres.Fantasy/Types/StatsVariableTypes.cs)
+    - [Stat Variable Helpers](https://github.com/openrpg/OpenRpg.Fantasy/blob/master/src/OpenRpg.Genres.Fantasy/Extensions/StatExtensions.cs)
+    
+    Currently loads of objects expose the notion of variables, such as templates, characters, loot tables, items etc.
+</Markdown>
+@code {
+}

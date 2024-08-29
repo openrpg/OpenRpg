@@ -1,0 +1,220 @@
+﻿@page "/curves/scaling-functions"
+
+@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Curves
+@using OpenRpg.CurveFunctions.Scaling
+
+<Markdown>
+   ## Scaling Functions
+   Scaling functions build on top of `CurveFunctions` and add the notion of scaled values, so with curve functions you
+   are always within a realm of 0-1, and that is fine for some things, but lets say you wanted to express how a stat should
+   scale based off another value.
+   
+   This is where `ScalingFunction` comes in as that lets you provide an underlying `CurveFunction` to provide the general
+   formula (or graph if you think visually) that represents the relationship, then you provide the value ranges on the 
+   inputs and the outputs, which then lets you express more complex notions such as how much xp is needed to level up
+   or how much bonus damage you get per strength point, or chances for things occurring.
+</Markdown>
+   
+<br/>
+
+<CardSection>
+   <div class="columns">
+         <div class="column is-one-third">
+            <Markdown Containerless>
+               ### Plotting Constitution Against Health Part 1
+               Just like how we plotted against a curve function, we can plot against a `ScaleFunction` and in this example
+               we have made a scale function that represents the relationship between constitution and health. 
+               
+               The underlying code for this is SUPER simple:
+               ```csharp
+               new ScalingFunction(PresetCurves.QuadraticUpperLeft, 25, 500, 0, 50);
+               ```
+               
+               To break down whats happening here lets go over what we are passing in
+               - As you can see we are using a `QuadraticUpperLeft` preset curve (check the Curve Function page for all preset examples)
+               - Then we pass in `25, 500` which is the OUTPUT min/max, which tells it we want 25 to be the lowest possible HP value then 500 be max
+               - Finally we pass in `0, 50` which is the INPUT min/max, which tells it we expect input values in the range of 0-50
+               
+               With all that together it plots the input against the output then provides you the result, go ahead and give it a try.
+            </Markdown>
+         </div>
+         <div class="column is-one-third">
+            <ScalingFunctionChart Title="Constitution Heath Scaling 1" ScalingFunction="ConstitutionToHealthScalingFunction1" XAxisName="Constitution" YAxisName="Health" />
+         </div>
+         <div class="column is-one-third">
+            <div class="field">
+               <label class="label">Constitution Score</label>
+               <div class="control">
+                  <input class="input" type="text" @bind="InputValue1">
+               </div>
+            </div>
+            <div class="field">
+               <label class="label">Health Value</label>
+               <div class="control">
+                  <a class="button is-primary" @onclick="RefreshOutputValue1">Plot Value</a>
+                  <label class="label">@OutputValue1</label>
+               </div>
+            </div>
+         </div>
+      </div>
+</CardSection>
+
+<br/>
+
+<CardSection>
+   <div class="columns">
+      <div class="column is-one-third">
+         <Markdown Containerless>
+            ### Plotting Constitution Against Health - Part 2
+            The previous example was cool, but notice how early on you get SOOooo much HP for a small amount of constitution,
+            in these sort of cases you probably want to customize your curve function, as we probably want something half
+            way between linear and the previous quadratic line, so lets try using the custom curve function:
+               
+            ```csharp
+            new PolynomialCurveFunction(-1, 1, 1, 2)
+            ```
+               
+            As you can see its still got some of that high early advancement with tailing off but its no where near as 
+            rapid as before, so you can tailor the actual scaler however you see fit.
+               
+            > The above polynomial curve function was created using the curve creator demo page, so feel free to mess
+            > about on there coming up with curves that work for you.
+         </Markdown>
+      </div>
+      <div class="column is-one-third">
+         <ScalingFunctionChart Title="Constitution Heath Scaling 2" ScalingFunction="ConstitutionToHealthScalingFunction2" XAxisName="Constitution" YAxisName="Health" />
+      </div>
+      <div class="column is-one-third">
+         <div class="field">
+            <label class="label">Constitution Score</label>
+            <div class="control">
+               <input class="input" type="text" @bind="InputValue2">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Health Value</label>
+            <div class="control">
+               <a class="button is-primary" @onclick="RefreshOutputValue2">Plot Value</a>
+               <label class="label">@OutputValue2</label>
+            </div>
+         </div>
+      </div>
+   </div>
+</CardSection>
+
+<br/>
+
+<CardSection>
+   <div class="columns">
+      <div class="column is-one-third">
+         <Markdown Containerless>
+            ### Experience Required To Level Example
+            Given how easy this is to do now lets have another look at a useful example, experience required for each level.
+               
+            Lets not do anything fancy, just make it scale linearly with us having 20 levels with the maximum xp threshold 
+            being 10000, that means its about 500 extra per level when done linearly.
+         </Markdown>
+      </div>
+      <div class="column is-one-third">
+         <ScalingFunctionChart Title="Experience Per Level" ScalingFunction="XpToLevelScalingFunction" XAxisName="Level" YAxisName="Experience Required" ChartColor="#2ecc71" />
+      </div>
+      <div class="column is-one-third">
+         <div class="field">
+            <label class="label">Level</label>
+            <div class="control">
+               <input class="input" type="text" @bind="InputValue3">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Experience Required</label>
+            <div class="control">
+               <a class="button is-primary" @onclick="RefreshOutputValue3">Plot Value</a>
+               <label class="label">@OutputValue3</label>
+            </div>
+         </div>
+      </div>
+   </div>
+</CardSection>
+
+<br/>
+
+<CardSection>
+   <div class="columns">
+         <div class="column is-one-third">
+            <Markdown Containerless>
+               ### Inverse Value Scaling
+               So lets look at something which you may need to do but dont know it yet, and this is a real world problem I faced
+               when doing some work in Unity.
+               
+               Say you have to have an `AttackSpeed` stat, and you want `Effects` to bump that value up so you can attack faster,
+               it sounds great until you come to implement it as to attack faster you want LESS of a cooldown between attacks.
+               
+               This is a scenario where you want to inversely scale the input value as they are both pulling in different directions,
+               so far both values have being going up together at their own rate of scale, but in this case we want to go the opposite
+               way, so lets use an `InverseLinear` preset and set input range as 0-100 as 100 seems pretty high for attack speed, then
+               set the output scaling as between 0.5 and 2.
+               
+               > As this is using an INVERSE curve the max and min are effectively flipped so the maximum input value would yield
+               > the minimum output value, give it a go.
+            </Markdown>
+         </div>
+         <div class="column is-one-third">
+            <ScalingFunctionChart Title="Attack Cooldowns" ScalingFunction="AttackSpeedScalingFunction" XAxisName="Attack Speed" YAxisName="Cooldown In Seconds" ChartColor="#3498db" />
+         </div>
+         <div class="column is-one-third">
+            <div class="field">
+               <label class="label">Attack Speed</label>
+               <div class="control">
+                  <input class="input" type="text" @bind="InputValue4">
+               </div>
+            </div>
+            <div class="field">
+               <label class="label">Attack Cooldown</label>
+               <div class="control">
+                  <a class="button is-primary" @onclick="RefreshOutputValue4">Plot Value</a>
+                  <label class="label">@OutputValue4</label>
+               </div>
+            </div>
+         </div>
+      </div>
+</CardSection>
+
+@code {
+
+   public ScalingFunction ConstitutionToHealthScalingFunction1 = new ScalingFunction(PresetCurves.QuadraticUpperLeft, 25, 500, 0, 50);
+   public float InputValue1 { get; set; } = 10;
+   public float OutputValue1 { get; set; }
+   
+   public ScalingFunction ConstitutionToHealthScalingFunction2 = new ScalingFunction(new PolynomialCurveFunction(-1, 1, 1, 2), 25, 500, 0, 50);
+   public float InputValue2 { get; set; } = 10;
+   public float OutputValue2 { get; set; }
+   
+   public ScalingFunction XpToLevelScalingFunction = new ScalingFunction(PresetCurves.Linear, 0, 10000, 0, 20);
+   public float InputValue3 { get; set; } = 1;
+   public float OutputValue3 { get; set; }
+   
+   public ScalingFunction AttackSpeedScalingFunction = new ScalingFunction(PresetCurves.InverseLinear, 0.5f, 2, 0, 100);
+   public float InputValue4 { get; set; } = 35;
+   public float OutputValue4 { get; set; }
+   
+   public void RefreshOutputValue1()
+   {
+      OutputValue1 = ConstitutionToHealthScalingFunction1.Plot(InputValue1);
+   }
+   
+   public void RefreshOutputValue2()
+   {
+      OutputValue2 = ConstitutionToHealthScalingFunction2.Plot(InputValue2);
+   }
+   
+   public void RefreshOutputValue3()
+   {
+      OutputValue3 = XpToLevelScalingFunction.Plot(InputValue3);
+   }
+   
+   public void RefreshOutputValue4()
+   {
+      OutputValue4 = AttackSpeedScalingFunction.Plot(InputValue4);
+   }
+}

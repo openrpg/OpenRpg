@@ -1,0 +1,155 @@
+﻿@page "/combat/looting"
+
+@using OpenRpg.Core.Templates
+@using OpenRpg.Core.Utils
+@using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+@using OpenRpg.Items.Variables
+@using OpenRpg.Items.Loot
+
+@inject ITemplateAccessor TemplateAccessor
+@inject IRandomizer Randomizer
+
+<Markdown>
+    ## Looting
+    So far we have covered the basic interactions that make up combat through attacking and defending. There is another
+    layer we can build on top of `ICharacter` at this point which is `IEnemy` which basically implies that a character
+    also has a loot table that can be accessed.
+</Markdown>
+<br />
+<Markdown>
+    ### `ILootTable` interface
+    This interface exposes `AvailableLoot` which houses all the loot that can possibly be dropped as well as a method
+    `GetLoot` which returns random drops for that loot table.
+    
+    The idea here is that you setup the loot tables ahead of time and assign them to your `IEnemy` implementations,
+    from there when the enemy has died you can just call `GetLoot`, which allocates you the drops.
+    
+    > One thing you may notice here is that all the loot is items, however in your scenarios you may want to give
+    xp or gold as drops. To do this its recommended you wrap the gold/xp in an item and expose it as a custom variable
+    or effect on the item which you then apply to wherever its needed.
+</Markdown>
+<br />
+<Markdown>
+    ### `ILootTableEntry` interface
+    
+    So the loot table itself needs you to provide it `ILootTableEntry` instances which wrap the item instance as well as 
+    the variables associated, such as `DropRate` or `IsUnique`. 
+    
+    > As with all `Variable` style objects you can add whatever variables you want to these entries, out the box there is 
+    `DropRate` which is an float representing a 0 (no drop) to 1 (always drops), with 0.5 being a 50% chance. Then `IsUnique`
+    which represent if only 1 of this can drop, this is more specific incase you have same items in with multiple chances.
+    
+    Here is an example of creating a simple loot entry for an item:
+    ```csharp
+    IItem potionItem = GeneratePotion(); // Gets an IItem for the potion
+    var lootEntryVariables = new LootTableEntryVariables();
+    lootEntryVariables.DropRate(1.0f); // 100% drop
+    
+    var lootEntry = new LootTableEntry
+    {
+        Item = item,
+        Variables = lootEntryVariables
+    };
+    ```
+    
+</Markdown>
+<br />
+<Markdown>
+    ### Setting up the loot table
+    
+    To keep things more succinct here we will be using the extension method on `IItem` to generate a `ILootTableEntry`
+    but the logic behind it is effectively the same shown in the previous section example.
+    
+    If we wanted to make it so there was a 100% chance of dropping a potion, but 10% chance of dropping a dagger we could
+    set it up like this.
+
+    ```csharp
+    var potionItem = GeneratePotion();
+    var potionLootEntry = potionItem.GenerateLootTableEntry(); // Defaults to 100% drop rate
+    
+    var swordItem = GenerateSword();
+    var swordLootEntry = swordItem.GenerateLootTableEntry(0.25f); // Give it a 25% chance of dropping
+    
+    var lootTable = new DefaultLootTable
+    {
+    Randomizer = Randomizer, // You can provide any IRandomizer instance
+    AvailableLoot = new[] { potionLootEntry, swordLootEntry }
+    }
+    ```
+
+    Now that we have a loot table we can query it and get loot from it.
+    
+    > You would normally use the `IEnemy` interface to attach loot to enemies but you can use them outside of
+    that or however you want really
+</Markdown>
+<br />
+<div class="columns">
+    <div class="column is-two-fifths">
+        <CardSection>
+            <a class="button is-info" @onclick="GetRandomLoot">Get Random Loot</a>
+        </CardSection>
+    </div>
+    <div class="column">
+        <CardSection>
+            <h4>Looted Items</h4>
+            @foreach (var item in _currentLoot)
+            {
+                <ItemTemplateDetails ItemTemplate="TemplateAccessor.GetItemTemplate(item.TemplateId)"></ItemTemplateDetails>
+            }
+        </CardSection>
+    </div>
+</div>
+@code {
+
+    public ILootTable _lootTable;
+    public List<Item> _currentLoot = new List<Item>();
+
+    protected override void OnInitialized()
+    {
+        _lootTable = CreateLootTable();
+
+        base.OnInitialized();
+    }
+
+    public ILootTable CreateLootTable()
+    {
+        var potionItem = GeneratePotion();
+        var potionLootEntry = potionItem.GenerateLootTableEntry();
+    
+        var swordItem = GenerateSword();
+        var swordLootEntry = swordItem.GenerateLootTableEntry(0.25f);
+        return new DefaultLootTable
+        {
+            Randomizer = Randomizer,
+            AvailableLoot = new[] {potionLootEntry, swordLootEntry}
+        };
+    }
+    
+    public Item GeneratePotion()
+    {
+        return new Item
+        {
+            TemplateId = ItemTemplateLookups.HealingPotion,
+            Variables = new ItemVariables()
+        };
+    }
+    
+    public Item GenerateSword()
+    {
+        return new Item
+        {
+            TemplateId = ItemTemplateLookups.Sword,
+            Variables = new ItemVariables()
+        };
+    }
+
+    public void GetRandomLoot()
+    {
+        var loot = _lootTable.GetLoot();
+        _currentLoot.Clear();
+        _currentLoot.AddRange(loot);
+    }
+
+}

@@ -1,0 +1,51 @@
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Types
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Items.Inventories
+@using OpenRpg.Items.Templates
+
+@for (var i = 0; i < Inventory.Variables.MaxSlots(); i+=SlotsPerRow)
+{
+    <div class="columns">
+        @for (var row = 0; row < SlotsPerRow; row++)
+        {
+            <div class="column">
+                @{ var slotIndex = i + row;}
+                <div @onclick="@(() => OnItemInteraction.InvokeAsync(GetItemFromIndex(slotIndex)))">
+                    <InventoryIcon Item="@GetItemFromIndex(slotIndex)" Character="Character"></InventoryIcon>
+                </div>
+            </div>
+        }
+    </div>
+}
+<div class="subtitle has-text-dark has-text-right">
+    @(Inventory.Items.Count) @(Inventory.Variables.ContainsKey(InventoryVariableTypes.MaxSlots) ? $"/ {Inventory.Variables.MaxSlots()}" : "") Items
+</div>
+
+@code {
+    [Parameter]
+    public Inventory Inventory { get; set; }
+
+    [Parameter]
+    public int SlotsPerRow { get; set; } = 8;
+
+    [Parameter]
+    public Character Character { get; set; }
+
+    [Parameter]
+    public EventCallback<Item> OnItemInteraction { get; set; }
+
+    public Item GetItemFromIndex(int itemIndex)
+    {
+        if (itemIndex >= Inventory.Items.Count)
+        { return null; }
+
+        return Inventory.Items[itemIndex];
+    }
+
+    public void Refresh()
+    {
+        StateHasChanged();
+    }
+
+}

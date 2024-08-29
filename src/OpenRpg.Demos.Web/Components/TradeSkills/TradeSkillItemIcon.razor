@@ -1,0 +1,44 @@
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Types
+@using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Items.Templates
+@using OpenRpg.Items.TradeSkills
+@using OpenRpg.Items.TradeSkills.Extensions
+
+<figure class="item-icon image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
+    <img src="images/items/@(ItemTemplate.Variables.AssetCode()).png">
+    <div class="item-amount">@(_itemAmount > 0 ? $"{_itemAmount}" : "")</div>
+    <div class="item-icon-summary">
+        <ItemTemplateDetails ItemTemplate="@ItemTemplate" Character="Character"></ItemTemplateDetails>
+    </div>
+</figure>
+
+@code {
+
+    [Parameter]
+    public TradeSkillItemEntry Item { get; set; }
+    
+    [Parameter]
+    public ItemTemplate ItemTemplate { get; set; }
+
+    [Parameter]
+    public Character Character { get; set; }
+
+    private int _itemQualityTypeId;
+    private int _itemAmount;
+
+
+    protected override void OnParametersSet()
+    {
+        if (Item.Variables != null && Item.Variables.ContainsKey(ItemVariableTypes.Amount))
+        { _itemAmount = Item.Variables.Amount(); }
+        else
+        { _itemAmount = 0;}
+
+        if (ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
+        { _itemQualityTypeId = ItemTemplate.Variables.QualityType(); }
+
+        base.OnParametersSet();
+    }
+}

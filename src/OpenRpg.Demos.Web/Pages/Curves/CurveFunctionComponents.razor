@@ -1,0 +1,149 @@
+﻿@page "/curves/curve-functions"
+@using OpenRpg.CurveFunctions
+
+<CardSection>
+   <Markdown Containerless>
+      ## Curve Functions
+      Curve functions are basically mathematical functions that take an input and produce and output value between 0 and 1.
+      
+      These are represented by the `ICurveFunction` interface, and there are a few out of the box implementations that are 
+      based on common graph function formulas and can use as a basis and provide your own configurations for such as:
+      - `Linear`
+      - `Logistic`
+      - `Logit`
+      - `Normal`
+      - `Polynomial`
+      - `Sine`
+      - `Passthrough`
+      - `Step`
+      
+      Each one is a formula that you can configure to plot an output, or you can use the `PresetCurves` class that has a 
+      whole suite of base pre-made curves you can use or build on top of if you don't want to write your own.
+   </Markdown>
+   
+   <div class="columns">
+      <div class="column is-one-third">
+         <Markdown Containerless>
+            ### Plotting On Curves
+            As we mention above the whole point of the curve function is so you can pass it an input value and it will scale
+            the output between 0 and 1 via the `Plot(inputValue)` method which all curves implement.
+            
+            Have a go, try providing an input of 0.5 and you will see the output value will be 1.
+
+            > This is super useful for certain AI paradigms (Utility Theory/AI) but also can be used
+            as a basis for doing other more complex stat scaling or loot chances etc, but we will get more into that later.
+         </Markdown>
+      </div>
+      <div class="column is-one-third">
+         <CurveFunctionChart Title="Bell Curve Preset" CurveFunction="ExampleCurveFunction" />
+      </div>
+      <div class="column is-one-third">
+         <div class="field">
+            <label class="label">Input</label>
+            <div class="control">
+               <input class="input" type="text" @bind="InputValue">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Output</label>
+            <div class="control">
+               <a class="button is-primary" @onclick="RefreshOutputValue">Plot Value</a>
+               <label class="label">@OutputValue</label>
+            </div>
+         </div>
+      </div>
+   </div>
+</CardSection>
+
+<br/>
+
+<CardSection>
+   <Markdown Containerless>
+      ## The `PresetCurves` class
+      As mentioned above this is a pre made set of common graph types that you can use out the box, or via extension methods
+      alter to suit your needs, here are quick previews of all the premade ones.
+   </Markdown>
+   
+   <div class="columns">
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Constant" CurveFunction="PresetCurves.Constant" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Linear" CurveFunction="PresetCurves.Linear" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Inverse Linear" CurveFunction="PresetCurves.InverseLinear" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Cooldown" CurveFunction="PresetCurves.StandardCooldown" ShowLabels="false"/>
+      </div>
+   </div>
+   <div class="columns">
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Runtime" CurveFunction="PresetCurves.StandardRuntime" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Quadratic Lower Left" CurveFunction="PresetCurves.QuadraticLowerLeft" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Quadratic Lower Right" CurveFunction="PresetCurves.QuadraticLowerRight" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Quadratic Upper Left" CurveFunction="PresetCurves.QuadraticUpperLeft" ShowLabels="false"/>
+      </div>
+   </div>
+   <div class="columns">
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Quadratic Upper Right" CurveFunction="PresetCurves.QuadraticUpperRight" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Logistic" CurveFunction="PresetCurves.Logistic" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Inverse Logistic" CurveFunction="PresetCurves.InverseLogistic" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Logit" CurveFunction="PresetCurves.Logit" ShowLabels="false"/>
+      </div>
+   </div>
+   <div class="columns">
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Inverse Logit" CurveFunction="PresetCurves.InverseLogit" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Bell Curve" CurveFunction="PresetCurves.BellCurve" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Inverse Bell Curve" CurveFunction="PresetCurves.InverseBellCurve" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Sine Wave" CurveFunction="PresetCurves.SineWave" ShowLabels="false"/>
+      </div>
+
+   </div>
+   <div class="columns">
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Inverse Sine Wave" CurveFunction="PresetCurves.InverseSineWave" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Greater Than Half" CurveFunction="PresetCurves.GreaterThanHalf" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Less Than Half" CurveFunction="PresetCurves.LessThanHalf" ShowLabels="false"/>
+      </div>
+      <div class="column is-one-quarter">
+         <CurveFunctionChart Title="Pass Through" CurveFunction="PresetCurves.PassThrough" ShowLabels="false"/>
+      </div>
+   </div>
+</CardSection>
+
+@code {
+   public ICurveFunction ExampleCurveFunction { get; set; } = PresetCurves.BellCurve;
+   public float InputValue { get; set; } = 0.5f;
+   public float OutputValue { get; set; }
+
+   public void RefreshOutputValue()
+   {
+      OutputValue = ExampleCurveFunction.Plot(InputValue);
+   }
+}

@@ -1,0 +1,151 @@
+﻿@page "/quests/basic-components"
+
+@using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Genres.Types
+@using OpenRpg.Quests
+
+<Markdown>
+    ## Basic Quests Components
+    Quests are a common staple in RPGs and quest support here allows you to create a quest type, i.e fetch something, kill something etc
+    Then from there give rewards, you can also provide *gifts* at the start of a quest to give someone a quest item needed for the quest.
+
+    As with most parts of the system you can add requirements before you can pickup the quest as well as add your own custom variables
+    for logic outside of the core.
+</Markdown>
+<br />
+
+<div class="columns">
+    <div class="column is-two-thirds">
+        <Markdown>
+            ### A Simple Quest
+            So lets just make a simple quest where we need the player to provide 5 health pots and get 100xp and 50 gold as a reward.
+
+            ```csharp
+            var quest = new DefaultQuest
+            {
+                Id = 1,
+                NameLocaleId = "A Simple Quest",
+                DescriptionLocaleId = "An NPC needs you to collect 5 health potions, better get on the case!",
+                IsRepeatable = false,
+                Objectives = new List&lt;Objective&gt;
+                {
+                    new Objective {ObjectiveType = ObjectiveTypes.ItemObjective, AssociatedId = ItemTemplateLookups.HealingPotion, AssociatedValue = 5}
+                },
+                Rewards = new List&lt;Reward&gt;
+                {
+                    new Reward {RewardType = RewardTypes.ExperienceReward, AssociatedValue = 100},
+                    new Reward {RewardType = RewardTypes.GoldReward, AssociatedValue = 50}
+                }
+            };
+            quest.Variables.AssetCode("default-quest");
+            ```
+
+        </Markdown>
+    </div>
+    <div class="column is-one-third">
+        <QuestDetails Quest="_basicQuest"></QuestDetails>
+    </div>
+</div>
+<br />
+<Markdown>
+    ## Quest Details
+    So as we can see above a quest is primarily about `Objectives` and `Rewards`, we can also have `Gifts` and `Requirements` but ultimately
+    the player is just going to care about what they need to do, and what they get for it.
+
+    ### Objectives
+    A quest can have as many objectives as you want, and each objectives has an `ObjectiveType`, `AssociatedId` and `AssociatedValue`.
+
+    The `ObjectiveType` is an int lookup and can be whatever you want contextual to your scenario. As this example is using the pre-made
+    fantasy setting we are able to use any of the available fantasy [objective types](https://github.com/openrpg/OpenRpg.Fantasy/blob/master/src/OpenRpg.Genres.Fantasy/Types/ObjectiveTypes.cs).
+    
+    The `AssociatedId` and `AssociatedValue` are for you to be able to link the objective to something, so for example if you were having an
+    item objective (i.e go find 5 health potions) the `AssociatedId` would be the id of the `Health Potion` template (which we have from our infrastructure/repository),
+    then the `AssociatedValue` would be the amount of health potions you want. If the objective was to get a specific class you would put the `AssociatedId`
+    as the id of the class you want.
+    
+    An example of this which could be slightly more complex than the simple one would be making a class change quest for the character,
+    the quest itself gives a gift which sets a trigger so the character can now speak to a certain NPC to unlock the class, then
+    the objective would be a `ObjectiveTypes.ClassObjective` with the `AssociatedId` being the class the character should change into.
+    
+    > There are many ways you can link together quests or have atomic quests which are simple to start and finish, you can also extend them with
+    your own meta data via the variables if needed.
+    
+    ### Rewards
+    Rewards are what the player will get from completing the quest, and you may not always want to show all of the rewards based on their type. In most cases
+    though you will probably be giving gold/xp/items as rewards, and in some scenarios enabling a game state trigger or giving a class etc.
+    
+    Rewards can also have an associated chance, so if you wanted varying rewards you could decide how likely a reward is to be given and from there
+    add your logic for deciding which reward should be given, but this brings some UI overhead in how you show the user that there may be varied rewards.
+    
+    > In some cases it may make sense to have a layer above a quest for you which rolls the rewards ahead of time and caches them, so then you can link to the 
+    quest id but already know what the rewards are. To some extent you could also do this with dynamic objectives so you can procedurally make quests based 
+    off a common blueprint but add your own objectives/rewards in on the fly, however doing this would mean you need to persist them manually and track them yourself.
+</Markdown>
+<br />
+<Markdown>
+    ## Quest Workflows / States (`IGameState`)
+
+    We have covered how to make a quest which is great but we also need to be able to track quests the player has picked up/finished. To do this
+    there is an [`IGameState`](https://github.com/openrpg/OpenRpg/blob/master/src/OpenRpg.Quests/States/IGameState.cs) interface which provides an out the box blueprint for how quests can be tracked.
+
+    You may want to track other information too, but out of the box this provides you a way to track quest states and triggers (we will talk about triggers more in a mo).
+
+    The `QuestStates` property is like other `IVariable` instances we have seen before where it allows you to insert a key for a given type, which
+    in this example is an int. The number you provide to the variable indicates the quests state, which we can get for free from the fantasy lib [QuestStateTypes](https://github.com/openrpg/OpenRpg.Fantasy/blob/master/src/OpenRpg.Genres.Fantasy/Types/QuestStateTypes.cs).
+    
+    > You can make your own states though as in some cases you may have timed quests or other unique scenarios so feel free to make your own types if needed.
+
+</Markdown>
+<br/>
+<Markdown>
+    ## About Triggers
+    
+    So we have briefly mentioned triggers before and they are super useful as they allow you a way to indicate the player has done something.
+    
+    For example lets say you have a locked door that should only open once you have spoken to an NPC, you would have a trigger which would indicate
+    if the player has spoken to the NPC in question or not, if its false/unset then you know they havent, if its true you know they have.
+    
+    This is quite a simple approach but it is a common one which lets you flip triggers on and off from dialogues, quests or anywhere else you fancy.
+    
+    The triggers themselves live within the `IGameState` object and much like everything else it is recommended you create a lookup class with the ids
+    and a name, which you can either reflect on to get a name for the trigger or in more real world scenarios have locale entries per trigger name needed.
+    
+    > You may not always need to expose trigger names, but in some cases you may need to let the player know that they cannot progress until *something*
+    has happened, and you can use the trigger id as the requirement and then lookup the text associated with that trigger to show in a UI.
+</Markdown>
+
+@code {
+
+    public Quest _basicQuest;
+
+    protected override void OnInitialized()
+    {
+        _basicQuest = CreateBasicQuest();
+        base.OnInitialized();
+    }
+
+    private Quest CreateBasicQuest()
+    {
+        var quest = new Quest
+        {
+            Id = 1,
+            NameLocaleId = "A Simple Quest",
+            DescriptionLocaleId = "An NPC needs you to collect 5 health potions, better get on the case!",
+            IsRepeatable = false,
+            Objectives = new List<Objective>
+        {
+                new Objective {ObjectiveType = GenresObjectiveTypes.ItemObjective, AssociatedId = ItemTemplateLookups.HealingPotion, AssociatedValue = 5}
+            },
+            Rewards = new List<Reward>
+        {
+                new Reward {RewardType = FantasyRewardTypes.ExperienceReward, AssociatedValue = 100},
+                new Reward {RewardType = FantasyRewardTypes.CurrencyReward, AssociatedValue = 50}
+            }
+        };
+        quest.Variables.AssetCode("default-quest");
+        return quest;
+    }
+
+}

@@ -1,0 +1,93 @@
+@using OpenRpg.CurveFunctions
+@using OpenRpg.Demos.Web.Models
+
+@implements IRefreshable
+
+<ApexChart TItem="DataPoint" Title="@Title" @ref="ChartInstance" Options="ChartOptions" XAxisType="XAxisType.Numeric">
+    <ApexPointSeries TItem="DataPoint"
+        Items="Data"
+        SeriesType="SeriesType.Line"
+        Stroke="new SeriesStroke() { Width = 2, Color = ChartColor }"
+        YValue="@(e => e.OutputValue)"
+        XValue="@(e => e.InputValue)"/>
+</ApexChart>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    
+    [Parameter]
+    public ICurveFunction CurveFunction { get; set; }
+
+    [Parameter]
+    public bool ShowLabels { get; set; } = true;
+    
+    [Parameter]
+    public string ChartColor { get; set; } = "#008FFB";
+
+    public List<DataPoint> Data { get; set; } = new();
+    
+    public ApexChartOptions<DataPoint> ChartOptions { get; set; } = new();
+    public ApexChart<DataPoint> ChartInstance { get; set; }
+    
+    void PopulatePoints()
+    {
+        Data.Clear();
+        var newPoints = FixedDataRanges.NormalizedZeroToOne
+            .Select(GenerateDataPoint)
+            .ToArray();
+        
+        Data.AddRange(newPoints);
+    }
+
+    DataPoint GenerateDataPoint(float input)
+    {
+        return new DataPoint((decimal)input, (decimal)CurveFunction.Plot(input));
+    }
+   
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        
+        ChartOptions.Tooltip = new Tooltip() { Enabled = false };
+        ChartOptions.Legend = new Legend() { Show = false };
+        ChartOptions.Title = new Title() { Align = Align.Center };
+        ChartOptions.Chart = new Chart()
+        {
+            Toolbar = new Toolbar() { Show = false },
+            Animations = new Animations() { Enabled = false },
+            Zoom = new Zoom() { Enabled = false }
+        };
+        
+        ChartOptions.Xaxis = new XAxis()
+        {
+            Labels = new XAxisLabels() { Show  = ShowLabels }, 
+            Min = 0.0M,
+            Max = 1.0M
+        };
+        
+        ChartOptions.Yaxis = new List<YAxis>()
+        {
+            new()
+            {
+                Labels = new YAxisLabels() { Formatter = @"function (value) { return value.toFixed(1); }", Show = ShowLabels },
+                Min = 0.0M,
+                Max = 1.0M,
+            }
+        };
+
+        if (ShowLabels)
+        {
+            ChartOptions.Yaxis[0].Title = new AxisTitle() { Text = "Output" };
+            ChartOptions.Xaxis.Title = new AxisTitle() { Text = "Input" };
+        }
+        
+        PopulatePoints();
+    }
+
+    public async Task Refresh()
+    {
+        PopulatePoints();
+        await ChartInstance.RenderAsync();
+    }
+}

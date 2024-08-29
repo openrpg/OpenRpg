@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using OpenRpg.Core.Classes;
 using OpenRpg.Core.Classes.Templates;
 using OpenRpg.Core.Races;
@@ -19,6 +21,10 @@ namespace OpenRpg.Core.Extensions
             var template = templateAccessor.Get<ClassTemplate>(classData.TemplateId);
             return new ClassView() { Instance = classData, Template = template };
         }
+        
+        public static IEnumerable<ClassView> ToView(this ITemplateAccessor templateAccessor, IEnumerable<Class> classData)
+        { return classData.Select(x => ToView(templateAccessor, x)); }
+
         
         public static RaceView ToView(this ITemplateAccessor templateAccessor, Race raceData)
         {

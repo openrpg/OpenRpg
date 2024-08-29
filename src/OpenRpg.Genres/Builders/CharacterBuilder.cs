@@ -5,7 +5,6 @@ using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Races;
 using OpenRpg.Core.State.Variables;
-using OpenRpg.Core.Templates;
 using OpenRpg.Core.Utils;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Items.Equippables;

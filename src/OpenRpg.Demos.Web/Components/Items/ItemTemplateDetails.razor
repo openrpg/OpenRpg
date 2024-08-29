@@ -1,0 +1,124 @@
+@using OpenRpg.Core.Races
+@using OpenRpg.Core.Classes
+@using OpenRpg.Core.Effects
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+@using OpenRpg.Items.Types
+@using System.Transactions
+@using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Fantasy.Requirements
+@using OpenRpg.Genres.Requirements
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject ILocaleRepository LocaleRepository;
+@inject ICharacterRequirementChecker RequirementsChecker
+
+<CardSection customClasses="@cardClasses">
+    <h4 class="title is-4 has-text-centered item-quality-@(_itemQualityTypeId)">@(ItemTemplate.NameLocaleId ?? "Unnamed Item")</h4>
+    @if (!string.IsNullOrEmpty(ItemTemplate.DescriptionLocaleId))
+    {
+        <h6 class="subtitle is-7 has-text-dark has-text-centered">@(ItemTemplate.DescriptionLocaleId)</h6>
+    }
+    <div class="columns">
+        <div class="column">
+            <figure class="image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
+                <img src="images/items/@(ItemTemplate.Variables.AssetCode()).png">
+            </figure>
+        </div>
+        <div class="column">
+            @if (IsWeapon)
+            {
+                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Effects.Where(x => x.EffectType == FantasyEffectTypes.DamageBonusAmount).Sum(x => x.Potency))</h4>
+                <h6 class="subtitle is-7 has-text-dark has-text-centered">Damage</h6>
+            }
+            @if (IsArmour)
+            {
+                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Effects.Where(x => x.EffectType == FantasyEffectTypes.DefenseBonusAmount).Sum(x => x.Potency))</h4>
+                <h6 class="subtitle is-7 has-text-dark has-text-centered">Defense</h6>
+            }
+        </div>
+        <div class="column">
+            @if (_itemQualityTypeId != 0)
+            {
+                <h6 class="subtitle is-5 has-text-dark has-text-centered mb-1">@(LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.ItemQualityTextKey, _itemQualityTypeId)))</h6>
+            }
+            <h6 class="subtitle is-6 has-text-dark has-text-centered">@(LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.ItemTypesTextKey, ItemTemplate.ItemType)))</h6>
+        </div>
+    </div>
+    @if (DisplayEffects.Any())
+    {
+        <h5 class="title is-5 has-text-centered has-text-dark mb-1 mt-1">Effects</h5>
+        <div>
+            <EffectList Effects="DisplayEffects.ToArray()" Character="@Character"></EffectList>
+        </div>
+    }
+    @if (ItemTemplate.Requirements.Any())
+    {
+        <h5 class="title is-5 has-text-centered has-text-dark mb-1 mt-3">Requirements</h5>
+        <div>
+            <RequirementList Requirements="@ItemTemplate.Requirements.ToArray()" Character="@Character"></RequirementList>
+        </div>
+    }
+</CardSection>
+
+@code {
+
+    [Parameter]
+    public ItemTemplate ItemTemplate { get; set; }
+
+    [Parameter]
+    public Character Character { get; set; }
+
+    private bool IsWeapon => ItemTemplate.ItemType == FantasyItemTypes.GenericWeapon;
+
+    private bool IsArmour
+    {
+        get
+        {
+            var type = ItemTemplate.ItemType;
+            return type == FantasyItemTypes.BackArmour ||
+                   type == FantasyItemTypes.FootArmour ||
+                   type == FantasyItemTypes.HeadItem ||
+                   type == FantasyItemTypes.WristItem ||
+                   type == FantasyItemTypes.LowerBodyArmour ||
+                   type == FantasyItemTypes.UpperBodyArmour;
+        }
+    }
+
+    private IEnumerable<Effect> DisplayEffects
+    {
+        get
+        {
+            if (IsWeapon) { return ItemTemplate.Effects.Where(x => x.EffectType != FantasyEffectTypes.DamageBonusAmount); }
+            if (IsArmour) { return ItemTemplate.Effects.Where(x => x.EffectType != FantasyEffectTypes.DefenseBonusAmount); }
+            return ItemTemplate.Effects;
+        }
+    }
+
+    private int _itemQualityTypeId;
+    private string cardClasses;
+
+    protected override void OnParametersSet()
+    {
+
+        var areRequirementsMet = RequirementsChecker.AreRequirementsMet(Character, ItemTemplate);
+        var requirementsClass = !areRequirementsMet ? "has-background-danger-light" : "";
+        cardClasses = $"item-border item-quality-{_itemQualityTypeId} {requirementsClass}";
+
+        base.OnParametersSet();
+    }
+
+    protected override void OnInitialized()
+    {
+        if (ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
+        { _itemQualityTypeId = ItemTemplate.Variables.QualityType(); }
+
+    }
+
+}

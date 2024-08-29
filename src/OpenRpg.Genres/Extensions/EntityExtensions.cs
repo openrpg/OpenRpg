@@ -16,7 +16,7 @@ namespace OpenRpg.Genres.Extensions
         /// <param name="entity">The entity to process</param>
         /// <returns>All known effects that are applied to the entity</returns>
         /// <remarks>Multiclass are not included as that's likely to need complex mapping logic</remarks>
-        public static IEnumerable<Effect> GetEffects(this Entity entity, ITemplateAccessor templateAccessor)
+        public static IReadOnlyCollection<Effect> GetEffects(this Entity entity, ITemplateAccessor templateAccessor)
         {
             var effects = new List<Effect>();
 

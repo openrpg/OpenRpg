@@ -1,0 +1,161 @@
+﻿@page "/combat/defending"
+
+@using OpenRpg.Combat.Attacks
+@using OpenRpg.Combat.Processors.Attacks
+@using OpenRpg.Combat.Processors.Attacks.Entity
+@using OpenRpg.Core.Stats.Variables
+@using OpenRpg.Core.Templates
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Populators.Entity.Stats
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject DemoCharacterBuilder CharacterBuilder
+@inject IEntityAttackGenerator AttackGenerator
+@inject IAttackProcessor<EntityStatsVariables> AttackProcessor
+@inject ILocaleRepository LocaleRepository
+@inject IEntityStatPopulator StatPopulator;
+@inject ITemplateAccessor TemplateAccessor;
+
+<Markdown>
+    ## Defending
+
+    We have discussed generating attacks, and that is one of the larger pieces of the puzzle, but we also need to cover
+    how we use this attack with a defenders stats to generate a `ProcessedAttack` which details both the damage done
+    and the damage defended.
+</Markdown>
+<br />
+<Markdown>
+    ### `IAttackProcessor` interface
+    This interface defines a single method `ProcessAttack` which requires the attack you wish to apply and the stats of the defender
+    (it is assumed they are pre-computed), then will return a `ProcessedAttack` object representing what set of damages the character
+    would do.
+
+    If we generate two random characters and then have one attack the other we would do something like:
+
+    ```csharp
+    var attackingCharacter = CharacterBuilder.CreateNew().Build();
+    var defendingCharacter = CharacterBuilder.CreateNew().Build();
+    var randomAttack = AttackGenerator.GenerateAttack(attackingCharacter.Stats);
+    var processedAttack = AttackProcessor.ProcessAttack(randomAttack, defendingCharacter.Stats);
+    ```
+
+    There is a simple example below that you can use to see what this looks like in practice.
+</Markdown>
+<br />
+<div class="columns">
+    <div class="column is-two-fifths">
+        <CardSection>
+            <a class="button is-info" @onclick="RandomizeAttacker">Randomize Attacking Character</a>
+            <BasicCharacter Character="_attackingCharacter"></BasicCharacter>
+        </CardSection>
+    </div>
+    <div class="column is-two-fifths">
+        <CardSection>
+            <a class="button is-info" @onclick="RandomizeDefender">Randomize Defending Character</a>
+            <BasicCharacter Character="_defendingCharacter"></BasicCharacter>
+        </CardSection>
+    </div>
+    <div class="column">
+        <CardSection>
+            <a class="button is-info" @onclick="GenerateAttack">Generate Attack</a>
+            @foreach (var damage in _randomAttack.Damages)
+            {
+                <br />
+                <div class="subtitle is-6 has-text-dark">@(damage.Value) @(GetDamageTypeText(damage.Type))</div>
+            }
+        </CardSection>
+        <br />
+        <CardSection>
+            <a class="button is-info" @onclick="ProcessAttack">Process Attack</a>
+            @foreach (var damage in _processedAttack.DamageDefended)
+            {
+                <br />
+                <div class="subtitle is-6 has-text-dark text-success">Defended @(damage.Value) @(GetDamageTypeText(damage.Type))</div>
+            }
+            @foreach (var damage in _processedAttack.DamageDone)
+            {
+                <br />
+                <div class="subtitle is-6 has-text-dark text-danger">Took @(damage.Value) @(GetDamageTypeText(damage.Type)) Damage</div>
+            }
+            <div class="subtitle is-6 has-text-dark">Total Damage: @(_processedAttack.DamageDone.Sum(x => x.Value))</div>
+        </CardSection>
+    </div>
+</div>
+<br />
+<Markdown>
+    ### Summary
+    Once you have summed the damage done you can do whatever you want with it, directly deduct it from their HP or if you have more complex
+    systems you can deduct an amount from HP and an amount from a shield etc, as with most of the system you are free to interpret the data
+    however you want.
+    
+    > You may also notice in some scenarios you will get negative defenses, this happens because they have a weakness to a specific damage type
+    so for example if someone has a `-1 Dark Defense` and they are hit with `1 Dark Damage` this 1 damage becomes 2 after defending because we
+    need to account for the amplification of weaknesses. So the total damage done here should be `2 Dark Damage`
+</Markdown>
+<br />
+
+<Markdown>
+    ## Applying Damage
+    So we now know how to do an attack, and how to apply that attack to a target to work out how much damage the target 
+    would receive you also need to be able to apply all the damages to the target in question.
+    
+    On face value you may be thinking "this is really simple, why cant this all be done in the processor", but its actually
+    not that simple. I mean it could be, if you have a simple scenario, but what if you have a game where you have the notion
+    of shields which need to be depleted before you remove health, or you have a custom bit of code which means the main
+    player only takes 50% damage compared to NPCs etc.
+    
+    Now with this being said there is a quick "Just apply the damage to the target" helper method in the `OpenRpg.Genres`
+    library that lets you do `myEntity.State.ApplyDamageToTarget(theProcessedAttack);` which will simply take all the damages
+    contained within the processed attack and just apply it to the `Health` in the `State`.
+    
+    However if you need something more complicated you can just take the collection of `Damage` objects inside the 
+    processed attack and apply them to the health however you see fit.
+</Markdown>
+
+@code {
+
+    public Character _attackingCharacter, _defendingCharacter;
+    public Attack _randomAttack;
+    public ProcessedAttack _processedAttack;
+
+    protected override void OnInitialized()
+    {
+        RandomizeAttacker();
+        RandomizeDefender();
+        GenerateAttack();
+        ProcessAttack();
+
+        base.OnInitialized();
+    }
+
+    public void RandomizeAttacker()
+    {
+        _attackingCharacter = CharacterBuilder.CreateNew().Build();
+        StatPopulator.Populate(_attackingCharacter.Stats, _attackingCharacter.GetEffects(TemplateAccessor).ToArray(), null);
+    }
+
+    public void RandomizeDefender()
+    {
+        _defendingCharacter = CharacterBuilder.CreateNew().Build();
+        StatPopulator.Populate(_defendingCharacter.Stats, _defendingCharacter.GetEffects(TemplateAccessor).ToArray(), null);
+    }
+
+    public string GetDamageTypeText(int damageType)
+    {
+        var damageLocaleKey = LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.DamageTypesTextKey, damageType);
+        return LocaleRepository.Get(damageLocaleKey);
+    }
+
+    public void GenerateAttack()
+    {
+        _randomAttack = AttackGenerator.GenerateAttack(_attackingCharacter.Stats);
+    }
+
+    public void ProcessAttack()
+    {
+        _processedAttack = AttackProcessor.ProcessAttack(_randomAttack, _defendingCharacter.Stats);
+    }
+
+}

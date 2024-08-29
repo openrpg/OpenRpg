@@ -1,0 +1,109 @@
+﻿@page "/trade-skills/basic-components"
+
+<Markdown>
+    ## Basic Trade Skill Components
+    The `OpenRpg.Items.TradeSkills` library adds the notion of trade based skills which are configurable like `Stats`, then
+    crafting blueprints/recipes which can be unlocked based on your score with the given skills. 
+    
+    > For example you could add support for `Mining`, `Smelting`, `Smithing`, `Tailoring` etc with each skill having 
+    > its own unlockable blueprints allowing you to craft or smelt more complex items as you get better, however this
+    > is all configurable to be handled how you want (although default out the box implementations exist).
+    
+    The key type that represents the data for trade skills is the `TradeSkillTemplate` which wraps up the notion
+    of needing a certain skill to do something and how long it takes to finish. Alone it is not that useful but it 
+    has 2 classes derived from it which are `ItemCraftingTemplate` and `ItemGatheringTemplate`.
+    
+    So lets try to break them down and then we can have an example of them running like we do with the other demos.
+</Markdown>
+<br />
+
+<Markdown>
+    ### ItemGatheringTemplate
+    The `ItemGatheringTemplate` adds the notion of an output item/s to the `TradeSkillTemplate` so we can represent
+    what you can get, as well as how hard it is to get and how long it takes to get.
+    
+    Here is a quick example of how to setup a simple copper ore gathering template.
+    
+    ```csharp
+    // Output Items
+    var copperOreItemTemplate = // Get the IItemTemplate for your item
+    var copperOreTradeSkillItemEntry = new TradeSkillItemEntry { Template = copperOreItemTemplate };
+    
+    // Gathering Template
+    var copperOreGatheringTemplate = new ItemGatheringTemplate()
+    {
+        Id = 1,
+        SkillType = FantasyTradeSkillTypes.Mining,
+        SkillDifficulty = 0,
+        TimeToComplete = 1.0f,
+        OutputItems = new List&lt;TradeSkillItemEntry&gt;() { copperOreTradeSkillItemEntry }
+    };
+    ```
+    So the gist of this is that we have an object thats a bit like an `IItem` but its a `TradeSkillItemEntry`, 
+    while there is a lot of overlap with a regular `Item` that generally has a slightly different responsibility
+    but the trade skill item entry can have amounts or weights applied to indicate what it will output.
+    
+    Then once we have gotten our `TradeSkillItemEntry` we need to create an `ItemGatheringTemplate` which 
+    ties the item we want someone to be able to gather with the metadata around what type of skill is required
+    as well as how hard it is to get.
+    
+    > The higher the `SkillDifficulty` the harder it is for the gatherer to get, this can be used as both a
+    > gating mechanism to stop people gathering materials too high for them, as well as a way to indicate
+    > the drop chance of things, however we will touch on that more later.
+    
+</Markdown>
+<br />
+
+<Markdown>
+    ### ItemCraftingTemplate
+    The `ItemCraftingTemplate` is like the gathering one but has the notions of both input and output item/s, this
+    allows us to represent the required ingredients to create something and what you get from crafting it.
+    
+    Here is a quick example of how to setup a simple copper ore gathering template.
+    
+    ```csharp
+    // Input Items
+    var copperOreItemTemplate = // Get the IItemTemplate for your item
+    var copperOreTradeSkillItemEntry = new TradeSkillItemEntry { Template = copperOreItemTemplate };
+    copperOreTradeSkillItemEntry.Variables.Amount(5);
+    
+    // Output Items
+    var copperIngotItemTemplate = // Get the IItemTemplate for your item
+    var copperIngotTradeSkillItemEntry = new TradeSkillItemEntry { Template = copperIngotItemTemplate };
+    copperIngotTradeSkillItemEntry.Variables.Amount(1);
+    
+    var copperIngotCraftingTemplate = new ItemGatheringTemplate()
+    {
+        Id = 1,
+        SkillType = FantasyTradeSkillTypes.Smelting,
+        SkillDifficulty = 0,
+        TimeToComplete = 2.0f,
+        InputItems = new List&lt;TradeSkillItemEntry&gt;() { copperOreTradeSkillItemEntry }
+        OutputItems = new List&lt;TradeSkillItemEntry&gt;() { copperIngotTradeSkillItemEntry }
+    };
+    ```
+    
+    As you can see its not that much different from the gathering one but its different enough to let us express
+    the notion of an item that can be crafted given the correct inputs.
+    
+</Markdown>
+<br />
+
+<Markdown>
+    ## How do we use these templates?
+    
+    This part is up to you really, we provide some out the box functionality to allow you to easily see if you can create
+    something, as well as handling the inventory related transaction to do the crafting, but ultimately it comes down to
+    your use case.
+    
+    We will cover some example use cases making use of the out the box extensions to `Inventory` objects to assist with
+    crafting and using the `TradeSkillsCalculator` in the next couple of pages.
+    
+    > As with the rest of the framework we try to separate the `Data` and `Logic` aspects of things, so now you have a
+    > way to store your gathering and crafting data we can make use of it however we want.
+    
+</Markdown>
+<br />
+
+@code {
+}

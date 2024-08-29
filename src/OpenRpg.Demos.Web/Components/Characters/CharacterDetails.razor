@@ -1,0 +1,31 @@
+@using OpenRpg.Core.Races
+@using OpenRpg.Core.Classes
+@using OpenRpg.Core.Extensions
+
+<div class="has-text-centered">
+    <h2 class="title has-text-dark">@(Name ?? "Unnamed Person")</h2>
+    @if(@ClassView != null)
+    {
+    <h3 class="subtitle has-text-dark">@($"Level {ClassView?.Instance.Variables.Level().ToString() ?? "1"} {RaceView.Template?.NameLocaleId ?? "Unknown Race"} {ClassView?.Template?.NameLocaleId ?? "Unknown Class"}")</h3>
+    }
+    @if(@Classes != null)
+    {
+        <h3 class="subtitle has-text-dark">@($"{RaceView?.Template.NameLocaleId ?? "Unknown Race"}")</h3>
+        <div class="columns">
+        @foreach (var _class in @Classes)
+         {
+             <div class="column">
+                 <TagLabel Label="@($"Level {ClassView?.Instance.Variables.Level().ToString() ?? "1"}")" Content="@($"{ClassView?.Template?.NameLocaleId ?? "Unknown Class"}")" Centered="true"></TagLabel>
+             </div>
+         }
+        </div>
+    }
+</div>
+
+@code {
+    
+    [Parameter] public string Name { get; set; }
+    [Parameter] public RaceView RaceView { get; set; }
+    [Parameter] public ClassView ClassView { get; set; }
+    [Parameter] public IEnumerable<ClassView> Classes { get; set; }
+}

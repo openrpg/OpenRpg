@@ -1,0 +1,50 @@
+﻿@using OpenRpg.Core.Effects
+@using OpenRpg.Cards.Types
+@using OpenRpg.Cards
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject ILocaleRepository LocaleRepository
+
+<div class="container game-card" card-type="@Card.CardType">
+    <div class="card @CardTypeClass">
+        <div class="card-content">
+            <div class="content has-text-centered">
+                <h3 class="ribbon">
+                    <p class="ribbon-content">@Card.NameLocaleId</p>
+                </h3>
+                <div class="card-body">
+                    <div class="card-effects">
+                        <EffectList Effects=@Card.Effects.ToArray()></EffectList>
+                    </div>
+                    @if (Card.CardType == CardTypes.EquipmentCard)
+                    {
+                        <div class="box as-circle has-background-link-light">
+                            <span class="is-size-4">
+                                @GetMaximumEffectPotency.Potency
+                            </span>
+                        </div>
+                    }
+                </div>
+                <div class="description-section">
+                    <p>@Card.DescriptionLocaleId</p>
+                </div>
+                <span class="card-tag tag">@CardTypeText</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public ICard Card { get; set; }
+
+    [Parameter]
+    public bool Draggable { get; set; } = false;
+
+    public string CardTypeClass => $"card-type-{Card.CardType}";
+    public string CardTypeText => LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.CardTypesTextKey, Card.CardType));
+    public Effect GetMaximumEffectPotency => Card.Effects.OrderByDescending(x => x.Potency).FirstOrDefault();
+
+}

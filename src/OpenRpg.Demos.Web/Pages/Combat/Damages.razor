@@ -1,0 +1,49 @@
+﻿@page "/combat/damages"
+<Markdown>
+    ## Damages, Attacks & Defenses
+
+    Before we wade into combat its worth quickly covering what damages/defenses are and how they work as well as how they relate to attacks, 
+    as the combat system is heavily based upon the concept of damages and attacks.
+</Markdown>
+<br/>
+<Markdown>
+    ### `Damage` component
+    This is quite a simple object and purely contains the type of damage with the value of the damage.
+
+    The concept behind it is that an overall attack can be broken down into various types of damage which may be from different
+    sources. For example lets say you have a flaming sword, rather than just do a blanket 10 damage you may do 8 slashing damage
+    and 2 fire damage.
+
+    > As with most examples we are drawing off the pre-made example damage types which can be found within the [OpenRpg.Fantasy](https://github.com/openrpg/OpenRpg.Fantasy/blob/master/src/OpenRpg.Genres.Fantasy/Types/DamageTypes.cs) repo.
+
+    You are free to have as few or many damage types as you want, as ultimately its just an `int` describing the type of the damage
+    then the amount of associated damage that goes with that.
+    
+    The damage is just the start of the combat journey though as damage itself is just seen as the raw damage you have output,
+    it needs to be processed further down the line against a potential target to see how much of that damage is actually applied.
+</Markdown>
+<br/>
+<Markdown>
+    ### `Attack` component
+    The Attack object contains all the applicable damage types and their amounts via the `Damage` object.
+
+    The idea is that you generate an `Attack` for a character which can then be applied to 1-N sources, so this way you may
+    have your flaming sword dealing 8 slashing and 2 fire damage as an AoE to 3 targets who are in range, however each of 
+    those 3 targets may have different defense so after its all been processed you may do far less damage to each of the 
+    targets.
+    
+    > We will cover attacks more in the next section as we need to discuss `IAttackGenerator` and `IAttackProcessor` which
+    will give us some insight into how you can create your own damage handling mechanics.
+</Markdown>
+<br/>
+<Markdown>
+    ### `Defenses`
+    So now we have the notion of `Damage` and `Attack` object and we can see how we generate an attack from someone, however
+    we also need the notion of `Defenses` which act as the mitigation amount of a specific damage.
+    
+    Given the previous example you may have an attack with 8 slashing and 2 fire damage, but you may have 5 fire defense 
+    and 3 slashing defense meaning once the mitigation has been applied you would only take 5 slashing damage and 0 fire damage.
+</Markdown>
+
+@code {
+}

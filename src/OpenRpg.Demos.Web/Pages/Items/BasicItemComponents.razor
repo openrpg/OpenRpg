@@ -1,0 +1,181 @@
+@page "/items/basic-components"
+@using OpenRpg.Core.Effects
+@using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+
+<Markdown>
+    ## Basic Item Components
+    Items are in some ways easier to work with than the notion of characters as its easier to constrain what an item would
+    look like, but there is some additional complexities depending on scenarios such as item modifications and requirements, 
+    so lets cover some of the high level bits.
+    
+    ### `IItemTemplate`
+    A bit like in the character examples there will be some layering of templates etc, and the `IItemTemplate` acts 
+    as the blueprint for the item, so we should only have 1 item template in existence for each item, so for example
+    we only need to describe a `Longsword` once.
+    
+    > You could be carrying 100 of them, but really all it would be is the single item template being linked to 100 times.
+    
+    The item template contains effects, requirements and any modification information, i.e a weapon may allow 2 gem slots,
+    an enchantment slot and 3 forging upgrades etc. So this system should allow you to define your items up front, and then
+    just consume them via the `IItem` interface.
+    
+    > There are also some more specific variables for stacking, slot or weight limit scenarios.
+    
+    ### `IItem` and `DefaultItem`
+    
+    This acts as the instance of the item that a character would pickup/carry/equip. It allows for you to track the amount of the
+    item as well as any modifications you have applied. As you may have 10 healing potions, but really its just one template for a 
+    healing potion with the number 10 attached so you know to factor in that you have 10 of these.
+    
+    There is a default `IItem` implementation provided, but in most cases you probably want to make your own which lets you further
+    configure your item for stacking/weight scenarios.
+</Markdown>
+
+<br />
+<div class="columns">
+    <div class="column is-two-thirds">
+        <Markdown>
+            ### A Simple Item
+            So lets just make a simple sword item template based off the built in components.
+
+            ```csharp
+            var swordTemplate = new ItemTemplate
+            {
+                Id = 1,
+                NameLocaleId = "Sword",
+                DescriptionLocaleId = "A really bad looking sword, can slay things though",
+                ItemType = ItemTypes.GenericWeapon,
+                Effects = new []
+                {
+                    new Effect { EffectType = EffectTypes.DamageBonusAmount, Potency = 30.0f }
+                }
+            };
+            swordTemplate.Variables.QualityType(ItemQualityTypes.JunkQuality);
+            swordTemplate.Variables.Value(10);
+            swordTemplate.Variables.AssetCode("sword");
+            ```
+
+            This indicates that the sword is a **Generic Weapon** of **Common Quality**, then it has no requirements, no moddable slots and does damage of 30.
+
+            To actually create an instance of this item we need to use the template with an `IItem` implementation, like so:
+
+            ```csharp
+            var item = new DefaultItem
+            {
+                Template = swordTemplate
+            };
+            ```
+
+            So we have one of them, but as we don't have stackable/weight based systems in place so we don't need any of that information.
+        </Markdown>
+    </div>
+    <div class="column is-one-third">
+        <ItemDetails Item="_simpleItem"></ItemDetails>
+    </div>
+</div>
+
+<br />
+<div class="columns">
+    <div class="column is-two-thirds">
+        <Markdown>
+            ### A More Complex Item
+            So now lets make an item which has some fancy effects on it,
+
+            ```csharp
+            var swordEffects = new[]
+            {
+                new Effect { EffectType = EffectTypes.DamageBonusAmount, Potency = 765.5f },
+                new Effect { EffectType = EffectTypes.StrengthBonusAmount, Potency = 20.0f },
+                new Effect { EffectType = EffectTypes.DamageBonusPercentage, Potency = 10.0f },
+                new Effect { EffectType = EffectTypes.ConstitutionBonusAmount, Potency = 15.0f },
+                new Effect { EffectType = EffectTypes.DarkDefenseAmount, Potency = 15.0f }
+            };
+
+            var template = new ItemTemplate
+            {
+                Id = 2,
+                NameLocaleId = "Super Sword",
+                DescriptionLocaleId = "So fancy it could slice through stone",
+                ItemType = ItemTypes.GenericWeapon,
+                Effects = swordEffects
+            };
+            template.Variables.QualityType(ItemQualityTypes.EpicQuality);
+            template.Variables.Value(10000);
+            template.Variables.AssetCode("sword");
+            ```
+
+            So we have the template built we can assign it to an item instance and show it.
+            
+            > At this point its worth mentioning that these templates should all be pre-made in a data store
+            of some sort, we are just hardcoding here to show simplest avenues for usage. You could do it all in code, 
+            a json/binary/xml file from an external editor etc. Ultimately as long as all these items can be grabbed 
+            from a repository of some sort you are good.
+        </Markdown>
+    </div>
+    <div class="column is-one-third">
+        <ItemTemplateDetails ItemTemplate="_fancyItem"></ItemTemplateDetails>
+    </div>
+</div>
+
+@code {
+    private ItemTemplate _simpleItem, _fancyItem;
+
+    protected override void OnInitialized()
+    {
+        _simpleItem = MakeRubbishSword();
+        _fancyItem = MakeSuperSword();
+
+        base.OnInitialized();
+    }
+
+    private ItemTemplate MakeRubbishSword()
+    {
+        var template = new ItemTemplate
+        {
+            Id = 1,
+            NameLocaleId = "Sword",
+            DescriptionLocaleId = "A really bad looking sword, can slay things though",
+            ItemType = FantasyItemTypes.GenericWeapon,
+            Effects = new []
+            {
+                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
+            }
+        };
+        template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
+        template.Variables.Value(10);
+        template.Variables.AssetCode("sword");
+
+        return template;
+    }
+
+    private ItemTemplate MakeSuperSword()
+    {
+        var swordEffects = new[]
+        {
+            new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 765.5f },
+            new Effect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 20.0f },
+            new Effect { EffectType = FantasyEffectTypes.DamageBonusPercentage, Potency = 10.0f },
+            new Effect { EffectType = FantasyEffectTypes.ConstitutionBonusAmount, Potency = 15.0f },
+            new Effect { EffectType = FantasyEffectTypes.DarkDefenseAmount, Potency = 15.0f }
+        };
+
+        var template = new ItemTemplate
+        {
+            Id = 2,
+            NameLocaleId = "Super Sword",
+            DescriptionLocaleId = "So fancy it could slice through stone",
+            ItemType = FantasyItemTypes.GenericWeapon,
+            Effects = swordEffects
+        };
+        template.Variables.QualityType(FantasyItemQualityTypes.EpicQuality);
+        template.Variables.Value(10000);
+        template.Variables.AssetCode("sword");
+
+        return template;
+    }
+
+}

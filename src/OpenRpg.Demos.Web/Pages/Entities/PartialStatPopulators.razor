@@ -1,0 +1,87 @@
+﻿@page "/entities/stat-populators"
+
+<Markdown>
+   ## Stat Populators
+   As you saw in the last chapter we have a decent understanding of stats and how they can be populated, but lets take a slightly 
+   deeper dive into how to make stat populators and how you can layer multiple populators together to allow re-use and composition.
+   
+   The main job of a stat populator (or any variable populator) is to take in `Effect` and `Variables` then populate the stats
+   that have been passed in.
+   
+   > For example if you have a `Damage` stat you will need to compute that value from all the related damage based effects applied,
+   > this could come from your `Race`, `Class`, `Equipment` or any other source of effects you have on the entity with stats.
+   
+   To understand this more lets look deeper at the underlying code to understand what we need to do.
+</Markdown>
+
+<br/>
+
+<Markdown>
+   ## `IStatsPopulator` Interface
+   The `IStatsPopulator` interface actually just wraps the generic `Variable` populator interface, but at the heart of it 
+   you need to implement the following:
+   
+   ```csharp
+   void Populate(IStatsVariable stats, IReadOnlyCollection&lt;Effect&gt; activeEffects, IReadOnlyCollection&lt;IVariables&gt; relatedVars);
+   ```
+   
+   You have free reign over how you do that, but basically you need to take the effects that are being provided which should cover *ALL* effects
+   currently applied for processing, then any related vars (which may be null/empty). This could be as simple as:
+   
+   ```csharp
+   public void Populate(IStatsVariable stats, IReadOnlyCollection&lt;Effect&gt; activeEffects, IReadOnlyCollection&lt;IVariables&gt; relatedVars)
+   {
+      var strengthValue = (int)activeEffects.CalculateBonusFor(FantasyEffectTypes.StrengthBonusAmount, FantasyEffectTypes.StrengthBonusPercentage);
+      var dexterityValue = (int)activeEffects.CalculateBonusFor(FantasyEffectTypes.DexterityBonusAmount, FantasyEffectTypes.DexterityBonusPercentage);
+      var constitutionValue = (int)activeEffects.CalculateBonusFor(FantasyEffectTypes.ConstitutionBonusAmount, FantasyEffectTypes.ConstitutionBonusPercentage);
+      var intelligenceValue = (int)activeEffects.CalculateBonusFor(FantasyEffectTypes.IntelligenceBonusAmount, FantasyEffectTypes.IntelligenceBonusPercentage);
+      var wisdomValue = (int)activeEffects.CalculateBonusFor(FantasyEffectTypes.WisdomBonusAmount, FantasyEffectTypes.WisdomBonusPercentage);
+      var charismaValue = (int)activeEffects.CalculateBonusFor(FantasyEffectTypes.CharismaBonusAmount, FantasyEffectTypes.CharismaBonusPercentage);
+      var allAttributeValue = (int)activeEffects.GetPotencyFor(FantasyEffectTypes.AllAttributeBonusAmount);
+
+      stats.Strength(strengthValue + allAttributeValue);
+      stats.Dexterity(dexterityValue + allAttributeValue);
+      stats.Constitution(constitutionValue + allAttributeValue);
+      stats.Intelligence(intelligenceValue + allAttributeValue);
+      stats.Wisdom(wisdomValue + allAttributeValue);
+      stats.Charisma(charismaValue + allAttributeValue);
+   }
+   ```
+   
+   This is actually an old example from the `OpenRpg.Genres.Fantasy` library but as you can see we take the effects we care about
+   and then apply them to the related stats, and the best thing is you can configure this however you want.
+  
+   > The `OpenRpg.Genres.Fantasy` library provides some out the box ones for fantasy scenarios populating stats, so 
+   > take a look at them if you want to see some more real world examples.
+
+</Markdown>
+
+<br/>
+
+<Markdown>
+  ## Partial/Composite Stat Population
+  So far we have discussed how to populate all stats and that's great, but what if you want lots of little populators working
+  together rather than one big one?
+  
+  Well dont worry we already have something for that, so we have the `IPartialStatPopulator` which has exactly the same
+  implementations as the regular one, but it also contains a `Priority` field that lets you indicate in what order
+  the partial populators should be run.
+  
+  This however is just part of the puzzle, as you can implement as many partial populators as you want but you still need
+  some way to bring them together, and that's where `CompositeStatPopulator` comes in.
+  
+  ```csharp
+  var statPopulator = new CompositeStatPopulator(new [] {
+     new SomePartialPopulator(),
+     new SomeOtherPartialPopulator()
+     // others
+  });
+  ```
+  
+  As you can see you can just add as many as you want, or just inherit from it and internally load what you want internally,
+  which is what the `OpenRpg.Genres.Fantasy` example ones do.
+</Markdown>
+
+@code {
+   
+}

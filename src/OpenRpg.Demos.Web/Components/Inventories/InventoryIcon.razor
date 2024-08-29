@@ -1,0 +1,21 @@
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Items.Templates
+
+@if (Item == null)
+{
+    <figure class="image is-64x64 item-border with-rounding">
+        <img src="images/items/empty.png">
+    </figure>
+}
+else
+{
+    <ItemIcon Item="Item" Character="Character"></ItemIcon>
+}
+
+@code {
+    [Parameter]
+    public Item Item { get; set; }
+
+    [Parameter]
+    public Character Character { get; set; }
+}
