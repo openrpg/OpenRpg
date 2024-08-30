@@ -49,9 +49,9 @@
         <BasicCharacter Character="@_randomCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
     </div>
     <div class="column">
-        <ItemDetails Item="_item1WithRequirement" Character="_randomCharacter"></ItemDetails>
+        <ItemTemplateDetails ItemTemplate="_item1WithRequirement" Character="_randomCharacter"></ItemTemplateDetails>
         <br />
-        <ItemDetails Item="_item2WithRequirements" Character="_randomCharacter"></ItemDetails>
+        <ItemTemplateDetails ItemTemplate="_item2WithRequirements" Character="_randomCharacter"></ItemTemplateDetails>
     </div>
 </div>
 <br />
@@ -98,7 +98,7 @@
         <BasicCharacter Character="@_randomCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
     </div>
     <div class="column">
-        <ItemDetails Item="_item3WithEffectRequirements" Character="_randomCharacter"></ItemDetails>
+        <ItemTemplateDetails ItemTemplate="_item3WithEffectRequirements" Character="_randomCharacter"></ItemTemplateDetails>
     </div>
 </div>
 @code {
@@ -210,7 +210,6 @@
     public void RandomizeCharacter()
     {
         _randomCharacter = CharacterBuilder.CreateNew().Build();
-        StatPopulator.Populate(_randomCharacter.Stats, _randomCharacter.GetEffects(TemplateAccessor), null);
         StateHasChanged();
     }
 
