@@ -20,6 +20,7 @@
     <ProjectReference Include="..\OpenRpg.Genres\OpenRpg.Genres.csproj" />
     <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
     <ProjectReference Include="..\OpenRpg.Genres.Scifi\OpenRpg.Genres.Scifi.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RandomNameGenerator" Version="1.0.4" />
     <PackageReference Include="System.Reactive" Version="6.0.0" />
   </ItemGroup>

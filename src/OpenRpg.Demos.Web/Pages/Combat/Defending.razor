@@ -48,13 +48,13 @@
     <div class="column is-two-fifths">
         <CardSection>
             <a class="button is-info" @onclick="RandomizeAttacker">Randomize Attacking Character</a>
-            <BasicCharacter Character="_attackingCharacter"></BasicCharacter>
+            <BasicCharacter Character="_attackingCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
         </CardSection>
     </div>
     <div class="column is-two-fifths">
         <CardSection>
             <a class="button is-info" @onclick="RandomizeDefender">Randomize Defending Character</a>
-            <BasicCharacter Character="_defendingCharacter"></BasicCharacter>
+            <BasicCharacter Character="_defendingCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
         </CardSection>
     </div>
     <div class="column">

@@ -8,7 +8,6 @@
 @using OpenRpg.Core.Classes.Templates
 @using OpenRpg.Core.Races.Templates
 @using OpenRpg.Core.Templates
-@using OpenRpg.Data.Conventions.Extensions
 @using OpenRpg.Genres.Extensions
 @using OpenRpg.Genres.Populators.Entity.Stats
 
@@ -135,7 +134,7 @@
 
 @if (_generatedCharacter != null)
 {
-    <BasicCharacter Character="_generatedCharacter"></BasicCharacter>
+    <BasicCharacter Character="_generatedCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
 }
 
 @code {

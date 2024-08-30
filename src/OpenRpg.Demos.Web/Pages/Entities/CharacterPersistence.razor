@@ -1,7 +1,9 @@
 ﻿@page "/entities/persistence"
 
 @using Newtonsoft.Json
+@using OpenRpg.Core.Entity
 @using OpenRpg.Core.Templates
+@using OpenRpg.Demos.Infrastructure.JSON
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Extensions
 @using OpenRpg.Genres.Populators.Entity.Stats
@@ -59,7 +61,7 @@
     <div class="column is-half">
         <CardSection>
             <a class="button is-info" @onclick="RandomizeCharacter">Regenerate Character</a>
-            <BasicCharacter Character="@_randomCharacter"></BasicCharacter>
+            <BasicCharacter Character="@_randomCharacter" TemplateAccessor="TemplateAccessor" />
         </CardSection>
     </div>
     <div class="column is-half">
@@ -120,7 +122,7 @@
     <div class="column is-half">
         <CardSection>
             <a class="button is-info" @onclick="ReloadCharacterFromData">Restore Character From Json Data</a>
-            <BasicCharacter Character="@_regeneratedCharacter"></BasicCharacter>
+            <BasicCharacter Character="@_regeneratedCharacter" TemplateAccessor="TemplateAccessor" />
         </CardSection>
     </div>
 </div>
@@ -153,7 +155,8 @@
     {
         _jsonSettings = new JsonSerializerSettings()
         {
-            TypeNameHandling = TypeNameHandling.Objects
+            TypeNameHandling = TypeNameHandling.Auto,
+            ContractResolver = new IgnorePropertiesResolver(new[] { nameof(Entity.Stats) })
         };
         
         RandomizeCharacter();
@@ -165,7 +168,6 @@
     public void RandomizeCharacter()
     {
         _randomCharacter = CharacterBuilder.CreateNew().Build();
-        StatPopulator.Populate(_randomCharacter.Stats, _randomCharacter.GetEffects(TemplateAccessor), null);
         PersistCharacter();
     }
     
