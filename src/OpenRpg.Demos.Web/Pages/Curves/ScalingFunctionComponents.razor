@@ -53,7 +53,7 @@
                <label class="label">Health Value</label>
                <div class="control">
                   <a class="button is-primary" @onclick="RefreshOutputValue1">Plot Value</a>
-                  <label class="label">@OutputValue1</label>
+                  <label class="label">@OutputValue1.ToString("F2")</label>
                </div>
             </div>
          </div>
@@ -96,7 +96,7 @@
             <label class="label">Health Value</label>
             <div class="control">
                <a class="button is-primary" @onclick="RefreshOutputValue2">Plot Value</a>
-               <label class="label">@OutputValue2</label>
+               <label class="label">@OutputValue2.ToString("F2")</label>
             </div>
          </div>
       </div>
@@ -130,7 +130,7 @@
             <label class="label">Experience Required</label>
             <div class="control">
                <a class="button is-primary" @onclick="RefreshOutputValue3">Plot Value</a>
-               <label class="label">@OutputValue3</label>
+               <label class="label">@OutputValue3.ToString("F2")</label>
             </div>
          </div>
       </div>
@@ -173,7 +173,7 @@
                <label class="label">Attack Cooldown</label>
                <div class="control">
                   <a class="button is-primary" @onclick="RefreshOutputValue4">Plot Value</a>
-                  <label class="label">@OutputValue4</label>
+                  <label class="label">@OutputValue4.ToString("F2")</label>
                </div>
             </div>
          </div>
