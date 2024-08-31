@@ -1,5 +1,5 @@
 @using OpenRpg.Genres.Characters
-@using OpenRpg.Items.Templates
+@using OpenRpg.Items
 
 @if (Item == null)
 {
@@ -9,12 +9,12 @@
 }
 else
 {
-    <ItemIcon Item="Item" Character="Character"></ItemIcon>
+    <ItemIcon ItemView="Item" Character="Character"></ItemIcon>
 }
 
 @code {
     [Parameter]
-    public Item Item { get; set; }
+    public ItemView Item { get; set; }
 
     [Parameter]
     public Character Character { get; set; }

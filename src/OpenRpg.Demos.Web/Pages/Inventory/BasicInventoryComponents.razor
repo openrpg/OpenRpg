@@ -40,7 +40,7 @@
                 <h6 class="subtitle is-6 has-text-dark has-text-centered">Click the item to drop it</h6>
             </div>
             <br />
-            <BasicInventory Inventory="_inventory" OnItemInteraction="RemoveItem" @ref="_inventoryRef"></BasicInventory>
+            <BasicInventory Inventory="_inventory" OnItemInteraction="RemoveItem" @ref="_inventoryRef" TemplateAccessor="TemplateAccessor"></BasicInventory>
         </CardSection>
     </div>
     <div class="column is-one-fifth">
@@ -121,10 +121,10 @@
         }
     }
 
-    public void RemoveItem(Item item)
+    public void RemoveItem(ItemView item)
     {
         if (item == null) { return; }
-        var removed = _inventory.AttemptRemoveItem(item);
+        var removed = _inventory.AttemptRemoveItem(item.Instance);
         _inventoryRef.Refresh();
 
     }
