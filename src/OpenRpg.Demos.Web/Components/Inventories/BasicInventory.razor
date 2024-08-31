@@ -4,7 +4,6 @@
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Items
 @using OpenRpg.Items.Inventories
-@using OpenRpg.Items.Templates
 
 @for (var i = 0; i < Inventory.Variables.MaxSlots(); i+=SlotsPerRow)
 {
@@ -14,7 +13,7 @@
             <div class="column">
                 @{ var slotIndex = i + row;}
                 <div @onclick="@(() => OnItemInteraction.InvokeAsync(GetItemFromIndex(slotIndex)))">
-                    <InventoryIcon Item="@GetItemFromIndex(slotIndex)" Character="Character"></InventoryIcon>
+                    <InventoryIcon Item="@GetItemFromIndex(slotIndex)" Character="Character" />
                 </div>
             </div>
         }

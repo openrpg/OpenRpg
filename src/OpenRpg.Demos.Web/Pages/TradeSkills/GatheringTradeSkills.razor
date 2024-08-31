@@ -46,12 +46,12 @@
             <div class="columns">
                 <div class="column">
                     <a disabled="@IsGathering" @onclick="() => StartGatheringExample1(CopperOreGatheringTemplate)">
-                        <TradeSkillItemIcon Item="CopperOreTradeSkillItemEntry" />
+                        <TradeSkillItemIcon Item="CopperOreTradeSkillItemEntry" ItemTemplate="TemplateAccessor.GetItemTemplate(CopperOreTradeSkillItemEntry.TemplateId)" />
                     </a>
                 </div>
                 <div class="column">
                     <a disabled="@IsGathering" @onclick="() => StartGatheringExample1(OakLogGatheringTemplate)">
-                        <TradeSkillItemIcon Item="OakLogTradeSkillItemEntry" />
+                        <TradeSkillItemIcon Item="OakLogTradeSkillItemEntry" ItemTemplate="TemplateAccessor.GetItemTemplate(OakLogTradeSkillItemEntry.TemplateId)"  />
                     </a>
                 </div>
             </div>
@@ -65,7 +65,7 @@
                     <TimedProgress RequiredTime="@(CurrentGatherTime)" Finished="FinishGatheringExample1" IsActive="IsGathering" @ref="ActionBarRef"/>
                 </div>
             </div>
-            <BasicInventory Inventory="Example1Inventory" SlotsPerRow="5" @ref="Example1InventoryRef"/>
+            <BasicInventory Inventory="Example1Inventory" SlotsPerRow="5" @ref="Example1InventoryRef" TemplateAccessor="TemplateAccessor"/>
         </CardSection>
     </div>
 </div>
@@ -120,12 +120,12 @@
             <div class="columns">
                 <div class="column">
                     <a @onclick="() => StartGatheringExample2(CopperOreGatheringTemplate)">
-                        <TradeSkillItemIcon Item="CopperOreTradeSkillItemEntry" />
+                        <TradeSkillItemIcon Item="CopperOreTradeSkillItemEntry" ItemTemplate="TemplateAccessor.GetItemTemplate(CopperOreTradeSkillItemEntry.TemplateId)"  />
                     </a>
                 </div>
                 <div class="column">
                     <a disabled="@(CanMineIron == false)" @onclick="() => StartGatheringExample2(IronOreGatheringTemplate)">
-                        <TradeSkillItemIcon Item="IronOreTradeSkillItemEntry" />
+                        <TradeSkillItemIcon Item="IronOreTradeSkillItemEntry" ItemTemplate="TemplateAccessor.GetItemTemplate(IronOreTradeSkillItemEntry.TemplateId)"/>
                     </a>
                 </div>
             </div>
@@ -136,7 +136,7 @@
             <div class="field">
                 <label class="label has-text-centered">Gathering @(CurrentGatherName)</label>
             </div>
-            <BasicInventory Inventory="Example2Inventory" SlotsPerRow="5" @ref="Example2InventoryRef"/>
+            <BasicInventory Inventory="Example2Inventory" SlotsPerRow="5" @ref="Example2InventoryRef" TemplateAccessor="TemplateAccessor"/>
         </CardSection>
     </div>
 </div>
