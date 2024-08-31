@@ -6,7 +6,7 @@
 @using OpenRpg.Items.TradeSkills
 @using OpenRpg.Items.TradeSkills.Extensions
 
-<figure class="item-icon image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
+<figure class="item-icon image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId) @(CanUse ? string.Empty : "has-disabled-border")">
     <img src="images/items/@(ItemTemplate.Variables.AssetCode()).png">
     <div class="item-amount">@(_itemAmount > 0 ? $"{_itemAmount}" : "")</div>
     <div class="item-icon-summary">
@@ -24,6 +24,8 @@
 
     [Parameter]
     public Character Character { get; set; }
+
+    [Parameter] public bool CanUse { get; set; } = true;
 
     private int _itemQualityTypeId;
     private int _itemAmount;

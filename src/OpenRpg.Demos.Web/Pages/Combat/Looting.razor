@@ -96,7 +96,7 @@
             <h4>Looted Items</h4>
             @foreach (var item in _currentLoot)
             {
-                <ItemTemplateDetails ItemTemplate="TemplateAccessor.GetItemTemplate(item.TemplateId)"></ItemTemplateDetails>
+                <ItemIcon ItemView="TemplateAccessor.ToView(item)"></ItemIcon>
             }
         </CardSection>
     </div>

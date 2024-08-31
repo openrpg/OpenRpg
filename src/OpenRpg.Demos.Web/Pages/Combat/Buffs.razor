@@ -7,6 +7,7 @@
 @using OpenRpg.Combat.Extensions
 @using OpenRpg.Core.Extensions
 @using OpenRpg.Core.Utils
+@using OpenRpg.Genres.Fantasy.Extensions
 @using OpenRpg.Genres.Fantasy.Types
 
 @inject IRandomizer Randomizer;
@@ -99,19 +100,20 @@
   <div class="column is-third">
       <Markdown>
           ### An Example Of Buffs In Action
-          Here is an example of buffs being applied
+          Here is an example of buffs being applied, where every 2 seconds a new random buff from the possible list will
+          be applied to simulate real world scenarios, notice how buffs may be reset in duration rather than removed etc.
       </Markdown>
   </div>
    <div class="column is-third">
       <CardSection>
-         <h2>Available Effects</h2>
+         <h2 class="title is-5 has-text-black">Possible Effects</h2>
          <div class="container">
             @foreach (var availableEffect in AvailableEffects)
             {
                <TagLabel Label="@($"{availableEffect.NameLocaleId}")" Content="@($"Lasts {(int)availableEffect.Duration}s")" ContentTagType="is-warning" />
             }
          </div>
-         <h2>Active Effects</h2>
+         <h2 class="title is-5 has-text-black">Active Effects</h2>
          <div class="container">
             @foreach (var activeEffect in ActiveEffects.ActiveEffects)
             {
@@ -122,12 +124,14 @@
    </div>
      <div class="column is-third">
          <CardSection>
-            <h2>Effect Output</h2>
+            <h2 class="title is-5 has-text-black">Effect Output</h2>
             <div style="height: 10em; overflow-y: scroll">
-               @foreach (var log in LogOutput)
-                {
-                   <p class="content">@log</p>
-                }
+               <ul class="content is-small">
+               @foreach (var logEntry in LogOutput)
+               {
+                  <li>@((MarkupString)logEntry.Entry)</li>
+               }
+               </ul>
             </div>
          </CardSection>
      </div>
@@ -185,8 +189,10 @@
    };
 
    public TimedEffect[] AvailableEffects;
+
+   public record LogEntry(bool IsBeneficial, bool IsPassive, string Entry);
    
-   public List<string> LogOutput { get; } = new();
+   public List<LogEntry> LogOutput { get; } = new();
 
    public DefaultActiveEffects ActiveEffects = new();
    
@@ -200,17 +206,27 @@
 
    public void OnEffectTriggered(ActiveEffect activeEffect)
    {
-      LogOutput.Add($"Effect Triggered {activeEffect.Effect.NameLocaleId} with {activeEffect.GetStackedPotency()} damage");
+      var effectTypeText = activeEffect.IsBeneficialEffect() ? "healing" : "damage";
+      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(),
+         $"Triggered <span class=\"has-text-info\">{activeEffect.Effect.NameLocaleId}</span> with {activeEffect.GetStackedPotency()} {effectTypeText}");
+      
+      LogOutput.Add(logEntry);
    }
 
    public void OnEffectExpired(ActiveEffect activeEffect)
    {
-      LogOutput.Add($"Effect Expired {activeEffect.Effect.NameLocaleId}");
+      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(), 
+         $"Expired <span class=\"has-text-info\">{activeEffect.Effect.NameLocaleId}</span>");
+      
+      LogOutput.Add(logEntry);
    }
    
    public void OnEffectAdded(ActiveEffect activeEffect)
    {
-      LogOutput.Add($"Effect Added {activeEffect.Effect.NameLocaleId}");
+      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(), 
+         $"Added <span class=\"has-text-info\">{activeEffect.Effect.NameLocaleId}</span>");
+      
+      LogOutput.Add(logEntry);
    }
    
    public void AddNewEffect()
@@ -218,9 +234,14 @@
       var effectToApply = Randomizer.TakeRandomFrom(AvailableEffects);
       var alreadyContainsEffect = ActiveEffects.HasEffect(effectToApply.Id);
       ActiveEffects.AddEffect(effectToApply);
-      
+
       if (alreadyContainsEffect)
-      { LogOutput.Add($"Effect Stacked/Reset For {effectToApply.NameLocaleId}"); }
+      {
+         var logEntry = new LogEntry(effectToApply.IsBeneficialEffect(), effectToApply.IsPassiveEffect(), 
+            $"Stacked/Reset <span class=\"has-text-info\">{effectToApply.NameLocaleId}</span>");
+         
+         LogOutput.Add(logEntry);
+      }
    }
    
    private void PopulateAvailableEffects()

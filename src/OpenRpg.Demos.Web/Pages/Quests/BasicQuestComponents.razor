@@ -1,10 +1,13 @@
 ﻿@page "/quests/basic-components"
 
+@using OpenRpg.Core.Templates
 @using OpenRpg.Demos.Infrastructure.Extensions
 @using OpenRpg.Demos.Infrastructure.Lookups
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Genres.Types
 @using OpenRpg.Quests
+
+@inject ITemplateAccessor TemplateAccessor
 
 <Markdown>
     ## Basic Quests Components
@@ -45,7 +48,7 @@
         </Markdown>
     </div>
     <div class="column is-one-third">
-        <QuestDetails Quest="_basicQuest"></QuestDetails>
+        <QuestDetails Quest="_basicQuest" TemplateAccessor="TemplateAccessor"></QuestDetails>
     </div>
 </div>
 <br />

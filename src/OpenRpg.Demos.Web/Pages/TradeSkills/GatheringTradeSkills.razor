@@ -125,7 +125,7 @@
                 </div>
                 <div class="column">
                     <a disabled="@(CanMineIron == false)" @onclick="() => StartGatheringExample2(IronOreGatheringTemplate)">
-                        <TradeSkillItemIcon Item="IronOreTradeSkillItemEntry" ItemTemplate="TemplateAccessor.GetItemTemplate(IronOreTradeSkillItemEntry.TemplateId)"/>
+                        <TradeSkillItemIcon Item="IronOreTradeSkillItemEntry" ItemTemplate="TemplateAccessor.GetItemTemplate(IronOreTradeSkillItemEntry.TemplateId)" CanUse="CanMineIron"/>
                     </a>
                 </div>
             </div>
@@ -181,7 +181,15 @@
     public ItemGatheringTemplate CurrentTemplate { get; set; }
     
     public float CurrentGatherTime => (CurrentTemplate?.TimeToComplete ?? 0.0f);
-    public string CurrentGatherName => TemplateAccessor.GetItemTemplate(CurrentTemplate?.OutputItems.First()?.TemplateId ?? -1)?.NameLocaleId ?? string.Empty;
+    public string CurrentGatherName
+    {
+        get
+        {
+            if (CurrentTemplate == null) { return string.Empty; }
+            return TemplateAccessor.GetItemTemplate(CurrentTemplate.OutputItems.First().TemplateId).NameLocaleId ?? string.Empty;
+        }
+    }
+
     public bool CanMineIron => RequirementsChecker.AreRequirementsMet(DummyCharacter, IronOreGatheringTemplate);
 
     public TradeSkillItemEntry CopperOreTradeSkillItemEntry => CopperOreGatheringTemplate.OutputItems.First();

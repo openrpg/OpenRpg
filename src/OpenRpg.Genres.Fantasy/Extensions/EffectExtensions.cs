@@ -66,14 +66,17 @@ namespace OpenRpg.Genres.Fantasy.Extensions
         {  return EffectTypeGroups.DefenseEffectTypes.Contains(effect.EffectType); }
 
         public static bool IsBeneficialEffect(this ActiveEffect effect)
+        { return IsBeneficialEffect(effect.Effect); }
+        
+        public static bool IsBeneficialEffect(this Effect effect)
         {
-            if(effect.Effect.EffectType != FantasyEffectTypes.LightBonusAmount)
+            if(effect.EffectType != FantasyEffectTypes.LightBonusAmount)
             {
-                if (effect.Effect.IsDamagingEffect())
+                if (effect.IsDamagingEffect())
                 { return false; }
             }
 
-            return effect.Effect.Potency >= 0;
+            return effect.Potency >= 0;
         }
     }
 }

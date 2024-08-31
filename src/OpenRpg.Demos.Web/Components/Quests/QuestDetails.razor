@@ -30,7 +30,7 @@
             {
                 if (gift.RewardType == FantasyRewardTypes.ItemReward)
                 {
-                    <ItemIcon Item="GetItemFor(gift.AssociatedId, gift.AssociatedValue)" Character="Character"></ItemIcon>
+                    <ItemIcon ItemView="GetItemFor(gift.AssociatedId, gift.AssociatedValue)" Character="Character"></ItemIcon>
                 }
             }
         </div>
@@ -45,7 +45,7 @@
                 {
                     if (objective.ObjectiveType == ObjectiveTypes.ItemObjective)
                     {
-                        <ItemIcon Item="GetItemFor(objective.AssociatedId, objective.AssociatedValue)" Character="Character"></ItemIcon>
+                        <ItemIcon ItemView="GetItemFor(objective.AssociatedId, objective.AssociatedValue)" Character="Character"></ItemIcon>
                     }
                     else if (objective.ObjectiveType == ObjectiveTypes.TriggerObjective)
                     {
@@ -64,7 +64,7 @@
             {
                 if (reward.RewardType == FantasyRewardTypes.ItemReward)
                 {
-                    <ItemIcon Item="@GetItemFor(reward.AssociatedId, reward.AssociatedValue)" Character="Character"></ItemIcon>
+                    <ItemIcon ItemView="@GetItemFor(reward.AssociatedId, reward.AssociatedValue)" Character="Character"></ItemIcon>
                 }
                 else if (reward.RewardType == FantasyRewardTypes.CurrencyReward)
                 {
@@ -84,11 +84,11 @@
     [Parameter] public Character Character { get; set; }
     [Parameter] public ITemplateAccessor TemplateAccessor { get; set; }
 
-    public ItemView GetItemFor(int itemId, int itemAmount)
+    public ItemView GetItemFor(int itemTemplateId, int itemAmount)
     {
         var item = new Item
         {
-            TemplateId = itemId,
+            TemplateId = itemTemplateId,
             Variables = new ItemVariables()
         };
         item.Variables.Amount(itemAmount);
