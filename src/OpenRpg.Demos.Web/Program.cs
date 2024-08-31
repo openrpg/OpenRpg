@@ -9,4 +9,3 @@ builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.H
 builder.Services.AddModule<OpenRpgModule>();
 builder.Services.AddModule<OpenRpgDataModule>();
 await builder.Build().RunAsync();
-

@@ -8,9 +8,11 @@ namespace OpenRpg.CurveFunctions.Extensions
         {
             if(float.IsInfinity(value)) { return 0.0f; }
             if(float.IsNaN(value)) { return 0.0f; }
-            if(value < 0 ) { return 0.0f; }
-            if(value > 1.0f ) { return 1.0f; }
-            return value;
+            
+            var sanitizedNumber = MathF.Round(value, 6);
+            if(sanitizedNumber < 0 ) { return 0.0f; }
+            if(sanitizedNumber > 1.0f ) { return 1.0f; }
+            return sanitizedNumber;
         }
 
         public static float NormalizeBetween(this float value, float min, float max)
