@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Core", "OpenRpg.Core\OpenRpg.Core.csproj", "{86FD715B-0B33-40EB-B8AC-25EE62398A66}"
 EndProject
@@ -41,6 +41,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Localization", "Localization", "{167FBCA2-476D-4BA4-818A-FA4ED80E6197}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Tags", "OpenRpg.Tags\OpenRpg.Tags.csproj", "{1F967BA2-0B0B-4305-B564-05EC9C49D308}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Data.LiteDB", "OpenRpg.Data.LiteDB\OpenRpg.Data.LiteDB.csproj", "{64141697-502A-4CEB-8127-2232F962B3F9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Items.TradeSkills", "OpenRpg.Items.TradeSkills\OpenRpg.Items.TradeSkills.csproj", "{70FCB73C-8493-4B0F-AA13-F3BA65AE86AB}"
 EndProject

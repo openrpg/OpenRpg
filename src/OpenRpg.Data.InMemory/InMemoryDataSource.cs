@@ -33,5 +33,8 @@ namespace OpenRpg.Data.InMemory
             if(id == null) { throw new ArgumentNullException(nameof(id), "In Memory DB Requires explicit keys on creation"); }
             Database[typeof(T)].Add(id, data);
         }
+
+        public void Dispose()
+        {}
     }
 }
