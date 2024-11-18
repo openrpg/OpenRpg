@@ -1,5 +1,6 @@
-﻿namespace OpenRpg.Data.LiteDB;
-
-public interface ILiteDBDataSource : IDataSource
+﻿namespace OpenRpg.Data.LiteDB
 {
+    public interface ILiteDBDataSource : IDataSource
+    {
+    }
 }
