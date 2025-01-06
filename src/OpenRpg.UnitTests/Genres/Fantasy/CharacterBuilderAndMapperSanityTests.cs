@@ -30,7 +30,7 @@ namespace OpenRpg.UnitTests.Genres.Fantasy
                 .WithGender(1)
                 .WithRaceId(1)
                 .WithClassId(1, 1)
-                .WithInventoryItem(new Item(){ TemplateId = 1 })
+                .WithInventoryItem(new ItemData(){ TemplateId = 1 })
                 .Build();
             
             Assert.NotNull(character);

@@ -3,7 +3,7 @@ using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Items
 {
-    public class ItemView : TemplateInstanceView<ItemTemplate, Item>
+    public class Item : TemplateInstance<ItemTemplate, ItemData>
     {
         
     }

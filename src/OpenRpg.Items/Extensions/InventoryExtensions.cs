@@ -59,18 +59,18 @@ namespace OpenRpg.Items.Extensions
         /// <summary>
         /// Checks to see if the given item exists in the inventory
         /// </summary>
-        /// <param name="item">The item to check for</param>
+        /// <param name="itemData">The item to check for</param>
         /// <returns>True if it has the item false if not</returns>
         /// <remarks>Implementations may also factor in variables like amounts/weights etc</remarks>
-        public static bool HasItem(this Inventory inventory, Item item)
+        public static bool HasItem(this Inventory inventory, ItemData itemData)
         {
-            if (item.Variables.HasAmount())
-            { return inventory.HasItem(item.TemplateId, item.Variables.Amount()); }
+            if (itemData.Variables.HasAmount())
+            { return inventory.HasItem(itemData.TemplateId, itemData.Variables.Amount()); }
 
-            if (item.Variables.HasWeight())
-            { return inventory.HasItem(item.TemplateId, item.Variables.Weight()); }
+            if (itemData.Variables.HasWeight())
+            { return inventory.HasItem(itemData.TemplateId, itemData.Variables.Weight()); }
 
-            return inventory.HasItem(item.TemplateId);
+            return inventory.HasItem(itemData.TemplateId);
         }
         
         /// <summary>
@@ -79,7 +79,7 @@ namespace OpenRpg.Items.Extensions
         /// <param name="inventory">The inventory to check</param>
         /// <param name="itemId">The item id to check for</param>
         /// <returns>All items of the given type</returns>
-        public static IEnumerable<Item> GetItemsOfType(this Inventory inventory, int itemTemplateId)
+        public static IEnumerable<ItemData> GetItemsOfType(this Inventory inventory, int itemTemplateId)
         { return inventory.Items.Where(x => x.TemplateId == itemTemplateId); }
         
         public static bool HasSlotCapacity(this Inventory inventory, int slotsRequired = 1)
@@ -111,8 +111,7 @@ namespace OpenRpg.Items.Extensions
         /// This will attempt to add the item to the inventory in the best way possible, i.e adding to existing stacks/weights
         /// </summary>
         /// <param name="inventory">The inventory you want to alter</param>
-        /// <param name="item">The item you want to add</param>
-        /// <param name="itemTemplate">The items template</param>
+        /// <param name="item">The item you want to add, containing both data and template</param>
         /// <returns>true if the item could be added/stacked false if not</returns>
         /// <remarks>
         /// The item passed in should be seen as immutable for the case of this method, in most cases the item
@@ -123,30 +122,29 @@ namespace OpenRpg.Items.Extensions
         /// Depending on the implementation different metadata would be factored in by the default version supports
         /// amount, max stacking, max slots, weight, max weight scenarios.
         /// </remarks>
-        public static bool AttemptAddItem(this Inventory inventory, Item item, ItemTemplate itemTemplate)
+        public static bool AttemptAddItem(this Inventory inventory, Item item)
         {
-            var clonedItem = item.Clone();
             
-            if (clonedItem.Variables.HasAmount())
-            { return AttemptAddAmountItem(inventory, clonedItem, itemTemplate); }
+            if (item.Data.Variables.HasAmount())
+            { return AttemptAddAmountItem(inventory, item); }
 
-            if (clonedItem.Variables.HasWeight())
-            { return HasWeightCapacity(inventory, itemTemplate.Variables.Weight()) && AttemptAddWeightedItem(inventory, clonedItem); }
+            if (item.Data.Variables.HasWeight())
+            { return HasWeightCapacity(inventory, item.Template.Variables.Weight()) && AttemptAddWeightedItem(inventory, item); }
 
             if (!HasSlotCapacity(inventory))
             { return false; }
 
-            inventory.Items.Add(clonedItem);
+            inventory.Items.Add(item.Data.Clone());
             return true;
         }
 
-        public static bool AttemptAddAmountItem(Inventory inventory, Item item, ItemTemplate itemTemplate)
+        public static bool AttemptAddAmountItem(Inventory inventory, Item item)
         {
-            var requiredAmount = item.Variables.Amount();
-            var stackSize = itemTemplate.Variables.MaxStacks();
+            var requiredAmount = item.Data.Variables.Amount();
+            var stackSize = item.Template.Variables.MaxStacks();
             
             var existingItemsWithSpace = inventory.Items
-                .Where(x => x.TemplateId == item.TemplateId && (stackSize == 0 || x.Variables.Amount() <= stackSize))
+                .Where(x => x.TemplateId == item.Data.TemplateId && (stackSize == 0 || x.Variables.Amount() <= stackSize))
                 .OrderByDescending(x => x.Variables.Amount())
                 .ToArray();
 
@@ -174,17 +172,17 @@ namespace OpenRpg.Items.Extensions
             var index = 0;
             while (amountLeft > 0)
             {
-                Item itemHasWithSpace;
+                ItemData itemDataHasWithSpace;
                 if (index < existingItemsWithSpace.Length)
-                { itemHasWithSpace = existingItemsWithSpace[index]; }
+                { itemDataHasWithSpace = existingItemsWithSpace[index]; }
                 else
                 {
-                    itemHasWithSpace = new Item() { TemplateId = item.TemplateId };
-                    inventory.Items.Add(itemHasWithSpace);
+                    itemDataHasWithSpace = new ItemData() { TemplateId = item.Data.TemplateId };
+                    inventory.Items.Add(itemDataHasWithSpace);
                 }
 
-                var existingAmount = itemHasWithSpace.Variables.HasAmount()
-                    ? itemHasWithSpace.Variables.Amount()
+                var existingAmount = itemDataHasWithSpace.Variables.HasAmount()
+                    ? itemDataHasWithSpace.Variables.Amount()
                     : 0;
                 
                 if (stackSize > 0)
@@ -192,18 +190,18 @@ namespace OpenRpg.Items.Extensions
                     var spaceLeft = stackSize - existingAmount;
                     if (amountLeft < spaceLeft)
                     {
-                        itemHasWithSpace.Variables.Amount(existingAmount + amountLeft);
+                        itemDataHasWithSpace.Variables.Amount(existingAmount + amountLeft);
                         amountLeft = 0;
                     }
                     else
                     {
-                        itemHasWithSpace.Variables.Amount(existingAmount + spaceLeft);
+                        itemDataHasWithSpace.Variables.Amount(existingAmount + spaceLeft);
                         amountLeft -= spaceLeft;
                     }
                 }
                 else
                 {
-                    itemHasWithSpace.Variables.Amount(existingAmount + amountLeft);
+                    itemDataHasWithSpace.Variables.Amount(existingAmount + amountLeft);
                     amountLeft = 0;
                 }
                 
@@ -218,35 +216,35 @@ namespace OpenRpg.Items.Extensions
         /// Attempts to remove the item from the inventory in the best way possible, i.e removing from existing stacks/weights
         /// </summary>
         /// <param name="inventory">The inventory you want to alter</param>
-        /// <param name="item">The item you want to remove</param>
+        /// <param name="itemData">The item you want to remove</param>
         /// <returns>true if the item could be removed false if not (i.e it isnt in the inventory)</returns>
-        public static bool AttemptRemoveItem(this Inventory inventory, Item item)
+        public static bool AttemptRemoveItem(this Inventory inventory, ItemData itemData)
         {
-            if (item.Variables.HasAmount())
-            { return AttemptRemoveAmountItem(inventory, item); }
+            if (itemData.Variables.HasAmount())
+            { return AttemptRemoveAmountItem(inventory, itemData); }
 
-            if (item.Variables.HasWeight())
-            { return AttemptRemoveWeightedItem(inventory, item); }
+            if (itemData.Variables.HasWeight())
+            { return AttemptRemoveWeightedItem(inventory, itemData); }
 
-            if (!inventory.Items.Contains(item))
+            if (!inventory.Items.Contains(itemData))
             { return false; }
 
-            inventory.Items.Remove(item);
+            inventory.Items.Remove(itemData);
             return true;
         }
 
-        private static bool AttemptRemoveAmountItem(Inventory inventory, Item item)
+        private static bool AttemptRemoveAmountItem(Inventory inventory, ItemData itemData)
         {
-            if (!item.Variables.HasAmount())
+            if (!itemData.Variables.HasAmount())
             {
-                if (!inventory.Items.Contains(item)) { return false; }
-                inventory.Items.Remove(item);
+                if (!inventory.Items.Contains(itemData)) { return false; }
+                inventory.Items.Remove(itemData);
                 return true;
             }
 
-            var amountToTake = item.Variables.Amount();
+            var amountToTake = itemData.Variables.Amount();
             var applicableItems = inventory.Items
-                .Where(x => x.TemplateId == item.TemplateId)
+                .Where(x => x.TemplateId == itemData.TemplateId)
                 .OrderByDescending(x => x.Variables.Amount())
                 .ToArray();
 
@@ -275,7 +273,7 @@ namespace OpenRpg.Items.Extensions
             return true;
         }
 
-        private static bool AttemptRemoveWeightedItem(Inventory inventory, Item item)
+        private static bool AttemptRemoveWeightedItem(Inventory inventory, ItemData itemData)
         {
             // TODO
             return false;

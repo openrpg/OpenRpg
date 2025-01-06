@@ -16,20 +16,19 @@ namespace OpenRpg.Core.Extensions
         public static RaceTemplate GetRaceTemplate(this ITemplateAccessor templateAccessor, int raceTemplateId)
         { return templateAccessor.Get<RaceTemplate>(raceTemplateId); }
         
-        public static ClassView ToView(this ITemplateAccessor templateAccessor, Class classData)
+        public static Class ToInstance(this ITemplateAccessor templateAccessor, ClassData classDataData)
         {
-            var template = templateAccessor.Get<ClassTemplate>(classData.TemplateId);
-            return new ClassView() { Instance = classData, Template = template };
+            var template = templateAccessor.Get<ClassTemplate>(classDataData.TemplateId);
+            return new Class() { Data = classDataData, Template = template };
         }
         
-        public static IReadOnlyCollection<ClassView> ToView(this ITemplateAccessor templateAccessor, IReadOnlyCollection<Class> classData)
-        { return classData.Select(x => ToView(templateAccessor, x)).ToArray(); }
-
+        public static IReadOnlyCollection<Class> ToInstance(this ITemplateAccessor templateAccessor, IReadOnlyCollection<ClassData> classData)
+        { return classData.Select(x => ToInstance(templateAccessor, x)).ToArray(); }
         
-        public static RaceView ToView(this ITemplateAccessor templateAccessor, Race raceData)
+        public static Race ToInstance(this ITemplateAccessor templateAccessor, RaceData raceDataData)
         {
-            var template = templateAccessor.Get<RaceTemplate>(raceData.TemplateId);
-            return new RaceView() { Instance = raceData, Template = template };
+            var template = templateAccessor.Get<RaceTemplate>(raceDataData.TemplateId);
+            return new Race() { Data = raceDataData, Template = template };
         }
     }
 }

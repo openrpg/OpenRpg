@@ -14,9 +14,9 @@ namespace OpenRpg.Items.Equippables.Slots
     /// to indicate if it can be equipped, so you may have a single slot for LeftHand but you may have multiple
     /// item types that are weapons i.e Sword, Shield etc or you may just have a singular Weapon type.
     /// </remarks>
-    public class EquipmentSlots: Variables<Item>
+    public class EquipmentSlots: Variables<ItemData>
     {
-        public EquipmentSlots(IDictionary<int, Item> internalVariables = null) : base(ItemCoreVariableTypes.EquipmentSlotVariables, internalVariables)
+        public EquipmentSlots(IDictionary<int, ItemData> internalVariables = null) : base(ItemCoreVariableTypes.EquipmentSlotVariables, internalVariables)
         {}
     }
 }

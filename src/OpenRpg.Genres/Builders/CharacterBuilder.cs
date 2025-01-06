@@ -24,8 +24,8 @@ namespace OpenRpg.Genres.Builders
         protected string _name, _description;
         protected Dictionary<int, float> _state;
 
-        protected Dictionary<int, Item> _equipment;
-        protected List<Item> _inventory;
+        protected Dictionary<int, ItemData> _equipment;
+        protected List<ItemData> _inventory;
         
         protected EntityVariables _variables;
 
@@ -39,8 +39,8 @@ namespace OpenRpg.Genres.Builders
             _raceId = _classId = _classLevels = _genderId = 0;
             _name = _description = string.Empty;
             _state = new Dictionary<int, float>();
-            _equipment = new Dictionary<int, Item>();
-            _inventory = new List<Item>();
+            _equipment = new Dictionary<int, ItemData>();
+            _inventory = new List<ItemData>();
             _variables = new EntityVariables();
             return this;
         }
@@ -94,15 +94,15 @@ namespace OpenRpg.Genres.Builders
             return this;
         }
 
-        public CharacterBuilder WithEquipment(int slotType, Item itemHas)
+        public CharacterBuilder WithEquipment(int slotType, ItemData itemDataHas)
         {
-            _equipment[slotType] = itemHas;
+            _equipment[slotType] = itemDataHas;
             return this;
         }
         
-        public CharacterBuilder WithInventoryItem(Item itemHas)
+        public CharacterBuilder WithInventoryItem(ItemData itemDataHas)
         {
-            _inventory.Add(itemHas);
+            _inventory.Add(itemDataHas);
             return this;
         }
         
@@ -127,9 +127,9 @@ namespace OpenRpg.Genres.Builders
             return new Inventory() { Items = _inventory };
         }
         
-        protected virtual Class ProcessClass()
+        protected virtual ClassData ProcessClass()
         {
-            var classData = new Class();
+            var classData = new ClassData();
             if (_classId == 0) { return classData; }
 
             classData.TemplateId = _classId;
@@ -137,9 +137,9 @@ namespace OpenRpg.Genres.Builders
             return classData;
         }
         
-        protected virtual Race ProcessRace()
+        protected virtual RaceData ProcessRace()
         {
-            var raceData = new Race();
+            var raceData = new RaceData();
             if (_raceId == 0) { return raceData; }
 
             raceData.TemplateId = _raceId;

@@ -54,9 +54,9 @@
     </div>
     <div class="column is-half">
         <CardSection>
-            <CharacterDetails Name="@ManualStatsExample.NameLocaleId" 
-                              RaceView="@ManualStatTemplateAccessor.ToView(ManualStatsExample.Variables.Race())" 
-                              ClassView="@ManualStatTemplateAccessor.ToView(ManualStatsExample.Variables.Class())" />
+            <CharacterDetails Name="@ManualStatsExample.NameLocaleId"
+                              Race="@ManualStatTemplateAccessor.ToInstance(ManualStatsExample.Variables.Race())" 
+                              Class="@ManualStatTemplateAccessor.ToInstance(ManualStatsExample.Variables.Class())" />
             <br />
             <CharacterVitals Stats="@ManualStatsExample.Stats" />
             <br />
@@ -151,9 +151,9 @@
     </div>
     <div class="column is-half">
         <CardSection>
-            <CharacterDetails Name="@AutoStatsExample.NameLocaleId" 
-                              RaceView="@AutoStatTemplateAccessor.ToView(AutoStatsExample.Variables.Race())" 
-                              ClassView="@AutoStatTemplateAccessor.ToView(AutoStatsExample.Variables.Class())" />
+            <CharacterDetails Name="@AutoStatsExample.NameLocaleId"
+                              Race="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample.Variables.Race())" 
+                              Class="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample.Variables.Class())" />
             <br />
             <CharacterVitals Stats="@AutoStatsExample.Stats" />
             <br />
@@ -172,9 +172,9 @@
         </CardSection>
         <br />
         <CardSection>
-            <CharacterDetails Name="@AutoStatsExample2.NameLocaleId" 
-                              RaceView="@AutoStatTemplateAccessor.ToView(AutoStatsExample2.Variables.Race())" 
-                              ClassView="@AutoStatTemplateAccessor.ToView(AutoStatsExample2.Variables.Class())" />
+            <CharacterDetails Name="@AutoStatsExample2.NameLocaleId"
+                              Race="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample2.Variables.Race())" 
+                              Class="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample2.Variables.Class())" />
             <br />
             <CharacterVitals Stats="@AutoStatsExample2.Stats" />
             <br />
@@ -214,8 +214,8 @@
         
         ManualStatsExample.NameLocaleId = "Frodo Baggins";
         
-        ManualStatsExample.Variables.Race(new Race { TemplateId = hobbitRace.Id });
-        ManualStatsExample.Variables.Class(new Class { TemplateId = fighterClass.Id });
+        ManualStatsExample.Variables.Race(new RaceData { TemplateId = hobbitRace.Id });
+        ManualStatsExample.Variables.Class(new ClassData { TemplateId = fighterClass.Id });
         
         ManualStatsExample.Stats = new EntityStatsVariables();
         ManualStatsExample.Stats.MaxHealth(100);
@@ -268,12 +268,12 @@
         AutoStatTemplateAccessor.AddTemplate(fighterClass);
         
         AutoStatsExample.NameLocaleId = "Frodo Baggins";
-        AutoStatsExample.Variables.Race(new Race { TemplateId = hobbitRace.Id });
-        AutoStatsExample.Variables.Class(new Class{ TemplateId = fighterClass.Id });
+        AutoStatsExample.Variables.Race(new RaceData { TemplateId = hobbitRace.Id });
+        AutoStatsExample.Variables.Class(new ClassData{ TemplateId = fighterClass.Id });
 
         AutoStatsExample2.NameLocaleId = "Peregrin Took";
-        AutoStatsExample2.Variables.Race(new Race { TemplateId = hobbitRace.Id });
-        AutoStatsExample2.Variables.Class(new Class { TemplateId = fighterClass.Id });
+        AutoStatsExample2.Variables.Race(new RaceData { TemplateId = hobbitRace.Id });
+        AutoStatsExample2.Variables.Class(new ClassData { TemplateId = fighterClass.Id });
         
         var statsCalculator = new FantasyStatsPopulator();
         statsCalculator.Populate(AutoStatsExample.Stats, AutoStatsExample.GetEffects(AutoStatTemplateAccessor), null);

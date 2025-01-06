@@ -12,9 +12,9 @@ namespace OpenRpg.Cards.Genres
     {
         public virtual int CardType => CardTypes.ItemCard;
         public ICardVariables Variables { get; set; } = new DefaultCardVariables();
-        public ItemView Data { get; }
+        public Item Data { get; }
 
-        public ItemCard(ItemView item)
+        public ItemCard(Item item)
         { Data = item; }
 
         public string NameLocaleId => Data.Template.NameLocaleId;

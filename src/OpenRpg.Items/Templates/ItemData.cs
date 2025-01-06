@@ -6,7 +6,7 @@ using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Templates
 {
-    public class Item : IHasTemplateLink, IHasVariables<ItemVariables>, IHasModifications<ItemModificationTemplate>
+    public class ItemData : ITemplateData<ItemVariables>, IHasModifications<ItemModificationTemplate>
     {
         public int TemplateId { get; set; }
         

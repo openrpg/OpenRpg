@@ -7,19 +7,19 @@ namespace OpenRpg.Core.Extensions
     {
         public static bool HasClass(this MultiClasses multiClasses, int classTemplateId) => multiClasses.Classes.Any(x => x.TemplateId == classTemplateId);
 
-        public static Class AddClass(this MultiClasses multiClasses, int classTemplateId)
+        public static ClassData AddClass(this MultiClasses multiClasses, int classTemplateId)
         {
-            var newClass = new Class { TemplateId = classTemplateId };
+            var newClass = new ClassData { TemplateId = classTemplateId };
             return AddClass(multiClasses, newClass);
         }
         
-        public static Class AddClass(this MultiClasses multiClasses, Class classToAdd)
+        public static ClassData AddClass(this MultiClasses multiClasses, ClassData classDataToAdd)
         {
-            if (multiClasses.HasClass(classToAdd.TemplateId))
-            { return multiClasses.Classes[classToAdd.TemplateId]; }
+            if (multiClasses.HasClass(classDataToAdd.TemplateId))
+            { return multiClasses.Classes[classDataToAdd.TemplateId]; }
             
-            multiClasses.Classes.Add(classToAdd);
-            return classToAdd;
+            multiClasses.Classes.Add(classDataToAdd);
+            return classDataToAdd;
         } 
         
         public static bool RemoveClass(this MultiClasses multiClasses, int classTemplateId)
@@ -31,7 +31,7 @@ namespace OpenRpg.Core.Extensions
             return true;
         }
         
-        public static Class GetClass(this MultiClasses multiClasses, int classTemplateId)
+        public static ClassData GetClass(this MultiClasses multiClasses, int classTemplateId)
         { return multiClasses.HasClass(classTemplateId) ? multiClasses.Classes.Single(x => x.TemplateId == classTemplateId) : null; }
     }
 }

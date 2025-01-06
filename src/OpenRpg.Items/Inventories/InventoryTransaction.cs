@@ -11,11 +11,11 @@ namespace OpenRpg.Items.Inventories
         public Inventory Inventory { get; }
         public ITemplateAccessor TemplateAccessor { get; }
 
-        public List<Item> Additions { get; } = new List<Item>();
-        public List<Item> Removals { get; } = new List<Item>();
+        public List<ItemData> Additions { get; } = new List<ItemData>();
+        public List<ItemData> Removals { get; } = new List<ItemData>();
 
-        public void AddItem(Item item) => Additions.Add(item);
-        public void RemoveItem(Item item) => Removals.Add(item);
+        public void AddItem(ItemData itemData) => Additions.Add(itemData);
+        public void RemoveItem(ItemData itemData) => Removals.Add(itemData);
 
         public InventoryTransaction(Inventory inventory, ITemplateAccessor templateAccessor)
         {
@@ -28,7 +28,8 @@ namespace OpenRpg.Items.Inventories
             for (var i = 0; i <= lastProcessedIndex; i++)
             {
                 var itemToAddBack = Removals[i];
-                Inventory.AttemptAddItem(itemToAddBack, TemplateAccessor.GetItemTemplate(itemToAddBack.TemplateId));
+                var itemInstance = new Item() { Data = itemToAddBack, Template = TemplateAccessor.GetItemTemplate(itemToAddBack.TemplateId) };
+                Inventory.AttemptAddItem(itemInstance);
             }
         }
         
@@ -56,7 +57,8 @@ namespace OpenRpg.Items.Inventories
             for (var i = 0; i < Additions.Count; i++)
             {
                 var itemToAdd = Additions[i];
-                if (!Inventory.AttemptAddItem(itemToAdd, TemplateAccessor.GetItemTemplate(itemToAdd.TemplateId)))
+                var itemInstance = new Item() { Data = itemToAdd, Template = TemplateAccessor.GetItemTemplate(itemToAdd.TemplateId) };
+                if (!Inventory.AttemptAddItem(itemInstance))
                 {
                     RevertAdditionsUpTo(i);
                     RevertRemovalsUpTo(Removals.Count-1);

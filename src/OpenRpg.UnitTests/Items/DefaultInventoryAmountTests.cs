@@ -19,9 +19,11 @@ public class DefaultInventoryAmountTests
         var existingItemTemplate = new ItemTemplate { Id = 1 };
 
         var inventory = new Inventory();
-        var itemToAdd = new Item() { TemplateId = existingItemTemplate.Id };
+        var itemToAdd = new ItemData() { TemplateId = existingItemTemplate.Id };
         itemToAdd.Variables.Amount(25);
-        var isItemAdded = inventory.AttemptAddItem(itemToAdd, existingItemTemplate);
+
+        var item = new Item { Data = itemToAdd, Template = existingItemTemplate };
+        var isItemAdded = inventory.AttemptAddItem(item);
 
         Assert.True(isItemAdded);
         Assert.Contains(inventory.Items, x => x.TemplateId == existingItemTemplate.Id);
@@ -33,15 +35,17 @@ public class DefaultInventoryAmountTests
     {
         var expectedAmount = 35;
         var existingItemTemplate = new ItemTemplate { Id = 1 };
-        var existingItem = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem.Variables.Amount(10);
         
         var inventory = new Inventory();
         inventory.Items.Add(existingItem);
         
-        var itemToAdd = new Item() { TemplateId = existingItemTemplate.Id };
+        var itemToAdd = new ItemData() { TemplateId = existingItemTemplate.Id };
         itemToAdd.Variables.Amount(25);
-        var isItemAdded = inventory.AttemptAddItem(itemToAdd, existingItemTemplate);
+        
+        var item = new Item { Data = itemToAdd, Template = existingItemTemplate };
+        var isItemAdded = inventory.AttemptAddItem(item);
 
         Assert.True(isItemAdded);
         Assert.Contains(inventory.Items, x => x.TemplateId == existingItem.TemplateId);
@@ -54,15 +58,17 @@ public class DefaultInventoryAmountTests
         var existingItemTemplate = new ItemTemplate { Id = 1 };
         existingItemTemplate.Variables.MaxStacks(12);
         
-        var existingItem = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem.Variables.Amount(10);
         
         var inventory = new Inventory();
         inventory.Items.Add(existingItem);
         
-        var itemToAdd = new Item() { TemplateId = existingItemTemplate.Id };
+        var itemToAdd = new ItemData() { TemplateId = existingItemTemplate.Id };
         itemToAdd.Variables.Amount(5);
-        var isItemAdded = inventory.AttemptAddItem(itemToAdd, existingItemTemplate);
+        
+        var item = new Item { Data = itemToAdd, Template = existingItemTemplate };
+        var isItemAdded = inventory.AttemptAddItem(item);
 
         Assert.True(isItemAdded);
         Assert.Equal(2, inventory.Items.Count);
@@ -76,19 +82,21 @@ public class DefaultInventoryAmountTests
         var existingItemTemplate = new ItemTemplate { Id = 1 };
         existingItemTemplate.Variables.MaxStacks(10);
         
-        var existingItem1 = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem1 = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem1.Variables.Amount(8);
         
-        var existingItem2 = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem2 = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem2.Variables.Amount(8);
         
         var inventory = new Inventory();
         inventory.Items.Add(existingItem1);
         inventory.Items.Add(existingItem2);
         
-        var itemToAdd = new Item() { TemplateId = existingItemTemplate.Id };
+        var itemToAdd = new ItemData() { TemplateId = existingItemTemplate.Id };
         itemToAdd.Variables.Amount(5);
-        var isItemAdded = inventory.AttemptAddItem(itemToAdd, existingItemTemplate);
+        
+        var item = new Item { Data = itemToAdd, Template = existingItemTemplate };
+        var isItemAdded = inventory.AttemptAddItem(item);
 
         Assert.True(isItemAdded);
         Assert.Equal(3, inventory.Items.Count);
@@ -103,10 +111,10 @@ public class DefaultInventoryAmountTests
         var existingItemTemplate = new ItemTemplate { Id = 1 };
         existingItemTemplate.Variables.MaxStacks(10);
         
-        var existingItem1 = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem1 = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem1.Variables.Amount(8);
         
-        var existingItem2 = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem2 = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem2.Variables.Amount(8);
         
         var inventory = new Inventory();
@@ -114,9 +122,11 @@ public class DefaultInventoryAmountTests
         inventory.Items.Add(existingItem1);
         inventory.Items.Add(existingItem2);
         
-        var itemToAdd = new Item() { TemplateId = existingItemTemplate.Id };
+        var itemToAdd = new ItemData() { TemplateId = existingItemTemplate.Id };
         itemToAdd.Variables.Amount(5);
-        var isItemAdded = inventory.AttemptAddItem(itemToAdd, existingItemTemplate);
+        
+        var item = new Item { Data = itemToAdd, Template = existingItemTemplate };
+        var isItemAdded = inventory.AttemptAddItem(item);
 
         Assert.False(isItemAdded);
         Assert.Equal(2, inventory.Items.Count);
@@ -129,13 +139,13 @@ public class DefaultInventoryAmountTests
     {
         var expectedAmount = 75;
         var existingItemTemplate = new ItemTemplate { Id = 1 };
-        var existingItem = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem.Variables.Amount(100);
         
         var inventory = new Inventory();
         inventory.Items.Add(existingItem);
 
-        var itemToRemove = new Item() { TemplateId = existingItemTemplate.Id };
+        var itemToRemove = new ItemData() { TemplateId = existingItemTemplate.Id };
         itemToRemove.Variables.Amount(25);
         var isItemRemoved = inventory.AttemptRemoveItem(itemToRemove);
 
@@ -148,7 +158,7 @@ public class DefaultInventoryAmountTests
     public void should_remove_item_when_existing_amount_matched()
     {
         var existingItemTemplate = new ItemTemplate { Id = 1 };
-        var existingItem = new Item() {TemplateId = existingItemTemplate.Id };
+        var existingItem = new ItemData() {TemplateId = existingItemTemplate.Id };
         existingItem.Variables.Amount(100);
         
         var inventory = new Inventory();
@@ -164,17 +174,17 @@ public class DefaultInventoryAmountTests
     public void should_remove_multiple_when_existing_amount_exceeds_single_stack()
     {
         var existingItemTemplate = new ItemTemplate { Id = 1 };
-        var existingItem1 = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem1 = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem1.Variables.Amount(5);
         
-        var existingItem2 = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem2 = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem2.Variables.Amount(5);
         
         var inventory = new Inventory();
         inventory.Items.Add(existingItem1);
         inventory.Items.Add(existingItem2);
 
-        var itemToRemove = new Item() { TemplateId = existingItemTemplate.Id };
+        var itemToRemove = new ItemData() { TemplateId = existingItemTemplate.Id };
         itemToRemove.Variables.Amount(10);
         var isItemRemoved = inventory.AttemptRemoveItem(itemToRemove);
 
@@ -186,17 +196,17 @@ public class DefaultInventoryAmountTests
     public void should_remove_and_alter_multiple_when_existing_amount_exceeds_single_stack()
     {
         var existingItemTemplate = new ItemTemplate { Id = 1 };
-        var existingItem1 = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem1 = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem1.Variables.Amount(5);
         
-        var existingItem2 = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem2 = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem2.Variables.Amount(7);
         
         var inventory = new Inventory();
         inventory.Items.Add(existingItem1);
         inventory.Items.Add(existingItem2);
 
-        var itemToRemove = new Item() { TemplateId = existingItemTemplate.Id };
+        var itemToRemove = new ItemData() { TemplateId = existingItemTemplate.Id };
         itemToRemove.Variables.Amount(10);
         var isItemRemoved = inventory.AttemptRemoveItem(itemToRemove);
 

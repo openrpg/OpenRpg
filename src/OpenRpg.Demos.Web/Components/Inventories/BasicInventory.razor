@@ -34,17 +34,17 @@
     public Character Character { get; set; }
 
     [Parameter]
-    public EventCallback<ItemView> OnItemInteraction { get; set; }
+    public EventCallback<Item> OnItemInteraction { get; set; }
     
     [Parameter]
     public ITemplateAccessor TemplateAccessor { get; set; }
 
-    public ItemView GetItemFromIndex(int itemIndex)
+    public Item GetItemFromIndex(int itemIndex)
     {
         if (itemIndex >= Inventory.Items.Count)
         { return null; }
 
-        return TemplateAccessor.ToView(Inventory.Items[itemIndex]);
+        return TemplateAccessor.ToInstance(Inventory.Items[itemIndex]);
     }
 
     public void Refresh()

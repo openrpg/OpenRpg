@@ -32,15 +32,15 @@ public class TradeSkillInventoryExtensionsTests
         
         var craftingTemplate = new ItemCraftingTemplate() { Id = 1, InputItems = inputItems, OutputItems = new List<TradeSkillItemEntry>() };
 
-        var itemInInventory1 = new Item() { TemplateId = dummyItemTemplate1.Id };
+        var itemInInventory1 = new ItemData() { TemplateId = dummyItemTemplate1.Id };
         itemInInventory1.Variables.Amount(5);
         
-        var itemInInventory2 = new Item() { TemplateId = dummyItemTemplate2.Id };
+        var itemInInventory2 = new ItemData() { TemplateId = dummyItemTemplate2.Id };
         itemInInventory2.Variables.Amount(2);
 
         var inventory = new Inventory()
         {
-            Items = new List<Item> { itemInInventory1, itemInInventory2 }
+            Items = new List<ItemData> { itemInInventory1, itemInInventory2 }
         };
 
         var hasItems = inventory.HasItemsRequiredFor(craftingTemplate);
@@ -63,12 +63,12 @@ public class TradeSkillInventoryExtensionsTests
         
         var craftingTemplate = new ItemCraftingTemplate() { Id = 1, InputItems = inputItems, OutputItems = new List<TradeSkillItemEntry>() };
 
-        var itemInInventory1 = new Item() { TemplateId = dummyItemTemplate1.Id };
+        var itemInInventory1 = new ItemData() { TemplateId = dummyItemTemplate1.Id };
         itemInInventory1.Variables.Amount(5);
 
         var inventory = new Inventory()
         {
-            Items = new List<Item>() { itemInInventory1 }
+            Items = new List<ItemData>() { itemInInventory1 }
         };
 
         var hasItems = inventory.HasItemsRequiredFor(craftingTemplate);
@@ -101,15 +101,15 @@ public class TradeSkillInventoryExtensionsTests
 
         var craftingTemplate = new ItemCraftingTemplate() { Id = 1, InputItems = inputItems, OutputItems = outputItems };
 
-        var itemInInventory1 = new Item() { TemplateId = dummyItemTemplate1.Id };
+        var itemInInventory1 = new ItemData() { TemplateId = dummyItemTemplate1.Id };
         itemInInventory1.Variables.Amount(5);
         
-        var itemInInventory2 = new Item() { TemplateId = dummyItemTemplate2.Id };
+        var itemInInventory2 = new ItemData() { TemplateId = dummyItemTemplate2.Id };
         itemInInventory2.Variables.Amount(2);
 
         var inventory = new Inventory()
         {
-            Items = new List<Item>() { itemInInventory1, itemInInventory2 }
+            Items = new List<ItemData>() { itemInInventory1, itemInInventory2 }
         };
 
         var hasItems = inventory.HasItemsRequiredFor(craftingTemplate);
