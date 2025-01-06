@@ -1,0 +1,43 @@
+@using OpenRpg.Core.Variables
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Variables
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label has-text-light">Asset Code</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="text" placeholder="i.e my-asset-code" 
+                       value="@Variables.AssetCode()" @onchange="AssetCodeChanged" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] 
+    public IVariables<object> Variables { get; set; }
+
+    [Parameter]
+    public string DefaultAssetCode { get; set; } = string.Empty;
+    
+    [Parameter]
+    public EventCallback<string> OnAssetCodeChanged { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (!Variables.ContainsKey(CustomVariableTypes.AssetCode))
+        { Variables.AssetCode(DefaultAssetCode); }
+    }
+
+    private void AssetCodeChanged(ChangeEventArgs e)
+    {
+        var newAssetCode = e.Value.ToString();
+        Variables.AssetCode(newAssetCode);
+        OnAssetCodeChanged.InvokeAsync(newAssetCode);
+    }
+
+}

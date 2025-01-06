@@ -1,0 +1,249 @@
+﻿@page "/items"
+
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Modifications
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Editor.Infrastructure.Pipelines.Typed
+@using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+@using OpenRpg.Localization.Data.Repositories
+
+@inject IJSRuntime JS
+@inject IRepository Repository
+@inject ISaveDataPipeline<List<ItemTemplate>> SavePipeline;
+@inject ILocaleRepository LocaleRepository;
+@inject ICloner Cloner;
+
+<div class="columns">
+    <div class="column is-one-fifth">
+        <ContentSidebar Title="Item Templates" Data="Repository.GetAll<ItemTemplate>()" SelectedItem="CurrentItemTemplate"
+                    OnAdd="@AddItem" OnSelected="@((selected) => SelectItem(selected as ItemTemplate))">
+        </ContentSidebar>
+    </div>
+    <div class="column">
+        
+        <div class="is-rounded has-background-dark p-lg m-md">
+            <BasicDetailsEditor Data="CurrentItemTemplate">
+                <AvatarContent>
+                    <figure id="item-image" quality-type="@CurrentItemTemplate.Variables.QualityType()" 
+                            class="image is-128x128 pixilize is-margin-auto is-rounded has-background-grey-dark p-md">
+                        <img src="@($"Assets/{CurrentItemTemplate.Variables.AssetCode()}.png")">
+                    </figure>
+                </AvatarContent>
+                <AdditionalContent>
+                    <AssetCodeEditor Variables="CurrentItemTemplate.Variables" DefaultAssetCode="@($"item-{CurrentItemTemplate.Id}")" 
+                                     OnAssetCodeChanged="OnAssetCodeChanged"/>
+                </AdditionalContent>
+            </BasicDetailsEditor>
+        </div>
+        
+        <div class="is-rounded has-background-dark p-lg m-md">
+            <h4 class="title is-4">Item Details</h4>
+            <div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label has-text-light">Stack Amount</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="text" placeholder="i.e 25" 
+                                   value="@CurrentItemTemplate.Variables.MaxStacks()" 
+                                   @onchange="e => CurrentItemTemplate.Variables.MaxStacks(int.Parse(e.Value?.ToString()))"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label has-text-light">Value</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="text" placeholder="i.e 100" 
+                                   value="@CurrentItemTemplate.Variables.Value()"
+                                   @onchange="e => CurrentItemTemplate.Variables.Value(int.Parse(e.Value?.ToString()))"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label has-text-light">Item Type</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <div class="select">
+                                <select @bind="CurrentItemTemplate.ItemType">
+                                    @foreach (var itemType in TypesHelper.GetItemTypes)
+                                    {
+                                        <option value=@itemType.Id>@itemType.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-label">
+                        <label class="label has-text-light">Item Quality</label>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <div class="select">
+                                <select value="@CurrentItemTemplate.Variables.QualityType()" 
+                                        @onchange="e => CurrentItemTemplate.Variables.QualityType(int.Parse(e.Value?.ToString()))">
+                                    @foreach (var itemType in TypesHelper.GetItemQualityTypes)
+                                    {
+                                        <option value=@itemType.Id>@itemType.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="is-rounded has-background-dark p-lg m-md">
+            <LocaleDetails LocaleData="CurrentItemTemplate"></LocaleDetails>
+        </div>
+        
+        <div class="is-rounded has-background-dark p-lg m-md">
+            <h4 class="title is-4">Effects</h4>
+            <EffectsEditor Effects="CurrentItemTemplate.Effects" OnUpdate="@UpdateEffect"></EffectsEditor>
+        </div>
+        
+        <div class="is-rounded has-background-dark p-lg m-md">
+            <h4 class="title is-4">Requirements</h4>
+            <RequirementsEditor Requirements="CurrentItemTemplate.Requirements" OnUpdate="@UpdateRequirements"></RequirementsEditor>
+        </div>
+        
+        <div class="is-rounded has-background-dark p-lg m-md">
+            <h4 class="title is-4">Modification Allowances</h4>
+            <ModificationAllowancesEditor ModificationAllowances="CurrentItemTemplate.ModificationAllowances" OnUpdate="UpdateModificationAllowances"></ModificationAllowancesEditor>
+        </div>
+        
+        <div class="field is-grouped has-text-centered">
+            <p class="control">
+                <a class="button is-success" @onclick="SaveChanges">
+                    Save Item
+                </a>
+            </p>
+            <p class="control">
+                <a class="button is-info" @onclick="CloneItem">
+                    Clone Item
+                </a>
+            </p>
+            <p class="control">
+                <a class="button is-danger" @onclick="DeleteItem">
+                    Delete Item
+                </a>
+            </p>
+        </div>
+        
+    </div>
+</div>
+
+@functions {
+    
+    public ItemTemplate CurrentItemTemplate;
+
+    protected override void OnInitialized()
+    {
+        SelectDefault();
+    }
+    
+    public void SelectDefault()
+    {
+        var firstItemTemplate = Repository.GetAll<ItemTemplate>().FirstOrDefault();
+        if (firstItemTemplate != null)
+        { CurrentItemTemplate = firstItemTemplate as ItemTemplate; }
+        else
+        {
+            CurrentItemTemplate = new ItemTemplate();
+            CurrentItemTemplate.Id = 1;
+            Repository.Create<ItemTemplate>(CurrentItemTemplate);
+        }
+    }
+
+    public void AddItem()
+    {
+        CurrentItemTemplate = new ItemTemplate();
+        CurrentItemTemplate.Id = Repository.GetAll<ItemTemplate>().Count() + 1;
+        CurrentItemTemplate.Variables.AssetCode($"item-{CurrentItemTemplate.Id}");
+        CurrentItemTemplate.GenerateLocaleCodes(CurrentItemTemplate.Variables.AssetCode());
+        Repository.Create<ItemTemplate>(CurrentItemTemplate);
+        StateHasChanged();
+    }
+
+    public void SelectItem(ItemTemplate itemTemplate)
+    {
+        CurrentItemTemplate = itemTemplate;
+        StateHasChanged();
+    }
+
+    public void DeleteItem()
+    {
+        Repository.Delete<ItemTemplate>(CurrentItemTemplate.Id);
+        var options = new {message = $"Deleted Item {CurrentItemTemplate.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
+        JS.InvokeAsync<object>("bulmaToast.toast", options);   
+        SelectDefault();
+    }
+
+    public void CloneItem()
+    {
+        var clone = Cloner.Clone(CurrentItemTemplate);
+        clone.Id = Repository.GetAll<ItemTemplate>().Count() + 1;
+        clone.Variables.AssetCode($"{CurrentItemTemplate.Variables.AssetCode()}-clone");
+        clone.GenerateLocaleCodes(clone.Variables.AssetCode());
+        Repository.Create<ItemTemplate>(clone);
+        
+        var options = new {message = $"Cloned Item {CurrentItemTemplate.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
+        JS.InvokeAsync<object>("bulmaToast.toast", options);
+        
+        CurrentItemTemplate = clone;
+        StateHasChanged();
+    }
+
+    public async void SaveChanges()
+    {
+        try
+        {
+            await SavePipeline.Execute(Repository.GetAll<ItemTemplate>());
+            var options = new {message = "Items saved", type = "is-success", position = "bottom-center"};
+            await JS.InvokeAsync<object>("bulmaToast.toast", options);
+
+        }
+        catch (Exception e)
+        {
+            var options = new {message = $"Error Saving: {e.Message}", type = "is-danger", position = "bottom-center"};
+            await JS.InvokeAsync<object>("bulmaToast.toast", options);   
+        }
+    }
+
+    public void UpdateEffect(IReadOnlyCollection<Effect> updatedEffects)
+    {
+        CurrentItemTemplate.Effects = updatedEffects;
+        StateHasChanged();
+    }
+    
+    public void UpdateRequirements(IReadOnlyCollection<Requirement> updatedRequirements)
+    {
+        CurrentItemTemplate.Requirements = updatedRequirements;
+        StateHasChanged();
+    }
+    
+    public void UpdateModificationAllowances(IReadOnlyCollection<ModificationAllowance> updatedModificationAllowances)
+    {
+        CurrentItemTemplate.ModificationAllowances = updatedModificationAllowances;
+        StateHasChanged();
+    }
+
+    public void OnAssetCodeChanged(string newAssetCode)
+    { CurrentItemTemplate.UpdateLocale(newAssetCode, LocaleRepository); }
+}

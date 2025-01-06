@@ -1,0 +1,119 @@
+﻿@page "/classes"
+
+@using OpenRpg.Core.Classes
+@using OpenRpg.Core.Classes.Templates
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Pipelines.Typed
+@using OpenRpg.Localization.Data.Repositories
+
+@inject IJSRuntime JS
+@inject IRepository Repository
+@inject ISaveDataPipeline<List<ClassTemplate>> SavePipeline
+@inject ILocaleRepository LocaleRepository;
+
+<div class="columns">
+    <div class="column is-one-fifth">
+        <ContentSidebar Title="Class Templates" Data="Repository.DataSource.GetAll<ClassTemplate>()" SelectedItem="CurrentClassTemplate"
+                        OnAdd="AddClass" 
+                        OnSelected="(selected => SelectClass(selected as ClassTemplate))">
+        </ContentSidebar>
+    </div>
+    <div class="column">
+        
+        <div class="is-rounded has-background-dark p-lg m-md">
+            <BasicDetailsEditor Data="CurrentClassTemplate">
+                <AdditionalContent>
+                    <AssetCodeEditor Variables="CurrentClassTemplate.Variables" DefaultAssetCode="@($"class-{CurrentClassTemplate.Id}")" 
+                                     OnAssetCodeChanged="OnAssetCodeChanged"/>
+                </AdditionalContent>
+            </BasicDetailsEditor>
+        </div>
+
+        <div class="is-rounded has-background-dark p-lg m-md">
+            <LocaleDetails LocaleData="CurrentClassTemplate"></LocaleDetails>
+        </div>
+        
+        <div class="is-rounded has-background-dark p-lg m-md">
+            <h4 class="title is-4">Effects</h4>
+            <EffectsEditor Effects="CurrentClassTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
+        </div>
+        
+        <div class="is-rounded has-background-dark p-lg m-md">
+            <h4 class="title is-4">Requirements</h4>
+            <RequirementsEditor Requirements="CurrentClassTemplate.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
+        </div>
+        
+        <div>
+            <a class="button is-success" @onclick="SaveChanges">Save</a>
+        </div>
+        
+    </div>
+</div>
+
+@functions {
+    public ClassTemplate CurrentClassTemplate;
+
+    protected override void OnInitialized()
+    {
+        var firstClassTemplate = Repository.GetAll<ClassTemplate>().FirstOrDefault();
+        
+        if (firstClassTemplate != null)
+        { CurrentClassTemplate = firstClassTemplate as ClassTemplate; }
+        else
+        {
+            CurrentClassTemplate = new ClassTemplate();
+            CurrentClassTemplate.Id = 1;
+            Repository.Create<ClassTemplate>(CurrentClassTemplate);
+        }
+    }
+
+    public void AddClass()
+    {
+        CurrentClassTemplate = new ClassTemplate();
+        CurrentClassTemplate.Id = Repository.GetAll<ClassTemplate>().Count() + 1;
+        CurrentClassTemplate.Variables.AssetCode($"class-{CurrentClassTemplate.Id}");
+        Repository.Create<ClassTemplate>(CurrentClassTemplate);
+        StateHasChanged();
+    }
+
+    public void SelectClass(ClassTemplate classTemplate)
+    {
+        CurrentClassTemplate = classTemplate;
+        StateHasChanged();
+    }
+
+    public async void SaveChanges()
+    {
+        try
+        {
+            await SavePipeline.Execute(Repository.GetAll<ClassTemplate>());
+            var options = new {message = "Classes saved", type = "is-success", position = "bottom-center"};
+            await JS.InvokeAsync<object>("bulmaToast.toast", options);
+
+        }
+        catch (Exception e)
+        {
+            var options = new {message = $"Error Saving: {e.Message}", type = "is-danger", position = "bottom-center"};
+            await JS.InvokeAsync<object>("bulmaToast.toast", options);   
+        }
+    }
+    
+    public void UpdateEffect(IReadOnlyCollection<Effect> updatedEffects)
+    {
+        CurrentClassTemplate.Effects = updatedEffects;
+        StateHasChanged();
+    }
+    
+    public void UpdateRequirements(IReadOnlyCollection<Requirement> updatedRequirements)
+    {
+        CurrentClassTemplate.Requirements = updatedRequirements;
+        StateHasChanged();
+    }
+    
+    public void OnAssetCodeChanged(string newAssetCode)
+    { CurrentClassTemplate.UpdateLocale(newAssetCode, LocaleRepository); }
+}

@@ -1,0 +1,42 @@
+﻿@using OpenRpg.Core.Requirements
+@using OpenRpg.Editor.Infrastructure.Helpers
+
+<ListEditor Data="Requirements" OnUpdate="OnUpdate" TItem="Requirement">
+    <HeaderTemplate>
+        <th><abbr title="Requirement Type">Requirement Type</abbr></th>
+        <th><abbr title="Associated Id">Associated Id</abbr></th>
+        <th><abbr title="Associated Value">Associated Value</abbr></th>
+    </HeaderTemplate>
+    <RowTemplate>
+        <td>
+            <div class="control">
+                <div class="select">
+                    <select bind="@context.RequirementType">
+                        @foreach (var requirementType in TypesHelper.GetRequirementTypes)
+                        {
+                            <option value=@requirementType.Id>@requirementType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" bind="@context.AssociatedId" />
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" bind="@context.AssociatedValue" />
+            </div>
+        </td>
+    </RowTemplate>
+</ListEditor>
+
+@functions {
+    [Parameter]
+    public IEnumerable<Requirement> Requirements { get; set; }
+    
+    [Parameter]
+    public EventCallback<List<Requirement>> OnUpdate { get; set; }
+}

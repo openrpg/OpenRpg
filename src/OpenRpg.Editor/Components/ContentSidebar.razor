@@ -1,0 +1,26 @@
+@using OpenRpg.Core.Common
+
+<aside class="menu side-menu has-background-dark">
+    <p class="menu-label">
+        <span>@Title</span> 
+        <a class="tag is-primary m-sm" @onclick="OnAdd">+ Add</a>
+    </p>
+    <ul class="menu-list p-sm">
+        @foreach (var current in Data)
+        {
+            <li class="menu-item m-sm">
+                <a class="button has-text-left @(current.Id == SelectedItem.Id ? "is-active" : "")" 
+                   @onclick="() => OnSelected.InvokeAsync(current)">@($"{current.Id}. {(current as IHasLocaleDescription)?.NameLocaleId}")</a>
+            </li>
+        }
+    </ul>
+</aside>
+
+@functions {
+    [Parameter] public string Title { get; set; }
+    [Parameter] public IEnumerable<IHasDataId> Data { get; set; }
+    [Parameter] public IHasDataId SelectedItem { get; set; }
+    
+    [Parameter] public EventCallback OnAdd { get; set; }
+    [Parameter] public EventCallback<IHasDataId> OnSelected { get; set; }
+}

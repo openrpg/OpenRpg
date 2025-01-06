@@ -1,0 +1,109 @@
+﻿@using OpenRpg.Editor.Infrastructure.Models
+@using OpenRpg.Editor.Infrastructure.Pipelines.Typed
+@using OpenRpg.Localization
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject ILocaleRepository Repository;
+@inject ISaveDataPipeline<LocaleDataset> SavePipeline;
+
+<div class="modal @(IsActive ? "is-active" : "")">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Locale Editor For <code>@LocaleId</code></p>
+                <button class="delete" @onclick="HideModal"></button>
+            </header>
+            <section class="modal-card-body">
+                <ListEditor Data="new [] {LocaleEntry}" TItem="LocaleEntry">
+                    <HeaderTemplate>
+                        <th><abbr title="Locale Code">Locale Code</abbr></th>
+                        <th><abbr title="Locale Id">Locale Id</abbr></th>
+                        <th><abbr title="Locale Text">Locale Text</abbr></th>
+                    </HeaderTemplate>
+                    <RowTemplate>
+                        <td>@context.LocaleCode</td>
+                        <td>@context.LocaleId</td>
+                        <td>
+                            <div class="control">
+                                <input class="input" type="text" @bind="context.LocaleText"/>
+                            </div>
+                        </td>
+                    </RowTemplate>
+                </ListEditor>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-success" @onclick="SaveChanges">Save changes</button>
+                <button class="button" @onclick="HideModal">Cancel</button>
+            </footer>
+        </div>
+        
+        
+        <h4></h4>
+        
+    </div>
+    <button class="modal-close is-large" @onclick="HideModal"></button>
+</div>
+
+
+
+@functions {
+    [Parameter]
+    public string LocaleId { get; set; }
+
+    [Parameter]
+    public bool IsActive { get; set; }
+    
+    [Parameter] 
+    public EventCallback<bool> IsActiveChanged { get; set; }
+
+    LocaleEntry LocaleEntry { get; set; }
+
+    public void HideModal()
+    {
+        IsActive = false;
+        IsActiveChanged.InvokeAsync(IsActive);
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        LocaleEntry = GetLocaleEntries();
+        base.OnParametersSet();
+    }
+    
+    public void SaveChanges()
+    {
+        UpdateLocaleText(LocaleEntry);
+
+        SavePipeline.Execute(Repository.GetDataset());
+        HideModal();
+    }
+
+    public LocaleEntry GetLocaleEntries()
+    {
+        if (!Repository.Exists(LocaleId))
+        { return new LocaleEntry{LocaleCode = Repository.CurrentLocaleCode, LocaleId = LocaleId, LocaleText = string.Empty, Exists = false}; }
+        
+        var data = Repository.Get(LocaleId);
+        return new LocaleEntry {LocaleCode = Repository.CurrentLocaleCode, LocaleId = LocaleId, LocaleText = data, Exists = true};
+    }
+
+    public void UpdateLocaleText(LocaleEntry localeEntry)
+    {
+        var prefix = localeEntry.Exists ? "Updating" : "Creating";
+        Console.WriteLine($"{prefix} {localeEntry.LocaleCode} - {localeEntry.LocaleId} with {localeEntry.LocaleText}");
+
+        if (localeEntry.Exists)
+        {
+            Repository.Update(LocaleId, localeEntry.LocaleText);
+            return;
+        }
+        
+        Repository.Create(LocaleId, localeEntry.LocaleText);
+        localeEntry.Exists = true;
+    }
+
+}

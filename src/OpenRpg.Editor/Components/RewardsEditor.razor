@@ -1,0 +1,45 @@
+﻿@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Quests
+
+<ListEditor Data="Rewards" OnUpdate="OnUpdate" TItem="Reward">
+    <HeaderTemplate>
+        <th><abbr title="Reward Type">Reward Type</abbr></th>
+        <th><abbr title="Reward Chance">Reward Chance</abbr></th>
+        <th><abbr title="Associated Id">Associated Id</abbr></th>
+        <th><abbr title="Associated Value">Associated Value</abbr></th>
+    </HeaderTemplate>
+    <RowTemplate>
+        <td>
+            <div class="control">
+                <div class="select">
+                    <select bind="@context.RewardType">
+                        @foreach (var rewardType in TypesHelper.GetRewardTypes)
+                        {
+                            <option value=@rewardType.Id>@rewardType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" placeholder="i.e. 0.1 for 10%" bind="@context.RewardChance" />
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" bind="@context.AssociatedId" />
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" bind="@context.AssociatedValue" />
+            </div>
+        </td>
+    </RowTemplate>
+</ListEditor>
+
+@functions {
+    [Parameter] public IEnumerable<Reward> Rewards { get; set; }
+    [Parameter] public EventCallback<List<Reward>> OnUpdate { get; set; }
+}

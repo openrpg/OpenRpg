@@ -1,0 +1,107 @@
+[
+  {
+    "Id": 1,
+    "NameLocaleId": "quest-basic-bandits-name",
+    "DescriptionLocaleId": "quest-basic-bandits-description",
+    "Requirements": [],
+    "IsRepeatable": false,
+    "Objectives": [
+      {
+        "ObjectiveType": 8,
+        "AssociatedId": 1,
+        "AssociatedValue": 1
+      }
+    ],
+    "Rewards": [
+      {
+        "RewardType": 1,
+        "AssociatedId": 0,
+        "AssociatedValue": 10,
+        "RewardChance": 1.0
+      },
+      {
+        "RewardType": 2,
+        "AssociatedId": 0,
+        "AssociatedValue": 5,
+        "RewardChance": 1.0
+      }
+    ],
+    "Gifts": [],
+    "Variables":
+      {
+        "500": "quest-basic-bandits"
+      }
+  },
+  {
+    "Id": 2,
+    "NameLocaleId": "quest-basic-slimes-name",
+    "DescriptionLocaleId": "quest-basic-slimes-description",
+    "Requirements": [],
+    "IsRepeatable": false,
+    "Objectives": [
+      {
+        "ObjectiveType": 8,
+        "AssociatedId": 2,
+        "AssociatedValue": 4
+      }
+    ],
+    "Rewards": [
+      {
+        "RewardType": 2,
+        "AssociatedId": 0,
+        "AssociatedValue": 10,
+        "RewardChance": 1.0
+      },
+      {
+        "RewardType": 2,
+        "AssociatedId": 0,
+        "AssociatedValue": 15,
+        "RewardChance": 1.0
+      }
+    ],
+    "Gifts": [],
+    "Variables":
+    {
+      "500": "quest-basic-slimes"
+    }
+  },
+  {
+    "Id": 3,
+    "NameLocaleId": "quest-first-boss-name",
+    "DescriptionLocaleId": "quest-first-boss-description",
+    "Requirements": [
+      {
+        "RequirementType": 3,
+        "AssociatedId": 0,
+        "AssociatedValue": 2
+      }
+    ],
+    "IsRepeatable": false,
+    "Objectives": [
+      {
+        "ObjectiveType": 8,
+        "AssociatedId": 3,
+        "AssociatedValue": 1
+      }
+    ],
+    "Rewards": [
+      {
+        "RewardType": 1,
+        "AssociatedId": 0,
+        "AssociatedValue": 100,
+        "RewardChance": 1.0
+      },
+      {
+        "RewardType": 2,
+        "AssociatedId": 0,
+        "AssociatedValue": 250,
+        "RewardChance": 1.0
+      }
+    ],
+    "Gifts": [],
+    "Variables":
+    {
+      "500": "quest-first-boss"
+    }
+  }
+]

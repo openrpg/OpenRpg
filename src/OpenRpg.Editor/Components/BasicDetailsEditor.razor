@@ -1,0 +1,37 @@
+@using System.Reflection
+@using OpenRpg.Core.Common
+
+<h4 class="title is-4">Basic Details</h4>
+
+@if (AvatarContent != null)
+{
+    <div class="field is-horizontal">
+        @AvatarContent
+    </div>
+}
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label has-text-light">Id</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="text" value="@Data.Id" 
+                       disabled="@true" readonly="@true" />
+            </div>
+        </div>
+    </div>
+</div>
+@if (AdditionalContent != null)
+{
+    @AdditionalContent
+}
+
+@functions {
+    [Parameter]
+    public IHasDataId Data { get; set; }
+
+    [Parameter] public RenderFragment AvatarContent { get; set; }
+    [Parameter] public RenderFragment AdditionalContent { get; set; }
+}

@@ -1,0 +1,182 @@
+[
+  {
+    "Id": 1,
+    "NameLocaleId": "class-warrior-name",
+    "DescriptionLocaleId": "class-warrior-description",
+    "Requirements": [],
+    "Effects": [
+      {
+        "EffectType": 54,
+        "Potency": 0.3,
+        "Requirements": []
+      },
+      {
+        "EffectType": 74,
+        "Potency": 0.2,
+        "Requirements": []
+      },
+      {
+        "EffectType": 13,
+        "Potency": 2.0,
+        "Requirements": []
+      },
+      {
+        "EffectType": 33,
+        "Potency": 0.2,
+        "Requirements": []
+      },
+      {
+        "EffectType": 16,
+        "Potency": 20.0,
+        "Requirements": []
+      },
+      {
+        "EffectType": 2,
+        "Potency": 2.0,
+        "Requirements": []
+      }
+    ],
+    "Variables":
+    {
+      "500": "class-warrior"
+    }
+  },
+  {
+    "Id": 2,
+    "NameLocaleId": "class-paladin-name",
+    "DescriptionLocaleId": "class-paladin-description",
+    "Requirements": [],
+    "Effects": [
+      {
+        "EffectType": 75,
+        "Potency": 0.4,
+        "Requirements": []
+      },
+      {
+        "EffectType": 74,
+        "Potency": 0.4,
+        "Requirements": []
+      },
+      {
+        "EffectType": 76,
+        "Potency": 0.2,
+        "Requirements": []
+      },
+      {
+        "EffectType": 34,
+        "Potency": 0.2,
+        "Requirements": []
+      },
+      {
+        "EffectType": 16,
+        "Potency": 20.0,
+        "Requirements": []
+      }
+    ],
+    "Variables":
+    {
+      "500": "class-paladin"
+    }
+  },
+  {
+    "Id": 3,
+    "NameLocaleId": "class-rogue-name",
+    "DescriptionLocaleId": "class-rogue-description",
+    "Requirements": [],
+    "Effects": [
+      {
+        "EffectType": 30,
+        "Potency": 0.2,
+        "Requirements": []
+      },
+      {
+        "EffectType": 55,
+        "Potency": 0.5,
+        "Requirements": []
+      },
+      {
+        "EffectType": 16,
+        "Potency": 10.0,
+        "Requirements": []
+      }
+    ],
+    "Variables":
+    {
+      "500": "class-rogue"
+    }
+  },
+  {
+    "Id": 4,
+    "NameLocaleId": "class-priest-name",
+    "DescriptionLocaleId": "class-priest-description",
+    "Requirements": [],
+    "Effects": [
+      {
+        "EffectType": 31,
+        "Potency": 0.3,
+        "Requirements": []
+      },
+      {
+        "EffectType": 154,
+        "Potency": 5.0,
+        "Requirements": []
+      },
+      {
+        "EffectType": 160,
+        "Potency": 0.5,
+        "Requirements": []
+      },
+      {
+        "EffectType": 161,
+        "Potency": 0.3,
+        "Requirements": []
+      },
+      {
+        "EffectType": 16,
+        "Potency": 8.0,
+        "Requirements": []
+      }
+    ],
+    "Variables":
+    {
+      "500": "class-priest"
+    }
+  },
+  {
+    "Id": 5,
+    "NameLocaleId": "class-mage-name",
+    "DescriptionLocaleId": "class-mage-description",
+    "Requirements": [],
+    "Effects": [
+      {
+        "EffectType": 31,
+        "Potency": 0.3,
+        "Requirements": []
+      },
+      {
+        "EffectType": 156,
+        "Potency": 0.2,
+        "Requirements": []
+      },
+      {
+        "EffectType": 157,
+        "Potency": 0.2,
+        "Requirements": []
+      },
+      {
+        "EffectType": 116,
+        "Potency": 0.1,
+        "Requirements": []
+      },
+      {
+        "EffectType": 117,
+        "Potency": 0.1,
+        "Requirements": []
+      }
+    ],
+    "Variables":
+    {
+      "500": "class-mage"
+    }
+  }
+]

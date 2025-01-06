@@ -1,0 +1,75 @@
+﻿@typeparam TItem
+
+<table class="table is-fullwidth is-rounded">
+    <thead>
+    <tr>
+        @HeaderTemplate
+        @if (OnUpdate.HasDelegate)
+        {
+            <th><a class="tag is-primary" @onclick="AddHandler">Add</a></th>
+        }
+    </tr>
+    </thead>
+    <tbody>
+    @if (ShowNoCount && !ProxyList.Any())
+    {
+        <tr>
+            <td colspan="10000" class="has-text-centered">
+                <p>Collection contains no data</p>
+            </td>
+        </tr>
+    }
+
+    @foreach (var element in ProxyList)
+    {
+        <tr>
+            @RowTemplate(element)
+            @if (OnUpdate.HasDelegate)
+            {
+                <td>
+                    <button class="button is-danger" @onclick="() => { RemoveHandler(element); }">X</button>
+                </td>  
+            }
+        </tr>
+        if (NestedRowTemplate != null)
+        {
+            <tr>
+                <td colspan="10000">
+                    @NestedRowTemplate(element)
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>
+
+@functions {
+    [Parameter] public RenderFragment HeaderTemplate { get; set; }
+    [Parameter] public RenderFragment<TItem> RowTemplate { get; set; }
+    [Parameter] public RenderFragment<TItem> NestedRowTemplate { get; set; }
+    [Parameter] public IEnumerable<TItem> Data { get; set; }
+    [Parameter] public EventCallback<List<TItem>> OnUpdate { get; set; }
+    [Parameter] public bool ShowNoCount { get; set; } = false;
+    
+    public List<TItem> ProxyList { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        ProxyList = new List<TItem>();
+        
+        if(Data != null) 
+        { ProxyList.AddRange(Data); }
+    }
+    
+    public void AddHandler()
+    {
+        ProxyList.Add(Activator.CreateInstance<TItem>());
+        OnUpdate.InvokeAsync(ProxyList);
+    }
+
+    public void RemoveHandler(TItem element)
+    {
+        ProxyList.Remove(element);
+        OnUpdate.InvokeAsync(ProxyList);
+    }
+}
