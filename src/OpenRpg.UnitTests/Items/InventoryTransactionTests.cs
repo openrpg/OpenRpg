@@ -20,21 +20,21 @@ public class InventoryTransactionTests
         var dummyItemTemplate3 = new ItemTemplate() { Id = 567 };
         var dummyItemTemplate4 = new ItemTemplate() { Id = 789 };
 
-        var itemToRemove1 = new Item() { TemplateId = dummyItemTemplate1.Id };
+        var itemToRemove1 = new ItemData() { TemplateId = dummyItemTemplate1.Id };
         itemToRemove1.Variables.Amount(5);
 
-        var itemToRemove2 = new Item() { TemplateId = dummyItemTemplate2.Id };
+        var itemToRemove2 = new ItemData() { TemplateId = dummyItemTemplate2.Id };
         itemToRemove2.Variables.Amount(2);
         
-        var itemToAdd1 = new Item() { TemplateId = dummyItemTemplate3.Id };
+        var itemToAdd1 = new ItemData() { TemplateId = dummyItemTemplate3.Id };
         itemToAdd1.Variables.Amount(1);
 
-        var itemToAdd2 = new Item() { TemplateId = dummyItemTemplate4.Id };
+        var itemToAdd2 = new ItemData() { TemplateId = dummyItemTemplate4.Id };
         itemToAdd2.Variables.Amount(10);
 
         var inventory = new Inventory()
         {
-            Items = new List<Item>() { itemToRemove1.Clone(), itemToRemove2.Clone() }
+            Items = new List<ItemData>() { itemToRemove1.Clone(), itemToRemove2.Clone() }
         };
 
         var mockTemplateAccessor = new Mock<ITemplateAccessor>();

@@ -5,17 +5,17 @@
 @using OpenRpg.Genres.Characters
 
 <figure class="item-icon image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
-    <img src="images/items/@(ItemView.Template.Variables.AssetCode()).png">
+    <img src="images/items/@(Item.Template.Variables.AssetCode()).png">
     <div class="item-amount">@(_itemAmount > 0 ? $"{_itemAmount}" : "")</div>
     <div class="item-icon-summary">
-        <ItemTemplateDetails ItemTemplate="@ItemView.Template" Character="Character"></ItemTemplateDetails>
+        <ItemTemplateDetails ItemTemplate="@Item.Template" Character="Character"></ItemTemplateDetails>
     </div>
 </figure>
 
 @code {
 
     [Parameter]
-    public ItemView ItemView { get; set; }
+    public Item Item { get; set; }
 
     [Parameter]
     public Character Character { get; set; }
@@ -26,13 +26,13 @@
 
     protected override void OnParametersSet()
     {
-        if (ItemView.Instance.Variables != null && ItemView.Instance.Variables.ContainsKey(ItemVariableTypes.Amount))
-        { _itemAmount = ItemView.Instance.Variables.Amount(); }
+        if (Item.Data.Variables != null && Item.Data.Variables.ContainsKey(ItemVariableTypes.Amount))
+        { _itemAmount = Item.Data.Variables.Amount(); }
         else
         { _itemAmount = 0;}
 
-        if (ItemView.Template.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
-        { _itemQualityTypeId = ItemView.Template.Variables.QualityType(); }
+        if (Item.Template.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
+        { _itemQualityTypeId = Item.Template.Variables.QualityType(); }
 
         base.OnParametersSet();
     }

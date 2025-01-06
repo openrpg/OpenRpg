@@ -10,7 +10,7 @@ namespace OpenRpg.Items.Inventories
     /// </summary>
     public class Inventory : IHasVariables<InventoryVariables>
     {
-        public List<Item> Items { get; set; } = new List<Item>();
+        public List<ItemData> Items { get; set; } = new List<ItemData>();
         public InventoryVariables Variables { get; set; } = new InventoryVariables();
     }
 }

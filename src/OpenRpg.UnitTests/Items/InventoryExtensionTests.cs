@@ -16,7 +16,7 @@ public class InventoryExtensionTests
     {
         var expectedItemTypeId = 1;
         var inventory = new Inventory();
-        inventory.Items.Add(new Item() { TemplateId = expectedItemTypeId });
+        inventory.Items.Add(new ItemData() { TemplateId = expectedItemTypeId });
 
         var hasExpectedItem = inventory.HasItem(expectedItemTypeId);
         Assert.True(hasExpectedItem);
@@ -33,13 +33,13 @@ public class InventoryExtensionTests
     public void should_correctly_return_if_it_has_items_with_amounts(int startingAmount, int requestAmount, bool expected)
     {
         var existingItemTemplate = new ItemTemplate { Id = 1 };
-        var existingItem = new Item() { TemplateId = existingItemTemplate.Id };
+        var existingItem = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem.Variables.Amount(startingAmount);
         
         var inventory = new Inventory();
         inventory.Items.Add(existingItem);
 
-        var itemToCheck = new Item() { TemplateId = existingItemTemplate.Id };
+        var itemToCheck = new ItemData() { TemplateId = existingItemTemplate.Id };
         itemToCheck.Variables.Amount(requestAmount);
         var actualThroughAgnosticMethod = inventory.HasItem(itemToCheck);
         var actualFromDirectMethod = inventory.HasItem(existingItemTemplate.Id, requestAmount);

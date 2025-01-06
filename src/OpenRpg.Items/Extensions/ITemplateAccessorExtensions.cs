@@ -8,10 +8,10 @@ namespace OpenRpg.Items.Extensions
         public static ItemTemplate GetItemTemplate(this ITemplateAccessor templateAccessor, int itemTemplateId)
         { return templateAccessor.Get<ItemTemplate>(itemTemplateId); }
         
-        public static ItemView ToView(this ITemplateAccessor templateAccessor, Item item)
+        public static Item ToInstance(this ITemplateAccessor templateAccessor, ItemData itemData)
         {
-            var template = templateAccessor.Get<ItemTemplate>(item.TemplateId);
-            return new ItemView() { Instance = item, Template = template };
+            var template = templateAccessor.Get<ItemTemplate>(itemData.TemplateId);
+            return new Item() { Data = itemData, Template = template };
         }
     }
 }

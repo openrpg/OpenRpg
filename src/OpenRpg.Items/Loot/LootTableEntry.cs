@@ -11,6 +11,6 @@ namespace OpenRpg.Items.Loot
     {
         public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
         public LootTableEntryVariables Variables { get; set; } = new LootTableEntryVariables();
-        public Item Item { get; set; }
+        public ItemData ItemData { get; set; }
     }
 }

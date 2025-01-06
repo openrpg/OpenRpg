@@ -28,7 +28,7 @@ public class EntityVariableExtensionTests
         var entityVars = new EntityVariables();
         Assert.False(entityVars.HasRace());
         
-        var dummyRace = new Race();
+        var dummyRace = new RaceData();
         entityVars.Race(dummyRace);
         Assert.True(entityVars.HasRace());
         Assert.Equal(entityVars.Race(), dummyRace);
@@ -40,7 +40,7 @@ public class EntityVariableExtensionTests
         var entityVars = new EntityVariables();
         Assert.False(entityVars.HasClass());
         
-        var dummyClass = new Class();
+        var dummyClass = new ClassData();
         entityVars.Class(dummyClass);
         Assert.True(entityVars.HasClass());
         Assert.Equal(entityVars.Class(), dummyClass);

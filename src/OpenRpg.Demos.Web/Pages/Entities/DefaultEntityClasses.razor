@@ -142,8 +142,8 @@
         
         _manualCharacter = new Character();
         _manualCharacter.NameLocaleId = "John Doe";
-        _manualCharacter.Variables.Race(new Race { TemplateId = RaceTypeLookups.Human });
-        _manualCharacter.Variables.Class(new Class { TemplateId = ClassTypeLookups.Fighter });
+        _manualCharacter.Variables.Race(new RaceData { TemplateId = RaceTypeLookups.Human });
+        _manualCharacter.Variables.Class(new ClassData { TemplateId = ClassTypeLookups.Fighter });
 
         _manualCharacter.Stats.MaxHealth(100);
         _manualCharacter.State.Health(50);

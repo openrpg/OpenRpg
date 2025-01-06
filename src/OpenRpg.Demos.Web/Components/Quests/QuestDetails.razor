@@ -30,7 +30,7 @@
             {
                 if (gift.RewardType == FantasyRewardTypes.ItemReward)
                 {
-                    <ItemIcon ItemView="GetItemFor(gift.AssociatedId, gift.AssociatedValue)" Character="Character"></ItemIcon>
+                    <ItemIcon Item="GetItemFor(gift.AssociatedId, gift.AssociatedValue)" Character="Character"></ItemIcon>
                 }
             }
         </div>
@@ -45,7 +45,7 @@
                 {
                     if (objective.ObjectiveType == ObjectiveTypes.ItemObjective)
                     {
-                        <ItemIcon ItemView="GetItemFor(objective.AssociatedId, objective.AssociatedValue)" Character="Character"></ItemIcon>
+                        <ItemIcon Item="GetItemFor(objective.AssociatedId, objective.AssociatedValue)" Character="Character"></ItemIcon>
                     }
                     else if (objective.ObjectiveType == ObjectiveTypes.TriggerObjective)
                     {
@@ -64,7 +64,7 @@
             {
                 if (reward.RewardType == FantasyRewardTypes.ItemReward)
                 {
-                    <ItemIcon ItemView="@GetItemFor(reward.AssociatedId, reward.AssociatedValue)" Character="Character"></ItemIcon>
+                    <ItemIcon Item="@GetItemFor(reward.AssociatedId, reward.AssociatedValue)" Character="Character"></ItemIcon>
                 }
                 else if (reward.RewardType == FantasyRewardTypes.CurrencyReward)
                 {
@@ -84,14 +84,14 @@
     [Parameter] public Character Character { get; set; }
     [Parameter] public ITemplateAccessor TemplateAccessor { get; set; }
 
-    public ItemView GetItemFor(int itemTemplateId, int itemAmount)
+    public Item GetItemFor(int itemTemplateId, int itemAmount)
     {
-        var item = new Item
+        var item = new ItemData
         {
             TemplateId = itemTemplateId,
             Variables = new ItemVariables()
         };
         item.Variables.Amount(itemAmount);
-        return TemplateAccessor.ToView(item);
+        return TemplateAccessor.ToInstance(item);
     }
 }

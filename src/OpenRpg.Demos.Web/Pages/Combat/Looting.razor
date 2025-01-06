@@ -96,7 +96,7 @@
             <h4>Looted Items</h4>
             @foreach (var item in _currentLoot)
             {
-                <ItemIcon ItemView="TemplateAccessor.ToView(item)"></ItemIcon>
+                <ItemIcon Item="TemplateAccessor.ToInstance(item)"></ItemIcon>
             }
         </CardSection>
     </div>
@@ -104,7 +104,7 @@
 @code {
 
     public ILootTable _lootTable;
-    public List<Item> _currentLoot = new List<Item>();
+    public List<ItemData> _currentLoot = new List<ItemData>();
 
     protected override void OnInitialized()
     {
@@ -127,18 +127,18 @@
         };
     }
     
-    public Item GeneratePotion()
+    public ItemData GeneratePotion()
     {
-        return new Item
+        return new ItemData
         {
             TemplateId = ItemTemplateLookups.HealingPotion,
             Variables = new ItemVariables()
         };
     }
     
-    public Item GenerateSword()
+    public ItemData GenerateSword()
     {
-        return new Item
+        return new ItemData
         {
             TemplateId = ItemTemplateLookups.Sword,
             Variables = new ItemVariables()

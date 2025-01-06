@@ -10,7 +10,7 @@ namespace OpenRpg.Items.Inventories
     {
         public bool ApplyChanges();
         
-        void AddItem(Item item);
-        void RemoveItem(Item item);
+        void AddItem(ItemData itemData);
+        void RemoveItem(ItemData itemData);
     }
 }

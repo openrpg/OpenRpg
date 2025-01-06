@@ -1,9 +1,6 @@
-using System;
 using OpenRpg.Core.Classes;
-using OpenRpg.Core.Classes.Templates;
 using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Core.Races;
-using OpenRpg.Core.Races.Templates;
 using OpenRpg.Core.Types;
 
 namespace OpenRpg.Core.Extensions
@@ -22,20 +19,20 @@ namespace OpenRpg.Core.Extensions
         public static bool HasRace(this EntityVariables vars) 
         { return vars.ContainsKey(EntityVariableTypes.Race); }
         
-        public static Race Race(this EntityVariables vars)
-        { return vars.GetAs<Race>(EntityVariableTypes.Race); }
+        public static RaceData Race(this EntityVariables vars)
+        { return vars.GetAs<RaceData>(EntityVariableTypes.Race); }
 
-        public static void Race(this EntityVariables vars, Race raceData)
-        { vars[EntityVariableTypes.Race] = raceData; }
+        public static void Race(this EntityVariables vars, RaceData raceDataData)
+        { vars[EntityVariableTypes.Race] = raceDataData; }
         
         public static bool HasClass(this EntityVariables vars) 
         { return vars.ContainsKey(EntityVariableTypes.Class); }
         
-        public static Class Class(this EntityVariables vars)
-        { return vars.GetAs<Class>(EntityVariableTypes.Class); }
+        public static ClassData Class(this EntityVariables vars)
+        { return vars.GetAs<ClassData>(EntityVariableTypes.Class); }
 
-        public static void Class(this EntityVariables vars, Class classData)
-        { vars[EntityVariableTypes.Class] = classData; }
+        public static void Class(this EntityVariables vars, ClassData classDataData)
+        { vars[EntityVariableTypes.Class] = classDataData; }
         
         public static bool HasMultiClass(this EntityVariables vars) 
         { return vars.ContainsKey(EntityVariableTypes.MultiClasses); }

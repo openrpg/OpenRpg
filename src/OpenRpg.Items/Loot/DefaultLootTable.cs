@@ -20,12 +20,12 @@ namespace OpenRpg.Items.Loot
             AvailableLoot = availableLoot;
         }
         
-        public IEnumerable<Item> GetLoot()
-        { return GetRandomLootEntries().Select(x => x.Item.Clone()); }
+        public IEnumerable<ItemData> GetLoot()
+        { return GetRandomLootEntries().Select(x => x.ItemData.Clone()); }
         
         public IEnumerable<LootTableEntry> GetRandomLootEntries()
         {
-            var uniqueItems = new List<Item>();
+            var uniqueItems = new List<ItemData>();
 
             foreach (var loot in AvailableLoot)
             {
@@ -34,10 +34,10 @@ namespace OpenRpg.Items.Loot
                 
                 if (loot.Variables.ContainsKey(LootTableEntryVariableTypes.IsUnique) && loot.Variables.IsUnique())
                 {
-                    if(uniqueItems.Contains(loot.Item))
+                    if(uniqueItems.Contains(loot.ItemData))
                     { continue; }
                     
-                    uniqueItems.Add(loot.Item);
+                    uniqueItems.Add(loot.ItemData);
                 }
 
                 yield return loot;

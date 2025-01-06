@@ -17,28 +17,28 @@ namespace OpenRpg.Items.Extensions
         /// <summary>
         /// Clones the item copying the modifications and variables
         /// </summary>
-        /// <param name="item">The item to clone</param>
-        public static Item Clone(this Item item)
+        /// <param name="itemData">The item to clone</param>
+        public static ItemData Clone(this ItemData itemData)
         {
-            return new Item
+            return new ItemData
             {
-                TemplateId = item.TemplateId,
-                Variables = item.Variables.Clone(),
-                Modifications = new List<ItemModificationTemplate>(item.Modifications.ToArray())
+                TemplateId = itemData.TemplateId,
+                Variables = itemData.Variables.Clone(),
+                Modifications = new List<ItemModificationTemplate>(itemData.Modifications.ToArray())
             };
         }
         
         /// <summary>
-        /// This will clone an ItemView
+        /// This will clone an Item
         /// </summary>
         /// <param name="item">The item to clone</param>
-        public static ItemView Clone(this ItemView item)
+        public static Item Clone(this Item item)
         {
-            var instanceClone = item.Instance.Clone();
-            return new ItemView() { Instance = instanceClone, Template = item.Template };
+            var instanceClone = item.Data.Clone();
+            return new Item() { Data = instanceClone, Template = item.Template };
         }
 
-        public static LootTableEntry GenerateLootTableEntry(this Item item, float dropRate = 1, bool isUnique = false, IReadOnlyCollection<Requirement> requirements = null)
+        public static LootTableEntry GenerateLootTableEntry(this ItemData itemData, float dropRate = 1, bool isUnique = false, IReadOnlyCollection<Requirement> requirements = null)
         {
             var variables = new LootTableEntryVariables();
             variables.DropRate(dropRate);
@@ -46,26 +46,26 @@ namespace OpenRpg.Items.Extensions
 
             return new LootTableEntry
             {
-                Item = item,
+                ItemData = itemData,
                 Requirements = requirements ?? Array.Empty<Requirement>(),
                 Variables = variables
             };
         }
         
-        public static IReadOnlyCollection<Effect> GetItemEffects(this Item item, ItemTemplate itemTemplate)
+        public static IReadOnlyCollection<Effect> GetItemEffects(this ItemData itemData, ItemTemplate itemTemplate)
         {
-            if(!item.Modifications.Any())
+            if(!itemData.Modifications.Any())
             { return itemTemplate.Effects; }
          
-            return itemTemplate.Effects.Union(item.Modifications.SelectMany(x => x.Effects)).ToArray();
+            return itemTemplate.Effects.Union(itemData.Modifications.SelectMany(x => x.Effects)).ToArray();
         }
         
-        public static IReadOnlyCollection<Effect> GetItemEffects(this ItemView item)
+        public static IReadOnlyCollection<Effect> GetItemEffects(this Item item)
         {
-            if(!item.Instance.Modifications.Any())
+            if(!item.Data.Modifications.Any())
             { return item.Template.Effects; }
          
-            return item.Template.Effects.Union(item.Instance.Modifications.SelectMany(x => x.Effects)).ToArray();
+            return item.Template.Effects.Union(item.Data.Modifications.SelectMany(x => x.Effects)).ToArray();
         }
         
         

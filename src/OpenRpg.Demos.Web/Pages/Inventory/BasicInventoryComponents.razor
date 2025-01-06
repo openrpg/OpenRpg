@@ -51,19 +51,19 @@
             </div>
             <br />
             <a @onclick="() => AddItem(_simpleItem)">
-                <ItemIcon ItemView="_simpleItem"></ItemIcon>
+                <ItemIcon Item="_simpleItem"></ItemIcon>
             </a>
             <br />
             <a @onclick="() => AddItem(_fancyItem)">
-                <ItemIcon ItemView="_fancyItem"></ItemIcon>
+                <ItemIcon Item="_fancyItem"></ItemIcon>
             </a>
             <br />
             <a @onclick="() => AddItem(_potionItem)">
-                <ItemIcon ItemView="_potionItem"></ItemIcon>
+                <ItemIcon Item="_potionItem"></ItemIcon>
             </a>
             <br />
             <a @onclick="() => AddItem(_junkPotions)">
-                <ItemIcon ItemView="_junkPotions"></ItemIcon>
+                <ItemIcon Item="_junkPotions"></ItemIcon>
             </a>
         </CardSection>
     </div>
@@ -96,7 +96,7 @@
     be altered in any way.
 </Markdown>
 @code {
-    private ItemView _simpleItem, _fancyItem, _potionItem, _junkPotions;
+    private Item _simpleItem, _fancyItem, _potionItem, _junkPotions;
     private Inventory _inventory;
     private BasicInventory _inventoryRef;
 
@@ -111,9 +111,9 @@
         base.OnInitialized();
     }
 
-    public async void AddItem(ItemView item)
+    public async void AddItem(Item item)
     {
-        var added = _inventory.AttemptAddItem(item.Instance, item.Template);
+        var added = _inventory.AttemptAddItem(item);
         if (!added)
         {
             var options = new { message = $"Can't Add {item.Template.NameLocaleId}, Not enough slots", type = "is-danger", position = "center" };
@@ -121,38 +121,38 @@
         }
     }
 
-    public void RemoveItem(ItemView item)
+    public void RemoveItem(Item item)
     {
         if (item == null) { return; }
-        var removed = _inventory.AttemptRemoveItem(item.Instance);
+        var removed = _inventory.AttemptRemoveItem(item.Data);
         _inventoryRef.Refresh();
 
     }
 
-    private ItemView MakeRubbishSword()
+    private Item MakeRubbishSword()
     {
-        var item = new Item { TemplateId = ItemTemplateLookups.Sword };
-        return TemplateAccessor.ToView(item);
+        var item = new ItemData { TemplateId = ItemTemplateLookups.Sword };
+        return TemplateAccessor.ToInstance(item);
     }
 
-    private ItemView MakeSuperSword()
+    private Item MakeSuperSword()
     {
-        var item = new Item { TemplateId = ItemTemplateLookups.SuperSword };
-        return TemplateAccessor.ToView(item);
+        var item = new ItemData { TemplateId = ItemTemplateLookups.SuperSword };
+        return TemplateAccessor.ToInstance(item);
     }
 
-    private ItemView MakePotion()
+    private Item MakePotion()
     {
-        var item = new Item { TemplateId = ItemTemplateLookups.HealingPotion };
+        var item = new ItemData { TemplateId = ItemTemplateLookups.HealingPotion };
         item.Variables.Amount(1);
-        return TemplateAccessor.ToView(item);
+        return TemplateAccessor.ToInstance(item);
     }
 
-    private ItemView MakeJunkPotion()
+    private Item MakeJunkPotion()
     {
-        var item = new Item { TemplateId = ItemTemplateLookups.JunkPotion };
+        var item = new ItemData { TemplateId = ItemTemplateLookups.JunkPotion };
         item.Variables.Amount(3);
-        return TemplateAccessor.ToView(item);
+        return TemplateAccessor.ToInstance(item);
     }
 
 }

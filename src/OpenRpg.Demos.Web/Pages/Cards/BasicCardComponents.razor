@@ -122,16 +122,16 @@
         template.Variables.Value(10);
         template.Variables.AssetCode("sword");
 
-        var item = new Item { TemplateId = template.Id };
-        var itemView = TemplateAccessor.ToView(item);
-        return new EquipmentCard(itemView);
+        var itemData = new ItemData { TemplateId = template.Id };
+        var item = TemplateAccessor.ToInstance(itemData);
+        return new EquipmentCard(item);
     }
 
     private IEnumerable<ICard> MakeExampleCards()
     {
-        var potion = new Item { TemplateId = ItemTemplateLookups.HealingPotion };
-        var potionView = TemplateAccessor.ToView(potion);
-        yield return new ItemCard(potionView);
+        var potionData = new ItemData { TemplateId = ItemTemplateLookups.HealingPotion };
+        var potion = TemplateAccessor.ToInstance(potionData);
+        yield return new ItemCard(potion);
         yield return _rubbishSwordCard;
         yield return new ClassCard(TemplateAccessor.GetClassTemplate(ClassTypeLookups.Fighter));
         yield return new RaceCard(TemplateAccessor.GetRaceTemplate(RaceTypeLookups.Dwarf));
