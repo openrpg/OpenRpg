@@ -162,12 +162,12 @@
     {
         var firstItemTemplate = Repository.GetAll<ItemTemplate>().FirstOrDefault();
         if (firstItemTemplate != null)
-        { CurrentItemTemplate = firstItemTemplate as ItemTemplate; }
+        { CurrentItemTemplate = firstItemTemplate; }
         else
         {
             CurrentItemTemplate = new ItemTemplate();
             CurrentItemTemplate.Id = 1;
-            Repository.Create<ItemTemplate>(CurrentItemTemplate);
+            Repository.Create(CurrentItemTemplate);
         }
     }
 
@@ -177,7 +177,7 @@
         CurrentItemTemplate.Id = Repository.GetAll<ItemTemplate>().Count() + 1;
         CurrentItemTemplate.Variables.AssetCode($"item-{CurrentItemTemplate.Id}");
         CurrentItemTemplate.GenerateLocaleCodes(CurrentItemTemplate.Variables.AssetCode());
-        Repository.Create<ItemTemplate>(CurrentItemTemplate);
+        Repository.Create(CurrentItemTemplate);
         StateHasChanged();
     }
 

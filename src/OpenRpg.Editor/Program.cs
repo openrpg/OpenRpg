@@ -1,10 +1,11 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using OpenRpg.Editor.Desktop.Modules;
-using OpenRpg.Editor.Web;
+using OpenRpg.Editor.Infrastructure.Extensions;
+using OpenRpg.Editor.Modules;
+using OpenRpg.Editor.UI;
 using Photino.Blazor;
 
-namespace OpenRpg.Editor.Desktop;
+namespace OpenRpg.Editor;
 
 class Program
 {
@@ -15,9 +16,11 @@ class Program
 
         appBuilder.Services.AddLogging();
         DataServiceModule.Setup(appBuilder.Services);
-        appBuilder.RootComponents.Add<App>("app");
+        appBuilder.RootComponents.Add<App>("#app");
 
         var app = appBuilder.Build();
+        app.Services.SetupAppData();
+        
         AppDomain.CurrentDomain.UnhandledException += (sender, error) =>
             { app.MainWindow.ShowMessage("Fatal exception", error.ExceptionObject.ToString()); };
 

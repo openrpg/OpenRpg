@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Core.Classes.Templates;
 using OpenRpg.Core.Races.Templates;
 using OpenRpg.Data;
-using OpenRpg.Data.InMemory;
+using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Editor.Infrastructure.Pipelines;
 using OpenRpg.Editor.Infrastructure.Pipelines.Typed;
 using OpenRpg.Editor.Infrastructure.Services;
@@ -20,7 +20,7 @@ using Persistity.Endpoints.Files;
 using Persistity.Flow.Builders;
 using Persistity.Serializers.Json;
 
-namespace OpenRpg.Editor.Desktop.Modules
+namespace OpenRpg.Editor.Modules
 {
     public class DataServiceModule
     {
@@ -66,6 +66,10 @@ namespace OpenRpg.Editor.Desktop.Modules
         
         public static void RegisterRepository(IServiceCollection services)
         {
+            services.AddSingleton<EditorDatasource>();
+            services.AddSingleton<IDataSource>(x => x.GetService<EditorDatasource>());
+            
+            /*
             services.AddSingleton<IDataSource>(x =>
             {
                 var itemTemplateData = LoadPipelineData<List<ItemTemplate>>(x);
@@ -78,9 +82,9 @@ namespace OpenRpg.Editor.Desktop.Modules
                 inMemoryDatabase.Add(typeof(ClassTemplate), classTemplateData.ToDictionary(x => (object)x.Id, x => (object)x));
                 inMemoryDatabase.Add(typeof(Quest), questTemplateData.ToDictionary(x => (object)x.Id, x => (object)x));
                 return new InMemoryDataSource(inMemoryDatabase);
-            });
+            });*/
 
-            services.AddSingleton<IRepository, DefaultRepository>();
+            services.AddSingleton<IRepository, Repository>();
         }
 
         public static void RegisterLocaleRespository(IServiceCollection services)

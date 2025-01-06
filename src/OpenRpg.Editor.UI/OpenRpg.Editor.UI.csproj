@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
-        <RootNamespace>OpenRpg.Editor.Web</RootNamespace>
         <LangVersion>13</LangVersion>
     </PropertyGroup>
 
@@ -16,7 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.Editor.Infrastructure\OpenRpg.Editor.Infrastructure.csproj" />
-      <ProjectReference Include="..\OpenRpg.Editor\OpenRpg.Editor.csproj" />
+      <ProjectReference Include="..\OpenRpg.Editor.Core\OpenRpg.Editor.Core.csproj" />
       <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
     </ItemGroup>
 

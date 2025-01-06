@@ -13,12 +13,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\OpenRpg.Data.InMemory\OpenRpg.Data.InMemory.csproj" />
         <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
         <ProjectReference Include="..\OpenRpg.Localization\OpenRpg.Localization.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Queries" />
     </ItemGroup>
 
 </Project>

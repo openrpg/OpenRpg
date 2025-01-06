@@ -3,11 +3,11 @@ using OpenRpg.Core.Templates;
 
 namespace OpenRpg.Data
 {
-    public class DefaultTemplateAccessor : ITemplateAccessor
+    public class TemplateAccessor : ITemplateAccessor
     {
         public IDataSource DataSource { get; }
 
-        public DefaultTemplateAccessor(IDataSource dataSource)
+        public TemplateAccessor(IDataSource dataSource)
         {
             DataSource = dataSource;
         }
