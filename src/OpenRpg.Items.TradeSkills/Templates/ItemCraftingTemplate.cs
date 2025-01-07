@@ -7,7 +7,7 @@ using OpenRpg.Items.TradeSkills.Variables;
 
 namespace OpenRpg.Items.TradeSkills.Templates
 {
-    public class ItemCraftingTemplate : ITemplate, ITradeSkillData, IHasRequirements, IHasVariables<ItemCraftingTemplateVariables>
+    public class ItemCraftingTemplate : ITemplate<ItemCraftingTemplateVariables>, ITradeSkillData, IHasRequirements
     {
         /// <summary>
         /// The Id for this template

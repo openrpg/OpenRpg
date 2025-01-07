@@ -9,7 +9,7 @@ using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Templates
 {
-    public class ItemTemplate : ITemplate, IHasRequirements, IHasEffects, IAllowsModification, IHasVariables<ItemTemplateVariables>
+    public class ItemTemplate : ITemplate<ItemTemplateVariables>, IHasRequirements, IHasEffects, IAllowsModification
     {
         public int Id { get; set; }
         public int ItemType { get; set;  }

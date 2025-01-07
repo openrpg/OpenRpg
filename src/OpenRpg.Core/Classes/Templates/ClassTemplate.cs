@@ -8,7 +8,7 @@ using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Core.Classes.Templates
 {
-    public class ClassTemplate : ITemplate, IHasEffects, IHasRequirements, IHasVariables<ClassTemplateVariables>
+    public class ClassTemplate : ITemplate<ClassTemplateVariables>, IHasEffects, IHasRequirements
     {
         public int Id { get; set; }
         public string NameLocaleId { get; set; }

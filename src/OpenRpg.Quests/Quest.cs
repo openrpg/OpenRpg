@@ -7,7 +7,7 @@ using OpenRpg.Quests.Variables;
 
 namespace OpenRpg.Quests
 {
-    public class Quest : ITemplate, IHasRequirements, IHasVariables<QuestVariables>
+    public class Quest : ITemplate<QuestVariables>, IHasRequirements
     {
         public int Id { get; set; }
         public string NameLocaleId { get; set; }

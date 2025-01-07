@@ -8,7 +8,7 @@ using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Core.Races.Templates
 {
-    public class RaceTemplate : ITemplate, IHasEffects, IHasRequirements, IHasVariables<RaceTemplateVariables>
+    public class RaceTemplate : ITemplate<RaceTemplateVariables>, IHasEffects, IHasRequirements
     {
         public int Id { get; set; }
         public string NameLocaleId { get; set; }
