@@ -19,7 +19,7 @@
                     OnAdd="AddQuest" OnSelected="selected => SelectQuest(selected as Quest)">
         </ContentSidebar>
     </div>
-    <div class="column">
+    <div class="column has-background-grey-dark">
         
         <div class="is-rounded has-background-dark p-lg m-md">
             <BasicDetailsEditor Data="CurrentQuest">
@@ -68,13 +68,9 @@
     {
         var firstQuest = Repository.GetAll<Quest>().FirstOrDefault();
         if (firstQuest != null)
-        { CurrentQuest = firstQuest as Quest; }
+        { CurrentQuest = firstQuest; }
         else
-        {
-            CurrentQuest = new Quest();
-            CurrentQuest.Id = 1;
-            Repository.Create<Quest>(CurrentQuest);
-        }
+        { AddQuest(); }
     }
 
     public void AddQuest()
@@ -82,7 +78,8 @@
         CurrentQuest = new Quest();
         CurrentQuest.Id = Repository.GetAll<Quest>().Count() + 1;
         CurrentQuest.Variables.AssetCode($"quest-{CurrentQuest.Id}");
-        Repository.Create<Quest>(CurrentQuest);
+        CurrentQuest.GenerateLocaleCodes(CurrentQuest.Variables.AssetCode());
+        Repository.Create(CurrentQuest);
         StateHasChanged();
     }
 

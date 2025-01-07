@@ -1,3 +1,4 @@
+using System;
 using OpenRpg.Localization.Data.DataSources;
 
 namespace OpenRpg.Localization.Data.Queries.Conventions
@@ -9,6 +10,9 @@ namespace OpenRpg.Localization.Data.Queries.Conventions
 
         public UpdateLocaleQuery(string text, string key)
         {
+            if (string.IsNullOrEmpty(key))
+            { throw new ArgumentException("key cannot be null or empty", nameof(key)); }
+            
             Text = text;
             Key = key;
         }

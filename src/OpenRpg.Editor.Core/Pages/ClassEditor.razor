@@ -1,6 +1,5 @@
 ﻿@page "/classes"
 
-@using OpenRpg.Core.Classes
 @using OpenRpg.Core.Classes.Templates
 @using OpenRpg.Core.Effects
 @using OpenRpg.Core.Requirements
@@ -22,7 +21,7 @@
                         OnSelected="(selected => SelectClass(selected as ClassTemplate))">
         </ContentSidebar>
     </div>
-    <div class="column">
+    <div class="column has-background-grey-dark">
         
         <div class="is-rounded has-background-dark p-lg m-md">
             <BasicDetailsEditor Data="CurrentClassTemplate">
@@ -62,13 +61,9 @@
         var firstClassTemplate = Repository.GetAll<ClassTemplate>().FirstOrDefault();
         
         if (firstClassTemplate != null)
-        { CurrentClassTemplate = firstClassTemplate as ClassTemplate; }
+        { CurrentClassTemplate = firstClassTemplate; }
         else
-        {
-            CurrentClassTemplate = new ClassTemplate();
-            CurrentClassTemplate.Id = 1;
-            Repository.Create<ClassTemplate>(CurrentClassTemplate);
-        }
+        { AddClass(); }
     }
 
     public void AddClass()
@@ -76,7 +71,8 @@
         CurrentClassTemplate = new ClassTemplate();
         CurrentClassTemplate.Id = Repository.GetAll<ClassTemplate>().Count() + 1;
         CurrentClassTemplate.Variables.AssetCode($"class-{CurrentClassTemplate.Id}");
-        Repository.Create<ClassTemplate>(CurrentClassTemplate);
+        CurrentClassTemplate.GenerateLocaleCodes(CurrentClassTemplate.Variables.AssetCode());
+        Repository.Create(CurrentClassTemplate);
         StateHasChanged();
     }
 

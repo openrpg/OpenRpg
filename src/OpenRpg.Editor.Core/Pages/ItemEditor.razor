@@ -25,9 +25,9 @@
                     OnAdd="@AddItem" OnSelected="@((selected) => SelectItem(selected as ItemTemplate))">
         </ContentSidebar>
     </div>
-    <div class="column">
+    <div class="column has-background-grey-dark">
         
-        <div class="is-rounded has-background-dark p-lg m-md">
+        <div class="is-rounded p-lg m-md">
             <BasicDetailsEditor Data="CurrentItemTemplate">
                 <AvatarContent>
                     <figure id="item-image" quality-type="@CurrentItemTemplate.Variables.QualityType()" 
@@ -36,7 +36,8 @@
                     </figure>
                 </AvatarContent>
                 <AdditionalContent>
-                    <AssetCodeEditor Variables="CurrentItemTemplate.Variables" DefaultAssetCode="@($"item-{CurrentItemTemplate.Id}")" 
+                    <AssetCodeEditor Variables="CurrentItemTemplate.Variables" 
+                                     DefaultAssetCode="@($"item-{CurrentItemTemplate.Id}")" 
                                      OnAssetCodeChanged="OnAssetCodeChanged"/>
                 </AdditionalContent>
             </BasicDetailsEditor>
@@ -164,11 +165,7 @@
         if (firstItemTemplate != null)
         { CurrentItemTemplate = firstItemTemplate; }
         else
-        {
-            CurrentItemTemplate = new ItemTemplate();
-            CurrentItemTemplate.Id = 1;
-            Repository.Create(CurrentItemTemplate);
-        }
+        { AddItem(); }
     }
 
     public void AddItem()

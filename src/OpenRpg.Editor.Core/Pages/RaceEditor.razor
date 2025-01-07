@@ -19,7 +19,7 @@
         <ContentSidebar Title="Race Templates" Data="Repository.GetAll<RaceTemplate>()" SelectedItem="CurrentRaceTemplate"
                         OnAdd="AddRace" OnSelected="selected => SelectRace(selected as RaceTemplate)"/>
     </div>
-    <div class="column">
+    <div class="column has-background-grey-dark">
         
         <div class="is-rounded has-background-dark p-lg m-md">
             <div class="is-rounded has-background-dark p-lg m-md">
@@ -60,13 +60,9 @@
     {
         var firstRaceTemplate = Repository.GetAll<RaceTemplate>().FirstOrDefault();
         if (firstRaceTemplate != null)
-        { CurrentRaceTemplate = firstRaceTemplate as RaceTemplate; }
+        { CurrentRaceTemplate = firstRaceTemplate; }
         else
-        {
-            CurrentRaceTemplate = new RaceTemplate();
-            CurrentRaceTemplate.Id = 1;
-            Repository.Create<RaceTemplate>(CurrentRaceTemplate);
-        }
+        { AddRace(); }
     }
 
     public void AddRace()
@@ -74,7 +70,8 @@
         CurrentRaceTemplate = new RaceTemplate();
         CurrentRaceTemplate.Id = Repository.GetAll<RaceTemplate>().Count() + 1;
         CurrentRaceTemplate.Variables.AssetCode($"race-new-{CurrentRaceTemplate.Id}");
-        Repository.Create<RaceTemplate>(CurrentRaceTemplate);
+        CurrentRaceTemplate.GenerateLocaleCodes(CurrentRaceTemplate.Variables.AssetCode());
+        Repository.Create(CurrentRaceTemplate);
         StateHasChanged();
     }
 

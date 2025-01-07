@@ -49,7 +49,7 @@
     [Parameter] public RenderFragment<TItem> NestedRowTemplate { get; set; }
     [Parameter] public IEnumerable<TItem> Data { get; set; }
     [Parameter] public EventCallback<List<TItem>> OnUpdate { get; set; }
-    [Parameter] public bool ShowNoCount { get; set; } = false;
+    [Parameter] public bool ShowNoCount { get; set; } = true;
     
     public List<TItem> ProxyList { get; set; }
 

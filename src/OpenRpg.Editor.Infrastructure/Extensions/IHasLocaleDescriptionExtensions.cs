@@ -1,4 +1,6 @@
+using OpenRpg.Core.Classes.Templates;
 using OpenRpg.Core.Common;
+using OpenRpg.Core.Races.Templates;
 using OpenRpg.Items.Templates;
 using OpenRpg.Localization.Data.Extensions;
 using OpenRpg.Localization.Data.Repositories;
@@ -15,12 +17,12 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
                 itemTemplate.NameLocaleId = $"{newAssetCode}-name";
                 itemTemplate.DescriptionLocaleId = $"{newAssetCode}-description";
             }
-            else if (localeEntity is ItemTemplate classTemplate)
+            else if (localeEntity is ClassTemplate classTemplate)
             {
                 classTemplate.NameLocaleId = $"{newAssetCode}-name";
                 classTemplate.DescriptionLocaleId = $"{newAssetCode}-description";
             }
-            else if (localeEntity is ItemTemplate raceTemplate)
+            else if (localeEntity is RaceTemplate raceTemplate)
             {
                 raceTemplate.NameLocaleId = $"{newAssetCode}-name";
                 raceTemplate.DescriptionLocaleId = $"{newAssetCode}-description";

@@ -1,8 +1,8 @@
 @using OpenRpg.Core.Common
 
-<aside class="menu side-menu has-background-dark">
+<div class="box has-background-grey-dark">
     <p class="menu-label">
-        <span>@Title</span> 
+        <span class="has-text-white">@Title</span> 
         <a class="tag is-primary m-sm" @onclick="OnAdd">+ Add</a>
     </p>
     <ul class="menu-list p-sm">
@@ -14,7 +14,7 @@
             </li>
         }
     </ul>
-</aside>
+</div>
 
 @functions {
     [Parameter] public string Title { get; set; }
