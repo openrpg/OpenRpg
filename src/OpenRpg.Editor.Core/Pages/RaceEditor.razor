@@ -7,12 +7,14 @@
 @using OpenRpg.Data.Conventions.Extensions
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Pipelines.Typed
+@using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Localization.Data.Repositories
 
 @inject IJSRuntime JS
 @inject IRepository Repository
 @inject ISaveDataPipeline<List<RaceTemplate>> SavePipeline;
 @inject ILocaleRepository LocaleRepository;
+@inject ICloner Cloner;
 
 <div class="columns">
     <div class="column is-one-fifth">
@@ -46,8 +48,22 @@
             <RequirementsEditor Requirements="CurrentRaceTemplate.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
         </div>
         
-        <div>
-            <a class="button is-success" @onclick="SaveChanges">Save</a>
+        <div class="field is-grouped has-text-centered">
+            <p class="control">
+                <a class="button is-success" @onclick="SaveChanges">
+                    Save Item
+                </a>
+            </p>
+            <p class="control">
+                <a class="button is-info" @onclick="CloneTemplate">
+                    Clone Item
+                </a>
+            </p>
+            <p class="control">
+                <a class="button is-danger" @onclick="DeleteTemplate">
+                    Delete Item
+                </a>
+            </p>
         </div>
         
     </div>
@@ -58,13 +74,18 @@
 
     protected override void OnInitialized()
     {
+        SelectDefault();
+    }
+
+    public void SelectDefault()
+    {
         var firstRaceTemplate = Repository.GetAll<RaceTemplate>().FirstOrDefault();
         if (firstRaceTemplate != null)
         { CurrentRaceTemplate = firstRaceTemplate; }
         else
         { AddRace(); }
     }
-
+    
     public void AddRace()
     {
         CurrentRaceTemplate = new RaceTemplate();
@@ -81,6 +102,28 @@
         StateHasChanged();
     }
 
+    public void CloneTemplate()
+    {
+        var clone = Cloner.Clone(CurrentRaceTemplate);
+        clone.Id = Repository.GetAll<RaceTemplate>().Count() + 1;
+        clone.Variables.AssetCode($"{CurrentRaceTemplate.Variables.AssetCode()}-clone");
+        clone.GenerateLocaleCodes(clone.Variables.AssetCode());
+        Repository.Create<RaceTemplate>(clone);
+        
+        var options = new {message = $"Cloned Class {CurrentRaceTemplate.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
+        JS.InvokeAsync<object>("bulmaToast.toast", options);
+        
+        CurrentRaceTemplate = clone;
+        StateHasChanged();
+    }
+    
+    public void DeleteTemplate()
+    {
+        Repository.Delete<RaceTemplate>(CurrentRaceTemplate.Id);
+        var options = new {message = $"Deleted Item {CurrentRaceTemplate.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
+        JS.InvokeAsync<object>("bulmaToast.toast", options);   
+        SelectDefault();
+    }
     
     public async void SaveChanges()
     {

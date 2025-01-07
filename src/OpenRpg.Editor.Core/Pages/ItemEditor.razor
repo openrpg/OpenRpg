@@ -136,12 +136,12 @@
                 </a>
             </p>
             <p class="control">
-                <a class="button is-info" @onclick="CloneItem">
+                <a class="button is-info" @onclick="CloneTemplate">
                     Clone Item
                 </a>
             </p>
             <p class="control">
-                <a class="button is-danger" @onclick="DeleteItem">
+                <a class="button is-danger" @onclick="DeleteTemplate">
                     Delete Item
                 </a>
             </p>
@@ -184,7 +184,7 @@
         StateHasChanged();
     }
 
-    public void DeleteItem()
+    public void DeleteTemplate()
     {
         Repository.Delete<ItemTemplate>(CurrentItemTemplate.Id);
         var options = new {message = $"Deleted Item {CurrentItemTemplate.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
@@ -192,7 +192,7 @@
         SelectDefault();
     }
 
-    public void CloneItem()
+    public void CloneTemplate()
     {
         var clone = Cloner.Clone(CurrentItemTemplate);
         clone.Id = Repository.GetAll<ItemTemplate>().Count() + 1;

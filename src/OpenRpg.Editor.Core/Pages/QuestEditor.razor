@@ -5,6 +5,7 @@
 @using OpenRpg.Data.Conventions.Extensions
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Pipelines.Typed
+@using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Localization.Data.Repositories
 @using OpenRpg.Quests
 
@@ -12,6 +13,7 @@
 @inject IRepository Repository
 @inject ISaveDataPipeline<List<Quest>> SavePipeline;
 @inject ILocaleRepository LocaleRepository;
+@inject ICloner Cloner;
 
 <div class="columns">
     <div class="column is-one-fifth">
@@ -54,8 +56,22 @@
             <RequirementsEditor Requirements="CurrentQuest.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
         </div>
         
-        <div>
-            <a class="button is-success" @onclick="SaveChanges">Save</a>
+        <div class="field is-grouped has-text-centered">
+            <p class="control">
+                <a class="button is-success" @onclick="SaveChanges">
+                    Save Item
+                </a>
+            </p>
+            <p class="control">
+                <a class="button is-info" @onclick="CloneTemplate">
+                    Clone Item
+                </a>
+            </p>
+            <p class="control">
+                <a class="button is-danger" @onclick="DeleteTemplate">
+                    Delete Item
+                </a>
+            </p>
         </div>
         
     </div>
@@ -65,6 +81,11 @@
     public Quest CurrentQuest;
 
     protected override void OnInitialized()
+    {
+        SelectDefault();
+    }
+
+    public void SelectDefault()
     {
         var firstQuest = Repository.GetAll<Quest>().FirstOrDefault();
         if (firstQuest != null)
@@ -87,6 +108,29 @@
     {
         CurrentQuest = quest;
         StateHasChanged();
+    }
+    
+    public void CloneTemplate()
+    {
+        var clone = Cloner.Clone(CurrentQuest);
+        clone.Id = Repository.GetAll<Quest>().Count() + 1;
+        clone.Variables.AssetCode($"{CurrentQuest.Variables.AssetCode()}-clone");
+        clone.GenerateLocaleCodes(clone.Variables.AssetCode());
+        Repository.Create<Quest>(clone);
+        
+        var options = new {message = $"Cloned Quest {CurrentQuest.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
+        JS.InvokeAsync<object>("bulmaToast.toast", options);
+        
+        CurrentQuest = clone;
+        StateHasChanged();
+    }
+    
+    public void DeleteTemplate()
+    {
+        Repository.Delete<Quest>(CurrentQuest.Id);
+        var options = new {message = $"Deleted Item {CurrentQuest.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
+        JS.InvokeAsync<object>("bulmaToast.toast", options);   
+        SelectDefault();
     }
 
     public async void SaveChanges()
