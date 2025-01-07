@@ -25,126 +25,128 @@
                     OnAdd="@AddItem" OnSelected="@((selected) => SelectItem(selected as ItemTemplate))">
         </ContentSidebar>
     </div>
-    <div class="column has-background-grey-dark">
+    <div class="column">
         
-        <div class="is-rounded p-lg m-md">
-            <BasicDetailsEditor Data="CurrentItemTemplate">
-                <AvatarContent>
-                    <figure id="item-image" quality-type="@CurrentItemTemplate.Variables.QualityType()" 
-                            class="image is-128x128 pixilize is-margin-auto is-rounded has-background-grey-dark p-md">
-                        <img src="@($"Assets/{CurrentItemTemplate.Variables.AssetCode()}.png")">
-                    </figure>
-                </AvatarContent>
-                <AdditionalContent>
-                    <AssetCodeEditor Variables="CurrentItemTemplate.Variables" 
-                                     DefaultAssetCode="@($"item-{CurrentItemTemplate.Id}")" 
-                                     OnAssetCodeChanged="OnAssetCodeChanged"/>
-                </AdditionalContent>
-            </BasicDetailsEditor>
-        </div>
+        <div class="box">
+            <div class="is-rounded has-background-dark p-lg m-md">
+                <BasicDetailsEditor Data="CurrentItemTemplate">
+                    <AvatarContent>
+                        <figure id="item-image" quality-type="@CurrentItemTemplate.Variables.QualityType()" 
+                                class="image is-128x128 pixilize is-margin-auto is-rounded has-background-grey-dark p-md">
+                            <img src="@($"Assets/{CurrentItemTemplate.Variables.AssetCode()}.png")">
+                        </figure>
+                    </AvatarContent>
+                    <AdditionalContent>
+                        <AssetCodeEditor Variables="CurrentItemTemplate.Variables" 
+                                         DefaultAssetCode="@($"item-{CurrentItemTemplate.Id}")" 
+                                         OnAssetCodeChanged="OnAssetCodeChanged"/>
+                    </AdditionalContent>
+                </BasicDetailsEditor>
+            </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Item Details</h4>
-            <div class="field is-horizontal">
-                <div class="field-label">
-                    <label class="label has-text-light">Stack Amount</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="i.e 25" 
-                                   value="@CurrentItemTemplate.Variables.MaxStacks()" 
-                                   @onchange="e => CurrentItemTemplate.Variables.MaxStacks(int.Parse(e.Value?.ToString()))"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="field is-horizontal">
-                <div class="field-label">
-                    <label class="label has-text-light">Value</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="i.e 100" 
-                                   value="@CurrentItemTemplate.Variables.Value()"
-                                   @onchange="e => CurrentItemTemplate.Variables.Value(int.Parse(e.Value?.ToString()))"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="field is-horizontal">
-                <div class="field-label">
-                    <label class="label has-text-light">Item Type</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <div class="control">
-                            <div class="select">
-                                <select @bind="CurrentItemTemplate.ItemType">
-                                    @foreach (var itemType in TypesHelper.GetItemTypes)
-                                    {
-                                        <option value=@itemType.Id>@itemType.Name</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+            <div class="is-rounded has-background-dark p-lg m-md">
+                <h4 class="title is-4">Item Details</h4>
+                <div class="field is-horizontal">
                     <div class="field-label">
-                        <label class="label has-text-light">Item Quality</label>
+                        <label class="label has-text-light">Stack Amount</label>
                     </div>
-                    <div class="field">
-                        <div class="control">
-                            <div class="select">
-                                <select value="@CurrentItemTemplate.Variables.QualityType()" 
-                                        @onchange="e => CurrentItemTemplate.Variables.QualityType(int.Parse(e.Value?.ToString()))">
-                                    @foreach (var itemType in TypesHelper.GetItemQualityTypes)
-                                    {
-                                        <option value=@itemType.Id>@itemType.Name</option>
-                                    }
-                                </select>
+                    <div class="field-body">
+                        <div class="field">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="i.e 25" 
+                                       value="@CurrentItemTemplate.Variables.MaxStacks()" 
+                                       @onchange="e => CurrentItemTemplate.Variables.MaxStacks(int.Parse(e.Value?.ToString()))"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label">
+                        <label class="label has-text-light">Value</label>
+                    </div>
+                    <div class="field-body">
+                        <div class="field">
+                            <div class="control">
+                                <input class="input" type="text" placeholder="i.e 100" 
+                                       value="@CurrentItemTemplate.Variables.Value()"
+                                       @onchange="e => CurrentItemTemplate.Variables.Value(int.Parse(e.Value?.ToString()))"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label">
+                        <label class="label has-text-light">Item Type</label>
+                    </div>
+                    <div class="field-body">
+                        <div class="field">
+                            <div class="control">
+                                <div class="select">
+                                    <select @bind="CurrentItemTemplate.ItemType">
+                                        @foreach (var itemType in TypesHelper.GetItemTypes)
+                                        {
+                                            <option value=@itemType.Id>@itemType.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field-label">
+                            <label class="label has-text-light">Item Quality</label>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <div class="select">
+                                    <select value="@CurrentItemTemplate.Variables.QualityType()" 
+                                            @onchange="e => CurrentItemTemplate.Variables.QualityType(int.Parse(e.Value?.ToString()))">
+                                        @foreach (var itemType in TypesHelper.GetItemQualityTypes)
+                                        {
+                                            <option value=@itemType.Id>@itemType.Name</option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <LocaleDetails LocaleData="CurrentItemTemplate"></LocaleDetails>
-        </div>
+            <div class="is-rounded has-background-dark p-lg m-md">
+                <LocaleDetails LocaleData="CurrentItemTemplate"></LocaleDetails>
+            </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Effects</h4>
-            <EffectsEditor Effects="CurrentItemTemplate.Effects" OnUpdate="@UpdateEffect"></EffectsEditor>
-        </div>
+            <div class="is-rounded has-background-dark p-lg m-md">
+                <h4 class="title is-4">Effects</h4>
+                <EffectsEditor Effects="CurrentItemTemplate.Effects" OnUpdate="@UpdateEffect"></EffectsEditor>
+            </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Requirements</h4>
-            <RequirementsEditor Requirements="CurrentItemTemplate.Requirements" OnUpdate="@UpdateRequirements"></RequirementsEditor>
-        </div>
+            <div class="is-rounded has-background-dark p-lg m-md">
+                <h4 class="title is-4">Requirements</h4>
+                <RequirementsEditor Requirements="CurrentItemTemplate.Requirements" OnUpdate="@UpdateRequirements"></RequirementsEditor>
+            </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Modification Allowances</h4>
-            <ModificationAllowancesEditor ModificationAllowances="CurrentItemTemplate.ModificationAllowances" OnUpdate="UpdateModificationAllowances"></ModificationAllowancesEditor>
-        </div>
+            <div class="is-rounded has-background-dark p-lg m-md">
+                <h4 class="title is-4">Modification Allowances</h4>
+                <ModificationAllowancesEditor ModificationAllowances="CurrentItemTemplate.ModificationAllowances" OnUpdate="UpdateModificationAllowances"></ModificationAllowancesEditor>
+            </div>
         
-        <div class="field is-grouped has-text-centered">
-            <p class="control">
-                <a class="button is-success" @onclick="SaveChanges">
-                    Save Item
-                </a>
-            </p>
-            <p class="control">
-                <a class="button is-info" @onclick="CloneTemplate">
-                    Clone Item
-                </a>
-            </p>
-            <p class="control">
-                <a class="button is-danger" @onclick="DeleteTemplate">
-                    Delete Item
-                </a>
-            </p>
+            <div class="field is-grouped has-text-centered">
+                <p class="control">
+                    <a class="button is-success" @onclick="SaveChanges">
+                        Save Item
+                    </a>
+                </p>
+                <p class="control">
+                    <a class="button is-info" @onclick="CloneTemplate">
+                        Clone Item
+                    </a>
+                </p>
+                <p class="control">
+                    <a class="button is-danger" @onclick="DeleteTemplate">
+                        Delete Item
+                    </a>
+                </p>
+            </div>
         </div>
         
     </div>

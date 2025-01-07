@@ -1,26 +1,60 @@
 @using OpenRpg.Core.Common
 
-<div class="box has-background-grey-dark">
-    <p class="menu-label">
-        <span class="has-text-white">@Title</span> 
-        <a class="tag is-primary m-sm" @onclick="OnAdd">+ Add</a>
-    </p>
-    <ul class="menu-list p-sm">
-        @foreach (var current in Data)
+@typeparam TData where TData: IHasDataId, IHasLocaleDescription
+
+<Accordion Title="Flow Filter" HeaderClasses="is-primary">
+    <div class="field">
+        <label class="label">Filter Content By Name</label>
+        <div class="control">
+            <input class="input" placeholder="Put in the partial name" @bind="SearchCriteria"/>
+        </div>
+    </div>
+</Accordion>
+
+<div class="box">
+    <div class="field">
+        <div class="control">
+            <button class="button is-primary is-leveled" @onclick="OnAdd">
+                <span class="icon is-small">
+                  <i class="fas fa-file-lines"></i>
+                </span>
+                <span>Add New</span>
+            </button>
+        </div>
+    </div>
+
+    <aside class="menu">
+        <ul class="menu-list">
+        @foreach (var element in GetFilteredData())
         {
-            <li class="menu-item m-sm">
-                <a class="button has-text-left @(current.Id == SelectedItem.Id ? "is-active" : "")" 
-                   @onclick="() => OnSelected.InvokeAsync(current)">@($"{current.Id}. {(current as IHasLocaleDescription)?.NameLocaleId}")</a>
+            <li>
+                <a class="ace @(element.Id == SelectedItem.Id ? "is-active" : "")"
+                   @onclick="() => OnSelected.InvokeAsync(element)">
+                    <span class="tag is-pulled-left">@element.Id</span>
+                    @element.NameLocaleId
+                </a>
             </li>
         }
-    </ul>
+        </ul>
+    </aside>
 </div>
 
 @functions {
     [Parameter] public string Title { get; set; }
-    [Parameter] public IEnumerable<IHasDataId> Data { get; set; }
+    [Parameter] public IEnumerable<TData> Data { get; set; }
     [Parameter] public IHasDataId SelectedItem { get; set; }
     
     [Parameter] public EventCallback OnAdd { get; set; }
     [Parameter] public EventCallback<IHasDataId> OnSelected { get; set; }
+    
+    public string SearchCriteria { get; set; }
+    
+    public IEnumerable<TData> GetFilteredData()
+    {
+        if (string.IsNullOrEmpty(SearchCriteria))
+        { return Data; }
+
+        return Data
+            .Where(x => x.NameLocaleId.Contains(SearchCriteria, StringComparison.OrdinalIgnoreCase));
+    }
 }
