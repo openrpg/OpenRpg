@@ -1,4 +1,6 @@
 ﻿@using OpenRpg.Core.Common
+@using OpenRpg.Editor.Core.Components.Modal
+@using OpenRpg.Editor.Core.Services.Modal
 
 <h4 class="title is-4 has-text-dark">Locale Details</h4>
 <div class="field is-horizontal">
@@ -14,7 +16,6 @@
         </div>
         <div class="field">
             <a class="button is-info" @onclick="ShowNameModal">Edit Locales</a>
-            <LocaleEditorModal LocaleId="@LocaleData.NameLocaleId" @bind-IsActive="IsNameModalActive"></LocaleEditorModal>
         </div>
     </div>
 </div>
@@ -31,27 +32,31 @@
         </div>
         <div class="field">
             <a class="button is-info" @onclick="ShowDescriptionModal">Edit Locales</a>
-            <LocaleEditorModal LocaleId="@LocaleData.DescriptionLocaleId" @bind-IsActive="IsDescriptionModalActive"></LocaleEditorModal>
         </div>
     </div>
 </div>
 
+<ModalContent Id="locale-name-modal" @ref="EditLocaleNameModal">
+    <LocaleEditorModal LocaleId="@LocaleData.NameLocaleId" OnCancelled="ModalService.CloseModal" OnSaved="ModalService.CloseModal" />
+</ModalContent>
+
+<ModalContent Id="locale-description-modal" @ref="EditLocaleDescriptionModal">
+    <LocaleEditorModal LocaleId="@LocaleData.DescriptionLocaleId" OnCancelled="ModalService.CloseModal" OnSaved="ModalService.CloseModal" />
+</ModalContent>
+
 @functions {
+    [CascadingParameter]
+    public IModalInteractionService ModalService { get; set; }
+    
     [Parameter]
     public IHasLocaleDescription LocaleData { get; set; }
 
     bool IsNameModalActive { get; set; }
     bool IsDescriptionModalActive { get; set; }
-
-    void ShowNameModal()
-    {
-        IsNameModalActive = true;
-        StateHasChanged();
-    }
     
-    void ShowDescriptionModal()
-    {
-        IsDescriptionModalActive = true;
-        StateHasChanged();
-    }
+    public ModalElementReference EditLocaleNameModal { get; set; }
+    public ModalElementReference EditLocaleDescriptionModal { get; set; }
+
+    void ShowNameModal() => ModalService.ShowModal(EditLocaleNameModal.Reference);
+    void ShowDescriptionModal() => ModalService.ShowModal(EditLocaleDescriptionModal.Reference);
 }
