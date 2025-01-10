@@ -6,12 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Core.Classes.Templates;
 using OpenRpg.Core.Races.Templates;
 using OpenRpg.Data;
+using OpenRpg.Editor.Core.Models;
+using OpenRpg.Editor.Core.Services.FileSystem;
 using OpenRpg.Editor.Core.Services.Modal;
 using OpenRpg.Editor.Core.Services.Notifications;
 using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Editor.Infrastructure.Pipelines;
 using OpenRpg.Editor.Infrastructure.Pipelines.Typed;
 using OpenRpg.Editor.Infrastructure.Services;
+using OpenRpg.Editor.Services.FileSystem;
 using OpenRpg.Items.Templates;
 using OpenRpg.Localization;
 using OpenRpg.Localization.Data.DataSources;
@@ -43,6 +46,8 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<PipelineBuilder>();
             services.AddTransient<IModalService, ModalService>();
             services.AddTransient<INotifier, Notifier>();
+            services.AddSingleton<IFileBrowser, PhotinoNativeFileBrowser>();
+            services.AddSingleton<EditorState>();
 
             var contentDir = GetContentDirectory();
             RegisterCollectionDataPipeline<ItemTemplate>(services, $"{contentDir}/Data/item-templates.json");

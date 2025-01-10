@@ -15,12 +15,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\OpenRpg.Editor.Infrastructure\OpenRpg.Editor.Infrastructure.csproj" />
       <ProjectReference Include="..\OpenRpg.Genres\OpenRpg.Genres.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Services\" />
+      <UpToDateCheckInput Remove="Components\Modals\LocaleEditorModal.razor" />
     </ItemGroup>
 
 </Project>

@@ -1,7 +1,52 @@
 ﻿@page "/"
+@using System.IO
+@using Newtonsoft.Json
+@using OpenRpg.Editor.Core.Models
+@using OpenRpg.Editor.Core.Services.FileSystem
 
-<h1>Welcome to the Data Editor</h1>
+@inject IFileBrowser FileBrowser
+@inject EditorState EditorState
 
-<p>Select one of the tabs below and begin viewing/altering the related data</p>
+<h1 class="title is-1">OpenRpg Data Editor</h1>
 
-<p>Data will be read from and output to the Content folder</p>
+<div class="box">
+    @if (EditorState.Project == null)
+    {
+        <p class="content">Please create or load an existing project.</p>
+        <div class="field">
+            <div class="control">
+                <a class="button is-primary" @onclick="CreateProject">Create New Project</a>
+            </div>
+        </div>
+        <div class="field">
+            <label class="label is-4">Or</label>
+        </div>
+        <div class="field">
+            <div class="control">
+                <a class="button is-primary">Open Existing Project</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="content">Using Project: <span class="tag">@EditorState.Project.ProjectPath</span></p>
+    }
+</div>
+
+
+@code 
+{
+    public async Task CreateProject()
+    {
+        var projectFolder = FileBrowser.BrowseToFolder();
+        if(string.IsNullOrEmpty(projectFolder)) { return; }
+
+        var newProject = new LoadedProject { ProjectPath = projectFolder };
+        var projectFile = $"{projectFolder}/project.json";
+        var projectContent = JsonConvert.SerializeObject(newProject.Project, Formatting.Indented);
+        await File.WriteAllTextAsync(projectFile, projectContent);
+
+        EditorState.Project = newProject;
+        StateHasChanged();
+    }
+}
