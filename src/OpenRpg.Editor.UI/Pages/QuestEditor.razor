@@ -3,13 +3,14 @@
 @using OpenRpg.Core.Requirements
 @using OpenRpg.Data
 @using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Pipelines.Typed
 @using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Localization.Data.Repositories
 @using OpenRpg.Quests
 
-@inject IJSRuntime JS
+@inject INotifier Notifier
 @inject IRepository Repository
 @inject ISaveDataPipeline<List<Quest>> SavePipeline;
 @inject ILocaleRepository LocaleRepository;
@@ -110,43 +111,36 @@
         StateHasChanged();
     }
     
-    public void CloneTemplate()
+    public async Task CloneTemplate()
     {
         var clone = Cloner.Clone(CurrentQuest);
         clone.Id = Repository.GetAll<Quest>().Count() + 1;
         clone.Variables.AssetCode($"{CurrentQuest.Variables.AssetCode()}-clone");
         clone.GenerateLocaleCodes(clone.Variables.AssetCode());
         Repository.Create<Quest>(clone);
-        
-        var options = new {message = $"Cloned Quest {CurrentQuest.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
-        JS.InvokeAsync<object>("bulmaToast.toast", options);
+
+        await Notifier.ShowNotification($"Cloned Quest {CurrentQuest.Variables.AssetCode()}");
         
         CurrentQuest = clone;
         StateHasChanged();
     }
     
-    public void DeleteTemplate()
+    public async Task DeleteTemplate()
     {
         Repository.Delete<Quest>(CurrentQuest.Id);
-        var options = new {message = $"Deleted Item {CurrentQuest.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
-        JS.InvokeAsync<object>("bulmaToast.toast", options);   
+        await Notifier.ShowNotification($"Deleted Item {CurrentQuest.Variables.AssetCode()}");
         SelectDefault();
     }
 
-    public async void SaveChanges()
+    public async Task SaveChanges()
     {
         try
         {
             await SavePipeline.Execute(Repository.GetAll<Quest>());
-            var options = new {message = "Quests saved", type = "is-success", position = "bottom-center"};
-            await JS.InvokeAsync<object>("bulmaToast.toast", options);
-
+            await Notifier.ShowNotification("Quests Saved");
         }
         catch (Exception e)
-        {
-            var options = new {message = $"Error Saving: {e.Message}", type = "is-danger", position = "bottom-center"};
-            await JS.InvokeAsync<object>("bulmaToast.toast", options);   
-        }
+        { await Notifier.ShowNotification($"Error Saving: {e.Message}", "is-danger"); }
     }
     
     public void UpdateObjectives(IReadOnlyCollection<Objective> updatedObjectives)

@@ -5,17 +5,17 @@
 @using OpenRpg.Core.Requirements
 @using OpenRpg.Data
 @using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Pipelines.Typed
 @using OpenRpg.Editor.Infrastructure.Services
-@using OpenRpg.Items.Templates
 @using OpenRpg.Localization.Data.Repositories
 
-@inject IJSRuntime JS
 @inject IRepository Repository
 @inject ISaveDataPipeline<List<ClassTemplate>> SavePipeline
 @inject ILocaleRepository LocaleRepository;
 @inject ICloner Cloner;
+@inject INotifier Notifier;
 
 <div class="columns">
     <div class="column is-one-fifth">
@@ -104,43 +104,36 @@
         StateHasChanged();
     }
     
-    public void CloneTemplate()
+    public async Task CloneTemplate()
     {
         var clone = Cloner.Clone(CurrentClassTemplate);
         clone.Id = Repository.GetAll<ClassTemplate>().Count() + 1;
         clone.Variables.AssetCode($"{CurrentClassTemplate.Variables.AssetCode()}-clone");
         clone.GenerateLocaleCodes(clone.Variables.AssetCode());
-        Repository.Create<ClassTemplate>(clone);
-        
-        var options = new {message = $"Cloned Class {CurrentClassTemplate.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
-        JS.InvokeAsync<object>("bulmaToast.toast", options);
+        Repository.Create(clone);
+        await Notifier.ShowNotification($"Cloned Class {CurrentClassTemplate.Variables.AssetCode()}");
         
         CurrentClassTemplate = clone;
         StateHasChanged();
     }
     
-    public void DeleteTemplate()
+    public async Task DeleteTemplate()
     {
         Repository.Delete<ClassTemplate>(CurrentClassTemplate.Id);
-        var options = new {message = $"Deleted Item {CurrentClassTemplate.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
-        JS.InvokeAsync<object>("bulmaToast.toast", options);   
+        await Notifier.ShowNotification($"Deleted Item {CurrentClassTemplate.Variables.AssetCode()}");
         SelectDefault();
     }
 
-    public async void SaveChanges()
+    public async Task SaveChanges()
     {
         try
         {
             await SavePipeline.Execute(Repository.GetAll<ClassTemplate>());
-            var options = new {message = "Classes saved", type = "is-success", position = "bottom-center"};
-            await JS.InvokeAsync<object>("bulmaToast.toast", options);
+            await Notifier.ShowNotification("Classes saved");
 
         }
         catch (Exception e)
-        {
-            var options = new {message = $"Error Saving: {e.Message}", type = "is-danger", position = "bottom-center"};
-            await JS.InvokeAsync<object>("bulmaToast.toast", options);   
-        }
+        { await Notifier.ShowNotification( $"Error Saving: {e.Message}", "is-danger"); }
     }
     
     public void UpdateEffect(IReadOnlyCollection<Effect> updatedEffects)

@@ -5,12 +5,13 @@
 @using OpenRpg.Core.Requirements
 @using OpenRpg.Data
 @using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Pipelines.Typed
 @using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Localization.Data.Repositories
 
-@inject IJSRuntime JS
+@inject INotifier Notifier
 @inject IRepository Repository
 @inject ISaveDataPipeline<List<RaceTemplate>> SavePipeline;
 @inject ILocaleRepository LocaleRepository;
@@ -102,43 +103,37 @@
         StateHasChanged();
     }
 
-    public void CloneTemplate()
+    public async Task CloneTemplate()
     {
         var clone = Cloner.Clone(CurrentRaceTemplate);
         clone.Id = Repository.GetAll<RaceTemplate>().Count() + 1;
         clone.Variables.AssetCode($"{CurrentRaceTemplate.Variables.AssetCode()}-clone");
         clone.GenerateLocaleCodes(clone.Variables.AssetCode());
         Repository.Create<RaceTemplate>(clone);
-        
-        var options = new {message = $"Cloned Class {CurrentRaceTemplate.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
-        JS.InvokeAsync<object>("bulmaToast.toast", options);
+
+        await Notifier.ShowNotification($"Cloned Class {CurrentRaceTemplate.Variables.AssetCode()}");
         
         CurrentRaceTemplate = clone;
         StateHasChanged();
     }
     
-    public void DeleteTemplate()
+    public async Task DeleteTemplate()
     {
         Repository.Delete<RaceTemplate>(CurrentRaceTemplate.Id);
-        var options = new {message = $"Deleted Item {CurrentRaceTemplate.Variables.AssetCode()}", type = "is-success", position = "bottom-center"};
-        JS.InvokeAsync<object>("bulmaToast.toast", options);   
+
+        await Notifier.ShowNotification($"Deleted Item {CurrentRaceTemplate.Variables.AssetCode()}");
         SelectDefault();
     }
     
-    public async void SaveChanges()
+    public async Task SaveChanges()
     {
         try
         {
             await SavePipeline.Execute(Repository.GetAll<RaceTemplate>());
-            var options = new {message = "Races saved", type = "is-success", position = "bottom-center"};
-            await JS.InvokeAsync<object>("bulmaToast.toast", options);
-
+            await Notifier.ShowNotification("Races Saved");
         }
         catch (Exception e)
-        {
-            var options = new {message = $"Error Saving: {e.Message}", type = "is-danger", position = "bottom-center"};
-            await JS.InvokeAsync<object>("bulmaToast.toast", options);   
-        }
+        { await Notifier.ShowNotification($"Error Saving: {e.Message}", "is-danger"); }
     }
     
     public void UpdateEffect(IReadOnlyCollection<Effect> updatedEffects)

@@ -1,0 +1,15 @@
+﻿
+<div class="modal @(IsVisible ? "is-active":"")">
+  <div class="modal-background"></div>
+  <div class="modal-content box">
+    @ChildContent
+  </div>
+</div>
+
+@code {
+  [Parameter]
+  public bool IsVisible { get; set; }
+    
+  [Parameter] 
+  public RenderFragment ChildContent  { get; set; }
+}

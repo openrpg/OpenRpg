@@ -1,0 +1,63 @@
+﻿@using System.Reactive.Disposables
+@using OpenRpg.Editor.Core.Extensions
+@using OpenRpg.Editor.Core.Services.Modal
+
+@inject IModalService ModalService
+
+@implements IDisposable
+
+<CascadingValue Value="ModalService as IModalInteractionService">
+    <Modal IsVisible="@IsVisible">
+        @ModalReference?.ModalContent
+    </Modal>
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    
+    public ModalReference? ModalReference { get; set; }
+    
+    public bool IsVisible { get; set; }
+
+    private CompositeDisposable _subs = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ModalService.OnModalOpenRequest
+            .Subscribe(ShowModal)
+            .AddTo(_subs);
+
+        ModalService.OnModalCloseRequest
+            .Subscribe(_ => CloseModal())
+            .AddTo(_subs);
+    }
+
+    public void ShowModal(ModalReference reference)
+    {
+        if (ModalReference != null)
+        {
+            ModalService.ClosingModal(ModalReference.Id);
+            ModalReference = null;
+        }
+        
+        IsVisible = true;
+        ModalReference = reference;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void CloseModal()
+    {
+        IsVisible = false;
+        if (ModalReference != null)
+        {
+            ModalService.ClosingModal(ModalReference.Id);
+            ModalReference = null;
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    { _subs.Dispose(); }
+}

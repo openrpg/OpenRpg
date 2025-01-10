@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Core.Classes.Templates;
 using OpenRpg.Core.Races.Templates;
 using OpenRpg.Data;
+using OpenRpg.Editor.Core.Services.Modal;
+using OpenRpg.Editor.Core.Services.Notifications;
 using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Editor.Infrastructure.Pipelines;
 using OpenRpg.Editor.Infrastructure.Pipelines.Typed;
@@ -39,6 +41,8 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<IDeserializer, JsonDeserializer>();
             services.AddSingleton<ICloner, Cloner>();
             services.AddSingleton<PipelineBuilder>();
+            services.AddTransient<IModalService, ModalService>();
+            services.AddTransient<INotifier, Notifier>();
 
             var contentDir = GetContentDirectory();
             RegisterCollectionDataPipeline<ItemTemplate>(services, $"{contentDir}/Data/item-templates.json");
