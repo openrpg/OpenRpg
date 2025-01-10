@@ -27,8 +27,8 @@
     </div>
     <div class="column">
         
-        <div class="box">
-            <div class="is-rounded has-background-dark p-lg m-md">
+        <div>
+            <div class="is-rounded box">
                 <BasicDetailsEditor Data="CurrentItemTemplate">
                     <AvatarContent>
                         <figure id="item-image" quality-type="@CurrentItemTemplate.Variables.QualityType()" 
@@ -44,11 +44,11 @@
                 </BasicDetailsEditor>
             </div>
         
-            <div class="is-rounded has-background-dark p-lg m-md">
-                <h4 class="title is-4">Item Details</h4>
+            <div class="is-rounded box">
+                <h4 class="title is-4 has-text-dark">Item Details</h4>
                 <div class="field is-horizontal">
                     <div class="field-label">
-                        <label class="label has-text-light">Stack Amount</label>
+                        <label class="label">Stack Amount</label>
                     </div>
                     <div class="field-body">
                         <div class="field">
@@ -62,7 +62,7 @@
                 </div>
                 <div class="field is-horizontal">
                     <div class="field-label">
-                        <label class="label has-text-light">Value</label>
+                        <label class="label">Value</label>
                     </div>
                     <div class="field-body">
                         <div class="field">
@@ -76,12 +76,12 @@
                 </div>
                 <div class="field is-horizontal">
                     <div class="field-label">
-                        <label class="label has-text-light">Item Type</label>
+                        <label class="label">Item Type</label>
                     </div>
                     <div class="field-body">
                         <div class="field">
                             <div class="control">
-                                <div class="select">
+                                <div class="select is-fullwidth">
                                     <select @bind="CurrentItemTemplate.ItemType">
                                         @foreach (var itemType in TypesHelper.GetItemTypes)
                                         {
@@ -92,11 +92,11 @@
                             </div>
                         </div>
                         <div class="field-label">
-                            <label class="label has-text-light">Item Quality</label>
+                            <label class="label">Item Quality</label>
                         </div>
                         <div class="field">
                             <div class="control">
-                                <div class="select">
+                                <div class="select is-fullwidth">
                                     <select value="@CurrentItemTemplate.Variables.QualityType()" 
                                             @onchange="e => CurrentItemTemplate.Variables.QualityType(int.Parse(e.Value?.ToString()))">
                                         @foreach (var itemType in TypesHelper.GetItemQualityTypes)
@@ -111,22 +111,22 @@
                 </div>
             </div>
 
-            <div class="is-rounded has-background-dark p-lg m-md">
+            <div class="is-rounded box">
                 <LocaleDetails LocaleData="CurrentItemTemplate"></LocaleDetails>
             </div>
         
-            <div class="is-rounded has-background-dark p-lg m-md">
-                <h4 class="title is-4">Effects</h4>
+            <div class="is-rounded box">
+                <h4 class="title is-4 has-text-dark">Effects</h4>
                 <EffectsEditor Effects="CurrentItemTemplate.Effects" OnUpdate="@UpdateEffect"></EffectsEditor>
             </div>
         
-            <div class="is-rounded has-background-dark p-lg m-md">
-                <h4 class="title is-4">Requirements</h4>
+            <div class="is-rounded box">
+                <h4 class="title is-4 has-text-dark">Requirements</h4>
                 <RequirementsEditor Requirements="CurrentItemTemplate.Requirements" OnUpdate="@UpdateRequirements"></RequirementsEditor>
             </div>
         
-            <div class="is-rounded has-background-dark p-lg m-md">
-                <h4 class="title is-4">Modification Allowances</h4>
+            <div class="is-rounded box">
+                <h4 class="title is-4 has-text-dark">Modification Allowances</h4>
                 <ModificationAllowancesEditor ModificationAllowances="CurrentItemTemplate.ModificationAllowances" OnUpdate="UpdateModificationAllowances"></ModificationAllowancesEditor>
             </div>
         

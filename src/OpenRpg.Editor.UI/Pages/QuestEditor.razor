@@ -21,9 +21,9 @@
                     OnAdd="AddQuest" OnSelected="selected => SelectQuest(selected as Quest)">
         </ContentSidebar>
     </div>
-    <div class="column has-background-grey-dark">
+    <div class="column">
         
-        <div class="is-rounded has-background-dark p-lg m-md">
+        <div class="is-rounded box">
             <BasicDetailsEditor Data="CurrentQuest">
                 <AdditionalContent>
                     <AssetCodeEditor Variables="CurrentQuest.Variables" DefaultAssetCode="@($"item-{CurrentQuest.Id}")" 
@@ -32,27 +32,27 @@
             </BasicDetailsEditor>
         </div>
 
-        <div class="is-rounded has-background-dark p-lg m-md">
+        <div class="is-rounded box">
             <LocaleDetails LocaleData="CurrentQuest"></LocaleDetails>
         </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Objectives</h4>
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Objectives</h4>
             <ObjectivesEditor Objectives="CurrentQuest.Objectives" OnUpdate="UpdateObjectives"></ObjectivesEditor>
         </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Gifts</h4>
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Gifts</h4>
             <RewardsEditor Rewards="CurrentQuest.Gifts" OnUpdate="UpdateGifts"></RewardsEditor>
         </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Rewards</h4>
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Rewards</h4>
             <RewardsEditor Rewards="CurrentQuest.Rewards" OnUpdate="UpdateRewards"></RewardsEditor>
         </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Requirements</h4>
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Requirements</h4>
             <RequirementsEditor Requirements="CurrentQuest.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
         </div>
         

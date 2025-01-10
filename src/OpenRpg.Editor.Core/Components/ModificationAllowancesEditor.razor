@@ -10,7 +10,7 @@
     <RowTemplate>
         <td>
             <div class="control">
-                <div class="select">
+                <div class="select is-fullwidth">
                     <select bind="@context.ModificationType">
                         @foreach (var modificationType in TypesHelper.GetModificationTypes)
                         {
@@ -27,11 +27,10 @@
         </td>
     </RowTemplate>
     <NestedRowTemplate>
-        <div class="m-md is-rounded has-shadow p-md has-background-dark has-text-centered">
-            <h5 class="has-text-light">Modification Allowance Requirements</h5>
+        <Accordion Title="Modification Allowance Requirements" HeaderClasses="is-info">
             <RequirementsEditor Requirements="context.Requirements" OnUpdate="requirements => UpdateRequirements(context, requirements)">
-            </RequirementsEditor> 
-        </div>
+            </RequirementsEditor>
+        </Accordion>
     </NestedRowTemplate>
 </ListEditor>
 

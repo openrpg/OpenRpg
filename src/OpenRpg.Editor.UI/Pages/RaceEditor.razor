@@ -21,10 +21,10 @@
         <ContentSidebar Title="Race Templates" Data="Repository.GetAll<RaceTemplate>()" SelectedItem="CurrentRaceTemplate"
                         OnAdd="AddRace" OnSelected="selected => SelectRace(selected as RaceTemplate)"/>
     </div>
-    <div class="column has-background-grey-dark">
+    <div class="column">
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <div class="is-rounded has-background-dark p-lg m-md">
+        <div class="is-rounded box">
+            <div class="is-rounded">
                 <BasicDetailsEditor Data="CurrentRaceTemplate">
                     <AdditionalContent>
                         <AssetCodeEditor Variables="CurrentRaceTemplate.Variables" DefaultAssetCode="@($"race-{CurrentRaceTemplate.Id}")"
@@ -34,17 +34,17 @@
             </div>
         </div>
 
-        <div class="is-rounded has-background-dark p-lg m-md">
+        <div class="is-rounded box">
             <LocaleDetails LocaleData="CurrentRaceTemplate"></LocaleDetails>
         </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Effects</h4>
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Effects</h4>
             <EffectsEditor Effects="CurrentRaceTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
         </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Requirements</h4>
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Requirements</h4>
             <RequirementsEditor Requirements="CurrentRaceTemplate.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
         </div>
         

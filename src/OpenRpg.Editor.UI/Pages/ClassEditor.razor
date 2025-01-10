@@ -24,9 +24,9 @@
                         OnSelected="(selected => SelectClass(selected as ClassTemplate))">
         </ContentSidebar>
     </div>
-    <div class="column has-background-grey-dark">
+    <div class="column">
         
-        <div class="is-rounded has-background-dark p-lg m-md">
+        <div class="is-rounded box">
             <BasicDetailsEditor Data="CurrentClassTemplate">
                 <AdditionalContent>
                     <AssetCodeEditor Variables="CurrentClassTemplate.Variables" DefaultAssetCode="@($"class-{CurrentClassTemplate.Id}")" 
@@ -35,17 +35,17 @@
             </BasicDetailsEditor>
         </div>
 
-        <div class="is-rounded has-background-dark p-lg m-md">
+        <div class="is-rounded box">
             <LocaleDetails LocaleData="CurrentClassTemplate"></LocaleDetails>
         </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Effects</h4>
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Effects</h4>
             <EffectsEditor Effects="CurrentClassTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
         </div>
         
-        <div class="is-rounded has-background-dark p-lg m-md">
-            <h4 class="title is-4">Requirements</h4>
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Requirements</h4>
             <RequirementsEditor Requirements="CurrentClassTemplate.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
         </div>
         

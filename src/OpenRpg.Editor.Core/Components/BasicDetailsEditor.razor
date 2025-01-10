@@ -1,7 +1,7 @@
 @using System.Reflection
 @using OpenRpg.Core.Common
 
-<h4 class="title is-4">Basic Details</h4>
+<h4 class="title has-text-dark is-4">Basic Details</h4>
 
 @if (AvatarContent != null)
 {
@@ -11,14 +11,13 @@
 }
 
 <div class="field is-horizontal">
-    <div class="field-label">
-        <label class="label has-text-light">Id</label>
-    </div>
+    <label class="field-label is-normal">
+        <label class="label">Id</label>
+    </label>
     <div class="field-body">
         <div class="field">
             <div class="control">
-                <input class="input" type="text" value="@Data.Id" 
-                       disabled="@true" readonly="@true" />
+                <input class="input" type="text" value="@Data.Id" disabled="@true" readonly="@true" />
             </div>
         </div>
     </div>
