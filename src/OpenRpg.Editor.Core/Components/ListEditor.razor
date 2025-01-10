@@ -22,7 +22,7 @@
 
     @foreach (var element in ProxyList)
     {
-        <tr>
+        <tr @key="element">
             @RowTemplate(element)
             @if (OnUpdate.HasDelegate)
             {
