@@ -1,11 +1,16 @@
 ﻿@page "/"
-@using System.IO
-@using Newtonsoft.Json
+
 @using OpenRpg.Editor.Core.Models
+@using OpenRpg.Editor.Core.Services.Events.Bus
 @using OpenRpg.Editor.Core.Services.FileSystem
+@using OpenRpg.Editor.Infrastructure.Events
+@using OpenRpg.Editor.Infrastructure.Persistence
 
 @inject IFileBrowser FileBrowser
 @inject EditorState EditorState
+@inject CreateProjectExecutor CreateProjectExecutor;
+@inject LoadProjectExecutor LoadProjectExecutor;
+@inject IEventBus EventBus; 
 
 <h1 class="title is-1">OpenRpg Data Editor</h1>
 
@@ -23,7 +28,7 @@
         </div>
         <div class="field">
             <div class="control">
-                <a class="button is-primary">Open Existing Project</a>
+                <a class="button is-primary" @onclick="OpenProject">Open Existing Project</a>
             </div>
         </div>
     }
@@ -41,12 +46,17 @@
         var projectFolder = FileBrowser.BrowseToFolder();
         if(string.IsNullOrEmpty(projectFolder)) { return; }
 
-        var newProject = new LoadedProject { ProjectPath = projectFolder };
-        var projectFile = $"{projectFolder}/project.json";
-        var projectContent = JsonConvert.SerializeObject(newProject.Project, Formatting.Indented);
-        await File.WriteAllTextAsync(projectFile, projectContent);
-
+        var newProject = await CreateProjectExecutor.Execute(projectFolder);
         EditorState.Project = newProject;
-        StateHasChanged();
+        EventBus.PublishAsync(new ProjectChangedEvent());
+    }
+    
+    public async Task OpenProject()
+    {
+        var projectFile = FileBrowser.BrowseToOpenFile(filterList: "*.json");
+        if(string.IsNullOrEmpty(projectFile)) { return; }
+
+        await LoadProjectExecutor.Execute(projectFile);
+        EventBus.PublishAsync(new ProjectChangedEvent());
     }
 }

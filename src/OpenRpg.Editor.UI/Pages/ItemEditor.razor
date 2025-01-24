@@ -8,7 +8,6 @@
 @using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Helpers
-@using OpenRpg.Editor.Infrastructure.Pipelines.Typed
 @using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
@@ -16,7 +15,6 @@
 
 @inject INotifier Notifier
 @inject IRepository Repository
-@inject ISaveDataPipeline<List<ItemTemplate>> SavePipeline;
 @inject ILocaleRepository LocaleRepository;
 @inject ICloner Cloner;
 
@@ -133,11 +131,6 @@
         
             <div class="field is-grouped has-text-centered">
                 <p class="control">
-                    <a class="button is-success" @onclick="SaveChanges">
-                        Save Item
-                    </a>
-                </p>
-                <p class="control">
                     <a class="button is-info" @onclick="CloneTemplate">
                         Clone Item
                     </a>
@@ -206,17 +199,6 @@
         
         CurrentItemTemplate = clone;
         StateHasChanged();
-    }
-
-    public async Task SaveChanges()
-    {
-        try
-        {
-            await SavePipeline.Execute(Repository.GetAll<ItemTemplate>());
-            await Notifier.ShowNotification("Items Saved");
-        }
-        catch (Exception e)
-        { await Notifier.ShowNotification($"Error Saving: {e.Message}", "is-danger"); }
     }
 
     public void UpdateEffect(IReadOnlyCollection<Effect> updatedEffects)

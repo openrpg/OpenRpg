@@ -1,11 +1,8 @@
 ﻿@using OpenRpg.Editor.Infrastructure.Models
-@using OpenRpg.Editor.Infrastructure.Pipelines.Typed
-@using OpenRpg.Localization
 @using OpenRpg.Localization.Data.Extensions
 @using OpenRpg.Localization.Data.Repositories
 
 @inject ILocaleRepository Repository;
-@inject ISaveDataPipeline<LocaleDataset> SavePipeline;
 
 <h3 class="title is-3 has-text-danger">Locale Editor For <code>@LocaleId</code></h3>
 <div class="field">
@@ -67,7 +64,6 @@
     public void SaveChanges()
     {
         UpdateLocaleText(LocaleEntry);
-        SavePipeline.Execute(Repository.GetDataset());
         OnSaved.InvokeAsync();
     }
 
@@ -87,11 +83,11 @@
 
         if (localeEntry.Exists)
         {
-            Repository.Update(LocaleId, localeEntry.LocaleText);
+            Repository.Update(localeEntry.LocaleText, LocaleId);
             return;
         }
         
-        Repository.Create(LocaleId, localeEntry.LocaleText);
+        Repository.Create(localeEntry.LocaleText, LocaleId);
         localeEntry.Exists = true;
     }
 

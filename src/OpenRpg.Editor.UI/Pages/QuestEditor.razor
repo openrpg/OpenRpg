@@ -5,14 +5,12 @@
 @using OpenRpg.Data.Conventions.Extensions
 @using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
-@using OpenRpg.Editor.Infrastructure.Pipelines.Typed
 @using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Localization.Data.Repositories
 @using OpenRpg.Quests
 
 @inject INotifier Notifier
 @inject IRepository Repository
-@inject ISaveDataPipeline<List<Quest>> SavePipeline;
 @inject ILocaleRepository LocaleRepository;
 @inject ICloner Cloner;
 
@@ -58,11 +56,6 @@
         </div>
         
         <div class="field is-grouped has-text-centered">
-            <p class="control">
-                <a class="button is-success" @onclick="SaveChanges">
-                    Save Item
-                </a>
-            </p>
             <p class="control">
                 <a class="button is-info" @onclick="CloneTemplate">
                     Clone Item
@@ -130,17 +123,6 @@
         Repository.Delete<Quest>(CurrentQuest.Id);
         await Notifier.ShowNotification($"Deleted Item {CurrentQuest.Variables.AssetCode()}");
         SelectDefault();
-    }
-
-    public async Task SaveChanges()
-    {
-        try
-        {
-            await SavePipeline.Execute(Repository.GetAll<Quest>());
-            await Notifier.ShowNotification("Quests Saved");
-        }
-        catch (Exception e)
-        { await Notifier.ShowNotification($"Error Saving: {e.Message}", "is-danger"); }
     }
     
     public void UpdateObjectives(IReadOnlyCollection<Objective> updatedObjectives)

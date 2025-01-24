@@ -7,6 +7,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Persistity" Version="2.0.47" />
       <PackageReference Include="Persistity.Core" Version="2.0.47" />
       <PackageReference Include="Persistity.Flow" Version="2.0.47" />
@@ -14,6 +15,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\OpenRpg.Data.InMemory\OpenRpg.Data.InMemory.csproj" />
+        <ProjectReference Include="..\OpenRpg.Editor.Core\OpenRpg.Editor.Core.csproj" />
         <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
         <ProjectReference Include="..\OpenRpg.Localization\OpenRpg.Localization.csproj" />
     </ItemGroup>

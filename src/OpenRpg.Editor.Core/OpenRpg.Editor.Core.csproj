@@ -22,4 +22,8 @@
       <UpToDateCheckInput Remove="Components\Modals\LocaleEditorModal.razor" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\Events\" />
+    </ItemGroup>
+
 </Project>

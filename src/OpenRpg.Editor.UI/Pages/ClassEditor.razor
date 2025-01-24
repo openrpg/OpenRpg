@@ -7,12 +7,10 @@
 @using OpenRpg.Data.Conventions.Extensions
 @using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
-@using OpenRpg.Editor.Infrastructure.Pipelines.Typed
 @using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Localization.Data.Repositories
 
 @inject IRepository Repository
-@inject ISaveDataPipeline<List<ClassTemplate>> SavePipeline
 @inject ILocaleRepository LocaleRepository;
 @inject ICloner Cloner;
 @inject INotifier Notifier;
@@ -50,11 +48,6 @@
         </div>
         
         <div class="field is-grouped has-text-centered">
-            <p class="control">
-                <a class="button is-success" @onclick="SaveChanges">
-                    Save Item
-                </a>
-            </p>
             <p class="control">
                 <a class="button is-info" @onclick="CloneTemplate">
                     Clone Item
@@ -122,18 +115,6 @@
         Repository.Delete<ClassTemplate>(CurrentClassTemplate.Id);
         await Notifier.ShowNotification($"Deleted Item {CurrentClassTemplate.Variables.AssetCode()}");
         SelectDefault();
-    }
-
-    public async Task SaveChanges()
-    {
-        try
-        {
-            await SavePipeline.Execute(Repository.GetAll<ClassTemplate>());
-            await Notifier.ShowNotification("Classes saved");
-
-        }
-        catch (Exception e)
-        { await Notifier.ShowNotification( $"Error Saving: {e.Message}", "is-danger"); }
     }
     
     public void UpdateEffect(IReadOnlyCollection<Effect> updatedEffects)
