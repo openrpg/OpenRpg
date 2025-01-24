@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using OpenRpg.Editor.Infrastructure.Extensions;
 using OpenRpg.Editor.Infrastructure.Models;
 using OpenRpg.Genres.Fantasy.Types;
@@ -13,14 +14,14 @@ namespace OpenRpg.Editor.Infrastructure.Helpers
         public static OptionData[] GetTypesFor(Type typesObject)
         {
             var optionData = new List<OptionData>();
-            var fields = typesObject.GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+            var fields = typesObject.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy);
             foreach (var property in fields)
             {
                 var value = (int)property.GetValue(null);
                 optionData.Add(new OptionData(value, property.Name.MakeReadable()));
             }
 
-            return optionData.OrderBy(x => x.Name).ToArray();
+            return optionData.ToArray();
         }
         
         public static readonly OptionData[] GetItemTypes = GetTypesFor(typeof(FantasyItemTypes)).OrderBy(x => x.Id).ToArray();

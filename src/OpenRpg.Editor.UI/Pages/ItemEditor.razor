@@ -30,7 +30,7 @@
             <div class="is-rounded box">
                 <BasicDetailsEditor Data="CurrentItemTemplate">
                     <AvatarContent>
-                        <AssetImage CustomClasses="@($".item-image .quality-type-{CurrentItemTemplate.Variables.QualityType()}")" 
+                        <AssetImage CustomClasses="@($"item-image quality-type-{CurrentItemTemplate.Variables.QualityType()}")" 
                                     AssetType="items" AssetCode="@CurrentItemTemplate.Variables.AssetCode()" />
                     </AvatarContent>
                     <AdditionalContent>
