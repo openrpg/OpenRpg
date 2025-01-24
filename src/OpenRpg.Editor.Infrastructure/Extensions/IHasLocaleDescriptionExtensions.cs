@@ -46,12 +46,12 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
             MoveLocaleInRepository(repository, oldDescriptionLocaleId, localeEntity.DescriptionLocaleId);
         }
 
-        public static void MoveLocaleInRepository(this ILocaleRepository repository, string oldLocaleKey, string newLocaleKey)
+        public static void MoveLocaleInRepository(this ILocaleRepository repository, string oldLocaleId, string newLocaleId)
         {
-            if (!repository.Exists(oldLocaleKey)) { return; }
-            var localeData = repository.Get(oldLocaleKey);
-            repository.Delete(oldLocaleKey);
-            repository.Create(newLocaleKey, localeData);
+            if (!repository.Exists(oldLocaleId)) { return; }
+            var localeData = repository.Get(oldLocaleId);
+            repository.Delete(oldLocaleId);
+            repository.Create(newLocaleId, localeData);
         }
     }
 }

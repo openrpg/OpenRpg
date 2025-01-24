@@ -83,11 +83,11 @@
 
         if (localeEntry.Exists)
         {
-            Repository.Update(localeEntry.LocaleText, LocaleId);
+            Repository.Update(LocaleId, localeEntry.LocaleText);
             return;
         }
         
-        Repository.Create(localeEntry.LocaleText, LocaleId);
+        Repository.Create(LocaleId, localeEntry.LocaleText);
         localeEntry.Exists = true;
     }
 

@@ -6,21 +6,21 @@ namespace OpenRpg.Localization.Data.Queries.Conventions
     public class UpdateLocaleQuery : ILocaleQuery<string>
     {
         public string Text { get; }
-        public string Key { get; }
+        public string Id { get; }
 
-        public UpdateLocaleQuery(string text, string key)
+        public UpdateLocaleQuery(string id, string text)
         {
-            if (string.IsNullOrEmpty(key))
-            { throw new ArgumentException("key cannot be null or empty", nameof(key)); }
+            if (string.IsNullOrEmpty(id))
+            { throw new ArgumentException("id cannot be null or empty", nameof(id)); }
             
             Text = text;
-            Key = key;
+            Id = id;
         }
 
         public string Execute(string locale, ILocaleDataSource dataSource)
         {
-            dataSource.Update(locale, Text, Key);
-            return Key;
+            dataSource.Update(locale, Id, Text);
+            return Id;
         }
     }
 }
