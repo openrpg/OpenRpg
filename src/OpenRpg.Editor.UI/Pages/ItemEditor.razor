@@ -30,10 +30,8 @@
             <div class="is-rounded box">
                 <BasicDetailsEditor Data="CurrentItemTemplate">
                     <AvatarContent>
-                        <figure id="item-image" quality-type="@CurrentItemTemplate.Variables.QualityType()" 
-                                class="image is-128x128 pixilize is-margin-auto is-rounded has-background-grey-dark p-md">
-                            <img src="@($"Assets/{CurrentItemTemplate.Variables.AssetCode()}.png")">
-                        </figure>
+                        <AssetImage CustomClasses="@($".item-image .quality-type-{CurrentItemTemplate.Variables.QualityType()}")" 
+                                    AssetType="items" AssetCode="@CurrentItemTemplate.Variables.AssetCode()" />
                     </AvatarContent>
                     <AdditionalContent>
                         <AssetCodeEditor Variables="CurrentItemTemplate.Variables" 

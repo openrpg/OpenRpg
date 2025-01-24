@@ -209,15 +209,19 @@ body
     image-rendering: -moz-crisp-edges;
 }
 
-#item-image { border: 0.25em solid; }
-#item-image[quality-type='0'] { border-color: black; }
-#item-image[quality-type='1'] { border-color: gray; }
-#item-image[quality-type='2'] { border-color: white; }
-#item-image[quality-type='3'] { border-color: greenyellow; }
-#item-image[quality-type='4'] { border-color: greenyellow; }
-#item-image[quality-type='5'] { border-color: blue; }
-#item-image[quality-type='6'] { border-color: blue; }
-#item-image[quality-type='7'] { border-color: purple; }
-#item-image[quality-type='8'] { border-color: orange; }
-#item-image[quality-type='9'] { border-color: orange; }
-#item-image[quality-type='10'] { border-color: yellow; }
+.item-image 
+{ 
+    border: 0.25em solid;
+
+    .quality-type-0 { border-color: black; }
+    .quality-type-1 { border-color: gray; }
+    .quality-type-2 { border-color: white; }
+    .quality-type-3 { border-color: greenyellow; }
+    .quality-type-4 { border-color: greenyellow; }
+    .quality-type-5 { border-color: blue; }
+    .quality-type-6 { border-color: blue; }
+    .quality-type-7 { border-color: purple; }
+    .quality-type-8 { border-color: orange; }
+    .quality-type-9 { border-color: orange; }
+    .quality-type-10 { border-color: yellow; }
+}
