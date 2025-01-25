@@ -2,7 +2,7 @@ name: Build And Test
 on: [push]
 
 env:
-  BuildVersion: '0.34.${{github.run_number}}'
+  BuildVersion: '0.40.${{github.run_number}}'
   SolutionFile: 'src/OpenRpg.sln'
 
 jobs:
