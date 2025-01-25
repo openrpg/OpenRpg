@@ -102,7 +102,7 @@ jobs:
         run: Compress-Archive -Path editor/* -Destination editor-${{env.BuildVersion}}.zip
         
       - name: Publish Editor Artifact
-      - uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
           name: editor-app
           path: /editor-${{env.BuildVersion}}.zip
