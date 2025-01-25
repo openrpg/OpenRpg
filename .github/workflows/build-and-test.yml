@@ -53,6 +53,9 @@ jobs:
 
   build-demos:
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     needs: [build-and-test]
     steps:
       - uses: actions/checkout@v3
