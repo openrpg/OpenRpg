@@ -6,10 +6,6 @@ env:
   SolutionFile: 'src/OpenRpg.sln'
   DemoProject: 'src/OpenRpg.Demos.Web/OpenRpg.Demos.Web.csproj'
 
-permissions:
-  pages: write
-  id-token: write
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -55,6 +51,12 @@ jobs:
       - name: Add Coverage Summary
         run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
+  build-demos:
+    runs-on: ubuntu-latest
+    needs: [builds-and-test]
+    steps:
+      - uses: actions/checkout@v3
+        
       - name: Build Web Demo
         run: dotnet publish -c Release -o demo "${{ env.DemoProject }}"
 
