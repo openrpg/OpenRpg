@@ -5,6 +5,7 @@ env:
   BuildVersion: '0.40.${{github.run_number}}'
   SolutionFile: 'src/OpenRpg.sln'
   DemoProject: 'src/OpenRpg.Demos.Web/OpenRpg.Demos.Web.csproj'
+  EditorProject: 'src/OpenRpg.Editor/OpenRpg.Editor.csproj'
 
 jobs:
   build-and-test:
@@ -53,6 +54,7 @@ jobs:
 
   build-demos:
     runs-on: ubuntu-latest
+    if: startsWith(github.event.ref, 'refs/tags/')
     permissions:
       pages: write
       id-token: write
@@ -79,6 +81,31 @@ jobs:
 
       - name: Deploy Demo to GitHub Pages
         uses: actions/deploy-pages@v4
+        
+        
+        
+  build-editor:
+    runs-on: windows-latest
+    needs: [build-and-test]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Build Editor App
+        run: dotnet publish -c Release -r win-x64 --sc /p:Version=${{ env.BuildVersion }} -o editor "${{ env.EditorProject }}"
+
+      - name: Package Editor App
+        run: Compress-Archive -Path editor/* -Destination editor-${{env.BuildVersion}}.zip
+        
+      - name: Publish Editor Artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editor-app
+          path: /editor-${{env.BuildVersion}}.zip
   
   package-and-release:
     runs-on: windows-latest
@@ -96,5 +123,5 @@ jobs:
       - name: .Net Pack
         run: dotnet pack --configuration Release /p:Version=${{ env.BuildVersion }} --no-build ${{ env.SolutionFile }}
 
-#      - name: Publish To Nuget
-#        run: dotnet nuget push "**/*.nupkg" -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      - name: Publish To Nuget
+        run: dotnet nuget push "**/*.nupkg" -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json

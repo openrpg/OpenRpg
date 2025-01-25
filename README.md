@@ -44,7 +44,7 @@ statsPopulator.Populate(stats, new [] { raceEffects, classEffects });
 
 As you can see above an effect can describe any effect on an entity, and the effect types can be anything you want, the above examples are `EffectTypes` within the `OpenRpg.Genres.Fantasy` library, but each genre contains its own effect types and population logic to turn effects into variables.
 
-> For more info view the [Demo Section On Stats/Effects Here](https://openrpg.github.io/OpenRpg.Demos.Web)
+> For more info view the [Demo Section On Stats/Effects Here](https://openrpg.github.io/OpenRpg)
 
 ### Variables
 
