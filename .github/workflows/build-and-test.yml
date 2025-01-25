@@ -96,7 +96,7 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Build Editor App
-        run: dotnet publish -c Release -r win-x64 --sc /p:Version=${{ env.BuildVersion }} -o "editor" "${{ env.EditorProject }}"
+        run: dotnet publish -c Release -r win-x64 --sc /p:Version=${{ env.BuildVersion }} -o /editor "${{ env.EditorProject }}"
 
       - name: Publish Editor Artifact
         uses: actions/upload-artifact@v4
