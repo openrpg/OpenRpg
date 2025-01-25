@@ -71,7 +71,7 @@ jobs:
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: demo/
+          path: demo/wwwroot/
 
       - name: Deploy Demo to GitHub Pages
         uses: actions/deploy-pages@v4
