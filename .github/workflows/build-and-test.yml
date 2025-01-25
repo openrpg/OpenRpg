@@ -6,6 +6,15 @@ env:
   SolutionFile: 'src/OpenRpg.sln'
   DemoProject: 'src/OpenRpg.Demos.Web/OpenRpg.Demos.Web.csproj'
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
