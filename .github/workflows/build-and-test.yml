@@ -96,19 +96,13 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Build Editor App
-        run: dotnet publish -c Release -r win-x64 --sc /p:Version=${{ env.BuildVersion }} -o "editor-temp" "${{ env.EditorProject }}"
+        run: dotnet publish -c Release -r win-x64 --sc /p:Version=${{ env.BuildVersion }} -o "editor" "${{ env.EditorProject }}"
 
-      - name: Package Editor App
-        shell: pwsh
-        run: |
-          New-Item -Path . -Name "editor-build" -ItemType "directory"
-          Compress-Archive -Path "editor-temp/*" -Destination "/editor-build/editor-${{env.BuildVersion}}.zip"
-        
       - name: Publish Editor Artifact
         uses: actions/upload-artifact@v4
         with:
           name: editor-app
-          path: /editor-build
+          path: /editor
   
   package-and-release:
     runs-on: windows-latest
