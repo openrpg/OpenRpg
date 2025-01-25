@@ -57,6 +57,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 9.0.x
+        
       - name: Build Web Demo
         run: dotnet publish -c Release -o demo "${{ env.DemoProject }}"
 
