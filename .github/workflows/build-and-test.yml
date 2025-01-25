@@ -67,6 +67,10 @@ jobs:
         
       - name: Build Web Demo
         run: dotnet publish -c Release -o demo "${{ env.DemoProject }}"
+        
+      - name: Rewrite Base Path
+        shell: pwsh
+        run: ((Get-Content -path "demo\wwwroot\index.html" -Raw) -replace '<base href="/" />', '<base href="/OpenRpg/" />') | Set-Content -Path "demo\wwwroot\index.html"
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
