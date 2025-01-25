@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using Microsoft.Extensions.DependencyInjection;
+using OpenRpg.Editor.Core.Services.Paths;
 using OpenRpg.Editor.Infrastructure.Extensions;
 using OpenRpg.Editor.Modules;
 using OpenRpg.Editor.UI;
@@ -27,7 +29,8 @@ class Program
         app.MainWindow
             .SetTitle("OpenRpg - Data Editor")
             .SetSize(1920, 1080)
-            .SetUseOsDefaultSize(false);
+            .SetUseOsDefaultSize(false)
+            .SetIconFile(Path.GetFullPath($"{PathHelper.AppPath}/openrpg.ico"));
 
         app.Run();
     }
