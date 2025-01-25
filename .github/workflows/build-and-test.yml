@@ -54,5 +54,6 @@ jobs:
         run: dotnet build --configuration Release /p:Version=${{ env.BuildVersion }} ${{ env.SolutionFile }}
       - name: .Net Pack
         run: dotnet pack --configuration Release /p:Version=${{ env.BuildVersion }} --no-build ${{ env.SolutionFile }}
-      - name: Publish To Nuget
-        run: dotnet nuget push "**/*.nupkg" -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        
+#      - name: Publish To Nuget
+#        run: dotnet nuget push "**/*.nupkg" -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
