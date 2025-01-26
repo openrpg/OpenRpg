@@ -3,8 +3,15 @@
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <LangVersion>13</LangVersion>
+        <ApplicationIcon>openrpg.ico</ApplicationIcon>
         <IsPackable>false</IsPackable>
+        <WasmFingerprintAssets>false</WasmFingerprintAssets>
+        <StaticWebAssetFingerprintingEnabled>false</StaticWebAssetFingerprintingEnabled>
+        <StaticWebAssetsFingerprintContent>false</StaticWebAssetsFingerprintContent>
+        <DisableBuildCompression>true</DisableBuildCompression>
     </PropertyGroup>
+    
+    
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
         <OutputType>Exe</OutputType>
