@@ -9,6 +9,7 @@ env:
 
 jobs:
   build-and-test:
+    name: "Build & Test"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -53,6 +54,7 @@ jobs:
         run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
   build-demos:
+    name: "Build Demos {{ startsWith(github.event.ref, 'refs/tags/') && '& Release' }}"
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -86,7 +88,6 @@ jobs:
         
   build-editor:
     runs-on: windows-latest
-    if: startsWith(github.event.ref, 'refs/tags/')
     needs: [build-and-test]
     steps:
       - uses: actions/checkout@v3
