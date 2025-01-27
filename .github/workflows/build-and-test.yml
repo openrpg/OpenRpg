@@ -54,7 +54,7 @@ jobs:
         run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
 
   build-demos:
-    name: "Build Demos ${{ startsWith(github.event.ref, 'refs/tags/') && '& Release' }}"
+    name: "Build Demos ${{ startsWith(github.event.ref, 'refs/tags/') && '& Release' || 'As Artifact' }}"
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -89,7 +89,7 @@ jobs:
         
         
   build-editor:
-    name: "Build Editor ${{ startsWith(github.event.ref, 'refs/feature') && '& Release' }}"
+    name: "Build Editor ${{ startsWith(github.event.ref, 'refs/feature') && '& Release' || 'As Artifact' }}"
     runs-on: windows-latest
     needs: [build-and-test]
     steps:
@@ -123,6 +123,7 @@ jobs:
           asset_paths: '["/editor-${{env.BuildVersion}}.zip"]'
   
   package-and-release:
+    name: "Package Libs ${{ startsWith(github.event.ref, 'refs/tags/') && '& Release' || 'As Artifact' }}"
     runs-on: windows-latest
     needs: [build-and-test]
     steps:
