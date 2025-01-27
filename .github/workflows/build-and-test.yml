@@ -86,7 +86,9 @@ jobs:
         uses: actions/deploy-pages@v4        
         
         
+        
   build-editor:
+    name: "Build Editor {{ startsWith(github.event.ref, 'refs/feature') && '& Release' }}"
     runs-on: windows-latest
     needs: [build-and-test]
     steps:
