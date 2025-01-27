@@ -54,7 +54,6 @@ jobs:
 
   build-demos:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.ref, 'refs/tags/')
     permissions:
       pages: write
       id-token: write
@@ -70,8 +69,9 @@ jobs:
       - name: Build Web Demo
         run: dotnet publish -c Release -o demo "${{ env.DemoProject }}"
         
-      - name: Rewrite Base Path
+      - name: Rewrite Base Path For Release
         shell: pwsh
+        if: startsWith(github.event.ref, 'refs/tags/')
         run: ((Get-Content -path "demo\wwwroot\index.html" -Raw) -replace '<base href="/" />', '<base href="/OpenRpg/" />') | Set-Content -Path "demo\wwwroot\index.html"
 
       - name: Upload Pages Artifact
@@ -80,12 +80,13 @@ jobs:
           path: demo/wwwroot/
 
       - name: Deploy Demo to GitHub Pages
-        uses: actions/deploy-pages@v4
-        
+        if: startsWith(github.event.ref, 'refs/tags/')
+        uses: actions/deploy-pages@v4        
         
         
   build-editor:
     runs-on: windows-latest
+    if: startsWith(github.event.ref, 'refs/tags/')
     needs: [build-and-test]
     steps:
       - uses: actions/checkout@v3
@@ -103,10 +104,22 @@ jobs:
         with:
           name: editor-app
           path: /editor
+          
+      - name: Compress App
+        shell: pwsh
+        if: startsWith(github.event.ref, 'refs/tags/')
+        run: Compress-Archive -Path "editor/*" -Destination "/editor-${{env.BuildVersion}}.zip"
+
+      - name: Upload App Release
+        uses: alexellis/upload-assets@0.2.2
+        if: startsWith(github.event.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_paths: '["/editor-${{env.BuildVersion}}.zip"]'
   
   package-and-release:
     runs-on: windows-latest
-    if: startsWith(github.event.ref, 'refs/tags/')
     needs: [build-and-test]
     steps:
       - uses: actions/checkout@v3
@@ -119,6 +132,13 @@ jobs:
 
       - name: .Net Pack
         run: dotnet pack --configuration Release /p:Version=${{ env.BuildVersion }} --no-build ${{ env.SolutionFile }}
+        
+      - name: Publish Editor Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Libraries
+          path: "**/*.nupkg"
 
       - name: Publish To Nuget
+        if: startsWith(github.event.ref, 'refs/tags/')
         run: dotnet nuget push "**/*.nupkg" -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
