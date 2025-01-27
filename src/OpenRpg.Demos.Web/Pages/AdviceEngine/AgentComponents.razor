@@ -1,0 +1,90 @@
+@page "/advice-engine/agent-components"
+
+<Markdown>
+    ## `IAgent`
+    Now we have covered the basics of `IConsideration` and `IAdvice` objects we should look at how they work in
+    relation to the agent, and how you would be interacting with these in the real world.
+    
+    > The agent has a `DefaultAgent` implementation but you can provide your own. 
+    
+    The main job of the agent is to act on behalf of an entity in the game world, be it a `Character`, `NPC`, `Enemy` etc,
+    it maintains a list of all utilities and exposes ways to add/remove `Consideration` and `Advice` instances, but as 
+    each one should be unique per consumer not all agents will have the same variables available, i.e If you cannot heal
+    there is no point you having considerations and advice around healing others.
+    
+    A typical agent being setup may look like this:
+    
+    ```csharp
+    randomCharacter = CharacterBuilder.CreateNew().Build();
+    
+    var defaultRefreshScheduler = new DefaultRefreshScheduler();
+    var considerationHandler = new ConsiderationHandler(defaultRefreshScheduler);
+    var adviceHandler = new AdviceHandler(defaultRefreshScheduler);
+    exampleAgent = new Agent(randomCharacter, considerationHandler, adviceHandler);
+    ```
+    
+    So if we break it down we have a `Character` in this case which we are using, the agent accepts anything that implements
+    `IHasDataId` as its owning context.
+    
+    Then after that we create a `DefaultRefreshScheduler` which implements `IRefreshScheduler`, this provides a default refresh
+    trigger for when considerations and advice should be refreshed. So if you were in a game where its always ticking you may 
+    want this to be every second or two, however in a turn based game maybe after each turn.
+    
+    Finally we have the `ConsiderationHandler` and `AdviceHandler` they basically wrap up the storage and updating of 
+    considerations and advice and feed into the internal `UtilityVariables` which the `DefaultAgent` creates itself internally.
+    
+</Markdown>
+
+<br />
+
+<Markdown>
+    ## Adding/Removing Considerations/Advice
+    
+    The agent exposes the `ConsiderationHandler` and `AdviceHandler` directly so you can manually do things like:
+    
+    ```csharp
+    // Without extension
+    agent.ConsiderationHandler.AddConsideration(someConsideration);
+    
+    // With extension
+    agent.AddConsideration(someConsideration);
+    
+    // With explicit update trigger
+    agent.AddConsideration(someConsideration, Observable.Timer(Timespan.FromSeconds(2)).Select(x => new Unit());
+    ```
+    
+    As you can see you just pass it a `Consideration` instance which internally exposes what utility it effects and
+    how it operates, the explicit update trigger allows you to make sure the consideration updates when you want it to
+    update automatically. If no explicit trigger is provided then it will just use the default refresh schedule.
+    
+    The consideration and advice handlers expose remove functions as well so if you pass in the UtilityKey for what
+    you want to remove it will be disposed of and removed from the list. The agent itself should also be disposed of
+    when you no longer need it or the owner has been destroyed.
+    
+    > While we show how to manually add/remove these things here, in the real world you may want to use 
+    `ApplicatorRegistrys` to handle this for larger projects, as this allows you to register all possible 
+    considerations/advice ahead of time but have them only apply based on requirement checks.
+    
+</Markdown>
+
+<br />
+
+<Markdown>
+    ## Getting Advice
+    
+    It is up to you how you want to get your advice, but there is a simple extension method available on the `IAgent`
+    which exposes `GetAdvice()` which will provide you will a sorted list of advice from high scoring advice down to 
+    low scoring advice.
+    
+    The idea is that in most cases you will probably just take the first piece of advice and run with it, however you
+    can always take top N and randomize which one you take or even just take them all and decide what to do with it
+    yourself.
+    
+    You can get access to individual pieces of advice directly from the `AdviceHandler` through the `GetAdvice(int adviceId)`
+    or `GetAllAdvice()` methods which returns back an unsorted enumerable of advice.
+    
+</Markdown>
+
+@code {
+    
+}

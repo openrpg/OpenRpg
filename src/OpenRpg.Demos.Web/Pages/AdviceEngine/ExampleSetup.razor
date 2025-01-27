@@ -1,0 +1,533 @@
+@page "/advice-engine/example-setup"
+
+@using OpenRpg.AdviceEngine.Considerations
+@using OpenRpg.AdviceEngine.Accessors
+@using OpenRpg.AdviceEngine.Clampers
+@using OpenRpg.AdviceEngine.Handlers
+@using OpenRpg.AdviceEngine.Handlers.Advisors
+@using OpenRpg.AdviceEngine.Handlers.Considerations
+@using OpenRpg.AdviceEngine.Keys
+@using OpenRpg.CurveFunctions
+@using OpenRpg.Demos.Infrastructure.Types
+@using OpenRpg.AdviceEngine
+@using OpenRpg.AdviceEngine.Considerations.Applicators
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.AdviceEngine.Advisors.Applicators.Registries
+@using OpenRpg.AdviceEngine.Considerations.Applicators.Registries
+@using RandomNameGenerator
+@using System.Reactive.Linq
+@using OpenRpg.AdviceEngine.Advisors
+@using OpenRpg.AdviceEngine.Advisors.Applicators
+@using OpenRpg.AdviceEngine.Extensions
+@using OpenRpg.AdviceEngine.Handlers.Advisors.Factories
+@using OpenRpg.AdviceEngine.Handlers.Considerations.Factories
+@using OpenRpg.AdviceEngine.Variables
+@using OpenRpg.Core.Common
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Requirements
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject DemoCharacterBuilder CharacterBuilder;
+@inject ICharacterRequirementChecker RequirementChecker;
+@inject ILocaleRepository LocaleRepository;
+
+@implements IDisposable
+
+<Markdown>
+    ## Example Setup
+    So now we have covered all the basic bits lets make a simple example to show how all this stuff can work
+    together in a real use case.
+    
+    Lets assume we have a character and they need to know if they should themselves or go and attack and enemy.
+    To do this scenario we will need a couple of characters 2 being enemies one being the player and then have some
+    considerations for how far away the enemies are and how low the players health is.
+    
+    > Real world cases would be far larger and more complex with lots of various considerations to think about
+    but this is a simplified example of common use cases, and everything covered here can just be applied
+    on a larger scale.
+</Markdown>
+
+<br />
+
+<div class="columns">
+    @if (Agents != null)
+    {
+        <div class="column">
+            <CardSection>
+                <div class="columns">
+                    <div class="column has-text-centered">
+                        <h4 class="title is-4 has-text-grey-dark">Variables Data</h4>
+                        <button class="button" @onclick="ChangeVariables">Refresh Variables</button>
+                    </div>
+                </div>
+                <div class="columns">
+                    @foreach (var agent in Agents)
+                    {
+                        <div class=" column has-text-centered">
+                            <h4 class="title is-6 has-text-grey-dark">@((agent.OwnerContext as Character).NameLocaleId)</h4>
+                            <TagLabel Label="Health" Content="@((agent.OwnerContext as Character).State.Health().ToString())"></TagLabel>
+                            <TagLabel Label="Position" Content="@(((float)(agent.OwnerContext as Character).Variables[PositionVariable]).ToString("F2"))"></TagLabel>
+                        </div>
+                    }
+                </div>
+            </CardSection>
+        </div>
+        <div class="column">
+            <CardSection>
+                <div class="columns">
+                    @foreach (var agent in Agents)
+                    {
+                        <div class=" column has-text-centered">
+                            <h4 class="title is-5 has-text-grey-dark">@((agent.OwnerContext as Character).NameLocaleId)</h4>
+                            <div class="columns">
+                                <div class="column has-text-centered">
+                                    <h4 class="title is-6 has-text-grey-dark">Advice Data</h4>
+                                </div>
+                            </div>
+                            <div class="field is-grouped is-grouped-multiline">
+                                @{var index = 0;}
+                                @foreach (var advice in agent.GetAdvice())
+                                {
+
+                                    var relatedContext = advice.ContextAccessor.GetContext() as Character;
+                                    <AdviceValue Text="@GetAdviceText(advice.AdviceId)"
+                                                 ContextText="@relatedContext.NameLocaleId"
+                                                 IsBestAdvice="@(index++ == 0)" Value="@advice.Score"/>
+                                }
+                            </div>
+                            <div class="columns">
+                                <div class="column has-text-centered">
+                                    <h4 class="title is-6 has-text-grey-dark">Utility Data</h4>
+                                </div>
+                            </div>
+                            <div class="field is-grouped is-grouped-multiline">
+                                @foreach (var (key, value) in GetLocalUtilities(agent))
+                                {
+                                    <UtilityValue Text="@GetUtilityText(key)" Value="@value"/>
+                                }
+                            </div>
+                            <h5 class="title is-6 has-text-grey-dark">Related Utilities</h5>
+                            @foreach (var enemy in Agents.Where(x => (x.OwnerContext as Character).UniqueId != (agent.OwnerContext as Character).UniqueId))
+                            {
+                                var unitUtilities = GetOtherUnitUtilities((enemy.OwnerContext as Character).UniqueId.GetHashCode(), agent);
+                                if (!unitUtilities.Any())
+                                {
+                                    continue;
+                                }
+
+                                <h6 class="title is-7 has-text-grey-dark">@((enemy.OwnerContext as Character).NameLocaleId)</h6>
+                                <div class="field is-grouped is-grouped-multiline">
+                                    @foreach (var (key, value) in unitUtilities)
+                                    {
+                                        <UtilityValue Text="@GetUtilityText(key)" Value="@value"/>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </CardSection>
+        </div>
+    }
+</div>
+<br/>
+
+<Markdown>
+    ## OK, So whats happening?!
+    So as we can see we refresh the variables and it will refresh the utilities which drive the advice in turn.
+    
+    There is a lot of content required to setup all this, and while in this file we have lobbed it all in together, you
+    would generally split it all up into separate files, but lets just run through the important bits.
+</Markdown>
+
+<br/>
+
+<Markdown>
+    ## Setting up the applicators
+    The first part will be thinking about what considerations we want to apply, so lets look at each one.
+    
+    ```csharp
+    public class HasLowHealthConsiderationApplicator : DefaultLocalConsiderationApplicator&lt;ICharacter&gt;
+    {
+        public override IEnumerable&lt;Requirement&gt; Requirements { get; } = Array.Empty&lt;Requirement&gt;();
+
+        public HasLowHealthConsiderationApplicator(ICharacterRequirementChecker requirementChecker) : base(requirementChecker)
+        {}
+            
+        public override IConsideration CreateConsideration(IAgent agent)
+        {
+            var character = agent.OwnerContext as ICharacter;
+            var healthValueAccessor = new ManualValueAccessor((context, variables) => character.Stats.Health());
+            return new ValueBasedConsideration(new UtilityKey(UtilityVariableTypes.LowHealth), healthValueAccessor, PresetClampers.ZeroToHundred, PresetCurves.InverseLinear);
+        }
+    }
+    ```
+    
+    The key parts here are the `Requirements` which you will notice we have none, so this should apply to every agent,
+    then its the `CreateConsideration` section where we basically get the characters health, and we tell it to clamp
+    it between 0-100 then use an inverted linear curve to score it.
+    
+    > In real world scenarios you would want to be more specific about things like clampers, as you may have dynamic
+    values and you can change the curve to what best represents your scenario.
+    
+    Then we can look at the other consideration which factors in related entities.
+    
+    ```csharp
+    public class EnemyDistanceConsiderationApplicator : DefaultExternalConsiderationApplicator&lt;ICharacter&gt;
+    {
+        private static readonly IClamper DistanceClamper = new Clamper(0, 20.0f);
+
+        public override IEnumerable&lt;Requirement&gt; Requirements { get; } = Array.Empty&lt;Requirement&gt;();
+        public  IEnumerable&lt;IAgent&gt; AllAgents { get; }
+
+        public EnemyDistanceConsiderationApplicator(ICharacterRequirementChecker requirementChecker, IEnumerable&lt;IAgent&gt; allAgents) : base(requirementChecker)
+        {
+            AllAgents = allAgents;
+        }
+
+        public IConsideration CreateConsideration(ICharacter goodCharacter, ICharacter badCharacter)
+        {
+            var distanceUtilityKey = new UtilityKey(UtilityVariableTypes.EnemyDistance, badCharacter.Id);
+            var distanceAccessor = new ManualValueAccessor((context, variables) => Math.Abs((float)badCharacter.Variables[PositionVariable] - (float)goodCharacter.Variables[PositionVariable]));
+            return new ValueBasedConsideration(distanceUtilityKey, distanceAccessor, DistanceClamper, PresetCurves.QuadraticLowerLeft);
+        }
+
+        public override IEnumerable&lt;IConsideration> CreateConsiderations(IAgent agent)
+        {
+            var ourCharacter = agent.OwnerContext as ICharacter;
+            foreach (var otherAgent in AllAgents.Where(x => x != agent))
+            {
+                var otherCharacter = otherAgent.OwnerContext as ICharacter;
+                var isEnemyCharacter = otherCharacter.Variables[FactionVariable] != ourCharacter.Variables[FactionVariable];
+                if (isEnemyCharacter)
+                { yield return CreateConsideration(ourCharacter, otherCharacter); }
+            }
+        }
+    }
+    ```
+    
+    As you can see this one is a bit more involved and is dependent on external agents, however this is a common use case
+    so best get used to it. The key thing here is that our `CreateConsiderations` passes back an enumerable set of 
+    considerations. We generally just loop through all the other agents and just check if they are an enemy (relative to the agent) and
+    calculates the distance between them, scoring it as a floating point value.
+    
+    > As you can see its not SUPER complicated we just need to focus on what data drives our utilities and how we process
+    that data into useful values for driving advice.
+</Markdown>
+<br/>
+<Markdown>
+    ## Advice setup
+    
+    Much like the consideration applicator setups we need to create the advice applicators and they look like this:
+    
+    ```csharp
+    public class ShouldHealAdviceApplicator : DefaultAdviceApplicator&lt;ICharacter&gt;
+    {
+        public override IEnumerable&lt;Requirement&gt; Requirements { get; } = Array.Empty&lt;Requirement&gt;();
+
+        public ShouldHealAdviceApplicator(ICharacterRequirementChecker requirementChecker) : base(requirementChecker)
+        {}
+
+        public override IAdvice CreateAdvice(IAgent agent)
+        {
+            var contextAccessor = new ManualContextAccessor(agent.OwnerContext, agent.UtilityVariables, 
+                (context, variables) => context as ICharacter);
+            return new DefaultAdvice(AdviceVariableTypes.ShouldHeal, new[]
+                { new UtilityKey(UtilityVariableTypes.LowHealth)}, contextAccessor);
+            }
+        }
+    }
+    ```
+    
+    This is quite a simple one, we have no requirements again and just look at the low health key to work out if we should
+    heal ourself. We also need another piece of advice which will be dependent on other external considerations and then
+    we can decide who to attack.
+    
+    ```csharp
+    public class ShouldAttackAdviceApplicator : DefaultAdviceApplicator&lt;ICharacter>
+    {
+        public override IEnumerable&lt;Requirement> Requirements { get; } = Array.Empty&lt;Requirement>();
+        public IEnumerable&lt;IAgent> AllAgents { get; }
+
+        public ShouldAttackAdviceApplicator(ICharacterRequirementChecker requirementChecker, IEnumerable&lt;IAgent> allAgents) : base(requirementChecker)
+        {
+        AllAgents = allAgents;
+    }
+        
+    public ICharacter GetBestTarget(IHasDataId context, IUtilityVariables variables)
+    {
+        var targetUtility = variables
+        .GetRelatedUtilities(UtilityVariableTypes.EnemyDistance)
+        .OrderByDescending(x => x.Value)
+        .First();
+                
+        return AllAgents.First(x => x.OwnerContext.Id == targetUtility.Key.RelatedId).OwnerContext as ICharacter;
+    }
+
+    public override IAdvice CreateAdvice(IAgent agent)
+    {
+        return new DefaultAdvice(AdviceVariableTypes.ShouldAttack, new[]
+        {
+            new UtilityKey(UtilityVariableTypes.LowHealth),
+            new UtilityKey(UtilityVariableTypes.EnemyDistance)
+            }, new ManualContextAccessor(agent.OwnerContext, agent.UtilityVariables, GetBestTarget));
+        }
+    }
+    ```
+    
+    While this is a bit more complex really all we are doing is passing in all agents then scoring on the enemy distance 
+    then we get the best target based off the closest enemy.
+</Markdown>
+<br/>
+<Markdown>
+    ## Using the applicators
+    
+    Now we have created the consideration and advice applicators we need to add them to a registry like so:
+    ```csharp
+    public void SetupApplicators()
+    {
+        ConsiderationApplicatorRegistry.AddApplicator(new HasLowHealthConsiderationApplicator(RequirementChecker));
+        ConsiderationApplicatorRegistry.AddApplicator(new EnemyDistanceConsiderationApplicator(RequirementChecker, Agents));
+        AdviceApplicatorRegistry.AddApplicator(new ShouldHealAdviceApplicator(RequirementChecker));
+        AdviceApplicatorRegistry.AddApplicator(new ShouldAttackAdviceApplicator(RequirementChecker, Agents));
+    }
+    ```
+    
+    Then we use it like so:
+    
+    ```csharp
+    public void ApplyConsiderations()
+    {
+        foreach (var agent in Agents)
+        { ConsiderationApplicatorRegistry.ApplyAll(agent); }
+    }
+    
+    public void ApplyAdvice()
+    {
+        foreach (var agent in Agents)
+        { AdviceApplicatorRegistry.ApplyAll(agent); }
+    }
+    ```
+    
+    > I am omitting some boilerplate code which you can see by looking at the source code of this page directly, but
+    the key points are the bits above.
+    
+    Now that everything has been setup, we can just change our variables as we want and the advice/utility data will
+    update on the fly.
+    
+</Markdown>
+
+
+@code {
+
+    public List<IAgent> Agents = new List<IAgent>();
+    public IAdviceApplicatorRegistry AdviceApplicatorRegistry = new DefaultAdviceApplicatorRegistry();
+    public IConsiderationApplicatorRegistry ConsiderationApplicatorRegistry = new DefaultConsiderationApplicatorRegistry();
+
+    public static int PositionVariable = 100;
+    public static int FactionVariable = 101;
+
+    public static int GoodFaction = 1;
+    public static int BadFaction = 2;
+
+    private Random _random = new Random();
+    private IDisposable _sub;
+    
+    public class HasLowHealthConsiderationApplicator : DefaultLocalConsiderationApplicator<Character>
+    {
+        public override IReadOnlyCollection<Requirement> Requirements { get; } = Array.Empty<Requirement>();
+
+        public HasLowHealthConsiderationApplicator(ICharacterRequirementChecker requirementChecker) : base(requirementChecker)
+        {}
+        
+        public override IConsideration CreateConsideration(IAgent agent)
+        {
+            var healthValueAccessor = new ManualValueAccessor((context, _) => (context as Character).State.Health());
+            return new ValueBasedConsideration(new UtilityKey(UtilityVariableTypes.LowHealth), healthValueAccessor, PresetClampers.ZeroToHundred, PresetCurves.InverseLinear);
+        }
+    }
+    
+    public class EnemyDistanceConsiderationApplicator : DefaultExternalConsiderationApplicator<Character>
+    {
+        private static readonly IClamper DistanceClamper = new Clamper(0, 20.0f);
+
+        public override IReadOnlyCollection<Requirement> Requirements { get; } = Array.Empty<Requirement>();
+        public  IEnumerable<IAgent> AllAgents { get; }
+
+        public EnemyDistanceConsiderationApplicator(ICharacterRequirementChecker requirementChecker, IEnumerable<IAgent> allAgents) : base(requirementChecker)
+        {
+            AllAgents = allAgents;
+        }
+
+        public IConsideration CreateConsideration(Character goodCharacter, Character badCharacter)
+        {
+            var distanceUtilityKey = new UtilityKey(UtilityVariableTypes.EnemyDistance, badCharacter.UniqueId.GetHashCode());
+            var distanceAccessor = new ManualValueAccessor((context, variables) => Math.Abs((float)badCharacter.Variables[PositionVariable] - (float)goodCharacter.Variables[PositionVariable]));
+            return new ValueBasedConsideration(distanceUtilityKey, distanceAccessor, DistanceClamper, PresetCurves.QuadraticLowerLeft);
+        }
+
+        public override IEnumerable<IConsideration> CreateConsiderations(IAgent agent)
+        {
+            var ourCharacter = agent.OwnerContext as Character;
+            foreach (var otherAgent in AllAgents.Where(x => x != agent))
+            {
+                var otherCharacter = otherAgent.OwnerContext as Character;
+                var isEnemyCharacter = otherCharacter.Variables[FactionVariable] != ourCharacter.Variables[FactionVariable];
+                if (isEnemyCharacter)
+                { yield return CreateConsideration(ourCharacter, otherCharacter); }
+            }
+        }
+    }
+    
+    public class ShouldHealAdviceApplicator : DefaultAdviceApplicator<Character>
+    {
+        public override IReadOnlyCollection<Requirement> Requirements { get; } = Array.Empty<Requirement>();
+
+        public ShouldHealAdviceApplicator(ICharacterRequirementChecker requirementChecker) : base(requirementChecker)
+        {}
+
+        public override IAdvice CreateAdvice(IAgent agent)
+        {
+            var contextAccessor = new ManualContextAccessor(agent.OwnerContext, agent.UtilityVariables, 
+                (context, variables) => context as Character);
+            return new DefaultAdvice(AdviceVariableTypes.ShouldHeal, new[]
+            {
+                new UtilityKey(UtilityVariableTypes.LowHealth)
+            }, contextAccessor);
+        }
+    }
+    
+    public class ShouldAttackAdviceApplicator : DefaultAdviceApplicator<Character>
+    {
+        public override IReadOnlyCollection<Requirement> Requirements { get; } = Array.Empty<Requirement>();
+        public IEnumerable<IAgent> AllAgents { get; }
+
+        public ShouldAttackAdviceApplicator(ICharacterRequirementChecker requirementChecker, IEnumerable<IAgent> allAgents) : base(requirementChecker)
+        {
+            AllAgents = allAgents;
+        }
+        
+        public Character GetBestTarget(object context, IUtilityVariables variables)
+        {
+            var targetUtility = variables
+                .GetRelatedUtilities(UtilityVariableTypes.EnemyDistance)
+                .MaxBy(x => x.Value);
+            
+            return AllAgents.First(x => (x.OwnerContext as Character).UniqueId.GetHashCode() == targetUtility.Key.RelatedId).OwnerContext as Character;
+        }
+
+        public override IAdvice CreateAdvice(IAgent agent)
+        {
+            var contextAccessor = new ManualContextAccessor(agent.OwnerContext, agent.UtilityVariables, GetBestTarget);
+            return new DefaultAdvice(AdviceVariableTypes.ShouldAttack, new[]
+            {
+                new UtilityKey(UtilityVariableTypes.EnemyDistance)
+            }, contextAccessor);
+        }
+    }
+
+    public void SetupApplicators()
+    {
+        ConsiderationApplicatorRegistry.AddApplicator(new HasLowHealthConsiderationApplicator(RequirementChecker));
+        ConsiderationApplicatorRegistry.AddApplicator(new EnemyDistanceConsiderationApplicator(RequirementChecker, Agents));
+        AdviceApplicatorRegistry.AddApplicator(new ShouldHealAdviceApplicator(RequirementChecker));
+        AdviceApplicatorRegistry.AddApplicator(new ShouldAttackAdviceApplicator(RequirementChecker, Agents));
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        
+        var defaultRefreshScheduler = new DefaultRefreshScheduler();
+
+        var goodCharacter1 = CharacterBuilder.CreateNew()
+            .WithName(NameGenerator.Generate(Gender.Female))
+            .Build();
+        
+        var goodAgent = CreateAgentFor(goodCharacter1, defaultRefreshScheduler);
+        goodCharacter1.Variables[FactionVariable] = GoodFaction;
+        
+        var badCharacter1 = CharacterBuilder.CreateNew().Build();
+        var badAgent1 = CreateAgentFor(badCharacter1, defaultRefreshScheduler);
+        badCharacter1.Variables[FactionVariable] = BadFaction;
+
+        var badCharacter2 = CharacterBuilder.CreateNew().Build();
+        var badAgent2 = CreateAgentFor(badCharacter2, defaultRefreshScheduler);
+        badCharacter2.Variables[FactionVariable] = BadFaction;
+        
+        Agents.Add(goodAgent);
+        Agents.Add(badAgent1);
+        Agents.Add(badAgent2);
+
+        SetupApplicators();
+        ChangeVariables();
+        ApplyConsiderations();
+        ApplyAdvice();        
+
+        _sub = Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1)).Subscribe(x => StateHasChanged());
+    }
+
+    public void ApplyConsiderations()
+    {
+        foreach (var agent in Agents)
+        { ConsiderationApplicatorRegistry.ApplyAll(agent); }
+    }
+    
+    public void ApplyAdvice()
+    {
+        foreach (var agent in Agents)
+        { AdviceApplicatorRegistry.ApplyAll(agent); }
+    }
+
+    public IAgent CreateAgentFor(Character character, IRefreshScheduler refreshScheduler)
+    {
+        var considerationHandlerFactory = new DefaultConsiderationHandlerFactory(refreshScheduler);
+        var adviceHandlerFactory = new DefaultAdviceHandlerFactory(refreshScheduler);
+        return new Agent(character, considerationHandlerFactory, adviceHandlerFactory);
+    }
+
+    public int GetRandomHealthValue()
+    { return _random.Next(100); }
+
+    public float GetRandomPositionValue()
+    { return (float)_random.NextDouble() * 20; }
+    
+    public void ChangeVariables()
+    {
+        void ApplyRandoms(Character character)
+        {
+            character.Variables[PositionVariable] = GetRandomPositionValue();
+            character.State.Health(GetRandomHealthValue());
+        }
+
+        foreach (var agent in Agents)
+        { ApplyRandoms(agent.OwnerContext as Character); }
+        
+        StateHasChanged();
+    }
+    
+    public IEnumerable<KeyValuePair<UtilityKey, float>> GetLocalUtilities(IAgent agent)
+    { return agent.ConsiderationHandler.UtilityVariables.Where(x => x.Key.RelatedId == 0); }
+
+    public IEnumerable<KeyValuePair<UtilityKey, float>> GetOtherUnitUtilities(int unitId, IAgent agent)
+    { return agent.ConsiderationHandler.UtilityVariables.Where(x => x.Key.RelatedId == unitId); }
+
+    public string GetUtilityText(UtilityKey key)
+    {
+        var lookupKey = LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.UtilityTypesTextKey, key.UtilityId);
+        var lookupText = LocaleRepository.Get(lookupKey);
+        return key.RelatedId == 0 ? lookupText : $"{lookupText}";
+    }
+    
+    public string GetAdviceText(int adviceKey)
+    {
+        var lookupKey = LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.AdviceTypesTextKey, adviceKey);
+        return LocaleRepository.Get(lookupKey);
+    }
+
+    public void Dispose()
+    { _sub.Dispose(); }
+}

@@ -1,0 +1,101 @@
+﻿@using System.Reactive.Disposables
+@using OpenRpg.Editor.Core.Extensions
+@using OpenRpg.Editor.Core.Models
+@using OpenRpg.Editor.Core.Services.Events.Bus
+@using OpenRpg.Editor.Core.Services.Notifications
+@using OpenRpg.Editor.Infrastructure.Events
+@using OpenRpg.Editor.Infrastructure.Persistence
+
+@implements IDisposable
+
+@inject EditorState EditorState;
+@inject IEventBus EventBus;
+@inject SaveProjectExecutor SaveProjectExecutor;
+@inject INotifier Notifier;
+
+<nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+    <div class="navbar-menu">
+        <div class="navbar-start">
+            <span class="tag is-dark app-logo">OpenRpg Editor - v@(GetType().Assembly.GetName().Version) (Alpha)</span>
+        </div>
+        @if (EditorState.Project != null)
+        {
+            <div class="navbar ml-auto">
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <NavLink href="items" ActiveClass="is-active" class="navbar-link" Match="NavLinkMatch.All">
+                        <span class="icon mr-1"><i class="fas fa-file-lines" aria-hidden="true"></i></span>
+                        <span>Templates</span>
+                    </NavLink>
+
+                    <div class="navbar-dropdown has-background-grey-dark">
+                        <NavLink href="items" ActiveClass="is-active" class="navbar-item" Match="NavLinkMatch.All">
+                            <span class="icon mr-1"><i class="fas fa-hammer" aria-hidden="true"></i></span>
+                            <span>Items</span>
+                        </NavLink>
+
+                        <NavLink href="classes" ActiveClass="is-active" class="navbar-item" Match="NavLinkMatch.All">
+                            <span class="icon mr-1"><i class="fas fa-clipboard-user" aria-hidden="true"></i></span>
+                            <span>Classes</span>
+                        </NavLink>
+
+                        <NavLink href="races" ActiveClass="is-active" class="navbar-item" Match="NavLinkMatch.All">
+                            <span class="icon mr-1"><i class="fas fa-person" aria-hidden="true"></i></span>
+                            <span>Races</span>
+                        </NavLink>
+
+                        <NavLink href="quests" ActiveClass="is-active" class="navbar-item" Match="NavLinkMatch.All">
+                            <span class="icon mr-1"><i class="fas fa-dungeon" aria-hidden="true"></i></span>
+                            <span>Quests</span>
+                        </NavLink>
+                    </div>
+                </div>
+
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <NavLink href="items" ActiveClass="is-active" class="navbar-link" Match="NavLinkMatch.All">
+                        <span class="icon mr-1"><i class="fas fa-flag" aria-hidden="true"></i></span>
+                        <span>Locales</span>
+                    </NavLink>
+
+                    <div class="navbar-dropdown has-background-grey-dark">
+                        <NavLink href="locales" ActiveClass="is-active" class="navbar-item" Match="NavLinkMatch.All">
+                            <span class="icon mr-1"><i class="fas fa-flag" aria-hidden="true"></i></span>
+                            <span>Locales</span>
+                        </NavLink>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="navbar-end">
+                <button class="button is-primary is-small" @onclick="SaveProject">
+                    <span class="icon mr-1"><i class="fas fa-save" aria-hidden="true"></i></span>
+                    <span>Save Project</span>
+                </button>
+            </div>
+        }
+    </div>
+</nav>
+
+@code {
+
+    public CompositeDisposable Subs = new CompositeDisposable();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        EventBus
+            .Receive<ProjectChangedEvent>()
+            .Subscribe(_ => InvokeAsync(StateHasChanged))
+            .AddTo(Subs);
+    }
+
+    public async void SaveProject()
+    {
+        await SaveProjectExecutor.Execute();
+        await Notifier.ShowNotification("Project Saved");
+    }
+
+    public void Dispose() => Subs?.Dispose();
+
+}

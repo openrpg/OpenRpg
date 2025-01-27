@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using Moq;
 using OpenRpg.Items;
-using OpenRpg.Items.Inventory;
 using OpenRpg.Items.Extensions;
+using OpenRpg.Items.Inventories;
 using OpenRpg.Items.Templates;
 using Xunit;
 
@@ -15,20 +15,9 @@ public class InventoryExtensionTests
     public void should_tell_if_inventory_has_item_of_type()
     {
         var expectedItemTypeId = 1;
-        var dummyItems = new List<IItem>()
-        {
-            new DefaultItem()
-            {
-                Template = new DefaultItemTemplate()
-                {
-                    Id = expectedItemTypeId
-                }
-            }
-        };
-        var mockInventory = new Mock<IInventory>();
-        mockInventory.Setup(x => x.Items).Returns(dummyItems);
+        var inventory = new Inventory();
+        inventory.Items.Add(new ItemData() { TemplateId = expectedItemTypeId });
 
-        var inventory = mockInventory.Object;
         var hasExpectedItem = inventory.HasItem(expectedItemTypeId);
         Assert.True(hasExpectedItem);
 
@@ -43,14 +32,14 @@ public class InventoryExtensionTests
     [InlineData(5,10,false)]
     public void should_correctly_return_if_it_has_items_with_amounts(int startingAmount, int requestAmount, bool expected)
     {
-        var existingItemTemplate = new DefaultItemTemplate { Id = 1 };
-        var existingItem = new DefaultItem() { UniqueId = Guid.Empty, Template = existingItemTemplate };
+        var existingItemTemplate = new ItemTemplate { Id = 1 };
+        var existingItem = new ItemData() { TemplateId = existingItemTemplate.Id };
         existingItem.Variables.Amount(startingAmount);
         
-        var inventory = new DefaultInventory();
-        inventory.InternalItems.Add(existingItem);
+        var inventory = new Inventory();
+        inventory.Items.Add(existingItem);
 
-        var itemToCheck = new DefaultItem() { UniqueId = Guid.Empty, Template = existingItemTemplate };
+        var itemToCheck = new ItemData() { TemplateId = existingItemTemplate.Id };
         itemToCheck.Variables.Amount(requestAmount);
         var actualThroughAgnosticMethod = inventory.HasItem(itemToCheck);
         var actualFromDirectMethod = inventory.HasItem(existingItemTemplate.Id, requestAmount);

@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>13</LangVersion>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0" PrivateAssets="all" />
+        <PackageReference Include="Persistity" Version="2.0.47" />
+        <PackageReference Include="Persistity.Serializers.Json" Version="2.0.47" />
+        <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OpenRpg.Editor.Infrastructure\OpenRpg.Editor.Infrastructure.csproj" />
+      <ProjectReference Include="..\OpenRpg.Editor.Core\OpenRpg.Editor.Core.csproj" />
+      <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\AssetCodeEditor.razor" />
+      <_ContentIncludedByDefault Remove="Components\BasicDetailsEditor.razor" />
+      <_ContentIncludedByDefault Remove="Components\ContentSidebar.razor" />
+      <_ContentIncludedByDefault Remove="Components\EffectsEditor.razor" />
+      <_ContentIncludedByDefault Remove="Components\ListEditor.razor" />
+      <_ContentIncludedByDefault Remove="Components\LocaleDetails.razor" />
+      <_ContentIncludedByDefault Remove="Components\LocaleEditorModal.razor" />
+      <_ContentIncludedByDefault Remove="Components\ModificationAllowancesEditor.razor" />
+      <_ContentIncludedByDefault Remove="Components\ObjectivesEditor.razor" />
+      <_ContentIncludedByDefault Remove="Components\RequirementsEditor.razor" />
+      <_ContentIncludedByDefault Remove="Components\RewardsEditor.razor" />
+      <_ContentIncludedByDefault Remove="Pages\ClassEditor.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Index.razor" />
+      <_ContentIncludedByDefault Remove="Pages\ItemEditor.razor" />
+      <_ContentIncludedByDefault Remove="Pages\QuestEditor.razor" />
+      <_ContentIncludedByDefault Remove="Pages\RaceEditor.razor" />
+      <_ContentIncludedByDefault Remove="wwwroot\Assets\item-long-sword.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\Assets\item-short-sword.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\bulma\bulma.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\site.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\favicon.ico" />
+      <_ContentIncludedByDefault Remove="wwwroot\index.html" />
+      <_ContentIncludedByDefault Remove="wwwroot\libs\bulma.toast.js" />
+      <_ContentIncludedByDefault Remove="Properties\launchSettings.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Modals\LocaleEditorModal.razor" />
+    </ItemGroup>
+
+</Project>

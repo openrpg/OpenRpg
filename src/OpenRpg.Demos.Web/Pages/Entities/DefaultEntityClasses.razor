@@ -1,0 +1,174 @@
+﻿@page "/entities/default-character"
+
+@using OpenRpg.Core.Races
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Core.Classes
+@using OpenRpg.Core.Extensions
+@using OpenRpg.Core.Templates
+@using OpenRpg.Core.Utils
+@using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Populators.Entity.Stats
+
+@inject IRandomizer Randomizer;
+@inject IEntityStatPopulator StatPopulator;
+@inject ITemplateAccessor TemplateAccessor;
+
+<Markdown>
+    ## Custom Scenarios
+    
+    As we have seen you can keep adding complex responsibilities to the entity object however there will end up being
+    more complex scenarios that are unique to your game that we dont solve in the base layers. If we take leveling up 
+    for example, when you level up should your character get some arbitrary improvement points based on their class? 
+    should they get to pick what stats they want to improve?
+    
+    To solve these problems in most cases you would just add another custom variable to the `IEntityVariables` with 
+    relevant extension methods and then you can add whatever custom data you need to. 
+
+    > These extra concerns will in most cases just expose more `Effect` instances that need to be calculated with the 
+    stats calculator, so however you go about it, just try to keep it simple.
+</Markdown>
+
+<br />
+<div class="columns">
+    <div class="column is-half">
+        <Markdown>
+            ## Populating Entities
+            You can set whatever parts of it you want just like the previous character classes we made ourselves,
+            so lets hardcode stuff to see it working.
+
+            ```csharp
+            character.NameLocaleId = "John Doe";
+            character.Race = new DefaultRaceTemplate { NameLocaleId = "Human" };
+            character.Class = new DefaultCharacterClass(3, new DefaultClassTemplate { NameLocaleId = "Fighter" });
+            character.Stats.MaxHealth(100);
+            character.State.Health(50);
+            character.Stats.MaxMagic(10);
+            character.State.Magic(7);
+            character.Stats.Strength(11);
+            character.Stats.Dexterity(12);
+            character.Stats.Intelligence(12);
+            character.Stats.Wisdom(18);
+            character.Stats.Charisma(14);
+            character.Stats.Damage(10);
+            character.Stats.Defense(8);
+            character.Stats.DarkDamage(1);
+            character.Stats.DarkDefense(25);
+            ```
+
+            So as you can see we now have a character, although a bit hardcoded.
+        </Markdown>
+    </div>
+    <div class="column is-half">
+        <BasicCharacter Character="@_manualCharacter" TemplateAccessor="TemplateAccessor" />
+    </div>
+</div>
+
+<br />
+<div class="columns">
+    <div class="column is-half">
+        <CardSection>
+            <Markdown Containerless="true">
+                ## Generating Entities (Randomly/Builders)
+                In most real world scenarios you will want something slightly nicer than having to hard code everything, and as we mentioned earlier
+                we ideally want to be using effects to drive the underlying stat values.
+
+                So to achieve this you probably want to come up with a `CharacterBuilder` of sorts, there is something primitive for this in the `infrastructure`
+                section of this project, but as each scenario is different and each data set is different (i.e your races/classes/stats available) its hard to provide
+                an out the box version, but feel free to copy ours if needed.
+
+                With this you would do something like:
+
+                ```csharp
+                var myRandomCharacter = CharacterBuilder.CreateNew().Build(); // Generate Random
+
+                var mySpecificCharacter = CharacterBuilder.CreateNew()
+                .WithName("Fighter McFight Face")
+                .WithRaceId(1) // 1 is human here
+                .WithClassId(1, 2) // 1 is fighter here, 2 is the level
+                .AsMale()
+                .Build();
+                ```
+
+                You can mess around and generate your own random character if you want using the button below.
+            </Markdown>
+            <div class="has-text-centered">
+                <a class="button is-info mt-3" @onclick="RandomizeCharacter">Generate Random Character</a>
+            </div>
+        </CardSection>
+    </div>
+    <div class="column is-half has-text-centered">
+        <BasicCharacter Character="@_randomCharacter" TemplateAccessor="TemplateAccessor" />
+    </div>
+</div>
+
+<br />
+
+<Markdown>
+    ## Extending Character Classes
+    As mentioned it's best to extend the interface and build your extra concerns on top.
+
+    Here is an example from a game in (slow) progress which builds on top of this concept to allow for the player to
+    pick what stats should be improved each level up.
+
+    ```csharp
+    public interface IGameCharacter : ICharacter, IHasActiveEffects
+    {
+        ICollection&lt;Effect&gt; LevelUpEffects { get; set; }
+        ICollection&lt;ActiveEffect&gt; ActiveEffects {get;set;}
+    }
+    ```
+
+    As you can see there is a `LevelUpEffects` which is a custom property we add to track level up changes, which would be
+    controlled by some in game UI/rules then an `ActiveEffect` class which wraps up the notion of an `Effect` that only lasts 
+    a certain amount of time, such as someone putting a poison or regen effect on which may tick at a frequency, or just a buff
+    that increases a stat for a given duration.
+
+    Behind the scenes it's actually a `TimedEffect` which contains the info on frequency and duration, then the `ActiveEffect` 
+    class wraps that and tracks how long its been active etc. You can find more out about this in the `OpenRpg.Combat` library.
+</Markdown>
+
+
+
+@code {
+    private Character _manualCharacter;
+    private Character _randomCharacter;
+    private DemoCharacterBuilder CharacterBuilder { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        CharacterBuilder = new DemoCharacterBuilder(Randomizer, StatPopulator, TemplateAccessor);
+        
+        _manualCharacter = new Character();
+        _manualCharacter.NameLocaleId = "John Doe";
+        _manualCharacter.Variables.Race(new RaceData { TemplateId = RaceTypeLookups.Human });
+        _manualCharacter.Variables.Class(new ClassData { TemplateId = ClassTypeLookups.Fighter });
+
+        _manualCharacter.Stats.MaxHealth(100);
+        _manualCharacter.State.Health(50);
+        _manualCharacter.Stats.MaxMagic(10);
+        _manualCharacter.State.Magic(7);
+
+        _manualCharacter.Stats.Strength(11);
+        _manualCharacter.Stats.Dexterity(12);
+        _manualCharacter.Stats.Intelligence(12);
+        _manualCharacter.Stats.Wisdom(18);
+        _manualCharacter.Stats.Charisma(14);
+
+        _manualCharacter.Stats.Damage(10);
+        _manualCharacter.Stats.Defense(8);
+        _manualCharacter.Stats.DarkDamage(1);
+        _manualCharacter.Stats.DarkDefense(25);
+
+        RandomizeCharacter();
+
+        base.OnInitialized();
+    }
+
+    public void RandomizeCharacter()
+    {
+        _randomCharacter = CharacterBuilder.CreateNew().Build();
+        StateHasChanged();
+    }
+}

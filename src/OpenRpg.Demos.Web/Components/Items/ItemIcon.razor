@@ -1,0 +1,39 @@
+@using OpenRpg.Items
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Types
+@using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Genres.Characters
+
+<figure class="item-icon image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
+    <img src="images/items/@(Item.Template.Variables.AssetCode()).png">
+    <div class="item-amount">@(_itemAmount > 0 ? $"{_itemAmount}" : "")</div>
+    <div class="item-icon-summary">
+        <ItemTemplateDetails ItemTemplate="@Item.Template" Character="Character"></ItemTemplateDetails>
+    </div>
+</figure>
+
+@code {
+
+    [Parameter]
+    public Item Item { get; set; }
+
+    [Parameter]
+    public Character Character { get; set; }
+
+    private int _itemQualityTypeId;
+    private int _itemAmount;
+
+
+    protected override void OnParametersSet()
+    {
+        if (Item.Data.Variables != null && Item.Data.Variables.ContainsKey(ItemVariableTypes.Amount))
+        { _itemAmount = Item.Data.Variables.Amount(); }
+        else
+        { _itemAmount = 0;}
+
+        if (Item.Template.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
+        { _itemQualityTypeId = Item.Template.Variables.QualityType(); }
+
+        base.OnParametersSet();
+    }
+}

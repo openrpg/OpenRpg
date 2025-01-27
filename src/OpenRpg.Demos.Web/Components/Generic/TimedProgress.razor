@@ -1,0 +1,53 @@
+﻿@using System.Reactive.Disposables
+@using OpenRpg.AdviceEngine.Extensions
+@using OpenRpg.Demos.Infrastructure.Scheduling
+
+@inject IUpdateScheduler UpdateScheduler
+@implements IDisposable
+
+<progress class="progress @Styles" value="@ElapsedTime" max="@RequiredTime" />
+
+@code {
+    [Parameter]
+    public float RequiredTime { get; set; }
+
+    [Parameter]
+    public bool IsActive { get; set; }
+    
+    [Parameter]
+    public EventCallback Finished { get; set; }
+
+    public void Reset()
+    { ElapsedTime = 0; }
+
+    [Parameter]
+    public string Styles { get; set; } = "is-success";
+   
+    public float ElapsedTime { get; set; }
+
+    private CompositeDisposable _subs = new(); 
+    
+    protected override void OnInitialized()
+    {
+        // Attempt 30 fps updates
+        UpdateScheduler.OnUpdate
+            .Subscribe(UpdateProgress)
+            .AddTo(_subs);
+    }
+    
+    public void UpdateProgress(float deltaTime)
+    {
+        if(!IsActive){ return; }
+        
+        ElapsedTime += deltaTime;
+        if (ElapsedTime > RequiredTime)
+        {
+            ElapsedTime -= RequiredTime;
+            InvokeAsync(Finished.InvokeAsync);
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    { _subs.Dispose(); }
+}

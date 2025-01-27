@@ -1,0 +1,32 @@
+﻿<div class="block accordion @(IsExpanded ? "is-expanded": "is-collapsed") @ContainerClasses">
+    <a class="button is-flex @(HeaderClasses) has-text-left" @onclick="() => IsExpanded = !IsExpanded">
+        <span class="has-text-weight-semibold is-leveled">@((MarkupString)Title)</span>
+        <span class="icon is-small is-pulled-right">
+          <i class="fa @(IsExpanded ? "fa-circle-chevron-up" : "fa-circle-chevron-down")"></i>
+        </span>
+    </a>
+    <div class="box @ContentClasses">
+        @ChildContent 
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public bool IsExpanded { get; set; } = false;
+    
+    [Parameter]
+    public string HeaderClasses { get; set; } = "is-success";
+    
+    [Parameter]
+    public string ContentClasses { get; set; } = "";
+    
+    [Parameter]
+    public string ContainerClasses { get; set; } = string.Empty;
+    
+    [Parameter] 
+    public RenderFragment ChildContent  { get; set; }
+    
+    [Parameter]
+    public string Title { get; set; }
+}

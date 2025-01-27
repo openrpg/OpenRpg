@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>13</LangVersion>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Blazor-ApexCharts" Version="3.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="9.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <ProjectReference Include="..\OpenRpg.AdviceEngine\OpenRpg.AdviceEngine.csproj" />
+    <ProjectReference Include="..\OpenRpg.Cards\OpenRpg.Cards.csproj" />
+    <ProjectReference Include="..\OpenRpg.Combat\OpenRpg.Combat.csproj" />
+    <ProjectReference Include="..\OpenRpg.Core\OpenRpg.Core.csproj" />
+    <ProjectReference Include="..\OpenRpg.CurveFunctions\OpenRpg.CurveFunctions.csproj" />
+    <ProjectReference Include="..\OpenRpg.Data.InMemory\OpenRpg.Data.InMemory.csproj" />
+    <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
+    <ProjectReference Include="..\OpenRpg.Items.TradeSkills\OpenRpg.Items.TradeSkills.csproj" />
+    <ProjectReference Include="..\OpenRpg.Items\OpenRpg.Items.csproj" />
+    <ProjectReference Include="..\OpenRpg.Localization\OpenRpg.Localization.csproj" />
+    <ProjectReference Include="..\OpenRpg.Quests\OpenRpg.Quests.csproj" />
+    <ProjectReference Include="..\OpenRpg.Tags\OpenRpg.Tags.csproj" />
+    <ProjectReference Include="..\OpenRpg.Genres\OpenRpg.Genres.csproj" />
+    <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
+    <ProjectReference Include="..\OpenRpg.Genres.Scifi\OpenRpg.Genres.Scifi.csproj" />
+    <PackageReference Include="RandomNameGenerator" Version="1.0.4" />
+    <PackageReference Include="System.Net.Http.Json" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\items\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenRpg.Demos.Infrastructure\OpenRpg.Demos.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,62 @@
+﻿@page "/"
+
+@using OpenRpg.Editor.Core.Models
+@using OpenRpg.Editor.Core.Services.Events.Bus
+@using OpenRpg.Editor.Core.Services.FileSystem
+@using OpenRpg.Editor.Infrastructure.Events
+@using OpenRpg.Editor.Infrastructure.Persistence
+
+@inject IFileBrowser FileBrowser
+@inject EditorState EditorState
+@inject CreateProjectExecutor CreateProjectExecutor;
+@inject LoadProjectExecutor LoadProjectExecutor;
+@inject IEventBus EventBus; 
+
+<h1 class="title is-1">OpenRpg Data Editor</h1>
+
+<div class="box">
+    @if (EditorState.Project == null)
+    {
+        <p class="content">Please create or load an existing project.</p>
+        <div class="field">
+            <div class="control">
+                <a class="button is-primary" @onclick="CreateProject">Create New Project</a>
+            </div>
+        </div>
+        <div class="field">
+            <label class="label is-4">Or</label>
+        </div>
+        <div class="field">
+            <div class="control">
+                <a class="button is-primary" @onclick="OpenProject">Open Existing Project</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="content">Using Project: <span class="tag">@EditorState.Project.ProjectPath</span></p>
+    }
+</div>
+
+
+@code 
+{
+    public async Task CreateProject()
+    {
+        var projectFolder = FileBrowser.BrowseToFolder();
+        if(string.IsNullOrEmpty(projectFolder)) { return; }
+
+        var newProject = await CreateProjectExecutor.Execute(projectFolder);
+        EditorState.Project = newProject;
+        EventBus.PublishAsync(new ProjectChangedEvent());
+    }
+    
+    public async Task OpenProject()
+    {
+        var projectFile = FileBrowser.BrowseToOpenFile(filterList: "*.json");
+        if(string.IsNullOrEmpty(projectFile)) { return; }
+
+        await LoadProjectExecutor.Execute(projectFile);
+        EventBus.PublishAsync(new ProjectChangedEvent());
+    }
+}

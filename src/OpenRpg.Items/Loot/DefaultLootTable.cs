@@ -10,22 +10,22 @@ namespace OpenRpg.Items.Loot
     public class DefaultLootTable : ILootTable
     {
         public IRandomizer Randomizer { get; set; }
-        public ICollection<ILootTableEntry> AvailableLoot { get; set; } = new List<ILootTableEntry>();
+        public ICollection<LootTableEntry> AvailableLoot { get; set; } = new List<LootTableEntry>();
 
         public DefaultLootTable(){}
         
-        public DefaultLootTable(ICollection<ILootTableEntry> availableLoot, IRandomizer randomizer)
+        public DefaultLootTable(ICollection<LootTableEntry> availableLoot, IRandomizer randomizer)
         {
             Randomizer = randomizer;
             AvailableLoot = availableLoot;
         }
         
-        public IEnumerable<IItem> GetLoot()
-        { return GetRandomLootEntries().Select(x => (x.Item as DefaultItem).Clone()); }
+        public IEnumerable<ItemData> GetLoot()
+        { return GetRandomLootEntries().Select(x => x.ItemData.Clone()); }
         
-        public IEnumerable<ILootTableEntry> GetRandomLootEntries()
+        public IEnumerable<LootTableEntry> GetRandomLootEntries()
         {
-            var uniqueItems = new List<IItemTemplate>();
+            var uniqueItems = new List<ItemData>();
 
             foreach (var loot in AvailableLoot)
             {
@@ -34,9 +34,10 @@ namespace OpenRpg.Items.Loot
                 
                 if (loot.Variables.ContainsKey(LootTableEntryVariableTypes.IsUnique) && loot.Variables.IsUnique())
                 {
-                    if(uniqueItems.Contains(loot.Item.Template))
+                    if(uniqueItems.Contains(loot.ItemData))
                     { continue; }
-                    uniqueItems.Add(loot.Item.Template);
+                    
+                    uniqueItems.Add(loot.ItemData);
                 }
 
                 yield return loot;

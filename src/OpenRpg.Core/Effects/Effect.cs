@@ -26,6 +26,6 @@ namespace OpenRpg.Core.Effects
         /// <summary>
         /// The applicable requirements for this effect to be active
         /// </summary>
-        public IEnumerable<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
+        public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
     }
 }

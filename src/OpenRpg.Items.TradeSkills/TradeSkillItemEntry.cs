@@ -1,14 +1,12 @@
-using OpenRpg.Core.Common;
-using OpenRpg.Core.Variables.General;
-using OpenRpg.Items.Templates;
+using OpenRpg.Core.Templates;
 using OpenRpg.Items.TradeSkills.Variables;
 
 namespace OpenRpg.Items.TradeSkills
 {
-    public class TradeSkillItemEntry : IHasVariables<TradeSkillItemEntryVariables>, IHasTemplate<IItemTemplate>
+    public class TradeSkillItemEntry : ITemplateData<TradeSkillItemEntryVariables>
     {
-        public IItemTemplate Template { get; set; }
-
-        public TradeSkillItemEntryVariables Variables { get; set; } = new DefaultTradeSkillItemEntryVariables();
+        public int TemplateId { get; set; }
+        
+        public TradeSkillItemEntryVariables Variables { get; set; } = new TradeSkillItemEntryVariables();
     }
 }

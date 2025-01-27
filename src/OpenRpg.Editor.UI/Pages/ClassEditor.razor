@@ -1,0 +1,134 @@
+﻿@page "/classes"
+
+@using OpenRpg.Core.Classes.Templates
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Core.Services.Notifications
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Localization.Data.Repositories
+
+@inject IRepository Repository
+@inject ILocaleRepository LocaleRepository;
+@inject ICloner Cloner;
+@inject INotifier Notifier;
+
+<div class="columns">
+    <div class="column is-one-fifth">
+        <ContentSidebar Title="Class Templates" Data="Repository.DataSource.GetAll<ClassTemplate>()" SelectedItem="CurrentClassTemplate"
+                        OnAdd="AddClass" 
+                        OnSelected="(selected => SelectClass(selected as ClassTemplate))">
+        </ContentSidebar>
+    </div>
+    <div class="column">
+        
+        <div class="is-rounded box">
+            <BasicDetailsEditor Data="CurrentClassTemplate">
+                <AdditionalContent>
+                    <AssetCodeEditor Variables="CurrentClassTemplate.Variables" DefaultAssetCode="@($"class-{CurrentClassTemplate.Id}")" 
+                                     OnAssetCodeChanged="OnAssetCodeChanged"/>
+                </AdditionalContent>
+            </BasicDetailsEditor>
+        </div>
+
+        <div class="is-rounded box">
+            <LocaleDetails LocaleData="CurrentClassTemplate"></LocaleDetails>
+        </div>
+        
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Effects</h4>
+            <EffectsEditor Effects="CurrentClassTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
+        </div>
+        
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Requirements</h4>
+            <RequirementsEditor Requirements="CurrentClassTemplate.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
+        </div>
+        
+        <div class="field is-grouped has-text-centered">
+            <p class="control">
+                <a class="button is-info" @onclick="CloneTemplate">
+                    Clone Item
+                </a>
+            </p>
+            <p class="control">
+                <a class="button is-danger" @onclick="DeleteTemplate">
+                    Delete Item
+                </a>
+            </p>
+        </div>
+        
+    </div>
+</div>
+
+@functions {
+    public ClassTemplate CurrentClassTemplate;
+
+    protected override void OnInitialized()
+    {
+        SelectDefault();
+    }
+    
+    public void SelectDefault()
+    {
+        var firstClassTemplate = Repository.GetAll<ClassTemplate>().FirstOrDefault();
+        
+        if (firstClassTemplate != null)
+        { CurrentClassTemplate = firstClassTemplate; }
+        else
+        { AddClass(); }
+    }
+
+    public void AddClass()
+    {
+        CurrentClassTemplate = new ClassTemplate();
+        CurrentClassTemplate.Id = Repository.GetAll<ClassTemplate>().Count() + 1;
+        CurrentClassTemplate.Variables.AssetCode($"class-{CurrentClassTemplate.Id}");
+        CurrentClassTemplate.GenerateLocaleCodes(CurrentClassTemplate.Variables.AssetCode());
+        Repository.Create(CurrentClassTemplate);
+        StateHasChanged();
+    }
+
+    public void SelectClass(ClassTemplate classTemplate)
+    {
+        CurrentClassTemplate = classTemplate;
+        StateHasChanged();
+    }
+    
+    public async Task CloneTemplate()
+    {
+        var clone = Cloner.Clone(CurrentClassTemplate);
+        clone.Id = Repository.GetAll<ClassTemplate>().Count() + 1;
+        clone.Variables.AssetCode($"{CurrentClassTemplate.Variables.AssetCode()}-clone");
+        clone.GenerateLocaleCodes(clone.Variables.AssetCode());
+        Repository.Create(clone);
+        await Notifier.ShowNotification($"Cloned Class {CurrentClassTemplate.Variables.AssetCode()}");
+        
+        CurrentClassTemplate = clone;
+        StateHasChanged();
+    }
+    
+    public async Task DeleteTemplate()
+    {
+        Repository.Delete<ClassTemplate>(CurrentClassTemplate.Id);
+        await Notifier.ShowNotification($"Deleted Item {CurrentClassTemplate.Variables.AssetCode()}");
+        SelectDefault();
+    }
+    
+    public void UpdateEffect(IReadOnlyCollection<Effect> updatedEffects)
+    {
+        CurrentClassTemplate.Effects = updatedEffects;
+        StateHasChanged();
+    }
+    
+    public void UpdateRequirements(IReadOnlyCollection<Requirement> updatedRequirements)
+    {
+        CurrentClassTemplate.Requirements = updatedRequirements;
+        StateHasChanged();
+    }
+    
+    public void OnAssetCodeChanged(string newAssetCode)
+    { CurrentClassTemplate.UpdateLocale(newAssetCode, LocaleRepository); }
+}

@@ -1,3 +1,4 @@
+using System;
 using OpenRpg.Localization.Data.DataSources;
 
 namespace OpenRpg.Localization.Data.Queries.Conventions
@@ -7,7 +8,12 @@ namespace OpenRpg.Localization.Data.Queries.Conventions
         public string Id { get; }
 
         public GetLocaleQuery(string id)
-        { Id = id; }
+        {
+            if (string.IsNullOrEmpty(id))
+            { throw new ArgumentException("id cannot be null or empty", nameof(id)); }
+            
+            Id = id;
+        }
 
         public string Execute(string locale, ILocaleDataSource dataSource)
         { return dataSource.Get(locale, Id); }

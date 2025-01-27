@@ -1,0 +1,119 @@
+﻿@page "/curves/create-curve"
+@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Curves
+
+<CardSection>
+   <Markdown Containerless>
+      ## Make Your Own Function
+      Now that we have covered the out the box solutions available you can make your own curve functions by just
+      picking a base formula type and then configuring the values.
+      
+      Have a go below making your own polynomial function and plotting a value against it.
+   </Markdown>
+   
+   <div class="columns">
+      <div class="column is-one-quarter">
+         <div class="field">
+            <label class="label">Slope</label>
+            <div class="control">
+               <input class="input" type="text" @bind="Slope">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Exponent</label>
+            <div class="control">
+               <input class="input" type="text" @bind="Exponent">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Y Shift</label>
+            <div class="control">
+               <input class="input" type="text" @bind="YShift">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">X Shift</label>
+            <div class="control">
+               <input class="input" type="text" @bind="XShift">
+            </div>
+         </div>
+         <div class="field">
+            <div class="control">
+               <a class="button is-primary" @onclick="RefreshCustomChart">Refresh Chart</a>
+            </div>
+         </div>
+      </div>
+      <div class="column is-two-quarters">
+         <CurveFunctionChart CurveFunction="@CustomCurveFunction" Title="Custom Polynomial Function" @ref="ChartRefresher"/>
+         <div class="field">
+            <label class="label">Example Source Code</label>
+            <div>
+               <code class="content">
+                  var myCurve = new PolynomialCurveFunction(@(Slope)f, @(XShift)f, @(YShift)f, @(Exponent)f);
+               </code>
+            </div>
+            <div>
+               <code class="content">
+                  var output = myCurve.Plot(0.5f);
+               </code>
+            </div>
+         </div>
+      </div>
+      <div class="column is-one-quarter">
+         <div class="field">
+            <label class="label">Input</label>
+            <div class="control">
+               <input class="input" type="text" @bind="InputValue">
+            </div>
+         </div>
+         <div class="field">
+            <label class="label">Output</label>
+            <div class="control">
+               <a class="button is-primary" @onclick="RefreshOutputValue">Plot Value</a>
+               <label class="label">@OutputValue.ToString("F2")</label>
+            </div>
+         </div>
+      </div>
+   </div>
+</CardSection>
+
+@code {
+   public IRefreshable ChartRefresher { get; set; }
+   public ICurveFunction CustomCurveFunction { get; set; }
+   public float InputValue { get; set; } = 0.5f;
+   public float OutputValue { get; set; }
+   
+   public float Slope { get; set; }
+   public float Exponent { get; set; }
+   public float YShift { get; set; }
+   public float XShift { get; set; }
+
+   public async Task RefreshCustomChart()
+   {
+      CustomCurveFunction = new PolynomialCurveFunction(Slope, XShift, YShift, Exponent);
+      
+      // TODO: No idea why it needs to do this, but it wont work otherwise
+      await ChartRefresher.Refresh();
+      StateHasChanged();
+      await ChartRefresher.Refresh();
+      StateHasChanged();
+   }
+
+   protected override void OnInitialized()
+   {
+      base.OnInitialized();
+      var linearPreset = PresetCurves.StandardCooldown;
+      
+      CustomCurveFunction = linearPreset;
+      Slope = linearPreset.Slope;
+      Exponent = linearPreset.Exponent;
+      YShift = linearPreset.YShift;
+      XShift = linearPreset.XShift;
+   }
+   
+   public void RefreshOutputValue()
+   {
+      OutputValue = CustomCurveFunction.Plot(InputValue);
+   }
+
+}

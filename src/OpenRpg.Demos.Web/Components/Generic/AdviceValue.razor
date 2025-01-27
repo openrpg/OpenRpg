@@ -1,0 +1,14 @@
+<div class="control">
+    <div class="tags has-addons" style="@(IsBestAdvice ? "" : "opacity: 0.3")">
+        <span class="tag is-dark">@Text</span>
+        <span class="tag is-info">@ContextText</span>
+        <span class="tag is-white">@Value.ToString("F2")</span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool IsBestAdvice { get; set; }
+    [Parameter] public string Text { get; set; }
+    [Parameter] public string ContextText { get; set; }
+    [Parameter] public float Value { get; set; }
+}

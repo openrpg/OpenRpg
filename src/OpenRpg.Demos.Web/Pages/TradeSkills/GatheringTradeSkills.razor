@@ -1,0 +1,246 @@
+﻿@page "/trade-skills/gathering"
+
+@using OpenRpg.Core.Templates
+@using OpenRpg.Items.TradeSkills
+@using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Items.TradeSkills.Extensions
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Requirements
+@using OpenRpg.Items.TradeSkills.Calculator
+@using OpenRpg.Items.TradeSkills.Templates
+@using OpenRpg.Core.Utils
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.TradeSkills.State
+
+@using Inventory = OpenRpg.Items.Inventories.Inventory;
+
+@inject ITemplateAccessor TemplateAccessor
+@inject ICharacterRequirementChecker RequirementsChecker
+@inject IRandomizer Randomizer
+
+<Markdown>
+    ## Simple Gathering Example
+    
+    For gathering to happen we will need a populated `ItemGatheringTemplate` then we need some way to process that
+    data into items being gathered into the inventory/whatever.
+    
+    So lets make a quick example where we have an inventory, and we can gather either *Copper Ore* or *Oak Logs* and
+    then after the elapsed time it gets added to the inventory.
+
+</Markdown>
+<br />
+
+<div class="columns">
+    <div class="column is-one-third">
+        <CardSection>
+            <Markdown Containerless="true">
+                ### Gathering Copper & Wood
+                In the previous page we showed how you can create the `ItemGatheringTemplate` and `ItemCraftingTemplate`,
+                so based off that lets use a simple *Copper Ore* and *Oak Log* gathering template as a way to implement
+                gathering.
+                
+                Click on one of the possible items to gather below.
+            </Markdown>
+            <div class="columns">
+                <div class="column">
+                    <a disabled="@IsGathering" @onclick="() => StartGatheringExample1(CopperOreGatheringTemplate)">
+                        <TradeSkillItemIcon Item="CopperOreTradeSkillItemEntry" ItemTemplate="TemplateAccessor.GetItemTemplate(CopperOreTradeSkillItemEntry.TemplateId)" />
+                    </a>
+                </div>
+                <div class="column">
+                    <a disabled="@IsGathering" @onclick="() => StartGatheringExample1(OakLogGatheringTemplate)">
+                        <TradeSkillItemIcon Item="OakLogTradeSkillItemEntry" ItemTemplate="TemplateAccessor.GetItemTemplate(OakLogTradeSkillItemEntry.TemplateId)"  />
+                    </a>
+                </div>
+            </div>
+        </CardSection>
+    </div>
+    <div class="column is-two-thirds">
+        <CardSection>
+            <div class="field">
+                <label class="label has-text-centered">Gathering @(CurrentGatherName)</label>
+                <div class="control">
+                    <TimedProgress RequiredTime="@(CurrentGatherTime)" Finished="FinishGatheringExample1" IsActive="IsGathering" @ref="ActionBarRef"/>
+                </div>
+            </div>
+            <BasicInventory Inventory="Example1Inventory" SlotsPerRow="5" @ref="Example1InventoryRef" TemplateAccessor="TemplateAccessor"/>
+        </CardSection>
+    </div>
+</div>
+
+
+<Markdown>
+    ## More Complex Gathering Example
+    
+    As shown in the previous example its pretty simple to just gather items, however you can also gate items based on requirements
+    so you can make it so you require a certain skill level to gather or craft certain items.
+    
+    For example lets look at the below setup for the **Iron Ore** gathering template:
+    
+    ```csharp
+    new ItemGatheringTemplate()
+    {
+        Id = ItemGatheringTemplateLookups.IronOre,
+        SkillType = FantasyTradeSkillTypes.Mining,
+        SkillDifficulty = 15,
+        TimeToComplete = 1.0f,
+        OutputItems = new List&lt;TradeSkillItemEntry&gt;() { ironOreEntry },
+        Requirements =  new []
+        {
+            new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, AssociatedId = FantasyTradeSkillTypes.Mining, AssociatedValue = 10 }
+        },
+    };
+    ```
+    
+    As you can see we specify the `SkillDifficulty` being 15 which indicates the skill difficulty, which isnt directly a 
+    requirement, it is more used to indicate how skill points should be factored in to the gathering/crafting process. 
+    The main addition is the `Requirement` being added which acts more like a gating mechanism to stop you being able
+    to mine the Iron until you have got at least 10 points in the `Mining` trade skill.
+
+</Markdown>
+<br />
+
+<div class="columns">
+    <div class="column is-one-third">
+        <CardSection>
+            <Markdown Containerless="true">
+                ### Gated Ore Gathering
+                So with the gating in mind lets show have that can work in combination with increasing trade skill score.
+                
+                We will have copper ore which you can gather without any skill points, but you cannot gather Iron until
+                you have 10 skill points in **Mining** so gather copper a few times. 
+                
+                > To make it quicker to test we have disabled the gathering time so you gather immediately unlike previous example
+            </Markdown>
+            <div class="container">
+                <TagLabel Label="Mining Skill" Content="@TradeSkillState.Mining().ToString()"></TagLabel>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <a @onclick="() => StartGatheringExample2(CopperOreGatheringTemplate)">
+                        <TradeSkillItemIcon Item="CopperOreTradeSkillItemEntry" ItemTemplate="TemplateAccessor.GetItemTemplate(CopperOreTradeSkillItemEntry.TemplateId)"  />
+                    </a>
+                </div>
+                <div class="column">
+                    <a disabled="@(CanMineIron == false)" @onclick="() => StartGatheringExample2(IronOreGatheringTemplate)">
+                        <TradeSkillItemIcon Item="IronOreTradeSkillItemEntry" ItemTemplate="TemplateAccessor.GetItemTemplate(IronOreTradeSkillItemEntry.TemplateId)" CanUse="CanMineIron"/>
+                    </a>
+                </div>
+            </div>
+        </CardSection>
+    </div>
+    <div class="column is-two-thirds">
+        <CardSection>
+            <div class="field">
+                <label class="label has-text-centered">Gathering @(CurrentGatherName)</label>
+            </div>
+            <BasicInventory Inventory="Example2Inventory" SlotsPerRow="5" @ref="Example2InventoryRef" TemplateAccessor="TemplateAccessor"/>
+        </CardSection>
+    </div>
+</div>
+
+<Markdown>
+    ## How are the skill points working?
+    
+    This is completely open for you to handle however you want, but out the box we have the notion of a `TradeSkillCalculator`
+    which will basically take the current skill value and the target skill level. It then works out based off the configuration
+    provided if the current skill is in the ballpark to gain skill points from the action.
+    
+    There is also a `CanUseSkill` method which lets you provide the same values and indicate if you are proficient enough
+    to use the trade skill (be it gathering or crafting). This can be used instead of the explicit requirement, but if you
+    would rather not use explicit requirements you can just rely upon this method instead.
+    
+    > One thing to think about is some gathering/crafting stuff may be gated on other requirements too, so while it 
+    > may seem attractive to not use requirements and instead just use the `CanUseSkill` check, but that wont factor
+    > in any requirements, so its more flexible to just rely upon requirements.
+    
+    As with everything there is a separation between data and logic, so you can compose your gathering and crafting
+    logic however you want, and in some cases you may actually have multiple outputs per gathering, or you may end
+    up having more complex requirements which require you to have custom `Variables` on the trade skill, so keep that
+    in mind.
+
+</Markdown>
+<br />
+
+@code {
+
+    public ItemGatheringTemplate CopperOreGatheringTemplate { get; set; }
+    public ItemGatheringTemplate OakLogGatheringTemplate { get; set; }
+    public ItemGatheringTemplate IronOreGatheringTemplate { get; set; }
+    public Inventory Example1Inventory { get; set; } = new Inventory();
+    public Inventory Example2Inventory { get; set; } = new Inventory();
+    public Character DummyCharacter { get; set; } = new Character();
+    public ITradeSkillCalculator TradeSkillCalculator { get; set; }
+    
+    private BasicInventory Example1InventoryRef { get; set; }
+    private BasicInventory Example2InventoryRef { get; set; }
+    public TimedProgress ActionBarRef { get; set; }
+    public bool IsGathering { get; set; }
+    public ItemGatheringTemplate CurrentTemplate { get; set; }
+    
+    public float CurrentGatherTime => (CurrentTemplate?.TimeToComplete ?? 0.0f);
+    public string CurrentGatherName
+    {
+        get
+        {
+            if (CurrentTemplate == null) { return string.Empty; }
+            return TemplateAccessor.GetItemTemplate(CurrentTemplate.OutputItems.First().TemplateId).NameLocaleId ?? string.Empty;
+        }
+    }
+
+    public bool CanMineIron => RequirementsChecker.AreRequirementsMet(DummyCharacter, IronOreGatheringTemplate);
+
+    public TradeSkillItemEntry CopperOreTradeSkillItemEntry => CopperOreGatheringTemplate.OutputItems.First();
+    public TradeSkillItemEntry OakLogTradeSkillItemEntry => OakLogGatheringTemplate.OutputItems.First();
+    public TradeSkillItemEntry IronOreTradeSkillItemEntry => IronOreGatheringTemplate.OutputItems.First();
+    public TradeSkillState TradeSkillState => DummyCharacter.Variables.TradeSkillState();
+    
+    protected override void OnInitialized()
+    {
+        TradeSkillCalculator = new TradeSkillCalculator(Randomizer) { RandomnessVariance = 0.2f };
+        
+        Example1Inventory.Variables.MaxSlots(10);
+        Example2Inventory.Variables.MaxSlots(10);
+        CopperOreGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.CopperOre);
+        OakLogGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.OakLog);
+        IronOreGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.IronOre);
+
+        DummyCharacter.Variables.TradeSkillState(new TradeSkillState());
+        TradeSkillState.Mining(1);
+        
+        base.OnInitialized();
+    }
+
+    public void StartGatheringExample1(ItemGatheringTemplate gatherTemplate)
+    {
+        if (IsGathering) { return; }
+
+        IsGathering = true;
+        CurrentTemplate = gatherTemplate;
+        ActionBarRef?.Reset();
+    }
+    
+    public void StartGatheringExample2(ItemGatheringTemplate gatherTemplate)
+    {
+        CurrentTemplate = gatherTemplate;
+        CurrentTemplate.GatherInto(Example2Inventory, TemplateAccessor);
+        Example2InventoryRef.Refresh();
+
+        var currentMiningSkill = TradeSkillState.Mining();
+        var tradeSkillPoints = TradeSkillCalculator.CalculateSkillUpPointsFor(currentMiningSkill, CurrentTemplate.SkillDifficulty);
+        TradeSkillState.AddMining(tradeSkillPoints);
+        
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void FinishGatheringExample1()
+    {
+        IsGathering = false;
+        CurrentTemplate.GatherInto(Example1Inventory, TemplateAccessor);
+        ActionBarRef?.Reset();
+        Example1InventoryRef.Refresh();
+        InvokeAsync(StateHasChanged);
+    }
+}

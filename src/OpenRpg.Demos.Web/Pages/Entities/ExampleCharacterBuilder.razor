@@ -1,0 +1,173 @@
+﻿@page "/entities/builder"
+
+@using RandomNameGenerator
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Data
+@using OpenRpg.Core.Races
+@using OpenRpg.Core.Classes
+@using OpenRpg.Core.Classes.Templates
+@using OpenRpg.Core.Races.Templates
+@using OpenRpg.Core.Templates
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Populators.Entity.Stats
+
+@inject DemoCharacterBuilder CharacterBuilder;
+@inject ITemplateAccessor TemplateAccessor;
+@inject IEntityStatPopulator StatPopulator;
+
+<Markdown>
+    # Character Builder
+    
+    Using everything we have covered so far lets build a simple character builder.
+    
+    We can use the provided `RaceRepository` and `ClassRepository` to source the choices for the races/classes, then we use
+    all that data with the `CharacterBuilder` to generate the character.
+    
+    > The source code for all this can be found within the `Infrastructure` folder within this project, its bare bones simplest
+    approach but will at least let us get started.
+</Markdown>
+<br/>
+<CardSection>
+    <div class="has-text-centered">
+        <h2 class="title has-text-dark has-text-centered">Gender Selection</h2>
+        <div class="columns">
+            <div class="column is-fullheight">
+                <CardSection customClasses="has-background-dark expand-full-width">
+                    <h5 class="title is-5">Male</h5>
+                    <div class="icon is-large has-text-light">
+                        <i class="fas fa-3x fa-mars"></i>
+                    </div>
+                    <br />
+                    <a class="button @(_genderId == 1 ? "is-success": "")" @onclick="() => { SelectGender(1); }">Select Male</a>
+                </CardSection>
+            </div>
+            <div class="column is-fullheight">
+                <CardSection customClasses="has-background-dark expand-full-width">
+                    <h5 class="title is-5">Female</h5>
+                    <div class="icon is-large has-text-light">
+                        <i class="fas fa-3x fa-venus"></i>
+                    </div>
+                    <br />
+                    <a class="button @(_genderId == 2 ? "is-success": "")" @onclick="() => { SelectGender(2); }">Select Female</a>
+                </CardSection>
+            </div>
+        </div>
+    </div>
+</CardSection>
+<br/>
+@if (_genderId != 0)
+{
+    <CardSection>
+        <div class="has-text-centered">
+            <h2 class="title has-text-dark has-text-centered">Race Selection</h2>
+            <div class="columns">
+                @foreach (var race in TemplateAccessor.GetAll<RaceTemplate>())
+                {
+                    <div class="column is-fullheight">
+                        <CardSection customClasses="has-background-dark expand-full-width">
+                            <h5 class="title is-5">@race.NameLocaleId</h5>
+                            <div class="subtitle is-6">@race.DescriptionLocaleId</div>
+                            <EffectList Effects="race.Effects.ToArray()"></EffectList>
+                            <a class="button @(_raceId == race.Id ? "is-success" : "")" @onclick="() => { SelectRace(race.Id); }">Select @(race.NameLocaleId)</a>
+                        </CardSection>
+                    </div>
+                }
+            </div>
+        </div>
+    </CardSection>
+    <br/>
+}
+
+@if (_raceId != 0)
+{
+    <CardSection>
+        <div class="has-text-centered">
+            <h2 class="title has-text-dark has-text-centered">Class Selection</h2>
+            <div class="columns">
+                @foreach (var classTemplate in TemplateAccessor.GetAll<ClassTemplate>())
+                {
+                    <div class="column is-fullheight">
+                        <CardSection customClasses="has-background-dark expand-full-width">
+                            <h5 class="title is-5">@classTemplate.NameLocaleId</h5>
+                            <div class="subtitle is-6">@classTemplate.DescriptionLocaleId</div>
+                            <EffectList Effects="classTemplate.Effects.ToArray()"></EffectList>
+                            <a class="button @(_classId == classTemplate.Id ? "is-success" : "")" @onclick="() => { SelectClass(classTemplate.Id); }">Select @(classTemplate.NameLocaleId)</a>
+                        </CardSection>
+                    </div>
+                }
+            </div>
+        </div>
+    </CardSection>
+    <br/>
+}
+@if (_classId != 0)
+{
+    <CardSection>
+        <div class="has-text-centered">
+            <h2 class="title has-text-dark has-text-centered">Characters Name</h2>
+            
+            <div class="columns">
+                <div class="column is-four-fifths">
+                    <div class="field">
+                        <p class="control has-icons-left">
+                            <input class="input" type="text" @bind="_name" placeholder="Characters Name">
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-user"></i>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="column">
+                    <a class="button" @onclick="GenerateRandomName">Random Name</a>
+                </div>
+            </div>
+        </div>
+        @if (!string.IsNullOrEmpty(_name))
+        {
+            <div class="mt-3 has-text-centered">
+                <a class="button is-primary" @onclick="GenerateCharacter">Generate Character</a>
+            </div>
+        }
+    </CardSection>
+    <br/>
+}
+
+@if (_generatedCharacter != null)
+{
+    <BasicCharacter Character="_generatedCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
+}
+
+@code {
+    private Character _generatedCharacter;
+
+    private int _raceId, _classId, _genderId;
+    private string _name;
+
+    private void SelectRace(int raceId) => _raceId = raceId;
+    private void SelectClass(int classId) => _classId = classId;
+    private void SelectGender(int genderId) => _genderId = genderId;
+
+    private void GenerateRandomName()
+    {
+        _name = NameGenerator.Generate(_genderId == 1 ? Gender.Male : Gender.Female);
+    }
+
+    private void GenerateCharacter()
+    {
+        var builder = CharacterBuilder.CreateNew()
+            .WithRaceId(_raceId)
+            .WithClassId(_classId, 1)
+            .WithName(_name);
+
+        if (_genderId == 1)
+        { builder = builder.AsMale(); }
+        else
+        { builder = builder.AsFemale(); }
+
+        _generatedCharacter = builder.Build();
+        StatPopulator.Populate(_generatedCharacter.Stats, _generatedCharacter.GetEffects(TemplateAccessor).ToArray(), null);
+
+        StateHasChanged();
+    }
+
+}

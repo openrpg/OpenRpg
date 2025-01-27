@@ -1,0 +1,78 @@
+@page "/advice-engine/applicator-components"
+
+<Markdown>
+    ## `ApplicatorRegistry`
+    So now we have covered the basics of `Considerations`, `Advice` and the `Agent` we can now look at how to setup
+    your project in a way that lets you just register all possible considerations and advice for your scenairo and
+    have them be applied to agents based on their criteria.
+</Markdown>
+
+<br />
+
+<Markdown>
+    ### `IApplicator` 
+            
+    The `IApplicator` interface represents something that needs to be applied to the agent (`Consideration`, `Advice`)
+    and if it should be applied to the agent (via `CanApplyTo(IAgent)` method). It also needs to have a set of `Requirements`
+    to be provided that it can check against.
+
+    > The idea is that we create a lot of these applicators within a registry then we can pass the agent in and it will
+    be able to loop over all the applicators and check if it should be applied and if so generate the `Consideration` or 
+    `Advice` for that `Applicator`.
+    
+    There are 2 layered interfaces with some default implementations, these being `IConsiderationApplicator` and 
+    `IAdviceApplicator`. There is `DefaultApplicator&lt;T&gt;` which then has `DefaultAdviceApplicator` and 
+    `DefaultLocalConsiderationApplicator` and `DefaultExternalConsiderationApplicator`.
+    
+    > The difference between the local and external consideration applicators is that the local one expects you to be 
+    providing a singular conisderation which is relevant to the owner context. The external expects many considerations
+    with each one being relative to the owner and a 3rd party objects, such as a Character and their Abilities.
+    
+    ### `IApplicatorRegistry`
+    
+    This wraps up all the `IApplicator` instances and provides a way to add/remove applicators as well as being able to
+    apply all applicable applicators to an agent, or just apply those of a specific priority.
+    
+    > This is quite useful when you need to do layering/passes of applications, i.e 1st pass may be to add only
+    local considerations to all agents, then 2nd pass may be to have external considerations applied between all agents
+    with a 3rd pass doing composite considerations that depend on 1st/2nd pass already existing.
+    
+    There are 2 layered versions available `IAdviceApplicatorRegistry` and `IConsiderationApplicatorRegistry` which just
+    make it easier to split up your applicators, but you could just use the base ones but in most scenarios you will
+    be wanting to use the interfaces as a sort of separation mechanism, especially if you are using `Dependency Injection`
+</Markdown>
+<br/>
+<Markdown>
+    ## Quick Example
+    
+    Here is an example of both a consideration applicator and its registry together:
+    
+    ```csharp
+    public class HasLowHealthConsiderationApplicator : DefaultLocalConsiderationApplicator&lt;Character&gt;
+    {
+        public override IEnumerable&lt;Requirement&gt; Requirements { get; } = Array.Empty&lt;Requirement&gt;();
+
+        public HasLowHealthConsiderationApplicator(IRequirementChecker&lt;Character&gt; requirementChecker) : base(requirementChecker)
+        {}
+        
+        public override IConsideration CreateConsideration(IAgent agent)
+        {
+            var character = agent.GetOwnerContext() as Character;
+            var healthValueAccessor = new ManualValueAccessor(() => character.Stats.Health());
+            var healthClamper = new DynamicClamper(() => 0, () => character.Stats.MaxHealth());
+            return new ValueBasedConsideration(new UtilityKey(UtilityVariableTypes.HasLowHealth), healthValueAccessor, healthClamper, PresetCurves.StandardRuntime);
+        }
+    }
+    
+    var considerationApplicatorRegistry = new DefaultConsiderationApplicatorRegistry();
+    considerationApplicatorRegistry.AddApplicator(new HasLowHealthConsiderationApplicator);
+    
+    var someAgentWithCharacter = GetSomeRandomAgentWithCharacter();
+    considerationApplicatorRegistry.ApplyAll(someAgentWithCharacter.Agent); // No requirements so consideration applied
+    ```
+    
+    > As you can see its quite easy to build up a whole suite of considerations and advice applicators and then just
+    put any requirements that need to be met within the `Requirements` property and they will be factored in at time
+    of application.
+</Markdown>
+@code {}

@@ -18,9 +18,10 @@ namespace OpenRpg.Combat.Effects
 
         public IReadOnlyCollection<ActiveEffect> ActiveEffects => InternalActiveEffects.Values;
 
-        public IEnumerable<Effect> Effects => InternalActiveEffects.Values
+        public IReadOnlyCollection<Effect> Effects => InternalActiveEffects.Values
                 .Where(x => x.IsPassiveEffect())
-                .Select(x => x.ToEffect());
+                .Select(x => x.ToEffect())
+                .ToArray();
         
         public bool AddEffect(TimedEffect effect)
         {

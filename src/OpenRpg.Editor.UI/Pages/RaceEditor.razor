@@ -1,0 +1,135 @@
+﻿@page "/races"
+
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Races.Templates
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Core.Services.Notifications
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Localization.Data.Repositories
+
+@inject INotifier Notifier
+@inject IRepository Repository
+@inject ILocaleRepository LocaleRepository;
+@inject ICloner Cloner;
+
+<div class="columns">
+    <div class="column is-one-fifth">
+        <ContentSidebar Title="Race Templates" Data="Repository.GetAll<RaceTemplate>()" SelectedItem="CurrentRaceTemplate"
+                        OnAdd="AddRace" OnSelected="selected => SelectRace(selected as RaceTemplate)"/>
+    </div>
+    <div class="column">
+        
+        <div class="is-rounded box">
+            <div class="is-rounded">
+                <BasicDetailsEditor Data="CurrentRaceTemplate">
+                    <AdditionalContent>
+                        <AssetCodeEditor Variables="CurrentRaceTemplate.Variables" DefaultAssetCode="@($"race-{CurrentRaceTemplate.Id}")"
+                                         OnAssetCodeChanged="OnAssetCodeChanged"/>
+                    </AdditionalContent>
+                </BasicDetailsEditor>
+            </div>
+        </div>
+
+        <div class="is-rounded box">
+            <LocaleDetails LocaleData="CurrentRaceTemplate"></LocaleDetails>
+        </div>
+        
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Effects</h4>
+            <EffectsEditor Effects="CurrentRaceTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
+        </div>
+        
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Requirements</h4>
+            <RequirementsEditor Requirements="CurrentRaceTemplate.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
+        </div>
+        
+        <div class="field is-grouped has-text-centered">
+            <p class="control">
+                <a class="button is-info" @onclick="CloneTemplate">
+                    Clone Item
+                </a>
+            </p>
+            <p class="control">
+                <a class="button is-danger" @onclick="DeleteTemplate">
+                    Delete Item
+                </a>
+            </p>
+        </div>
+        
+    </div>
+</div>
+
+@functions {
+    public RaceTemplate CurrentRaceTemplate;
+
+    protected override void OnInitialized()
+    {
+        SelectDefault();
+    }
+
+    public void SelectDefault()
+    {
+        var firstRaceTemplate = Repository.GetAll<RaceTemplate>().FirstOrDefault();
+        if (firstRaceTemplate != null)
+        { CurrentRaceTemplate = firstRaceTemplate; }
+        else
+        { AddRace(); }
+    }
+    
+    public void AddRace()
+    {
+        CurrentRaceTemplate = new RaceTemplate();
+        CurrentRaceTemplate.Id = Repository.GetAll<RaceTemplate>().Count() + 1;
+        CurrentRaceTemplate.Variables.AssetCode($"race-new-{CurrentRaceTemplate.Id}");
+        CurrentRaceTemplate.GenerateLocaleCodes(CurrentRaceTemplate.Variables.AssetCode());
+        Repository.Create(CurrentRaceTemplate);
+        StateHasChanged();
+    }
+
+    public void SelectRace(RaceTemplate template)
+    {
+        CurrentRaceTemplate = template;
+        StateHasChanged();
+    }
+
+    public async Task CloneTemplate()
+    {
+        var clone = Cloner.Clone(CurrentRaceTemplate);
+        clone.Id = Repository.GetAll<RaceTemplate>().Count() + 1;
+        clone.Variables.AssetCode($"{CurrentRaceTemplate.Variables.AssetCode()}-clone");
+        clone.GenerateLocaleCodes(clone.Variables.AssetCode());
+        Repository.Create<RaceTemplate>(clone);
+
+        await Notifier.ShowNotification($"Cloned Class {CurrentRaceTemplate.Variables.AssetCode()}");
+        
+        CurrentRaceTemplate = clone;
+        StateHasChanged();
+    }
+    
+    public async Task DeleteTemplate()
+    {
+        Repository.Delete<RaceTemplate>(CurrentRaceTemplate.Id);
+
+        await Notifier.ShowNotification($"Deleted Item {CurrentRaceTemplate.Variables.AssetCode()}");
+        SelectDefault();
+    }
+    
+    public void UpdateEffect(IReadOnlyCollection<Effect> updatedEffects)
+    {
+        CurrentRaceTemplate.Effects = updatedEffects;
+        StateHasChanged();
+    }
+    
+    public void UpdateRequirements(IReadOnlyCollection<Requirement> updatedRequirements)
+    {
+        CurrentRaceTemplate.Requirements = updatedRequirements;
+        StateHasChanged();
+    }
+    
+    public void OnAssetCodeChanged(string newAssetCode)
+    { CurrentRaceTemplate.UpdateLocale(newAssetCode, LocaleRepository); }
+}

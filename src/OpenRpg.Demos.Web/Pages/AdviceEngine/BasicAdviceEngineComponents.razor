@@ -1,0 +1,219 @@
+@page "/advice-engine/basic-components"
+@using OpenRpg.AdviceEngine.Considerations
+@using OpenRpg.AdviceEngine.Accessors
+@using OpenRpg.AdviceEngine.Advisors
+@using OpenRpg.AdviceEngine.Clampers
+@using OpenRpg.AdviceEngine.Extensions
+@using OpenRpg.AdviceEngine.Keys
+@using OpenRpg.AdviceEngine.Variables
+@using OpenRpg.CurveFunctions
+@using OpenRpg.Demos.Infrastructure.Types
+
+<Markdown>
+    ## Advice Engine
+    The advice engine is a slightly customized Utility AI approach which allows objects to have an agent to 
+    assess `Considerations` and then turn them into `Advice` for the consumer to decide what to do with.
+    
+    The core parts we will cover here are:
+    - `UtilityVariables`
+    - `IConsideration`
+    - `IAdvice`
+    
+    > There is a lot more to it but this will give us a basis to explore the rest of the library
+</Markdown>
+
+<br />
+
+<Markdown>
+    ### UtilityVariables
+    The `UtilityVariables` object is basically just a fancy dictionary which keys off a `UtilityKey` object,
+    which **MUST** have an id provided for the high level Utility but can optionally have a `RelatedId` provided
+    to allow us to have multiple related objects be considered.
+    
+    > For most real world use cases you will be using an `IAgent` which wraps a lot of this up, but its still
+    useful to know how the underlying bits work.
+    
+    The UtilityVariable values should all be normalized values within the region of 0-1 as they will be used
+    to drive `Advice` further down the line and will be scored together, so as they are all 0-1 it makes it easy
+    to just multiply them by each other and remain within 0-1 range (there are some extra calculations though).
+    
+    > 0 indicates there is nothing to consider here, i.e if you had a LowHealth consideration of 0 it would 
+    imply you were at full health, a 1 would indicate you need to really consider this utility and you have 
+    very low health.
+    
+    ```csharp
+    var utilityVariables = new UtilityVariables();
+    var lowHealthUtilityKey = new UtilityKey(UtilityVariables.LowHealth);
+    var enemyHealthUtilityKey = new UtilityKey(UtilityVariables.EnemyLowHealth, someEnemy.Id);
+    
+    utilityVariables[lowHealthUtilityKey] = 0; // We are at full health
+    utilityVariables[enemyHealthUtilityKey] = 0.9f; // This enemy is VERY low on health
+    ```
+    
+    > In this example we are assuming we have `someEnemy` in scope which implements `IHasDataId` and we also
+    assume there is a `UtilityVariables` object which much like other `Types` style objects contains all the 
+    ids for each utility type.
+</Markdown>
+
+<br/>
+
+<div class="columns">
+    <div class="column is-two-thirds">
+        <Markdown>
+            ### IConsideration
+            A consideration will formalize the way we interact with the `UtilityVariables`, it will wrap up the
+            utility id it is going to be updating as well as how it gets its data and normalizes it.
+            
+            Here is an example which we can discuss further.
+            
+            ```csharp
+            var lowHealthKey = new UtilityKey(UtilityVariableTypes.LowHealth);
+            var healthAccessor = new ManualValueAccessor((context, variables) => example1Character.Stats.Health());
+            var healthClamper = new Clamper(0, example1Character.Stats.MaxHealth());
+            lowHealthConsideration = new ValueBasedConsideration(lowHealthKey, healthAccessor, healthClamper, PresetCurves.Linear);
+            ```
+            
+            So as we can see here we are using a `ValueBasedConsideration` which is a type of consideration which needs
+            to be provided a way to access the value its considering as well as being told how to clamp and process the
+            value accordingly.
+            
+            The first major part is the `UtilityKey` as this is the contract we have with the `UtilityVariables` and other
+            components to indicate that this `Consideration` is responsible for updating that variable. As you can see
+            we don't depend on any other objects so it is just taking the `LowHealth` variable type as its key.
+            
+            We then have the `ManualValueAccessor` which is being told to get the `Health` stat from an the example 
+            character. Behind the scenes the consideration will keep rechecking the value provided by the accessor to
+            check if the corresponding utility value should be updated.
+
+            > You can get data from anywhere in a value accessor, it just needs to return a valid float value. Also the
+            considerations can be told explicitly when to refresh their utility values, by default it is governed by the 
+            default `RefreshScheduler` but you can explicitly provide an observable trigger, which we will cover later.
+            
+            The clamper comes next, which tells us how to treat the value before trying to plot it on a curve function. 
+            So for example the health should be normalized between 0-`MaxHealth` in this case, so if max health was 100
+            and our health was 100 we should normalize that to 1, however if we had 1 health it should be 0.01f.
+            
+            > In the real world you would probably want to use a `DynamicClamper` here which will re-check the min/max
+            values for clamping ranges, as your `MaxHealth` may go up by 10 points and then you would want it to normalize
+            between 0-110, however the one we are using here would not update, so keep that in mind.
+            
+            Finally we have the `CurveFunction` which is an interesting one, the idea here is that we want to take our
+            value representing our consideration value and convert it to a utility value between 0-1, with 1 meaning 
+            its SUPER important and 0 meaning it is of little importance.
+            
+            To do this we provide a `CurveFunction` which we run our value through to derive the utility output. In this
+            example we are using a preset `InverseLinear` function which will basically invert the value within the range.
+            So for example a 0 would become a 1 and a 1 would become a 0, with 0.25 becoming 0.75. This models the relationship
+            between the health value and the utility value, so if we have 10/100 hp that should be a 0.9f importance of utility.
+        </Markdown>
+    </div>
+    <div class="column is-one-third">
+        <CardSection>
+            <p>Example Health Consideration</p>
+            <input @bind="ExampleHealthValue"></input>
+            <span>/100</span>
+            <br/>
+            <button @onclick="RefreshConsideration">Refresh Consideration</button>
+            <p>Resulting Utility: @ExampleHealthUtility</p>
+        </CardSection>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column is-two-thirds">
+        <Markdown>
+            ### IAdvice
+            Advice looks at the considerations utility values and then scores itself based off how important those utilities
+            are at the moment. For example if you were really low on health, advice could be to case a heal spell, or drink
+            a potion or something.
+            
+            Advice focuses on 2 main things, one is the considerations to factor in, and the final part is the context 
+            of the advice, as if you were in danger and I told you to `RunAway` that may be useful advice but where 
+            should you run to? or if I told you that its best for your to `GoAttack` its useless unless you know what to attack.
+            
+            > This is one divergance from the pure Utility AI implementation as the actions in Utility AI do not seem 
+            to convay any context they purely tell you what action you should take and its up to you to figure out 
+            what the action should do. You can still mimic this behaviour by just returning null for your context accessor.
+            
+            Here is an example which we can discuss further.
+            
+            ```csharp
+            var contextAccessor = new ManualContextAccessor(null, null, (context, variables) => myCharacter);
+            shouldHealAdvice = new DefaultAdvice(AdviceVariableTypes.ShouldHeal, new[] {lowHealthKey}, contextAccessor);
+            ```
+            
+            So as we can see here we are using a `DefaultAdvice` which is the default type of advice which needs
+            to be provided an id for the type of advice its offering, the utilities it is interested in and a way to 
+            access the context related to this advice, in this case it would be your character.
+            
+            > This is ok as far as `Advice` goes as it tells us that we should heal based on how low our HP is, but you
+            ideally want lots of advice to chose from, and realistically you would be wanting to look at multiple utility
+            values to decide what you want to do with it.
+        </Markdown>
+    </div>
+    <div class="column is-one-third">
+        <CardSection>
+            <p>Low Health Utility Value</p>
+            <input disabled="disabled" value="@UtilityVariables[lowHealthKey]" />
+            <br/>
+            <button @onclick="RefreshAdvice">Refresh Advice</button>
+            <p>Advice Score: @shouldHealAdvice.Score and target: @shouldHealAdvice.ContextAccessor.GetContext()</p>
+        </CardSection>
+    </div>
+</div>
+<br/>
+
+<Markdown>
+    ### Summary
+    
+    So as you can see the core 3 parts to making this whole system work are the `Considerations` which drive the utility
+    values inside the `UtilityVariables` and the `Advice` which reads any number of utilities and derives a score from 
+    that to indicate how important that advice is.
+    
+    > In the real world we wont really be using them as shown here as they would be all handled within the `IAgent`
+    implementation for us, but we still need to write `Consideration` and `Advice` objects for the agent to be 
+    able to function.
+    
+    Lets move on and look at the next section where we cover the `IAgent` and how that will act as an entry point
+    for all this information.
+</Markdown>
+
+@code {
+
+    public UtilityVariables UtilityVariables = new UtilityVariables();
+    public IConsideration lowHealthConsideration;
+    public IAdvice shouldHealAdvice;
+    public UtilityKey lowHealthKey = new UtilityKey(UtilityVariableTypes.LowHealth);
+    
+    public int ExampleHealthValue { get; set; }
+    public float ExampleHealthUtility { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        ExampleHealthValue = 60;
+        var healthAccessor = new ManualValueAccessor((context, variables) => ExampleHealthValue);
+        var healthClamper = new Clamper(0, 100);
+        lowHealthConsideration = new ValueBasedConsideration(lowHealthKey, healthAccessor, healthClamper, PresetCurves.InverseLinear);
+
+        var contextAccessor = new ManualContextAccessor(null, null, (context, variables) => "Yourself");
+        shouldHealAdvice = new DefaultAdvice(AdviceVariableTypes.ShouldHeal, new[] {lowHealthKey}, contextAccessor);
+
+        RefreshConsideration();
+        RefreshAdvice();
+    }
+
+    protected void RefreshConsideration()
+    {
+        if (ExampleHealthValue > 100) { ExampleHealthValue = 100; }
+        ExampleHealthUtility = lowHealthConsideration.CalculateUtility(null, UtilityVariables);
+        UtilityVariables[lowHealthKey] = ExampleHealthUtility;
+    }
+
+    protected void RefreshAdvice()
+    {
+        shouldHealAdvice.Score = UtilityVariables.GetRelatedUtilities(lowHealthKey.UtilityId).CalculateScore();
+    }
+
+}

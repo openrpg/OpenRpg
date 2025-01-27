@@ -1,0 +1,50 @@
+@using OpenRpg.Core.Effects
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Core.Extensions
+@using OpenRpg.Core.Templates
+
+<CardSection>
+    <div class="container">
+        @if (Character != null)
+        {
+            <CharacterDetails Name="@Character.NameLocaleId" 
+                              Race="@TemplateAccessor.ToInstance(Character.Variables.Race())"
+                              Class="@TemplateAccessor.ToInstance(Character.Variables.Class())" />
+            <br/>
+            <CharacterVitals Stats="@Character.Stats" State="@Character.State" />
+            <br/>
+            <CharacterStats Stats="@Character.Stats" />
+            <br/>
+            <div class="columns">
+                <div class="column has-text-centered">
+                    <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
+                    <EffectList Effects="@GetRaceEffects()" />
+                </div>
+                <div class="column has-text-centered">
+                    <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
+                    <EffectList Effects="@GetClassEffects()" />
+                </div>
+            </div>
+        }
+    </div>
+</CardSection>
+
+@code {
+    [Parameter]
+    public Character Character { get; set; }
+    
+    [Parameter]
+    public ITemplateAccessor TemplateAccessor { get; set; }
+
+    public IReadOnlyCollection<Effect> GetRaceEffects()
+    {
+        var raceId = Character.Variables.Race().TemplateId;
+        return TemplateAccessor.GetRaceTemplate(raceId).Effects;
+    }
+    
+    public IReadOnlyCollection<Effect> GetClassEffects()
+    {
+        var classId = Character.Variables.Class().TemplateId;
+        return TemplateAccessor.GetRaceTemplate(classId).Effects;
+    }
+}

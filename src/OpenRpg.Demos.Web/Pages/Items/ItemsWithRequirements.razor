@@ -1,0 +1,216 @@
+@page "/items/item-requirements"
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Modifications
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Core.Stats.Populators
+@using OpenRpg.Core.Templates
+@using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Genres.Populators.Entity.Stats
+@using OpenRpg.Items
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+
+@inject DemoCharacterBuilder CharacterBuilder;
+@inject IEntityStatPopulator StatPopulator;
+@inject ITemplateAccessor TemplateAccessor;
+
+<Markdown>
+    ## Requirements In General
+    We have skipped diving into requirements as to really verify requirements are met we need access to two things (by default).
+    - Characters data
+    - Game State data
+
+    So for example lets say you have a sword that the player can only use once he has beaten a boss or got to a certain level.
+    You would need to be able to verify these requirements against the characters data as well as the game state data. As
+    in some cases you may have multiple characters in party based games, so while you would only have 1 game state tied to the
+    player, each character can have different class/race/level/stat data etc.
+
+    So for now lets ignore game state data, as we will cover that in quests and instead look at requirements that the character
+    may or may not meet.
+</Markdown>
+<br />
+<CardSection>
+    <Markdown Containerless="true">
+        ## Random Character vs Item Requirements
+        So in this scenario here we will let you randomly generate a character (As we have already covered how to make and manage characters),
+        and have 2 items to see how the item requirements are met/failed based upon the characters data.
+    </Markdown>
+    <br />
+    <a class="button is-info" @onclick="RandomizeCharacter">Regenerate Character</a>
+</CardSection>
+
+<br />
+<div class="columns">
+    <div class="column">
+        <BasicCharacter Character="@_randomCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
+    </div>
+    <div class="column">
+        <ItemTemplateDetails ItemTemplate="_item1WithRequirement" Character="_randomCharacter"></ItemTemplateDetails>
+        <br />
+        <ItemTemplateDetails ItemTemplate="_item2WithRequirements" Character="_randomCharacter"></ItemTemplateDetails>
+    </div>
+</div>
+<br />
+<Markdown>
+    ## The Requirements Checking
+    So we have 2 bits of code running here, one is:
+
+    ```csharp
+    var areRequirementsMet = RequirementsChecker.AreRequirementsMet(Character, Item.Template);
+    ```
+
+    This is an extension method that checks the item templates requirements against the character and if not met you get the red
+    border and background, then at the requirement level there is:
+
+    ```csharp
+    var isRequirementMet = RequirementsChecker.IsRequirementMet(Character, requirement);
+    ```
+
+    This checks an individial requirement and colours it red or green on the item requirement listing.
+
+    As almost anything can have requirements applied, be it races, classes, items, quests, modifications, effects etc you can really
+    customize how the player can make use of and unlock certain items via progression/stats etc. We didn't cover one of the other parts
+    of requirements checking which is quest related, but we will do that later when we learn more about quests.
+</Markdown>
+<br />
+<CardSection>
+    <Markdown Containerless="true">
+        ## Effect Requirements
+        Just to really show some of the configurability here lets also add in an effect based requirement, so the item
+        has a basic requirement at item level, but also has some effects which are locked until requirements are met.
+        
+        In this instance you could potentially use the item but have some of the effects locked out.
+        
+        > You may notice the characters stats are not changing as the item is not equipped on the character so its not
+        factoring those details into the characters stats at all.
+    </Markdown>
+    <br />
+    <a class="button is-info" @onclick="RandomizeCharacter">Regenerate Character</a>
+</CardSection>
+
+<br />
+<div class="columns">
+    <div class="column">
+        <BasicCharacter Character="@_randomCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
+    </div>
+    <div class="column">
+        <ItemTemplateDetails ItemTemplate="_item3WithEffectRequirements" Character="_randomCharacter"></ItemTemplateDetails>
+    </div>
+</div>
+@code {
+    private Character _randomCharacter;
+    private ItemTemplate _item1WithRequirement, _item2WithRequirements, _item3WithEffectRequirements;
+
+    protected override void OnInitialized()
+    {
+        RandomizeCharacter();
+        _item1WithRequirement = MakeItem1WithRequirement();
+        _item2WithRequirements = MakeItem2WithRequirement();
+        _item3WithEffectRequirements = MakeItem3WithRequirement();
+
+        base.OnInitialized();
+    }
+
+    private ItemTemplate MakeItem1WithRequirement()
+    {
+        var template = new ItemTemplate
+        {
+            Id = 1,
+            NameLocaleId = "Staff Of Hitting",
+            DescriptionLocaleId = "A staff for hitting things, got gold bits on but still looks rubbish",
+            ItemType = FantasyItemTypes.GenericWeapon,
+            Requirements = new[]
+            {
+                new Requirement {RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 10 }
+                },
+            Effects = new[]
+            {
+                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f },
+                new Effect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 3.0f }
+            }
+        };
+        template.Variables.QualityType(FantasyItemQualityTypes.UncommonQuality);
+        template.Variables.Value(150);
+        template.Variables.AssetCode("staff");
+
+        return template;
+    }
+
+    private ItemTemplate MakeItem2WithRequirement()
+    {
+        var template = new ItemTemplate
+        {
+            Id = 1,
+            NameLocaleId = "Wizardy Wand",
+            DescriptionLocaleId = "A super special wand with some gem on the end that can only be used by the strongest of wizardy woos",
+            ItemType = FantasyItemTypes.GenericWeapon,
+            Requirements = new[]
+            {
+                new Requirement { RequirementType = FantasyRequirementTypes.ClassRequirement, AssociatedId = ClassTypeLookups.Mage, AssociatedValue = 3},
+            },
+            Effects = new[]
+            {
+                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 15.0f },
+                new Effect { EffectType = FantasyEffectTypes.DarkDamageAmount, Potency = 30.0f },
+                new Effect { EffectType = FantasyEffectTypes.IntelligenceBonusAmount, Potency = 5.0f },
+                new Effect { EffectType = FantasyEffectTypes.MagicBonusAmount, Potency = 40.0f }
+            }
+        };
+        template.Variables.QualityType(FantasyItemQualityTypes.RareQuality);
+        template.Variables.Value(300);
+        template.Variables.AssetCode("wand");
+
+        return template;
+    }
+
+    private ItemTemplate MakeItem3WithRequirement()
+    {
+        var template = new ItemTemplate
+        {
+            Id = 1,
+            NameLocaleId = "Sword For The Strong",
+            DescriptionLocaleId = "A sword that can only unlock its full power for those with high strength",
+            ItemType = FantasyItemTypes.GenericWeapon,
+            Requirements = new[]
+            {
+                new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 8 },
+            },
+            Effects = new[]
+            {
+                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 20 },
+                new Effect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 5.0f, Requirements = new []
+            {
+                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 9 }
+                }},
+                new Effect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 7.5f, Requirements = new []
+            {
+                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 10 }
+                }},
+                new Effect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f, Requirements = new []
+            {
+                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 11 }
+                }},
+                new Effect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 12.5f, Requirements = new []
+            {
+                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 12 }
+                }},
+            }
+        };
+        template.Variables.QualityType(FantasyItemQualityTypes.EpicQuality);
+        template.Variables.Value(1000);
+        template.Variables.AssetCode("sword");
+
+        return template;
+    }
+
+    public void RandomizeCharacter()
+    {
+        _randomCharacter = CharacterBuilder.CreateNew().Build();
+        StateHasChanged();
+    }
+
+}

@@ -1,0 +1,158 @@
+@page "/inventory/basic-components"
+
+@using OpenRpg.Core.Templates
+@using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Items
+@using OpenRpg.Items.Extensions
+@using Inventory = OpenRpg.Items.Inventories.Inventory
+@using OpenRpg.Items.Templates
+
+@inject IJSRuntime JSRuntime
+@inject ITemplateAccessor TemplateAccessor
+
+<Markdown>
+    ## Basic Inventory Components
+    The inventory component is quite simple at its core, as it just allows you to store a collection of items.
+
+    ### `IInventory`
+    This represents a common inventory which will expose a collection of items as well as `IInventoryVariables` which
+    can be used to store things like max slots, max weights and other data used in your custom scenarios.
+    
+    > The default implementation provided is the `DefaultInventory` which supports slot/stacking use cases out the box.
+</Markdown>
+<br />
+<Markdown>
+    ## Example inventory
+    Lets have a simple inventory here where we have a number of items on the right, lets pretend its from a shop or a loot drop
+    and the inventory on the left which can have items populated by clicking the items on the right.
+
+    > A lot of these interactions would be view concerns for you to solve in your own engine, be it Unity/Monogame/Godot etc
+    as this library just exposes the data and methods for interacting with the inventory, not the view layer parts. Common examples
+    would be using drag and drop or additional functionality like stack splitting etc.
+</Markdown>
+
+<br />
+<div class="columns">
+    <div class="column ">
+        <CardSection>
+            <div>
+                <h6 class="title is-6 has-text-centered has-text-dark">Inventory</h6>
+                <h6 class="subtitle is-6 has-text-dark has-text-centered">Click the item to drop it</h6>
+            </div>
+            <br />
+            <BasicInventory Inventory="_inventory" OnItemInteraction="RemoveItem" @ref="_inventoryRef" TemplateAccessor="TemplateAccessor"></BasicInventory>
+        </CardSection>
+    </div>
+    <div class="column is-one-fifth">
+        <CardSection>
+            <div>
+                <h6 class="title is-6 has-text-centered has-text-dark">Shop</h6>
+                <h6 class="subtitle is-6 has-text-dark has-text-centered">Everything is free! Click to Buy!</h6>
+            </div>
+            <br />
+            <a @onclick="() => AddItem(_simpleItem)">
+                <ItemIcon Item="_simpleItem"></ItemIcon>
+            </a>
+            <br />
+            <a @onclick="() => AddItem(_fancyItem)">
+                <ItemIcon Item="_fancyItem"></ItemIcon>
+            </a>
+            <br />
+            <a @onclick="() => AddItem(_potionItem)">
+                <ItemIcon Item="_potionItem"></ItemIcon>
+            </a>
+            <br />
+            <a @onclick="() => AddItem(_junkPotions)">
+                <ItemIcon Item="_junkPotions"></ItemIcon>
+            </a>
+        </CardSection>
+    </div>
+</div>
+<br />
+<Markdown>
+    ## How it works?
+    In this example we have 2 unstackable items and 1 stackable item (potions), so when we click on one of the items in
+    the shop area it basically calls the `AddItem` method on the inventory (Using `DefaultInventory here) and that internally
+    will try to work out how to best add that item.
+    
+    For example if we have 3 potions and they stack in 5, and you want to add 1 potion then it should just add to the existing
+    potions stacking amount. So behind the scenes it will check for the existence of known metadata such as weights, slots, stacks etc
+    and then work out how to best apply that information.
+    
+    > Different implementations will treat this data differently, and if you have a niche scenario it is recommended you implement your
+    own `IInventory` interface to get what you need.
+    
+    ### Immutable Items
+    One super important thing is that the implementations **SHOULD** keep the item passed in as immutable, for example if you have 3 
+    potions and you want to add 4 potions, it should add 2 to the existing to max out the slot, then add 2 into a new slot with the same
+    template, giving you effectively 2 potion slots. 
+    
+    The problem here is if the item passed in was not treated as immutable then you would in the latter phase make the items amount 2 then
+    add it into the inventory. However as they are reference types, this causes issues as the shops item amount would go up to 2 if you changed
+    the amount on the source instance.
+    
+    So the default inventory implementation (and hopefully other implementations) will clone the item before it is applied anywhere so
+    you can continue to pass in the same items (i.e Quest Rewards, Loot Table Entries, Shop Stock etc) without worrying that it is going to 
+    be altered in any way.
+</Markdown>
+@code {
+    private Item _simpleItem, _fancyItem, _potionItem, _junkPotions;
+    private Inventory _inventory;
+    private BasicInventory _inventoryRef;
+
+    protected override void OnInitialized()
+    {
+        _simpleItem = MakeRubbishSword();
+        _fancyItem = MakeSuperSword();
+        _potionItem = MakePotion();
+        _junkPotions = MakeJunkPotion();
+        _inventory = new Inventory();
+        _inventory.Variables.MaxSlots(32);
+        base.OnInitialized();
+    }
+
+    public async void AddItem(Item item)
+    {
+        var added = _inventory.AttemptAddItem(item);
+        if (!added)
+        {
+            var options = new { message = $"Can't Add {item.Template.NameLocaleId}, Not enough slots", type = "is-danger", position = "center" };
+            await JSRuntime.InvokeVoidAsync("bulmaToast.toast", options);
+        }
+    }
+
+    public void RemoveItem(Item item)
+    {
+        if (item == null) { return; }
+        var removed = _inventory.AttemptRemoveItem(item.Data);
+        _inventoryRef.Refresh();
+
+    }
+
+    private Item MakeRubbishSword()
+    {
+        var item = new ItemData { TemplateId = ItemTemplateLookups.Sword };
+        return TemplateAccessor.ToInstance(item);
+    }
+
+    private Item MakeSuperSword()
+    {
+        var item = new ItemData { TemplateId = ItemTemplateLookups.SuperSword };
+        return TemplateAccessor.ToInstance(item);
+    }
+
+    private Item MakePotion()
+    {
+        var item = new ItemData { TemplateId = ItemTemplateLookups.HealingPotion };
+        item.Variables.Amount(1);
+        return TemplateAccessor.ToInstance(item);
+    }
+
+    private Item MakeJunkPotion()
+    {
+        var item = new ItemData { TemplateId = ItemTemplateLookups.JunkPotion };
+        item.Variables.Amount(3);
+        return TemplateAccessor.ToInstance(item);
+    }
+
+}

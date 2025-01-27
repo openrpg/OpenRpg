@@ -1,0 +1,125 @@
+﻿@page "/combat/attacking"
+
+@using OpenRpg.Combat.Attacks
+@using OpenRpg.Combat.Processors.Attacks.Entity
+@using OpenRpg.Core.Templates
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Populators.Entity.Stats
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+@inject DemoCharacterBuilder CharacterBuilder
+@inject IEntityAttackGenerator AttackGenerator
+@inject ILocaleRepository LocaleRepository
+@inject IEntityStatPopulator StatPopulator;
+@inject ITemplateAccessor TemplateAccessor;
+
+<Markdown>
+    ## Attacking
+
+    Now we have covered the notion of `Damage` and `Attack` we can look at how we make use of these objects
+    with an `IAttackGenerator` to create an attack for a character.
+
+    > It is worth noting that an attack is just seen as a generic way to do damage, in more complex scenarios
+    you may have your own skill/spell systems where you would be wanting to do a specific kind of damage
+    and you can still piggy back off some of these systems but this is seen as a bare bones starting point
+    for having the ability for characters to fight.
+</Markdown>
+<br />
+<Markdown>
+    ### `IAttackGenerator` interface
+    This interface defines a single method `GenerateAttack` which requires the stats you wish to use to generate the attack
+    (it is assumed they are pre-computed), then will return an `Attack` object representing what set of damages the character
+    would do.
+
+    If we generate a random character and then attack we can see what sort of attack we would generate, the code would look something like:
+
+    ```csharp
+    var randomCharacter = CharacterBuilder.CreateNew().Build();
+    var randomAttack = AttackGenerator.GenerateAttack(_randomCharacter.Stats);
+    ```
+    
+    There is a simple example below that you can use to see what this looks like in practice.
+    
+    > You may notice it saying `Dark Damage` and behind the scenes we are using `Dark` attack/defense stats to represent
+    the `M.Def` and `M.Dmg` stats, in the real world you would probably want all damage types available, but we are trying
+    to keep things simple here. Same with `Pure Damage` it is just being used for `P.Def` and `P.Dmg`.
+</Markdown>
+<br />
+<div class="columns">
+    <div class="column is-three-fifths">
+        <CardSection>
+            <a class="button is-info" @onclick="RandomizeCharacter">Randomize Character</a>
+            <BasicCharacter Character="_randomCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
+        </CardSection>
+    </div>
+    <div class="column">
+        <CardSection>
+            <a class="button is-info" @onclick="GenerateAttack">Generate Attack</a>
+            @foreach (var damage in _randomAttack.Damages)
+            {
+                <br />
+                <div class="subtitle is-6 has-text-dark">@(damage.Value) @(GetDamageTypeText(damage.Type))</div>
+            }
+        </CardSection>
+    </div>
+</div>
+<br />
+<Markdown>
+    ## Attack Output
+    As you can see the damage is randomized around their P.Dmg and M.Dmg stats, and is dealt together at once, in some scenarios you may want to
+    isolate it so you either do melee or magic damage, or as mentioned before you do away with basic attacks and have the notion of moves/skills which
+    do a basic damage but then multiply based off existing stats.
+    
+    > You can also have multiple implementations of `IAttackGenerator` so if you want one for melee, one for magic etc you can constrain what
+    damages should be factored in, maybe you would want an attack generator per skill so you can more granularly decide how to calculate it all, the 
+    flexibility of the system allows you to do it however you want.
+
+    However you go about doing it you will pretty much always want to factor in the damage type and how much damage you would do with that type.
+
+    > It is worth noting although the output is a `float` in most cases you would probably show it to the end user as a rounded int, its just
+    better to work with the floats until everything has been processed so you can have a truer figure at the end.
+</Markdown>
+<br />
+<Markdown>
+    ## Different Damage Types
+    We have touched on the topic of damage types, but right now we only actually use `Pure Damage` to keep things simple. We are also using `Dark Damage`
+    as a stand in for magic damage, but a character can mix and match these however you see fit, in some cases you may want a singular damage type, in other
+    scenarios you may want dozens of damage types, but the point is as long as you are aware of them being there and factor them into the stats, the system
+    should pick them up and generate applicable damages for them.
+    
+    > You are also free to do anything you want to the `Attack` object once you have it, as maybe the player has some trigger enabled that allows them to
+    do double damage as part of a story fight or something, or you want to just strip any magic damages out while the player is in a nullified magic zone.
+</Markdown>
+<br />
+@code {
+
+    public Character _randomCharacter;
+    public Attack _randomAttack;
+
+    protected override void OnInitialized()
+    {
+        RandomizeCharacter();
+        GenerateAttack();
+
+        base.OnInitialized();
+    }
+
+    public void RandomizeCharacter()
+    {
+        _randomCharacter = CharacterBuilder.CreateNew().Build();
+        StatPopulator.Populate(_randomCharacter.Stats, _randomCharacter.GetEffects(TemplateAccessor).ToArray(), null);
+    }
+
+    public string GetDamageTypeText(int damageType)
+    {
+        var damageLocaleKey = LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.DamageTypesTextKey, damageType);
+        return LocaleRepository.Get(damageLocaleKey);
+    }
+
+    public void GenerateAttack()
+    {
+        _randomAttack = AttackGenerator.GenerateAttack(_randomCharacter.Stats);
+    }
+
+}

@@ -1,9 +1,7 @@
+using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Core.Extensions;
-using OpenRpg.Core.Variables.Entity;
-using OpenRpg.Items.Equipment;
 using OpenRpg.Items.TradeSkills.State;
 using OpenRpg.Items.TradeSkills.Types;
-using OpenRpg.Items.Types;
 
 namespace OpenRpg.Items.TradeSkills.Extensions
 {
@@ -12,13 +10,13 @@ namespace OpenRpg.Items.TradeSkills.Extensions
     /// </summary>
     public static class TradeSkillEntityVariableExtensions
     {
-        public static bool HasTradeSkillState(this IEntityVariables vars) 
+        public static bool HasTradeSkillState(this EntityVariables vars) 
         { return vars.ContainsKey(TradeSkillEntityVariableTypes.TradeSkillState); }
         
-        public static ITradeSkillState TradeSkillState(this IEntityVariables vars)
-        { return vars.GetAs<ITradeSkillState>(TradeSkillEntityVariableTypes.TradeSkillState); }
+        public static TradeSkillState TradeSkillState(this EntityVariables vars)
+        { return vars.GetAs<TradeSkillState>(TradeSkillEntityVariableTypes.TradeSkillState); }
 
-        public static void TradeSkillState(this IEntityVariables vars, ITradeSkillState tradeSkillState)
+        public static void TradeSkillState(this EntityVariables vars, TradeSkillState tradeSkillState)
         { vars[TradeSkillEntityVariableTypes.TradeSkillState] = tradeSkillState; }
     }
 }

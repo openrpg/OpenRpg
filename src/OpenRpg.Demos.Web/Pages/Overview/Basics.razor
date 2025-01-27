@@ -1,0 +1,49 @@
+﻿@page "/overview/basics"
+<Markdown>
+  ## About These Demos/Docs
+  
+  These demos are all run inside the browser so its easier to demonstrate how to use all the main features without
+  you needing to pick an engine or run a console app. It also makes it easier to just show the high level information
+  without worrying about making complex UIs or game assets.
+  
+  For the most part this application is using:
+  - Blazor (To allow us to use C# directly in browser)
+  - Bulma (For styling things)
+  
+  This is all meant to be seen as a starting point and explanation so you can take what is discussed here and roll it out 
+  into your own projects, be it Unity, Godot, Monogame etc.
+</Markdown>
+<br/>
+<Markdown>
+  ## OpenRpg Composability
+  Almost all parts of OpenRPG are built to be composable to build whatever sort of RPG system you require, so even if
+  we show you a way to do something with out the box parts, you can often implement your own versions or recompose the
+  objects however you wish.
+  
+  > For example you may have a fantasy based character system which has an inventory based on slots with turn based combat,
+  or you may have an action scifi based game which has an infinite inventory or even a party based game etc.
+  
+  As its almost impossible to cater for all scenarios, we focus on providing the building blocks for you to be able to 
+  compose however you wish for your scenario.
+  
+  > A lot of the demos here are building off the `Genres` library which acts as a unifying layer to build more specific
+  > libraries off, so when you see things like `FantasyEffectTypes` thats the effect types that are available withing the
+  > `OpenRpg.Genres.Fantasy` library. So keep that in mind when you see the demos and when you are building your own 
+  > stuff as there is no point re-inventing the wheel if we have already done it for you.
+</Markdown>
+<br/>
+<Markdown>
+  ## Managing Data
+  You are free to manage your data however you want within this system, you can code things like races/classes/items in C#
+  or you can save the data in json/xml/binary/whatever files and load them at runtime. For the most part in this demo we will
+  be hardcoding everything in C# but you can manage your data however you wish. We provide a basic example editor within 
+  the OpenRpg project which uses json but can easily be configured to use xml/binary/yaml/bson etc (built off LazyData lib).
+  So if you are unsure how to best hadle your data have a look at how that one works and change it to do what you need.
+  
+  We do have the notion of repositories and locale data which can be expressed within the system but its up to you to populate them,
+  in this example app there is some infrastructure done that provides simple examples, but in the real world you can satisfy these
+  however you want.
+</Markdown>
+
+@code {
+}

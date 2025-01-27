@@ -1,0 +1,98 @@
+﻿@page "/entities/advanced-stats"
+
+<Markdown>
+   ## Advanced Stats
+   Now that we have covered the basics around computed stats based off effects its time to dive a bit deeper into this topic.
+   
+   As you have seen your stats can be seen as a culmination of all effects on you, and at the moment we have added effects at
+   race and class level as well as providing manual effects on the character, but in the real world you may want to get 
+   effects from equipment, buffs, multi classing etc.
+   
+   We also haven't discussed the notion of `state` vs `stats`, so for example your max health can be seen as static as 
+   its computed once and possibly recomputed on effect changes etc, but your ACTUAL HEALTH value can change from various factors
+   such as being hit, drinking a potion, being poisoned etc, so while `Health` is kind of like a stat it is dynamic in value
+   and is stored separately as a `State`.
+</Markdown>
+
+<br/>
+
+<Markdown>
+    ## Damage/Defense Stats
+    In these examples we are sticking to `Pure Damage` and `Pure Defense` and using `Dark Damage` and `Dark Defense` as a stand in
+    for magic damage. In the real world you may have multiple damage sources and you can define as many as you want.
+    
+    The `OpenRpg.Fantasy` library comes with the notion of the following melee damage types:
+    - Damage (No affinity type damage)
+    - Slashing
+    - Piercing
+    - Blunt
+    - Unarmed
+    
+    And the following magical damage types:
+    - Fire
+    - Ice
+    - Earth
+    - Wind
+    - Light
+    - Dark
+    
+    As with all the stuff in these libraries you can use as much or as little of it as you want, but to keep things simple we will only
+    be using pure damage/defense for melee and dark damage/defense for magic so we don't have to worry about juggling multiple types of 
+    damage in the effects.
+</Markdown>
+
+<br/>
+
+<Markdown>
+  ## Stats (static) vs State (dynamic)
+  So like mentioned above MaxHealth is one of your `Stats` and Health can be seen as dynamic, and this becomes important when
+  we think about how we want to save/load our characters and related data.
+   
+  We could simply just dump the whole character object into JSON or some other format and load it back in and call it a day,
+  but this can cause you issues down the line. For example lets say you save your character on v1.0 of your game by dumping
+  the character and all stats and associated items etc. Then an update comes along for v1.1 which adds a new +10 maxhp bonus to your race, you get 
+  the update and boot up your game loading your save and you dont have this bonus maxhp as your character had its maxhp baked 
+  into the save.
+   
+  To get around this we try to think about the differences between static vs dynamic data in persistence terms and you generally 
+  want to cull all static data on persistence actions as it should all be regenerated when the character is loaded in, the only data 
+  that REALLY needs persisting from the stats is dynamic data like Health and Magic and any other `State` variables you add.
+</Markdown>
+
+<br/>
+
+<Markdown>
+   ## General Data Persistence
+   So while we are discussing persistence its worth saying that in most cases you want to create an object which encapsulates
+   the key aspects of a character. In the above example where we dumped everything its a massive waste as we are saving race,
+   class, effect, stat data as well as potentially other guff in real world scenarios.
+   
+   So it is best to create a separate model which would contain the key bits we care about:
+   
+   ```csharp
+   public class PersistedCharacter
+   {
+      public string NameLocaleId { get; set; }        // These may not ACTUALLY be locale ids if you let players name the character
+      public string DescriptionLocaleId { get; set; }
+      public int RaceId { get; set; }
+      public int ClassLevels { get; set; }
+      public int ClassId { get; set; }
+      public int Health { get; set; }  
+      public int Magic { get; set; }
+      // Maybe custom effects if you do not generate them each time on char creation 
+   }
+   ```
+   
+   The main thing to look at above is that the Race, Class are stored as Ids so they can be used to lookup the race/class
+   data when the save is loaded, this way your save files are lightweight and do not contain any data that can be regenerated.
+   
+   Also with this approach we solve the previous v1.0 -> v1.1 problem, as we would load up the `PersistedCharacter` then
+   use those details to build back up the `AutoStatsCharacter` and we can regenerate the stats, which would give us our
+   new improved MaxHp then we just manually overwrite the `character.Stats.Health(persistedCharacter.Health)` etc.
+   
+   > We will touch more on persistence in a later section as there are some existing models to help with this scenario
+</Markdown>
+
+@code {
+   
+}

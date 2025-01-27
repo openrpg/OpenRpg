@@ -1,0 +1,296 @@
+﻿@page "/combat/buffs"
+
+@using OpenRpg.Combat.Effects
+@using System.Reactive.Linq
+@using System.Reactive.Disposables
+@using OpenRpg.AdviceEngine.Extensions
+@using OpenRpg.Combat.Extensions
+@using OpenRpg.Core.Extensions
+@using OpenRpg.Core.Utils
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Fantasy.Types
+
+@inject IRandomizer Randomizer;
+
+@implements IDisposable
+
+<Markdown>
+   ## Buffs
+   We have discussed the notion of `Effects` earlier on and how they are used as a way to compute stats but so far we have 
+   only really dealt with the notion of static effects that are always applied based on your `Race`/`Class`/`Equipment` etc.
+   
+   So now lets talk about scenarios where you want to apply specific effects for a fixed period of time such as buffs/debuffs 
+   and possibly even have them proc after set durations etc.
+
+   > For anyone who doesn't know *Buffs* is a term for an effect that makes you more powerful for a period of time.
+</Markdown>
+
+<br/>
+
+<Markdown>
+   ## The `TimedEffect` class
+   To start with we need to look at the `TimedEffect` class which wraps an effect but gives it a name and some timing related metadata.
+   
+   ```csharp
+   var poison1Effect = new TimedEffect() 
+   {
+      // Locale/Id information
+      Id = 1,
+      NameLocaleId = "Poison I",
+      DescriptionLocaleId = "Applies a slight poison over time",
+   
+      // Timing information (in seconds as float)
+      Duration = 5, Frequency = 1, MaxStack = 2,
+   
+      // Effect information
+      EffectType = EffectType.DarkDamageAmount,
+      Potency = 2.0f
+   };
+   ```
+   
+   As you can see not much too it and this describes an effect that can be applied to an entity that every 1 second takes 
+   2 dark damage for 5 seconds and can be stacked twice, however we could also make a passive buff like so:
+
+      ```csharp
+      var protectionEffect = new TimedEffect() 
+      {
+         Id = 2,
+         NameLocaleId = "Protection I",
+         DescriptionLocaleId = "Increases defense by 5% for 1 minute",
+         Duration = 60,
+         EffectType = EffectType.DefenseBonusPercentage,
+         Potency = 5.0f
+      };
+      ```
+
+   There we go, we now have a protection buff which doesn't have a frequency so is seen as a passive buff that should be 
+   factored into your stats.
+
+   > You can make as many of these as you want and much like how you setup your races/classes/items etc you should also setup all existing buff types
+</Markdown>
+
+<br/>
+
+<Markdown>
+  ## The `ActiveEffect` class
+  Now we have covered the timed effects which describe each effect that can be applied, we now need a way to track them
+  on an entity which can be done via the `ActiveEffect` class which wraps up the transient information about a timed effect, 
+  such as how long its been active, how many stacks you have and when the next tick is due etc.
+  
+  So using the previous examples you would do something like:
+  
+  ```csharp
+   var activePoisonEffect = new ActiveEffect() 
+   {
+      TimedEffect = poison1,
+      Stacks = 1
+   };
+  ```
+  
+  Internally the class also tracks `ActiveTime` and `TimeSinceTick` for you to update as time elapses to work out when
+  the active effect should be removed from whatever entity it is applied to.
+  
+  > It is up to you how you track and process these active effects, it is recommended that you store them within the `Variables` 
+  > on the given entity, i.e `character.Variables.ActiveEffects` and there is an out the box way of updating and managing
+  > active effects using `IActiveEffects` which has a `DefaultActiveEffects` implementation out the box.
+</Markdown>
+
+<br/>
+<div class="columns">
+  <div class="column is-third">
+      <Markdown>
+          ### An Example Of Buffs In Action
+          Here is an example of buffs being applied, where every 2 seconds a new random buff from the possible list will
+          be applied to simulate real world scenarios, notice how buffs may be reset in duration rather than removed etc.
+      </Markdown>
+  </div>
+   <div class="column is-third">
+      <CardSection>
+         <h2 class="title is-5 has-text-black">Possible Effects</h2>
+         <div class="container">
+            @foreach (var availableEffect in AvailableEffects)
+            {
+               <TagLabel Label="@($"{availableEffect.NameLocaleId}")" Content="@($"Lasts {(int)availableEffect.Duration}s")" ContentTagType="is-warning" />
+            }
+         </div>
+         <h2 class="title is-5 has-text-black">Active Effects</h2>
+         <div class="container">
+            @foreach (var activeEffect in ActiveEffects.ActiveEffects)
+            {
+               <TagLabel Label="@($"x{activeEffect.Stacks} {activeEffect.Effect.NameLocaleId}")" Content="@($"{(int)activeEffect.ActiveTime} seconds")"/>
+            }
+         </div>
+      </CardSection>
+   </div>
+     <div class="column is-third">
+         <CardSection>
+            <h2 class="title is-5 has-text-black">Effect Output</h2>
+            <div style="height: 10em; overflow-y: scroll">
+               <ul class="content is-small">
+               @foreach (var logEntry in LogOutput)
+               {
+                  <li>@((MarkupString)logEntry.Entry)</li>
+               }
+               </ul>
+            </div>
+         </CardSection>
+     </div>
+</div>
+
+@code {
+   public TimedEffect Poison1Effect = new() 
+   {
+      Id = 1,
+      NameLocaleId = "Poison I",
+      DescriptionLocaleId = "Applies a slight poison over time",
+      Duration = 5, Frequency = 1, MaxStack = 2,
+      EffectType = FantasyEffectTypes.DarkDamageAmount,
+      Potency = 2.0f
+   };
+   
+   public TimedEffect Poison2Effect = new() 
+   {
+      Id = 2,
+      NameLocaleId = "Poison II",
+      DescriptionLocaleId = "Applies a moderate poison over time",
+      Duration = 5, Frequency = 1, MaxStack = 2,
+      EffectType = FantasyEffectTypes.DarkDamageAmount,
+      Potency = 4.0f
+   };
+   
+   public TimedEffect Regen1Effect = new() 
+   {
+      Id = 3,
+      NameLocaleId = "Regen I",
+      DescriptionLocaleId = "Applies a slight heal over time",
+      Duration = 10, Frequency = 1.5f,
+      EffectType = FantasyEffectTypes.HealthRestoreAmount,
+      Potency = 5.0f
+   };
+   
+   public TimedEffect Regen2Effect = new() 
+   {
+      Id = 4,
+      NameLocaleId = "Regen II",
+      DescriptionLocaleId = "Applies a moderate heal over time",
+      Duration = 10, Frequency = 1.5f,
+      EffectType = FantasyEffectTypes.HealthRestoreAmount,
+      Potency = 10.0f
+   };
+   
+   public TimedEffect Protection1Effect = new() 
+   {
+      Id = 5,
+      NameLocaleId = "Protection I",
+      DescriptionLocaleId = "Improves protection for a short period",
+      Duration = 5,
+      EffectType = FantasyEffectTypes.DefenseBonusAmount,
+      Potency = 5.0f
+   };
+
+   public TimedEffect[] AvailableEffects;
+
+   public record LogEntry(bool IsBeneficial, bool IsPassive, string Entry);
+   
+   public List<LogEntry> LogOutput { get; } = new();
+
+   public DefaultActiveEffects ActiveEffects = new();
+   
+   private CompositeDisposable _sub = new();
+   
+   public void TriggerUpdate(float elapsedTime)
+   {
+      ActiveEffects.UpdateEffects(elapsedTime);
+      StateHasChanged();
+   }
+
+   public void OnEffectTriggered(ActiveEffect activeEffect)
+   {
+      var effectTypeText = activeEffect.IsBeneficialEffect() ? "healing" : "damage";
+      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(),
+         $"Triggered <span class=\"has-text-info\">{activeEffect.Effect.NameLocaleId}</span> with {activeEffect.GetStackedPotency()} {effectTypeText}");
+      
+      LogOutput.Add(logEntry);
+   }
+
+   public void OnEffectExpired(ActiveEffect activeEffect)
+   {
+      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(), 
+         $"Expired <span class=\"has-text-info\">{activeEffect.Effect.NameLocaleId}</span>");
+      
+      LogOutput.Add(logEntry);
+   }
+   
+   public void OnEffectAdded(ActiveEffect activeEffect)
+   {
+      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(), 
+         $"Added <span class=\"has-text-info\">{activeEffect.Effect.NameLocaleId}</span>");
+      
+      LogOutput.Add(logEntry);
+   }
+   
+   public void AddNewEffect()
+   {
+      var effectToApply = Randomizer.TakeRandomFrom(AvailableEffects);
+      var alreadyContainsEffect = ActiveEffects.HasEffect(effectToApply.Id);
+      ActiveEffects.AddEffect(effectToApply);
+
+      if (alreadyContainsEffect)
+      {
+         var logEntry = new LogEntry(effectToApply.IsBeneficialEffect(), effectToApply.IsPassiveEffect(), 
+            $"Stacked/Reset <span class=\"has-text-info\">{effectToApply.NameLocaleId}</span>");
+         
+         LogOutput.Add(logEntry);
+      }
+   }
+   
+   private void PopulateAvailableEffects()
+   {
+      AvailableEffects = new[]
+      {
+         Poison1Effect, Poison2Effect,
+         Regen1Effect, Regen2Effect,
+         Protection1Effect
+      };
+   }
+   
+   protected override void OnInitialized()
+   {
+      base.OnInitialized();
+
+      PopulateAvailableEffects();
+      AddNewEffect();
+      
+      Observable.Timer(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1))
+         .Subscribe(x => TriggerUpdate(1))
+         .AddTo(_sub);
+      
+      Observable.Timer(TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2))
+         .Subscribe(x => AddNewEffect())
+         .AddTo(_sub);
+      
+      Observable.FromEventPattern<ActiveEffect>(
+         e => ActiveEffects.EffectExpired += e,
+         e => ActiveEffects.EffectExpired -= e)
+         .Select(x => x.EventArgs)
+         .Subscribe(OnEffectExpired)
+         .AddTo(_sub);
+      
+      Observable.FromEventPattern<ActiveEffect>(
+         e => ActiveEffects.EffectExpired += e,
+         e => ActiveEffects.EffectExpired -= e)
+         .Select(x => x.EventArgs)
+         .Subscribe(OnEffectAdded)
+         .AddTo(_sub);
+      
+      Observable.FromEventPattern<ActiveEffect>(
+         e => ActiveEffects.EffectTriggered += e,
+         e => ActiveEffects.EffectTriggered -= e)
+         .Select(x => x.EventArgs)
+         .Subscribe(OnEffectTriggered)
+         .AddTo(_sub);
+   }
+
+   public void Dispose()
+   { _sub.Dispose(); }
+}

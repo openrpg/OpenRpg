@@ -1,0 +1,149 @@
+name: Build And Test
+on: [push]
+
+env:
+  BuildVersion: '0.40.${{github.run_number}}'
+  SolutionFile: 'src/OpenRpg.sln'
+  DemoProject: 'src/OpenRpg.Demos.Web/OpenRpg.Demos.Web.csproj'
+  EditorProject: 'src/OpenRpg.Editor/OpenRpg.Editor.csproj'
+
+jobs:
+  build-and-test:
+    name: "Build & Test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 9.0.x
+
+      - name: .Net Restore
+        run: dotnet restore ${{ env.SolutionFile }}
+
+      - name: .Net Build
+        run: dotnet build --configuration Release ${{ env.SolutionFile }}
+
+      - name: .Net Test
+        run: dotnet test --configuration Release --no-build ${{ env.SolutionFile }} --logger trx --collect:"XPlat Code Coverage"
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        with:
+          name: Unit Test Summary
+          path: "**/*.trx"
+          reporter:  dotnet-trx
+
+      - name: Code Coverage Summary Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: '**/coverage.cobertura.xml'
+          badge: true
+          format: 'markdown'
+          output: 'both'
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: code-coverage-results.md
+
+      - name: Add Coverage Summary
+        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+
+  build-demos:
+    name: "Package Demos"
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    needs: [build-and-test]
+    steps:
+      - uses: actions/checkout@v3
+        
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 9.0.x
+        
+      - name: Build Web Demo
+        run: dotnet publish -c Release -o demo "${{ env.DemoProject }}"
+        
+      - name: Rewrite Base Path For Release
+        shell: pwsh
+        if: startsWith(github.event.ref, 'refs/tags/')
+        run: ((Get-Content -path "demo\wwwroot\index.html" -Raw) -replace '<base href="/" />', '<base href="/OpenRpg/" />') | Set-Content -Path "demo\wwwroot\index.html"
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: demo/wwwroot/
+
+      - name: Deploy Demo to GitHub Pages
+        if: startsWith(github.event.ref, 'refs/tags/')
+        uses: actions/deploy-pages@v4        
+        
+        
+        
+        
+  build-editor:
+    name: "Package Editor"
+    runs-on: windows-latest
+    needs: [build-and-test]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Build Editor App
+        run: dotnet publish -c Release -r win-x64 --sc /p:Version=${{ env.BuildVersion }} -o /editor "${{ env.EditorProject }}"
+
+      - name: Publish Editor Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: editor-app
+          path: /editor
+          
+      - name: Compress App
+        shell: pwsh
+        if: startsWith(github.event.ref, 'refs/tags/')
+        run: Compress-Archive -Path "editor/*" -Destination "/editor-${{env.BuildVersion}}.zip"
+
+      - name: Upload App Release
+        uses: alexellis/upload-assets@0.2.2
+        if: startsWith(github.event.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_paths: '["/editor-${{env.BuildVersion}}.zip"]'
+  
+  package-and-release:
+    name: "Package Libs"
+    runs-on: windows-latest
+    needs: [build-and-test]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: .Net Restore
+        run: dotnet restore ${{ env.SolutionFile }}
+
+      - name: .Net Build
+        run: dotnet build --configuration Release /p:Version=${{ env.BuildVersion }} ${{ env.SolutionFile }}
+
+      - name: .Net Pack
+        run: dotnet pack --configuration Release /p:Version=${{ env.BuildVersion }} --no-build ${{ env.SolutionFile }}
+        
+      - name: Publish Editor Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Libraries
+          path: "**/*.nupkg"
+
+      - name: Publish To Nuget
+        if: startsWith(github.event.ref, 'refs/tags/')
+        run: dotnet nuget push "**/*.nupkg" -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json

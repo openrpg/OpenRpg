@@ -4,6 +4,6 @@ namespace OpenRpg.Core.Effects
 {
     public interface IHasEffects
     {
-        IEnumerable<Effect> Effects { get; }
+        IReadOnlyCollection<Effect> Effects { get; }
     }
 }

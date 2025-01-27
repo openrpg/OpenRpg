@@ -1,0 +1,12 @@
+<div class="tags has-addons @(Centered == true ? "is-centered" : "")">
+    <span class="tag  @(LabelTagType ?? "is-dark")">@Label</span>
+    <span class="tag @(ContentTagType ?? "is-info")">@Content</span>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; }
+    [Parameter] public string Content { get; set; }
+    [Parameter] public string LabelTagType { get; set; }
+    [Parameter] public string ContentTagType { get; set; }
+    [Parameter] public bool Centered { get; set; } = true;
+}

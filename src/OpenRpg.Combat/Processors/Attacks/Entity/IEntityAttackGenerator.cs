@@ -1,7 +1,7 @@
-using OpenRpg.Core.Stats.Entity;
+using OpenRpg.Core.Stats.Variables;
 
 namespace OpenRpg.Combat.Processors.Attacks.Entity
 {
-    public interface IEntityAttackGenerator : IAttackGenerator<IEntityStatsVariables>
+    public interface IEntityAttackGenerator : IAttackGenerator<EntityStatsVariables>
     {}
 }

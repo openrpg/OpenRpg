@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 namespace OpenRpg.Core.Modifications
 {
-    public interface IHasModifications
+    public interface IHasModifications<out T> where T : ModificationTemplate
     {
-        IEnumerable<IModificationTemplate> Modifications { get; }
+        IEnumerable<T> Modifications { get; }
     }
 }

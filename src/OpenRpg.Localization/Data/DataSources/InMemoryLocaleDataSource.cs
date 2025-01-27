@@ -24,11 +24,11 @@ namespace OpenRpg.Localization.Data.DataSources
         protected InMemoryLocaleDataSource()
         {}
 
-        public string Get(string localeCode, string key) => LocaleDatasets[localeCode].LocaleData[key];
-        public void Create(string localeCode, string text, string key) => LocaleDatasets[localeCode].LocaleData.Add(key, text);
-        public void Update(string localeCode, string text, string key) => LocaleDatasets[localeCode].LocaleData[key] = text;
-        public bool Delete(string localeCode, string key) => LocaleDatasets[localeCode].LocaleData.Remove(key);
-        public bool Exists(string localeCode, string key) => LocaleDatasets[localeCode].LocaleData.ContainsKey(key);
+        public string Get(string localeCode, string id) => LocaleDatasets[localeCode].LocaleData[id];
+        public void Create(string localeCode, string id, string text) => LocaleDatasets[localeCode].LocaleData.Add(id, text);
+        public void Update(string localeCode, string id, string text) => LocaleDatasets[localeCode].LocaleData[id] = text;
+        public bool Delete(string localeCode, string id) => LocaleDatasets[localeCode].LocaleData.Remove(id);
+        public bool Exists(string localeCode, string id) => LocaleDatasets[localeCode].LocaleData.ContainsKey(id);
         public LocaleDataset GetLocaleDataset(string localeCode) => LocaleDatasets[localeCode];
     }
 }

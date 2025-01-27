@@ -1,0 +1,160 @@
+@page "/cards/basic-components"
+@using OpenRpg.Core.Effects
+@using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+@using OpenRpg.Cards.Genres
+@using OpenRpg.Cards
+@using OpenRpg.Cards.Effects
+@using OpenRpg.Combat.Abilities
+@using OpenRpg.Core.Classes
+@using OpenRpg.Core.Extensions
+@using OpenRpg.Core.Races
+@using OpenRpg.Core.Templates
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Demos.Infrastructure.Lookups
+
+@inject ITemplateAccessor TemplateAccessor
+
+<Markdown>
+    ## Basic Card Components
+    Cards act as a wrapper around a given object to allow you to track it as a card. This lets you have a general notion
+    of cards which can be in the players hand or whatever but actually link through to an existing type.
+    
+    Out the box the following objects can be used in cards:
+    
+    - Items
+    - Equipment (items)
+    - Abilities
+    - Effects (via CardEffects(
+    - RaceTemplates
+    - ClassTemplates
+    
+    > This is just the out the box types though, you can wrap whatever you want in a card.
+</Markdown>
+
+<br />
+<div class="columns">
+    <div class="column is-two-thirds">
+        <Markdown>
+            ### Some simple cards
+            So lets make some simple cards based off the existing data we have made so far from the other tutorials,
+            here is an example of what it looks like, all we do is just make an item, and then wrap it in an `ItemCard`
+            or an `EquipmentCard`.
+            
+            ```csharp
+            private EquipmentCard MakeRubbishSwordCard()
+            {
+                var template = new DefaultItemTemplate
+                {
+                    Id = 1,
+                    NameLocaleId = "Sword",
+                    DescriptionLocaleId = "A really bad looking sword, can slay things though",
+                    ItemType = ItemTypes.GenericWeapon,
+                    Effects = new []
+                    {
+                        new Effect { EffectType = EffectTypes.PureDamageAmount, Potency = 30.0f }
+                    }
+                };
+                template.Variables.QualityType(ItemQualityTypes.JunkQuality);
+                template.Variables.Value(10);
+                template.Variables.AssetCode("sword");
+            
+                var item = new DefaultItem { ItemTemplate = template };
+                return new EquipmentCard(item);
+            }
+            ```
+            
+            > An `ItemCard` is meant to signify an item that can be used on someone, like a potion whereas an
+            `EquipmentCard` indicates the item is meant to be equipped. You could just use an `ItemCard` for both
+            but its often better to provide other types based on use cases.
+        </Markdown>
+    </div>
+    <div class="column is-one-third">
+        <CardSection>
+            <BasicCard Card="_rubbishSwordCard"></BasicCard>
+        </CardSection>
+    </div>
+</div>
+<br/>
+<Markdown>
+    ## Example Cards
+    Here is a collection of example cards for different types, you can easily make your own using the existing conventions.
+</Markdown>
+<br/>
+<CardSection>
+    @foreach (var card in _exampleCards)
+    {
+        <BasicCard Card="card"></BasicCard>
+    }
+</CardSection>
+
+@code {
+    private EquipmentCard _rubbishSwordCard;
+
+    private IEnumerable<ICard> _exampleCards;
+
+    protected override void OnInitialized()
+    {
+        _rubbishSwordCard = MakeRubbishSwordCard();
+        _exampleCards = MakeExampleCards();
+
+        base.OnInitialized();
+    }
+
+    private EquipmentCard MakeRubbishSwordCard()
+    {
+        var template = new ItemTemplate
+        {
+            Id = 1,
+            NameLocaleId = "Sword",
+            DescriptionLocaleId = "A really bad looking sword, can slay things though",
+            ItemType = FantasyItemTypes.GenericWeapon,
+            Effects = new []
+            {
+                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
+            }
+        };
+        template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
+        template.Variables.Value(10);
+        template.Variables.AssetCode("sword");
+
+        var itemData = new ItemData { TemplateId = template.Id };
+        var item = TemplateAccessor.ToInstance(itemData);
+        return new EquipmentCard(item);
+    }
+
+    private IEnumerable<ICard> MakeExampleCards()
+    {
+        var potionData = new ItemData { TemplateId = ItemTemplateLookups.HealingPotion };
+        var potion = TemplateAccessor.ToInstance(potionData);
+        yield return new ItemCard(potion);
+        yield return _rubbishSwordCard;
+        yield return new ClassCard(TemplateAccessor.GetClassTemplate(ClassTypeLookups.Fighter));
+        yield return new RaceCard(TemplateAccessor.GetRaceTemplate(RaceTypeLookups.Dwarf));
+        yield return new AbilityCard(new Ability
+        {
+            Id = 1,
+            NameLocaleId = "Cleave",
+            DescriptionLocaleId = "Cleaves all enemies surrounding the user"
+        });
+        yield return new EffectCard(new CardEffects
+        {
+            Id = 1,
+            NameLocaleId = "Mighty Strength",
+            DescriptionLocaleId = "Increases the targets strength by 5",
+            Effects = new[]
+            {
+                new Effect
+                {
+                    Potency = 5,
+                    EffectType = FantasyEffectTypes.StrengthBonusAmount
+                }
+            }
+        });
+    }
+
+}

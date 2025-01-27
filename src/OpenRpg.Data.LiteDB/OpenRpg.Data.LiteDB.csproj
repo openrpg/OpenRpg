@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Version>0.0.0</Version>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Title>OpenRpg.Data.LiteDB</Title>
+        <Authors>Grofit (LP)</Authors>
+        <PackageLicenseUrl>https://github.com/openrpg/OpenRpg/blob/master/LICENSE</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/openrpg/OpenRpg</PackageProjectUrl>
+        <Description>A LiteDB implementation of the OpenRpg data layer</Description>
+        <PackageTags>rpg game-development repository data xna monogame unity godot</PackageTags>
+        <LangVersion>8</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OpenRpg.Data\OpenRpg.Data.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="LiteDB" Version="5.0.21" />
+    </ItemGroup>
+
+</Project>

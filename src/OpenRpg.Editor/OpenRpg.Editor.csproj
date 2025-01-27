@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>13</LangVersion>
+        <ApplicationIcon>openrpg.ico</ApplicationIcon>
+        <IsPackable>false</IsPackable>
+        <WasmFingerprintAssets>false</WasmFingerprintAssets>
+        <StaticWebAssetFingerprintingEnabled>false</StaticWebAssetFingerprintingEnabled>
+        <StaticWebAssetsFingerprintContent>false</StaticWebAssetsFingerprintContent>
+        <DisableBuildCompression>true</DisableBuildCompression>
+    </PropertyGroup>
+    
+    
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <OutputType>WinExe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OpenRpg.Data.InMemory\OpenRpg.Data.InMemory.csproj" />
+      <ProjectReference Include="..\OpenRpg.Editor.UI\OpenRpg.Editor.UI.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Photino.Blazor" Version="3.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="openrpg.ico">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="wwwroot\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    
+</Project>

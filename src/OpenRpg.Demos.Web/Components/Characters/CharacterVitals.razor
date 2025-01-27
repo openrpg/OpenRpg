@@ -1,0 +1,27 @@
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Core.State.Variables
+@using OpenRpg.Core.Stats.Variables
+
+@if (State != null)
+{
+    <div class="columns">
+        <div class="column">
+            <h4 class="subtitle mb-2 has-text-dark has-text-centered">Health</h4>
+            <progress class="progress is-danger" value="@State.Health().ToString()" max="@Stats.MaxHealth().ToString()"></progress>
+        </div>
+        <div class="column">
+            <h4 class="subtitle mb-2 has-text-dark has-text-centered">Magic</h4>
+            <progress class="progress is-info" value="@State.Magic().ToString()" max="@Stats.MaxMagic().ToString()"></progress>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public EntityStateVariables State { get; set; }
+    
+    
+    [Parameter]
+    public EntityStatsVariables Stats { get; set; }
+}

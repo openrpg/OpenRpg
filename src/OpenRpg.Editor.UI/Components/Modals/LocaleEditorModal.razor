@@ -1,0 +1,94 @@
+﻿@using OpenRpg.Editor.Infrastructure.Models
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject ILocaleRepository Repository;
+
+<h3 class="title is-3 has-text-danger">Locale Editor For <code>@LocaleId</code></h3>
+<div class="field">
+    <label class="label">Are you sure you wish to do this?</label>
+    <div class="control">
+        <ListEditor Data="new [] {LocaleEntry}" TItem="LocaleEntry">
+            <HeaderTemplate>
+                <th><abbr title="Locale Code">Locale Code</abbr></th>
+                <th><abbr title="Locale Id">Locale Id</abbr></th>
+                <th><abbr title="Locale Text">Locale Text</abbr></th>
+            </HeaderTemplate>
+            <RowTemplate>
+                <td>@context.LocaleCode</td>
+                <td>@context.LocaleId</td>
+                <td>
+                    <div class="control">
+                        <input class="input" type="text" @bind="context.LocaleText"/>
+                    </div>
+                </td>
+            </RowTemplate>
+        </ListEditor>
+    </div>
+</div>
+<div class="field is-grouped">
+    <div class="control">
+        <button class="button is-success" @onclick="SaveChanges">Save Changes</button>
+    </div>
+    <div class="control">
+        <button class="button is-link is-light" @onclick="Cancel">Cancel</button>
+    </div>
+</div>
+
+@functions {
+    [Parameter]
+    public string LocaleId { get; set; }
+
+    [Parameter]
+    public bool IsActive { get; set; }
+    
+    [Parameter] 
+    public EventCallback<bool> IsActiveChanged { get; set; }
+    
+    [Parameter] 
+    public EventCallback OnSaved { get; set; }
+    
+    [Parameter] 
+    public EventCallback OnCancelled { get; set; }
+
+    LocaleEntry LocaleEntry { get; set; }
+
+    public void Cancel() => OnCancelled.InvokeAsync();
+
+    protected override void OnParametersSet()
+    {
+        LocaleEntry = GetLocaleEntries();
+        base.OnParametersSet();
+    }
+    
+    public void SaveChanges()
+    {
+        UpdateLocaleText(LocaleEntry);
+        OnSaved.InvokeAsync();
+    }
+
+    public LocaleEntry GetLocaleEntries()
+    {
+        if (!Repository.Exists(LocaleId))
+        { return new LocaleEntry{LocaleCode = Repository.CurrentLocaleCode, LocaleId = LocaleId, LocaleText = string.Empty, Exists = false}; }
+        
+        var data = Repository.Get(LocaleId);
+        return new LocaleEntry {LocaleCode = Repository.CurrentLocaleCode, LocaleId = LocaleId, LocaleText = data, Exists = true};
+    }
+
+    public void UpdateLocaleText(LocaleEntry localeEntry)
+    {
+        var prefix = localeEntry.Exists ? "Updating" : "Creating";
+        Console.WriteLine($"{prefix} {localeEntry.LocaleCode} - {localeEntry.LocaleId} with {localeEntry.LocaleText}");
+
+        if (localeEntry.Exists)
+        {
+            Repository.Update(LocaleId, localeEntry.LocaleText);
+            return;
+        }
+        
+        Repository.Create(LocaleId, localeEntry.LocaleText);
+        localeEntry.Exists = true;
+    }
+
+}

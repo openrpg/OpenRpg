@@ -1,0 +1,182 @@
+﻿@page "/entities/basic-components"
+
+@using OpenRpg.Core.Classes
+@using OpenRpg.Core.Classes.Templates
+@using OpenRpg.Core.Entity
+@using OpenRpg.Core.Extensions
+@using OpenRpg.Core.Races.Templates
+@using OpenRpg.Demos.Infrastructure.Templates
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Core.Races
+
+<Markdown>
+   ## Basic Entity Components
+   As mentioned in previous pages we have basic components for building more complex objects, however in a lot of cases
+   your game logic will be needing a higher level composite object to act as an `Entity` or `Character` for you to track
+   common things like:
+   
+   - Name
+   - Stats
+   - State
+   - Variables
+   
+   An entity may be a `Monster` an `NPC` or a player `Character`, all which have a lot of similarities but may have different
+   responsibilities such as a `Monster` may need to have a `LootTable` but a player character would not.
+ </Markdown>
+
+<br/>
+
+<Markdown>
+    ### What Makes A Character?
+    If we want to make a simple entity/character all we need to do is think about what makes a character and how would this fit into an `IEntity`.
+
+    Lets say they need a name, a race and a class at minimum, so we need to supply an `IRaceTemplate` and an `IClass` as well as the Locale details,
+    which we can learn more about below.
+
+    > Locale details are a best practice to include, but wont really apply for player created characters as the player would name the character,
+    but in scenarios where you are creating NPC characters ahead of time you may have them use the Locale data rather than hard coded strings.
+
+    #### `IRaceTemplate` and `DefaultRaceTemplate`
+
+    `IRaceTemplate` wraps up the notion of a race, it contains the details of the race and any effects it has, and `DefaultRaceTemplate` is the default implementation
+    however you can always make your own implementation if required. Like most **template** objects in the system it will have a list of effects and requirements.
+
+    > The requirements are to allow you to lock certain race choices until criteria have been met, i.e player must complete the game once before they can pick
+    a certain race, or you need to unlock a story point, or get a character over level 30 etc. You can mix and match any requirements.
+
+    #### `IClass`, `DefaultClass` and `IClassTemplate` with `DefaultClassTemplate`
+
+    Much like the `IRaceTemplate` the `IClassTemplate` defines the class details, effects and requirements.
+
+    The `IClass` is another layer on top of the template though, as characters class also often has a level associated, but as the templates are seen as blueprints for
+    the classes/races, they do not track per character data, so this is where the `IClass` notion comes in, and you can even have a character with multiple classes if
+    your game scenario warrants that (which is covered later).
+</Markdown>
+
+<br />
+
+<div class="columns">
+  <div class="column is-half">
+      <Markdown>
+          #### Building on an Entity to Make a Character
+
+          So lets go ahead and make a simple character class using the pre-made entity components within OpenRpg and add our custom responsibilties to it.
+
+          ```csharp
+          var myCharacter = new DefaultEntity();
+          ```
+          
+          Now we have an entity we can apply whatever responsibilities we want, so lets add a race and a class.
+          
+          ```csharp
+          SimpleExample.NameLocaleId = "Frodo Baggins";
+          
+          var hobbitRace = new DefaultRaceTemplate { NameLocaleId = "Hobbit" };
+  
+          var fighterClass = new DefaultClassTemplate { Id = 1, NameLocaleId = "Fighter" };
+          SimpleExample.Variables.Race(hobbitRace);
+  
+          var level1Fighter = new DefaultClass(fighterClass);
+          SimpleExample.Variables.Class(level1Fighter);
+          ```
+      </Markdown>
+  </div>
+  <div class="column is-half">
+      <CardSection>
+          <CharacterDetails Name="@SimpleEntity.NameLocaleId"
+                            Race="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.Race())"
+                            Class="@TemplateAccessor.ToInstance(SimpleEntity.Variables.Class())">
+          </CharacterDetails>
+      </CardSection>
+  </div>
+</div>
+<div class="columns">
+  <div class="column is-half">
+    <Markdown>
+      ### BUT I NEED MORE CLASSES?!?!
+      You may have noticed that the level is associated with class and not character. This may seem a bit odd but this 
+      is to account for those scenarios where you may have multi-class scenarios or want to be able to sub class etc and
+      also you would want to track experience against a given class in this scenario too.
+      
+      So lets assume our buddy Frodo has got a prestige class of some kind known as *Ring Bearer* and hes leveled up a bit
+      how would our character change to reflect this?
+
+      ```csharp
+      var MultiClassExample = new DefaultEntity();
+      MultiClassExample.NameLocaleId = "Frodo Baggins";
+      MultiClassExample.Variables.Race(hobbitRace);
+
+      var multiClass = new DefaultMultiClass();
+      var level2Fighter = new DefaultClass(fighterClass);
+      level2Fighter.Variables.Level(2);
+      multiClass.AddClass(level2Fighter);
+
+      var level1Wraith = new DefaultClass(wraithClass);
+      multiClass.AddClass(level1Wraith);
+
+      var level3RingBearer = new DefaultClass(ringBearerClass);
+      level3RingBearer.Variables.Level(3);
+      multiClass.AddClass(level3RingBearer);
+
+      MultiClassExample.Variables.MultiClass(multiClass);
+      ```
+      
+      So lets make one of these and see how Frodo has developed
+      
+      Boom and there we go, we can now see that he has multiple classes assigned.
+      
+      Move onto the stats page for more information on entities.
+    </Markdown>
+  </div>
+    <div class="column is-half">
+        <CardSection>
+            <CharacterDetails Name="@MultiClassEntity.NameLocaleId"
+                              Race="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.Race())"
+                              Classes="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.MultiClass().Classes)">
+            </CharacterDetails>
+        </CardSection>
+    </div>
+</div>
+
+@code {
+    private Entity SimpleEntity = new Entity();
+    private Entity MultiClassEntity = new Entity();
+    
+    private RaceTemplate HobbitRace = new RaceTemplate { Id = 1, NameLocaleId = "Hobbit" };
+    
+    private ClassTemplate FighterClass = new ClassTemplate { Id = 1, NameLocaleId = "Fighter" };
+    private ClassTemplate WraithClass = new ClassTemplate { Id = 2, NameLocaleId = "Wraith" };
+    private ClassTemplate RingBearerClass = new ClassTemplate { Id = 3, NameLocaleId = "Ring Bearer" };
+
+    private ManualTemplateAccessor TemplateAccessor { get; } = new ManualTemplateAccessor();
+    
+    protected override void OnInitialized()
+    {
+        TemplateAccessor.AddTemplate(HobbitRace);
+        TemplateAccessor.AddTemplate(FighterClass);
+        TemplateAccessor.AddTemplate(WraithClass);
+        TemplateAccessor.AddTemplate(RingBearerClass);
+        
+        SimpleEntity.NameLocaleId = "Frodo Baggins";
+        SimpleEntity.Variables.Race(new RaceData { TemplateId = HobbitRace.Id });
+        SimpleEntity.Variables.Class(new ClassData { TemplateId = FighterClass.Id });
+        
+        MultiClassEntity.NameLocaleId = "Frodo Baggins";
+        MultiClassEntity.Variables.Race(new RaceData { TemplateId = HobbitRace.Id });
+
+        var multiClass = new MultiClasses();
+        var level2Fighter =new ClassData { TemplateId = FighterClass.Id };
+        level2Fighter.Variables.Level(2);
+        multiClass.AddClass(level2Fighter);
+        
+        var level1Wraith = new ClassData { TemplateId = WraithClass.Id };
+        multiClass.AddClass(level1Wraith);
+        
+        var level3RingBearer = new ClassData { TemplateId = RingBearerClass.Id };
+        level3RingBearer.Variables.Level(3);
+        multiClass.AddClass(level3RingBearer);
+
+        MultiClassEntity.Variables.MultiClass(multiClass);
+        base.OnInitialized();
+    }
+}

@@ -8,7 +8,10 @@ namespace OpenRpg.Combat.Extensions
     public static class ActiveEffectsExtensions
     {
         public static bool IsPassiveEffect(this ActiveEffect activeEffect)
-        { return activeEffect.Effect.Frequency == 0; }
+        { return IsPassiveEffect(activeEffect.Effect); }
+        
+        public static bool IsPassiveEffect(this TimedEffect effect)
+        { return effect.Frequency == 0; }
         
         public static float GetStackedPotency(this ActiveEffect activeEffect)
         {

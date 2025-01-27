@@ -1,0 +1,154 @@
+﻿@page "/quests"
+
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Core.Services.Notifications
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Localization.Data.Repositories
+@using OpenRpg.Quests
+
+@inject INotifier Notifier
+@inject IRepository Repository
+@inject ILocaleRepository LocaleRepository;
+@inject ICloner Cloner;
+
+<div class="columns">
+    <div class="column is-one-fifth">
+        <ContentSidebar Title="Quests" Data="Repository.GetAll<Quest>()" SelectedItem="CurrentQuest"
+                    OnAdd="AddQuest" OnSelected="selected => SelectQuest(selected as Quest)">
+        </ContentSidebar>
+    </div>
+    <div class="column">
+        
+        <div class="is-rounded box">
+            <BasicDetailsEditor Data="CurrentQuest">
+                <AdditionalContent>
+                    <AssetCodeEditor Variables="CurrentQuest.Variables" DefaultAssetCode="@($"item-{CurrentQuest.Id}")" 
+                                     OnAssetCodeChanged="OnAssetCodeChanged"/>
+                </AdditionalContent>
+            </BasicDetailsEditor>
+        </div>
+
+        <div class="is-rounded box">
+            <LocaleDetails LocaleData="CurrentQuest"></LocaleDetails>
+        </div>
+        
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Objectives</h4>
+            <ObjectivesEditor Objectives="CurrentQuest.Objectives" OnUpdate="UpdateObjectives"></ObjectivesEditor>
+        </div>
+        
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Gifts</h4>
+            <RewardsEditor Rewards="CurrentQuest.Gifts" OnUpdate="UpdateGifts"></RewardsEditor>
+        </div>
+        
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Rewards</h4>
+            <RewardsEditor Rewards="CurrentQuest.Rewards" OnUpdate="UpdateRewards"></RewardsEditor>
+        </div>
+        
+        <div class="is-rounded box">
+            <h4 class="title is-4 has-text-dark">Requirements</h4>
+            <RequirementsEditor Requirements="CurrentQuest.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
+        </div>
+        
+        <div class="field is-grouped has-text-centered">
+            <p class="control">
+                <a class="button is-info" @onclick="CloneTemplate">
+                    Clone Item
+                </a>
+            </p>
+            <p class="control">
+                <a class="button is-danger" @onclick="DeleteTemplate">
+                    Delete Item
+                </a>
+            </p>
+        </div>
+        
+    </div>
+</div>
+
+@functions {
+    public Quest CurrentQuest;
+
+    protected override void OnInitialized()
+    {
+        SelectDefault();
+    }
+
+    public void SelectDefault()
+    {
+        var firstQuest = Repository.GetAll<Quest>().FirstOrDefault();
+        if (firstQuest != null)
+        { CurrentQuest = firstQuest; }
+        else
+        { AddQuest(); }
+    }
+
+    public void AddQuest()
+    {
+        CurrentQuest = new Quest();
+        CurrentQuest.Id = Repository.GetAll<Quest>().Count() + 1;
+        CurrentQuest.Variables.AssetCode($"quest-{CurrentQuest.Id}");
+        CurrentQuest.GenerateLocaleCodes(CurrentQuest.Variables.AssetCode());
+        Repository.Create(CurrentQuest);
+        StateHasChanged();
+    }
+
+    public void SelectQuest(Quest quest)
+    {
+        CurrentQuest = quest;
+        StateHasChanged();
+    }
+    
+    public async Task CloneTemplate()
+    {
+        var clone = Cloner.Clone(CurrentQuest);
+        clone.Id = Repository.GetAll<Quest>().Count() + 1;
+        clone.Variables.AssetCode($"{CurrentQuest.Variables.AssetCode()}-clone");
+        clone.GenerateLocaleCodes(clone.Variables.AssetCode());
+        Repository.Create<Quest>(clone);
+
+        await Notifier.ShowNotification($"Cloned Quest {CurrentQuest.Variables.AssetCode()}");
+        
+        CurrentQuest = clone;
+        StateHasChanged();
+    }
+    
+    public async Task DeleteTemplate()
+    {
+        Repository.Delete<Quest>(CurrentQuest.Id);
+        await Notifier.ShowNotification($"Deleted Item {CurrentQuest.Variables.AssetCode()}");
+        SelectDefault();
+    }
+    
+    public void UpdateObjectives(IReadOnlyCollection<Objective> updatedObjectives)
+    {
+        CurrentQuest.Objectives = updatedObjectives;
+        StateHasChanged();
+    }
+    
+    public void UpdateRewards(IReadOnlyCollection<Reward> updatedRewards)
+    {
+        CurrentQuest.Rewards = updatedRewards;
+        StateHasChanged();
+    }
+    
+    public void UpdateGifts(IReadOnlyCollection<Reward> updatedGifts)
+    {
+        CurrentQuest.Gifts = updatedGifts;
+        StateHasChanged();
+    }
+    
+    public void UpdateRequirements(IReadOnlyCollection<Requirement> updatedRequirements)
+    {
+        CurrentQuest.Requirements = updatedRequirements;
+        StateHasChanged();
+    }
+    
+    public void OnAssetCodeChanged(string newAssetCode)
+    { CurrentQuest.UpdateLocale(newAssetCode, LocaleRepository); }
+}

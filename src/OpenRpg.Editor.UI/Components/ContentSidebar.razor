@@ -1,0 +1,60 @@
+@using OpenRpg.Core.Common
+
+@typeparam TData where TData: IHasDataId, IHasLocaleDescription
+
+<Accordion Title="Template Filter" HeaderClasses="is-primary">
+    <div class="field">
+        <label class="label">Filter Content By Name</label>
+        <div class="control">
+            <input class="input" placeholder="Put in the partial name" @bind="SearchCriteria"/>
+        </div>
+    </div>
+</Accordion>
+
+<div class="box">
+    <div class="field">
+        <div class="control">
+            <button class="button is-primary is-leveled" @onclick="OnAdd">
+                <span class="icon is-small">
+                  <i class="fas fa-file-lines"></i>
+                </span>
+                <span>Add New</span>
+            </button>
+        </div>
+    </div>
+
+    <aside class="menu">
+        <ul class="menu-list">
+        @foreach (var element in GetFilteredData())
+        {
+            <li>
+                <a class="ace @(element.Id == SelectedItem.Id ? "is-active" : "")"
+                   @onclick="() => OnSelected.InvokeAsync(element)">
+                    <span class="tag is-pulled-left">@element.Id</span>
+                    @element.NameLocaleId
+                </a>
+            </li>
+        }
+        </ul>
+    </aside>
+</div>
+
+@functions {
+    [Parameter] public string Title { get; set; }
+    [Parameter] public IEnumerable<TData> Data { get; set; }
+    [Parameter] public IHasDataId SelectedItem { get; set; }
+    
+    [Parameter] public EventCallback OnAdd { get; set; }
+    [Parameter] public EventCallback<IHasDataId> OnSelected { get; set; }
+    
+    public string SearchCriteria { get; set; }
+    
+    public IEnumerable<TData> GetFilteredData()
+    {
+        if (string.IsNullOrEmpty(SearchCriteria))
+        { return Data; }
+
+        return Data
+            .Where(x => x.NameLocaleId.Contains(SearchCriteria, StringComparison.OrdinalIgnoreCase));
+    }
+}

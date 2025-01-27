@@ -1,0 +1,54 @@
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Fantasy.Requirements
+@using OpenRpg.Genres.Requirements
+@using OpenRpg.Localization.Data.Repositories
+@using OpenRpg.Core.Classes
+@using OpenRpg.Core.Extensions
+@using OpenRpg.Core.Races
+@using OpenRpg.Core.Templates
+@using OpenRpg.Localization.Data.Extensions
+
+@inject ILocaleRepository LocaleRepository
+@inject ITemplateAccessor TemplateAccessor
+@inject ICharacterRequirementChecker RequirementsChecker
+
+@if (Requirements != null && Requirements.Count > 0)
+{
+    <div class="content is-small has-text-centered">
+        @foreach (var requirement in Requirements)
+        {
+            <li style="list-style: none;">
+                <span class="@(IsRequirementMet(requirement) ? "has-text-success" : "has-text-danger")">
+                    @if (requirement.RequirementType == FantasyRequirementTypes.ClassRequirement)
+                    {<span>Level @(requirement.AssociatedValue) @(TemplateAccessor.GetClassTemplate(requirement.AssociatedId).NameLocaleId) Class Required</span>}
+                    else if (requirement.RequirementType == FantasyRequirementTypes.RaceRequirement)
+                    {<span>@(TemplateAccessor.GetRaceTemplate(requirement.AssociatedId).NameLocaleId) Race Required</span>}
+                    else if (requirement.RequirementType == FantasyRequirementTypes.StrengthRequirement)
+                    {<span>@(requirement.AssociatedValue) Strength Required</span>}
+                    @* Lots of other checks would go here *@
+                </span>
+            </li>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public IReadOnlyCollection<Requirement> Requirements { get; set; }
+
+    [Parameter]
+    public Character Character { get; set; }
+
+    private IDictionary<Requirement, bool> _requirementPassed = new Dictionary<Requirement, bool>();
+
+    public bool IsRequirementMet(Requirement requirement)
+    { return RequirementsChecker.IsRequirementMet(Character, requirement); }
+
+    public string GetRequirementText(int requirementType)
+    { return LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.RequirementTextKey, requirementType)); }
+}

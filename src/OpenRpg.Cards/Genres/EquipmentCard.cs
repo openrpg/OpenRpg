@@ -7,7 +7,7 @@ namespace OpenRpg.Cards.Genres
     {
         public override int CardType => CardTypes.EquipmentCard;
 
-        public EquipmentCard(IItem item) : base(item)
+        public EquipmentCard(Item item) : base(item)
         {
         }
     }

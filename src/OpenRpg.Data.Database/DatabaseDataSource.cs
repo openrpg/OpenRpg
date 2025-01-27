@@ -19,5 +19,8 @@ namespace OpenRpg.Data.Database
         public void Update<T>(T data, object id) => Connection.Update(data);
         public bool Delete<T>(object id) => Connection.Delete<T>(id) > 0;
         public bool Exists<T>(object id) => Get<T>(id) != null;
+
+        public void Dispose()
+        { Connection?.Dispose(); }
     }
 }
