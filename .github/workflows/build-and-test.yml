@@ -112,7 +112,7 @@ jobs:
       - name: Compress App
         shell: pwsh
         if: startsWith(github.event.ref, 'refs/tags/')
-        run: Compress-Archive -Path "editor/*" -Destination "/editor-${{env.BuildVersion}}.zip"
+        run: Compress-Archive -Path "/editor/*" -Destination "/editor-${{env.BuildVersion}}.zip"
 
       - name: Upload App Release
         uses: alexellis/upload-assets@0.2.2
