@@ -22,48 +22,44 @@
     </div>
     <div class="column">
         
-        <div class="is-rounded box">
+        <Accordion Title="Quest Template" IsExpanded="true">
             <BasicDetailsEditor Data="CurrentQuest">
                 <AdditionalContent>
                     <AssetCodeEditor Variables="CurrentQuest.Variables" DefaultAssetCode="@($"item-{CurrentQuest.Id}")" 
                                      OnAssetCodeChanged="OnAssetCodeChanged"/>
                 </AdditionalContent>
             </BasicDetailsEditor>
-        </div>
+        </Accordion>
 
-        <div class="is-rounded box">
+        <Accordion Title="Locale Details" IsExpanded="true">
             <LocaleDetails LocaleData="CurrentQuest"></LocaleDetails>
-        </div>
+        </Accordion>
         
-        <div class="is-rounded box">
-            <h4 class="title is-4 has-text-dark">Objectives</h4>
+        <Accordion Title="Quest Objectives" IsExpanded="true">
             <ObjectivesEditor Objectives="CurrentQuest.Objectives" OnUpdate="UpdateObjectives"></ObjectivesEditor>
-        </div>
+        </Accordion>
         
-        <div class="is-rounded box">
-            <h4 class="title is-4 has-text-dark">Gifts</h4>
+        <Accordion Title="Quest Gifts" IsExpanded="true">
             <RewardsEditor Rewards="CurrentQuest.Gifts" OnUpdate="UpdateGifts"></RewardsEditor>
-        </div>
+        </Accordion>
         
-        <div class="is-rounded box">
-            <h4 class="title is-4 has-text-dark">Rewards</h4>
+        <Accordion Title="Quest Rewards" IsExpanded="true">
             <RewardsEditor Rewards="CurrentQuest.Rewards" OnUpdate="UpdateRewards"></RewardsEditor>
-        </div>
+        </Accordion>
         
-        <div class="is-rounded box">
-            <h4 class="title is-4 has-text-dark">Requirements</h4>
+        <Accordion Title="Quest Requirements" IsExpanded="true">
             <RequirementsEditor Requirements="CurrentQuest.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
-        </div>
+        </Accordion>
         
         <div class="field is-grouped has-text-centered">
             <p class="control">
                 <a class="button is-info" @onclick="CloneTemplate">
-                    Clone Item
+                    Clone Template
                 </a>
             </p>
             <p class="control">
                 <a class="button is-danger" @onclick="DeleteTemplate">
-                    Delete Item
+                    Delete Template
                 </a>
             </p>
         </div>
