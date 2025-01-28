@@ -12,13 +12,25 @@ The framework tries to give you all the basic building blocks you need for any g
 There is a suite of `OpenRpg.Genre` based extensions which provide conventions on top of the basics to compose them in some "out the box" way for you to just get on and use stuff.
 
 ---
-## Important Bits
+## A Quick Rundown
 
-There are 3 super important bits to this framework which make it nice to use, there is a lot more to it in terms of models etc and you can read about them more in the examples/docs etc, but this is a quick rundown on the key parts of the system.
+The library has loads of pre-made models that act as data containers for you to layer on your own conventions via extension methods (see the `Genres` for examples).
+
+With this in mind at the highest level there are two main type of data:
+- Templates (Static data, created and stored with game data)
+- TemplateData (Runtime data, created during gameplay and stored with users data)
+
+These both are different sides of the same object and are often both needed to be used together within the game but are stored and handled differently.
+
+> For more information on this read the [Template Docs](docs/templates.md)
+
+### Important Objects
+
+There are 3 super important objects in this framework which make it nice to use, there is a lot more to it in terms of models etc and you can read about them more in the examples/docs etc, but this is a quick rundown on the key parts of the system.
 
 > There is FAR more to the system than these 3 bits but most of the other bits build on top of these bits so knowing this stuff shows the potential of how you can have really flexible and extensible data models to build off.
 
-### Effects
+#### Effects
 
 Effects can be applied to almost everything and are used to derive variables for things, for example:
 
@@ -40,13 +52,13 @@ var stats = new DefaultStats();
 statsPopulator.Populate(stats, new [] { raceEffects, classEffects });
 // stats contains variables str 11, dex 1, health 150
 ```
-> Normally you would use `IRaceTemplate` and `IClassTemplate` objects which wrap up the effects and subsequent related data for re-use via `IRepository` objects etc.
+> Normally you would use `RaceTemplate` and `ClassTemplate` objects which wrap up the effects and subsequent related data for re-use via `IRepository` objects etc.
 
 As you can see above an effect can describe any effect on an entity, and the effect types can be anything you want, the above examples are `EffectTypes` within the `OpenRpg.Genres.Fantasy` library, but each genre contains its own effect types and population logic to turn effects into variables.
 
-> For more info view the [Demo Section On Stats/Effects Here](https://openrpg.github.io/OpenRpg)
+> For more info view the [Demo Section On Stats/Effects](https://openrpg.github.io/OpenRpg)
 
-### Variables
+#### Variables
 
 Variables are fancy dictionaries that can notify you on changes and let you track any data you want for any scenario, the key convention we have here is that a singular `Variable` object just stores data against keys and we make it nicer to use via extension methods, here is an example:
 
@@ -77,11 +89,11 @@ gameVariables.LivesLeft(3);
 
 As shown above you can set these values however you want, **BUT** in a lot of cases you would want your values to be derived from `Effects` within contextual objects, i.e your characters `Stats` are just `IVariables<float>`, so you could use the `IStatPopulator` object to pass in all your effects and generate your stats for you, so that way when you equip a new item you can regenerate the stats and it will reflect the changes.
 
-> This approach also makes it easier to separate live data from static data, as the effects are often setup within templates which are static, so you only need to persist your live data when saving your data.
+> This approach also makes it easier to separate runtime data from static data, as the effects are often setup within templates which are static, so you only need to persist your live data when saving your data.
 
-### Requirements
+#### Requirements
 
-Requirements like effects can be applied to lots of things within the framework, be it `items`, `quests`, `effects` etc and the `Requirement` object provides a mechanism to stop the entity being able to use the related data unless the requirement is met, this is simplest to visualize with quests.
+Requirements like `Effects` can be applied to lots of things within the framework, be it `items`, `quests`, `effects` etc and the `Requirement` object provides a mechanism to stop the entity being able to use the related data unless the requirement is met, this is simplest to visualize with quests.
 
 ```csharp
 var someQuest = new DefaultQuest
@@ -110,13 +122,12 @@ As you can see above we create a quest that requires you to have a strength of a
 
 You can apply requirements to almost anything in the framework and then use an `IRequirementsChecker` to see if the current context meets the requirements.
 
-> For more information and examples check [The Items & Requirements Demo Page](https://openrpg.github.io/OpenRpg.Demos.Web)
+> For more information and examples check [The Items & Requirements Demo Page](https://openrpg.github.io/OpenRpg)
 ---
 
 ## HALP! I NEED MORE INFORMATION?
 
 You can join the [discord server](https://discord.gg/nKejjgT) via the `Chat` button at the top or you can go over to the web demos or local docs:
-- [OpenRpg.Demos.Web](https://openrpg.github.io/OpenRpg.Demos.Web)
 - [Local Docs](docs/core.md)
 
 ## Framework Components / Related Libs
@@ -132,17 +143,17 @@ There are a few other related libraries/applications which may be of use, such a
 - [OpenRpg.Cards](docs/core.md) Contains models for card based games where you would wrap up items, quests, abilities etc as cards for the player to use.
 
 ### Genres/Extensions
-- [OpenRpg.Genres](https://github.com/openrpg/OpenRpg.Genres) Contains conventions and extensions for custom genres to build off
-- [OpenRpg.Genres.Fantasy](https://github.com/openrpg/OpenRpg.Genres) Contains common sci-fi types and data
-- [OpenRpg.Genres.SciFi](https://github.com/openrpg/OpenRpg.Genres) Contains common fantasy types and data
+- [OpenRpg.Genres](docs/genres.md) Contains conventions and extensions for custom genres to build off
+- [OpenRpg.Genres.Fantasy](docs/genres.md) Contains common fantasy types and data
+- [OpenRpg.Genres.SciFi](docs/genres.md) Contains common sci-fi types and data
 - [OpenRpg.Genres.GameDevSim](https://github.com/openrpg/OpenRpg.Genres.GameDevSim) Contains game dev sim related effects and models
 - [OpenRpg.Genres.Tactics](https://github.com/openrpg/OpenRpg.Genres.Tactics) Contains models and data related to strat rpg style games
 - [OpenRpg.Genres.TowerDefense](https://github.com/openrpg/OpenRpg.Genres.TowerDefense) Contains models and data related to tower defense style games
-- [OpenRpg.AdviceEngine](https://github.com/openrpg/OpenRpg.AdviceEngine) A utility based AI framework for use with OpenRpg models/data
+- [OpenRpg.AdviceEngine](docs/advice-engine.md) A utility based AI framework for use with OpenRpg models/data
 
 ### Applications
-- [OpenRpg.Editor](https://github.com/openrpg/OpenRpg.Editor) A simple electron.net based editor for items, classes, races etc
-- [OpenRpg.Demos.Web](https://github.com/openrpg/OpenRpg.Demos.Web) A Blazor application showing use cases for all the above functionality
+- [OpenRpg.Editor](docs/editor.md) A simple electron.net based editor for items, classes, races etc
+- [OpenRpg.Demos.Web](https://openrpg.github.io/OpenRpg) A Blazor application showing use cases for all the above functionality
 
 ---
 
@@ -152,11 +163,11 @@ This project began after I had multiple prototypes which were all some form of R
 
 So hopefully the same models/data and approaches can be of use to anyone else wanting to just take out the box data models/logic for common RPG data and just build on it.
 
-[build-status-image]: https://ci.appveyor.com/api/projects/status/6atqlmblut1x386w?svg=true
-[build-status-url]: https://ci.appveyor.com/project/grofit/openrpg/branch/master
+[build-status-image]: https://github.com/openrpg/OpenRpg/actions/workflows/build-and-test.yml/badge.svg
+[build-status-url]: https://github.com/openrpg/OpenRpg/actions/workflows/build-and-test.yml
 [nuget-image]: https://img.shields.io/nuget/v/openrpg.core.svg
 [nuget-url]: https://www.nuget.org/packages/OpenRpg.Core/
 [discord-image]: https://img.shields.io/discord/488609938399297536.svg
 [discord-url]: https://discord.gg/nKejjgT
 [demo-image]: https://img.shields.io/badge/Demo-Site-informational.svg
-[demo-url]: https://openrpg.github.io/OpenRpg.Demos.Web/
+[demo-url]: https://openrpg.github.io/OpenRpg/

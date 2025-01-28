@@ -22,40 +22,36 @@
     </div>
     <div class="column">
         
-        <div class="is-rounded box">
-            <div class="is-rounded">
-                <BasicDetailsEditor Data="CurrentRaceTemplate">
-                    <AdditionalContent>
-                        <AssetCodeEditor Variables="CurrentRaceTemplate.Variables" DefaultAssetCode="@($"race-{CurrentRaceTemplate.Id}")"
-                                         OnAssetCodeChanged="OnAssetCodeChanged"/>
-                    </AdditionalContent>
-                </BasicDetailsEditor>
-            </div>
-        </div>
+        <Accordion Title="Race Template" IsExpanded="true">
+            <BasicDetailsEditor Data="CurrentRaceTemplate">
+                <AdditionalContent>
+                    <AssetCodeEditor Variables="CurrentRaceTemplate.Variables" DefaultAssetCode="@($"race-{CurrentRaceTemplate.Id}")"
+                                     OnAssetCodeChanged="OnAssetCodeChanged"/>
+                </AdditionalContent>
+            </BasicDetailsEditor>
+        </Accordion>
 
-        <div class="is-rounded box">
+        <Accordion Title="Locale Details" IsExpanded="true">
             <LocaleDetails LocaleData="CurrentRaceTemplate"></LocaleDetails>
-        </div>
+        </Accordion>
         
-        <div class="is-rounded box">
-            <h4 class="title is-4 has-text-dark">Effects</h4>
+        <Accordion Title="Race Effects" IsExpanded="true">
             <EffectsEditor Effects="CurrentRaceTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
-        </div>
+        </Accordion>
         
-        <div class="is-rounded box">
-            <h4 class="title is-4 has-text-dark">Requirements</h4>
+        <Accordion Title="Race Requirements" IsExpanded="true">
             <RequirementsEditor Requirements="CurrentRaceTemplate.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
-        </div>
+        </Accordion>
         
         <div class="field is-grouped has-text-centered">
             <p class="control">
                 <a class="button is-info" @onclick="CloneTemplate">
-                    Clone Item
+                    Clone Template
                 </a>
             </p>
             <p class="control">
                 <a class="button is-danger" @onclick="DeleteTemplate">
-                    Delete Item
+                    Delete Template
                 </a>
             </p>
         </div>

@@ -24,38 +24,36 @@
     </div>
     <div class="column">
         
-        <div class="is-rounded box">
+        <Accordion Title="Class Template" IsExpanded="true">
             <BasicDetailsEditor Data="CurrentClassTemplate">
                 <AdditionalContent>
                     <AssetCodeEditor Variables="CurrentClassTemplate.Variables" DefaultAssetCode="@($"class-{CurrentClassTemplate.Id}")" 
                                      OnAssetCodeChanged="OnAssetCodeChanged"/>
                 </AdditionalContent>
             </BasicDetailsEditor>
-        </div>
+        </Accordion>
 
-        <div class="is-rounded box">
+        <Accordion Title="Locale Details" IsExpanded="true">
             <LocaleDetails LocaleData="CurrentClassTemplate"></LocaleDetails>
-        </div>
+        </Accordion>
         
-        <div class="is-rounded box">
-            <h4 class="title is-4 has-text-dark">Effects</h4>
+        <Accordion Title="Class Effects" IsExpanded="true">
             <EffectsEditor Effects="CurrentClassTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
-        </div>
+        </Accordion>
         
-        <div class="is-rounded box">
-            <h4 class="title is-4 has-text-dark">Requirements</h4>
+        <Accordion Title="Class Requirements" IsExpanded="true">
             <RequirementsEditor Requirements="CurrentClassTemplate.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
-        </div>
+        </Accordion>
         
         <div class="field is-grouped has-text-centered">
             <p class="control">
                 <a class="button is-info" @onclick="CloneTemplate">
-                    Clone Item
+                    Clone Template
                 </a>
             </p>
             <p class="control">
                 <a class="button is-danger" @onclick="DeleteTemplate">
-                    Delete Item
+                    Delete Template
                 </a>
             </p>
         </div>

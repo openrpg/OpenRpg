@@ -1,12 +1,20 @@
-# OpenRpg Editor
+# OpenRpg Data Editor
 
-The OpenRpg editor is a simple editor to allow you to create and edit content for your OpenRpg games/apps.
+![Editor Example](images/editor-item-example.png)
 
-## How to use it?
+This application provides you a streamlined way to create and store `Templates` for your games/apps.
 
-You open the editor and create or open a project, if you do not have a project just create a new one and it will automatically setup everything needed for you.
+## How do I use it?
 
-You can then use the editor to create/edit templates and locale information, then you can save all the changes using the Save button at the top.
+If you go to the latest github release you should see an option to download the `editor-app` there, which will be a zip file containing the application.
+
+Run the `OpenRpg.Editor.exe` which will ask you to Create/Load a project, for now you wont have a project but just go ahead and make a folder where you want to store your project data and it will automatically create a few things:
+- `project.json` - Contains configuration data
+- `/assets` - Optional folder for providing visual assets (i.e sword icon shown in screenshot)
+- `/templates` - Folder for storing template `json` files
+- `/locales` - Folder for storing locale strings related to templates
+
+You can then use the editor to create/edit templates and locale information, then you can save all the changes using the `Save` button at the top.
 
 ## FAQs
 
@@ -33,4 +41,4 @@ This functionality may get added but due to use using potentially large data set
 > This may be updated in the future to auto save every `n` minutes or something
 
 ### How do I add my own functionality to it?
-Currently you fork it and make your own changes, but going forward we will try to look into supporting a plugin based mechanism to let you write plugins that can just be included.
+You fork it and make your own changes, but going forward we will try to look into supporting a plugin based mechanism to let you write plugins that can just be included, as well as configure what genres should be used, as right now it only uses the `Fantasy` genre out the box.
