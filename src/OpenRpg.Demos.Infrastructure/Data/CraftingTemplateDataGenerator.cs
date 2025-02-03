@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Requirements;
 using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.TradeSkills;
@@ -33,7 +34,7 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
             SkillDifficulty = 0,
             TimeToComplete = 2.0f,
             InputItems = new List<TradeSkillItemEntry>() { inputItemEntry },
-            OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry }
+            OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry },
         };
     }
 
@@ -51,10 +52,14 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
         {
             Id = ItemCraftingTemplateLookups.CopperSword,
             SkillType = FantasyTradeSkillTypes.Smithing,
-            SkillDifficulty = 0,
+            SkillDifficulty = 10,
             TimeToComplete = 2.0f,
             InputItems = new List<TradeSkillItemEntry>() { inputItem1Entry, inputItem2Entry },
-            OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry }
+            OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry },
+            Requirements = new []
+            {
+                new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, AssociatedId = FantasyTradeSkillTypes.Smithing, AssociatedValue = 5 }
+            }
         };
     }
 }
