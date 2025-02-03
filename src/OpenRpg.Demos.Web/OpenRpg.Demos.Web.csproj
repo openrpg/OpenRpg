@@ -34,10 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\items\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\OpenRpg.Demos.Infrastructure\OpenRpg.Demos.Infrastructure.csproj" />
   </ItemGroup>
 
