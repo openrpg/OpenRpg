@@ -22,11 +22,11 @@ namespace OpenRpg.Demos.Infrastructure.Data
         {
             var effects = new[]
             {
-                new Effect {Potency = 2, EffectType = FantasyEffectTypes.StrengthBonusAmount},
-                new Effect {Potency = 2, EffectType = FantasyEffectTypes.ConstitutionBonusAmount},
-                new Effect {Potency = 5, EffectType = FantasyEffectTypes.DamageBonusAmount},
-                new Effect {Potency = 5, EffectType = FantasyEffectTypes.DefenseBonusAmount},
-                new Effect {Potency = 30, EffectType = FantasyEffectTypes.HealthBonusAmount}
+                new StaticEffect {Potency = 2, EffectType = FantasyEffectTypes.StrengthBonusAmount},
+                new StaticEffect {Potency = 2, EffectType = FantasyEffectTypes.ConstitutionBonusAmount},
+                new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DamageBonusAmount},
+                new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DefenseBonusAmount},
+                new StaticEffect {Potency = 30, EffectType = FantasyEffectTypes.HealthBonusAmount}
             };
 
             var classTemplate = new ClassTemplate
@@ -44,10 +44,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
         {
             var effects = new[]
             {
-                new Effect {Potency = 4, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
-                new Effect {Potency = 10, EffectType = FantasyEffectTypes.DarkDamageAmount},
-                new Effect {Potency = 10, EffectType = FantasyEffectTypes.DarkDefenseAmount},
-                new Effect {Potency = 30, EffectType = FantasyEffectTypes.MagicBonusAmount}
+                new StaticEffect {Potency = 4, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.DarkDamageAmount},
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.DarkDefenseAmount},
+                new StaticEffect {Potency = 30, EffectType = FantasyEffectTypes.MagicBonusAmount}
             };
 
             var classTemplate = new ClassTemplate

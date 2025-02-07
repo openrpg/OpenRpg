@@ -39,7 +39,7 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators
             };
         }
 
-        public static float GetElementalModBonus(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects,
+        public static float GetElementalModBonus(EntityStatsVariables stats, IReadOnlyCollection<StaticEffect> activeEffects,
             IReadOnlyCollection<IVariables> relatedVars)
         { return stats.Intelligence() / 100.0f;}
     }

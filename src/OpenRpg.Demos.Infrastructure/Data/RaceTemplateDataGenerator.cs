@@ -23,13 +23,13 @@ namespace OpenRpg.Demos.Infrastructure.Data
         {
             var effects = new[]
             {
-                new Effect {Potency = 10, EffectType = FantasyEffectTypes.AllAttributeBonusAmount},
-                new Effect {Potency = 8, EffectType = FantasyEffectTypes.DamageBonusAmount},
-                new Effect {Potency = 8, EffectType = FantasyEffectTypes.DefenseBonusAmount},
-                new Effect {Potency = 1, EffectType = FantasyEffectTypes.DarkDamageAmount},
-                new Effect {Potency = 5, EffectType = FantasyEffectTypes.DarkDefenseAmount},
-                new Effect {Potency = 80, EffectType = FantasyEffectTypes.HealthBonusAmount},
-                new Effect {Potency = 10, EffectType = FantasyEffectTypes.MagicBonusAmount}
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.AllAttributeBonusAmount},
+                new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.DamageBonusAmount},
+                new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.DefenseBonusAmount},
+                new StaticEffect {Potency = 1, EffectType = FantasyEffectTypes.DarkDamageAmount},
+                new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DarkDefenseAmount},
+                new StaticEffect {Potency = 80, EffectType = FantasyEffectTypes.HealthBonusAmount},
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.MagicBonusAmount}
             };
 
             var raceTemplate = new RaceTemplate
@@ -47,18 +47,18 @@ namespace OpenRpg.Demos.Infrastructure.Data
         {
             var effects = new[]
             {
-                new Effect {Potency = 8, EffectType = FantasyEffectTypes.StrengthBonusAmount},
-                new Effect {Potency = 12, EffectType = FantasyEffectTypes.DexterityBonusAmount},
-                new Effect {Potency = 8, EffectType = FantasyEffectTypes.ConstitutionBonusAmount},
-                new Effect {Potency = 12, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
-                new Effect {Potency = 10, EffectType = FantasyEffectTypes.WisdomBonusAmount},
-                new Effect {Potency = 10, EffectType = FantasyEffectTypes.CharismaBonusAmount},
-                new Effect {Potency = 8, EffectType = FantasyEffectTypes.DamageBonusAmount},
-                new Effect {Potency = 7, EffectType = FantasyEffectTypes.DefenseBonusAmount},
-                new Effect {Potency = 5, EffectType = FantasyEffectTypes.DarkDamageAmount},
-                new Effect {Potency = 10, EffectType = FantasyEffectTypes.DarkDefenseAmount},
-                new Effect {Potency = 70, EffectType = FantasyEffectTypes.HealthBonusAmount},
-                new Effect {Potency = 30, EffectType = FantasyEffectTypes.MagicBonusAmount}
+                new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.StrengthBonusAmount},
+                new StaticEffect {Potency = 12, EffectType = FantasyEffectTypes.DexterityBonusAmount},
+                new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.ConstitutionBonusAmount},
+                new StaticEffect {Potency = 12, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.WisdomBonusAmount},
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.CharismaBonusAmount},
+                new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.DamageBonusAmount},
+                new StaticEffect {Potency = 7, EffectType = FantasyEffectTypes.DefenseBonusAmount},
+                new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DarkDamageAmount},
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.DarkDefenseAmount},
+                new StaticEffect {Potency = 70, EffectType = FantasyEffectTypes.HealthBonusAmount},
+                new StaticEffect {Potency = 30, EffectType = FantasyEffectTypes.MagicBonusAmount}
             };
 
             var raceTemplate = new RaceTemplate
@@ -76,16 +76,16 @@ namespace OpenRpg.Demos.Infrastructure.Data
         {
             var effects = new[]
             {
-                new Effect {Potency = 12, EffectType = FantasyEffectTypes.StrengthBonusAmount},
-                new Effect {Potency = 8, EffectType = FantasyEffectTypes.DexterityBonusAmount},
-                new Effect {Potency = 12, EffectType = FantasyEffectTypes.ConstitutionBonusAmount},
-                new Effect {Potency = 10, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
-                new Effect {Potency = 10, EffectType = FantasyEffectTypes.WisdomBonusAmount},
-                new Effect {Potency = 8, EffectType = FantasyEffectTypes.CharismaBonusAmount},
-                new Effect {Potency = 8, EffectType = FantasyEffectTypes.DamageBonusAmount},
-                new Effect {Potency = 10, EffectType = FantasyEffectTypes.DefenseBonusAmount},
-                new Effect {Potency = 100, EffectType = FantasyEffectTypes.HealthBonusAmount},
-                new Effect {Potency = -1, EffectType = FantasyEffectTypes.DarkDefenseAmount},
+                new StaticEffect {Potency = 12, EffectType = FantasyEffectTypes.StrengthBonusAmount},
+                new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.DexterityBonusAmount},
+                new StaticEffect {Potency = 12, EffectType = FantasyEffectTypes.ConstitutionBonusAmount},
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.WisdomBonusAmount},
+                new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.CharismaBonusAmount},
+                new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.DamageBonusAmount},
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.DefenseBonusAmount},
+                new StaticEffect {Potency = 100, EffectType = FantasyEffectTypes.HealthBonusAmount},
+                new StaticEffect {Potency = -1, EffectType = FantasyEffectTypes.DarkDefenseAmount},
 
             };
 

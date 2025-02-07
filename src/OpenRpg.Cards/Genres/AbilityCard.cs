@@ -10,7 +10,7 @@ namespace OpenRpg.Cards.Genres
     public class AbilityCard : GenericDataCard<Ability>
     {
         public override int CardType => CardTypes.AbilityCard;
-        public override IReadOnlyCollection<Effect> Effects { get; } = Array.Empty<Effect>();
+        public override IReadOnlyCollection<StaticEffect> Effects { get; } = Array.Empty<StaticEffect>();
 
         public AbilityCard(Ability ability) : base(ability)
         {}

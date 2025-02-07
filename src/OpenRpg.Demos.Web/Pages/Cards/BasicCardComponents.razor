@@ -115,7 +115,7 @@
             ItemType = FantasyItemTypes.GenericWeapon,
             Effects = new []
             {
-                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
             }
         };
         template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
@@ -148,7 +148,7 @@
             DescriptionLocaleId = "Increases the targets strength by 5",
             Effects = new[]
             {
-                new Effect
+                new StaticEffect
                 {
                     Potency = 5,
                     EffectType = FantasyEffectTypes.StrengthBonusAmount

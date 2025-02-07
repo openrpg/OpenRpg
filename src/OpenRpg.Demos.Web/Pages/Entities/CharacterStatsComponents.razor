@@ -239,26 +239,26 @@
     {
         var raceEffects = new[]
         {
-          new Effect {Potency = 8, EffectType = FantasyEffectTypes.StrengthBonusAmount},
-          new Effect {Potency = 11, EffectType = FantasyEffectTypes.DexterityBonusAmount},
-          new Effect {Potency = 12, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
-          new Effect {Potency = 12, EffectType = FantasyEffectTypes.WisdomBonusAmount},
-          new Effect {Potency = 12, EffectType = FantasyEffectTypes.CharismaBonusAmount},
-          new Effect {Potency = 6, EffectType = FantasyEffectTypes.DamageBonusAmount},
-          new Effect {Potency = 5, EffectType = FantasyEffectTypes.DefenseBonusAmount},
-          new Effect {Potency = 1, EffectType = FantasyEffectTypes.DarkDamageAmount},
-          new Effect {Potency = 5, EffectType = FantasyEffectTypes.DarkDefenseAmount},
-          new Effect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount},
-          new Effect {Potency = 10, EffectType = FantasyEffectTypes.MagicBonusAmount}
+          new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.StrengthBonusAmount},
+          new StaticEffect {Potency = 11, EffectType = FantasyEffectTypes.DexterityBonusAmount},
+          new StaticEffect {Potency = 12, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
+          new StaticEffect {Potency = 12, EffectType = FantasyEffectTypes.WisdomBonusAmount},
+          new StaticEffect {Potency = 12, EffectType = FantasyEffectTypes.CharismaBonusAmount},
+          new StaticEffect {Potency = 6, EffectType = FantasyEffectTypes.DamageBonusAmount},
+          new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DefenseBonusAmount},
+          new StaticEffect {Potency = 1, EffectType = FantasyEffectTypes.DarkDamageAmount},
+          new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DarkDefenseAmount},
+          new StaticEffect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount},
+          new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.MagicBonusAmount}
         };
 
         var classEffects = new[]
         {
-          new Effect {Potency = 3, EffectType = FantasyEffectTypes.StrengthBonusAmount},
-          new Effect {Potency = 1, EffectType = FantasyEffectTypes.DexterityBonusAmount},
-          new Effect {Potency = 4, EffectType = FantasyEffectTypes.DamageBonusAmount},
-          new Effect {Potency = 3, EffectType = FantasyEffectTypes.DefenseBonusAmount},
-          new Effect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount}
+          new StaticEffect {Potency = 3, EffectType = FantasyEffectTypes.StrengthBonusAmount},
+          new StaticEffect {Potency = 1, EffectType = FantasyEffectTypes.DexterityBonusAmount},
+          new StaticEffect {Potency = 4, EffectType = FantasyEffectTypes.DamageBonusAmount},
+          new StaticEffect {Potency = 3, EffectType = FantasyEffectTypes.DefenseBonusAmount},
+          new StaticEffect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount}
         };
 
         var hobbitRace = new RaceTemplate { NameLocaleId = "Hobbit", Effects = raceEffects };

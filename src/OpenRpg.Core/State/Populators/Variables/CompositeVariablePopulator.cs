@@ -15,7 +15,7 @@ namespace OpenRpg.Core.State.Populators.Variables
         protected CompositeVariablePopulator()
         {}
 
-        public void Populate(T vars, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public void Populate(T vars, IReadOnlyCollection<StaticEffect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             foreach (var populator in PartialPopulators.OrderByDescending(x => x.Priority))
             { populator.Populate(vars, activeEffects, relatedVars); }

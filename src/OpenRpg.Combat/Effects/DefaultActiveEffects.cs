@@ -18,29 +18,29 @@ namespace OpenRpg.Combat.Effects
 
         public IReadOnlyCollection<ActiveEffect> ActiveEffects => InternalActiveEffects.Values;
 
-        public IReadOnlyCollection<Effect> Effects => InternalActiveEffects.Values
+        public IReadOnlyCollection<StaticEffect> Effects => InternalActiveEffects.Values
                 .Where(x => x.IsPassiveEffect())
                 .Select(x => x.ToEffect())
                 .ToArray();
         
-        public bool AddEffect(TimedEffect effect)
+        public bool AddEffect(TimedStaticEffect staticEffect)
         {
-            var hasEffect = InternalActiveEffects.ContainsKey(effect.Id);
-            var canBeStacked = effect.MaxStack > 1;
+            var hasEffect = InternalActiveEffects.ContainsKey(staticEffect.Id);
+            var canBeStacked = staticEffect.MaxStack > 1;
             
             if (hasEffect)
             {
-                var activeEffect = InternalActiveEffects[effect.Id];
+                var activeEffect = InternalActiveEffects[staticEffect.Id];
                 activeEffect.ActiveTime = 0;
                 
-                if (canBeStacked && activeEffect.Stacks < effect.MaxStack)
+                if (canBeStacked && activeEffect.Stacks < staticEffect.MaxStack)
                 { activeEffect.Stacks++; }
 
                 return true;
             }
             
-            var newActiveEffect = new ActiveEffect(effect);
-            InternalActiveEffects.Add(effect.Id, newActiveEffect); 
+            var newActiveEffect = new ActiveEffect(staticEffect);
+            InternalActiveEffects.Add(staticEffect.Id, newActiveEffect); 
             EffectAdded?.Invoke(this, newActiveEffect);
             return true;
         }
@@ -52,22 +52,22 @@ namespace OpenRpg.Combat.Effects
             {
                 var activeEffect = InternalActiveEffects[key];
            
-                if (activeEffect.Effect.Frequency > 0)
+                if (activeEffect.StaticEffect.Frequency > 0)
                 {
-                    var elapsedTimeToApply = elapsedTime + activeEffect.ActiveTime <= activeEffect.Effect.Duration 
+                    var elapsedTimeToApply = elapsedTime + activeEffect.ActiveTime <= activeEffect.StaticEffect.Duration 
                         ? elapsedTime 
-                        : activeEffect.Effect.Duration - activeEffect.ActiveTime;
+                        : activeEffect.StaticEffect.Duration - activeEffect.ActiveTime;
                     
                     activeEffect.TimeSinceTick += elapsedTimeToApply;
-                    while (activeEffect.TimeSinceTick >= activeEffect.Effect.Frequency)
+                    while (activeEffect.TimeSinceTick >= activeEffect.StaticEffect.Frequency)
                     {
                         EffectTriggered?.Invoke(this, activeEffect);
-                        activeEffect.TimeSinceTick -= activeEffect.Effect.Frequency;
+                        activeEffect.TimeSinceTick -= activeEffect.StaticEffect.Frequency;
                     }
                 }
                 
                 activeEffect.ActiveTime += elapsedTime;
-                if (activeEffect.ActiveTime >= activeEffect.Effect.Duration)
+                if (activeEffect.ActiveTime >= activeEffect.StaticEffect.Duration)
                 {
                     InternalActiveEffects.Remove(key);
                     EffectExpired?.Invoke(this, activeEffect);

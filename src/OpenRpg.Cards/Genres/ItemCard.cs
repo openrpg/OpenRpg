@@ -19,6 +19,6 @@ namespace OpenRpg.Cards.Genres
 
         public string NameLocaleId => Data.Template.NameLocaleId;
         public string DescriptionLocaleId => Data.Template.DescriptionLocaleId;
-        public IReadOnlyCollection<Effect> Effects => Data.GetItemEffects();
+        public IReadOnlyCollection<StaticEffect> Effects => Data.GetItemEffects();
     }
 }

@@ -142,7 +142,7 @@
             ItemType = FantasyItemTypes.GenericWeapon,
             Effects = new []
             {
-                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
             }
         };
         template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
@@ -156,11 +156,11 @@
     {
         var swordEffects = new[]
         {
-            new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 765.5f },
-            new Effect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 20.0f },
-            new Effect { EffectType = FantasyEffectTypes.DamageBonusPercentage, Potency = 10.0f },
-            new Effect { EffectType = FantasyEffectTypes.ConstitutionBonusAmount, Potency = 15.0f },
-            new Effect { EffectType = FantasyEffectTypes.DarkDefenseAmount, Potency = 15.0f }
+            new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 765.5f },
+            new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 20.0f },
+            new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusPercentage, Potency = 10.0f },
+            new StaticEffect { EffectType = FantasyEffectTypes.ConstitutionBonusAmount, Potency = 15.0f },
+            new StaticEffect { EffectType = FantasyEffectTypes.DarkDefenseAmount, Potency = 15.0f }
         };
 
         var template = new ItemTemplate

@@ -23,12 +23,12 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators
             };
         }
         
-        public static int GetMiscHealthBonus(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public static int GetMiscHealthBonus(EntityStatsVariables stats, IReadOnlyCollection<StaticEffect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             return stats.Constitution() * 5;
         }
         
-        public static int GetMiscMagicBonus(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public static int GetMiscMagicBonus(EntityStatsVariables stats, IReadOnlyCollection<StaticEffect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             return stats.Intelligence() * 5;
         }

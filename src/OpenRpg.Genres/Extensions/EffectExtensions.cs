@@ -16,7 +16,7 @@ namespace OpenRpg.Genres.Extensions
         /// <param name="percentageBonusType">The effect type signifying the percentage amount</param>
         /// <param name="miscBonus">Any misc bonus to apply to the calculation (calculated before percentage applied)</param>
         /// <returns>The total value based off effects of the given types</returns>
-        public static float CalculateStatValueFor(this IReadOnlyCollection<Effect> effects, int amountBonusType, int percentageBonusType, int miscBonus = 0)
+        public static float CalculateStatValueFor(this IReadOnlyCollection<StaticEffect> effects, int amountBonusType, int percentageBonusType, int miscBonus = 0)
         {
             var totalAmount = effects.GetPotencyFor(amountBonusType) + miscBonus;
             if(totalAmount == 0) { return 0; }
@@ -34,7 +34,7 @@ namespace OpenRpg.Genres.Extensions
         /// <param name="attributePercentageType"></param>
         /// <param name="miscBonus"></param>
         /// <returns></returns>
-        public static float CalculateAttributeValueFor(this IReadOnlyCollection<Effect> activeEffects, int attributeAmountType, int attributePercentageType, int miscBonus = 0)
+        public static float CalculateAttributeValueFor(this IReadOnlyCollection<StaticEffect> activeEffects, int attributeAmountType, int attributePercentageType, int miscBonus = 0)
         {
             var totalAmount = activeEffects.GetPotencyFor(attributeAmountType, GenreEffectTypes.AllAttributeBonusAmount) + miscBonus;
             if(totalAmount == 0) { return 0; }

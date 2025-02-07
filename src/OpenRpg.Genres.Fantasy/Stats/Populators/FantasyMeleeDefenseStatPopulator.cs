@@ -33,16 +33,16 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators
             };
         }
 
-        public static float GetBluntModBonus(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects,
+        public static float GetBluntModBonus(EntityStatsVariables stats, IReadOnlyCollection<StaticEffect> activeEffects,
             IReadOnlyCollection<IVariables> relatedVars)
         { return stats.Strength() / 100.0f; }
 
-        public static float GetPiercingModBonus(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects,
+        public static float GetPiercingModBonus(EntityStatsVariables stats, IReadOnlyCollection<StaticEffect> activeEffects,
             IReadOnlyCollection<IVariables> relatedVars)
         { return stats.Dexterity() / 100.0f; }
 
         public static float GetSlashingOrUnarmedModBonus(EntityStatsVariables stats,
-            IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+            IReadOnlyCollection<StaticEffect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             var strengthBonus = stats.Strength() / 200.0f;
             var dexterityBonus = stats.Dexterity() / 200.0f;

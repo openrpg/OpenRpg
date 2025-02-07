@@ -38,7 +38,7 @@
 
 @code {
     [Parameter]
-    public IReadOnlyCollection<Effect> Effects { get; set; }
+    public IReadOnlyCollection<StaticEffect> Effects { get; set; }
 
     [Parameter]
     public Character Character { get; set; }
@@ -71,26 +71,26 @@
     public string GetPotencySymbol(float potency)
     { return potency > 0 ? "+" : "-"; }
 
-    public bool HasRequirements(Effect effect)
+    public bool HasRequirements(StaticEffect staticEffect)
     {
-        if (effect.Requirements == null)
+        if (staticEffect.Requirements == null)
         { return false;}
         
-        if(!effect.Requirements.Any())
+        if(!staticEffect.Requirements.Any())
         { return false; }
 
         return true;
     }
 
-    public bool AreAllRequirementsMet(Effect effect)
+    public bool AreAllRequirementsMet(StaticEffect staticEffect)
     {
         if(Character == null)
         { return true; }
 
-        if(!HasRequirements(effect))
+        if(!HasRequirements(staticEffect))
         { return true; }
 
-        return RequirementsChecker.AreRequirementsMet(Character, effect);
+        return RequirementsChecker.AreRequirementsMet(Character, staticEffect);
     }
 
     public bool IsRequirementMet(Requirement requirement)

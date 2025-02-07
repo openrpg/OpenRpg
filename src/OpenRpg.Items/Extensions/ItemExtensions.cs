@@ -52,7 +52,7 @@ namespace OpenRpg.Items.Extensions
             };
         }
         
-        public static IReadOnlyCollection<Effect> GetItemEffects(this ItemData itemData, ItemTemplate itemTemplate)
+        public static IReadOnlyCollection<StaticEffect> GetItemEffects(this ItemData itemData, ItemTemplate itemTemplate)
         {
             if(!itemData.Modifications.Any())
             { return itemTemplate.Effects; }
@@ -60,7 +60,7 @@ namespace OpenRpg.Items.Extensions
             return itemTemplate.Effects.Union(itemData.Modifications.SelectMany(x => x.Effects)).ToArray();
         }
         
-        public static IReadOnlyCollection<Effect> GetItemEffects(this Item item)
+        public static IReadOnlyCollection<StaticEffect> GetItemEffects(this Item item)
         {
             if(!item.Data.Modifications.Any())
             { return item.Template.Effects; }

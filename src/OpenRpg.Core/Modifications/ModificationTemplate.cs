@@ -11,7 +11,7 @@ namespace OpenRpg.Core.Modifications
         public string NameLocaleId { get; set; }
         public string DescriptionLocaleId { get; set; }
 
-        public IReadOnlyCollection<Effect> Effects { get; set; } = Array.Empty<Effect>();
+        public IReadOnlyCollection<StaticEffect> Effects { get; set; } = Array.Empty<StaticEffect>();
         public int ModificationType { get; set; }
     }
 }

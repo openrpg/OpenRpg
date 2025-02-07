@@ -12,7 +12,7 @@ namespace OpenRpg.Genres.Populators.Entity.Stats
     {
         public int Priority => 10;
 
-        public float ComputeTotal(IReadOnlyCollection<Effect> effects)
+        public float ComputeTotal(IReadOnlyCollection<StaticEffect> effects)
         {
             var amount = effects.GetPotencyFor(GenreEffectTypes.DefenseBonusAmount);
             var percentage = effects.GetPotencyFor(GenreEffectTypes.DefenseBonusPercentage);
@@ -24,7 +24,7 @@ namespace OpenRpg.Genres.Populators.Entity.Stats
             return amount + addition;
         }
         
-        public void Populate(EntityStatsVariables stats, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public void Populate(EntityStatsVariables stats, IReadOnlyCollection<StaticEffect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             var totalValue = ComputeTotal(activeEffects);
             stats.Defense(totalValue);

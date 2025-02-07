@@ -20,7 +20,7 @@ namespace OpenRpg.Cards.Genres.Conventions
 
         public virtual string NameLocaleId => Data.NameLocaleId;
         public virtual string DescriptionLocaleId => Data.DescriptionLocaleId;
-        public abstract IReadOnlyCollection<Effect> Effects { get; }
+        public abstract IReadOnlyCollection<StaticEffect> Effects { get; }
         
     }
 }

@@ -2,7 +2,7 @@
 @using OpenRpg.Core.Requirements
 @using OpenRpg.Editor.Infrastructure.Helpers
 
-<ListEditor Data="Effects" OnUpdate="OnUpdate" TItem="Effect">
+<ListEditor Data="Effects" OnUpdate="OnUpdate" TItem="StaticEffect">
     <HeaderTemplate>
         <th><abbr title="Effect Type">Effect Type</abbr></th>
         <th><abbr title="Potency">Potency</abbr></th>
@@ -36,14 +36,14 @@
 
 @functions {
     [Parameter]
-    public IEnumerable<Effect> Effects { get; set; }
+    public IEnumerable<StaticEffect> Effects { get; set; }
 
     [Parameter]
-    public EventCallback<List<Effect>> OnUpdate { get; set; }
+    public EventCallback<List<StaticEffect>> OnUpdate { get; set; }
     
-    public void UpdateRequirements(Effect currentEffect, IReadOnlyCollection<Requirement> updatedRequirements)
+    public void UpdateRequirements(StaticEffect currentStaticEffect, IReadOnlyCollection<Requirement> updatedRequirements)
     {
-        currentEffect.Requirements = updatedRequirements;
+        currentStaticEffect.Requirements = updatedRequirements;
         StateHasChanged();
     }
 }

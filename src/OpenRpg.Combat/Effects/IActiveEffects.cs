@@ -24,7 +24,7 @@ namespace OpenRpg.Combat.Effects
         /// <summary>
         /// This will attempt to add an effect, each implementation may differ how stacking is handled etc
         /// </summary>
-        bool AddEffect(TimedEffect effect);
+        bool AddEffect(TimedStaticEffect staticEffect);
 
         /// <summary>
         /// Updates the effects based off how much time has passed

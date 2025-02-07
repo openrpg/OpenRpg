@@ -124,8 +124,8 @@
                 },
             Effects = new[]
             {
-                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f },
-                new Effect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 3.0f }
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 3.0f }
             }
         };
         template.Variables.QualityType(FantasyItemQualityTypes.UncommonQuality);
@@ -149,10 +149,10 @@
             },
             Effects = new[]
             {
-                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 15.0f },
-                new Effect { EffectType = FantasyEffectTypes.DarkDamageAmount, Potency = 30.0f },
-                new Effect { EffectType = FantasyEffectTypes.IntelligenceBonusAmount, Potency = 5.0f },
-                new Effect { EffectType = FantasyEffectTypes.MagicBonusAmount, Potency = 40.0f }
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 15.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.DarkDamageAmount, Potency = 30.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.IntelligenceBonusAmount, Potency = 5.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.MagicBonusAmount, Potency = 40.0f }
             }
         };
         template.Variables.QualityType(FantasyItemQualityTypes.RareQuality);
@@ -176,20 +176,20 @@
             },
             Effects = new[]
             {
-                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 20 },
-                new Effect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 5.0f, Requirements = new []
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 20 },
+                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 5.0f, Requirements = new []
             {
                     new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 9 }
                 }},
-                new Effect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 7.5f, Requirements = new []
+                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 7.5f, Requirements = new []
             {
                     new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 10 }
                 }},
-                new Effect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f, Requirements = new []
+                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f, Requirements = new []
             {
                     new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 11 }
                 }},
-                new Effect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 12.5f, Requirements = new []
+                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 12.5f, Requirements = new []
             {
                     new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 12 }
                 }},

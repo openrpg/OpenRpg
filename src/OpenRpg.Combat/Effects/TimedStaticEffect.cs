@@ -13,7 +13,7 @@ namespace OpenRpg.Combat.Effects
     /// This just describes how the effect should be processed, and is more akin to a template. It should be
     /// used in conjunction with ActiveEffect for actually tracking and processing the effect.
     /// </remarks>
-    public class TimedEffect : Effect, IHasDataId, IHasLocaleDescription, IHasVariables<ITimedEffectVariables>
+    public class TimedStaticEffect : StaticEffect, IHasDataId, IHasLocaleDescription, IHasVariables<ITimedEffectVariables>
     {
         /// <inheritdoc />
         public int Id { get; set; }
@@ -50,17 +50,17 @@ namespace OpenRpg.Combat.Effects
         /// </summary>
         public ITimedEffectVariables Variables { get; set; } = new DefaultTimedEffectVariables();
 
-        public TimedEffect() { }
+        public TimedStaticEffect() { }
 
         /// <summary>
         /// Allows you to populate the base data from an existing effect
         /// </summary>
-        /// <param name="baseEffect">The effect to copy from</param>
-        public TimedEffect(Effect baseEffect)
+        /// <param name="baseStaticEffect">The effect to copy from</param>
+        public TimedStaticEffect(StaticEffect baseStaticEffect)
         {
-            EffectType = baseEffect.EffectType;
-            Requirements = baseEffect.Requirements.ToArray();
-            Potency = baseEffect.Potency;
+            EffectType = baseStaticEffect.EffectType;
+            Requirements = baseStaticEffect.Requirements.ToArray();
+            Potency = baseStaticEffect.Potency;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace OpenRpg.Core.Classes.Templates
         public int Id { get; set; }
         public string NameLocaleId { get; set; }
         public string DescriptionLocaleId { get; set; }
-        public IReadOnlyCollection<Effect> Effects { get; set; } = Array.Empty<Effect>();
+        public IReadOnlyCollection<StaticEffect> Effects { get; set; } = Array.Empty<StaticEffect>();
         public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
         public ClassTemplateVariables Variables { get; set; } = new ClassTemplateVariables();
     }

@@ -21,7 +21,7 @@
                     {
                         <div class="box as-circle has-background-link-light">
                             <span class="is-size-4">
-                                @GetMaximumEffectPotency.Potency
+                                @GetMaximumStaticEffectPotency.Potency
                             </span>
                         </div>
                     }
@@ -45,6 +45,6 @@
 
     public string CardTypeClass => $"card-type-{Card.CardType}";
     public string CardTypeText => LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.CardTypesTextKey, Card.CardType));
-    public Effect GetMaximumEffectPotency => Card.Effects.OrderByDescending(x => x.Potency).FirstOrDefault();
+    public StaticEffect GetMaximumStaticEffectPotency => Card.Effects.OrderByDescending(x => x.Potency).FirstOrDefault();
 
 }

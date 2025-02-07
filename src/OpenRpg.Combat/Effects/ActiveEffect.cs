@@ -8,7 +8,7 @@ namespace OpenRpg.Combat.Effects
         /// <summary>
         /// The underlying timed effect that is active
         /// </summary>
-        public TimedEffect Effect { get; set; }
+        public TimedStaticEffect StaticEffect { get; set; }
 
         /// <summary>
         /// The amount of stacks of this effect active
@@ -28,7 +28,7 @@ namespace OpenRpg.Combat.Effects
         public ActiveEffect()
         {}
 
-        public ActiveEffect(TimedEffect effect)
-        { Effect = effect; }
+        public ActiveEffect(TimedStaticEffect staticEffect)
+        { StaticEffect = staticEffect; }
     }
 }

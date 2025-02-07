@@ -11,7 +11,7 @@ namespace OpenRpg.Genres.Populators.Entity.State
 {
     public class BasicEntityStatePopulator : IEntityStatePopulator
     {
-        public void Populate(EntityStateVariables varsToPopulate, IReadOnlyCollection<Effect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public void Populate(EntityStateVariables varsToPopulate, IReadOnlyCollection<StaticEffect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             var statsVars = relatedVars.SingleOrDefault(x => x.VariableType == CoreVariableTypes.EntityStatsVariables);
             if(statsVars == null) { return; }

@@ -36,13 +36,13 @@
     [Parameter]
     public ITemplateAccessor TemplateAccessor { get; set; }
 
-    public IReadOnlyCollection<Effect> GetRaceEffects()
+    public IReadOnlyCollection<StaticEffect> GetRaceEffects()
     {
         var raceId = Character.Variables.Race().TemplateId;
         return TemplateAccessor.GetRaceTemplate(raceId).Effects;
     }
     
-    public IReadOnlyCollection<Effect> GetClassEffects()
+    public IReadOnlyCollection<StaticEffect> GetClassEffects()
     {
         var classId = Character.Variables.Class().TemplateId;
         return TemplateAccessor.GetRaceTemplate(classId).Effects;

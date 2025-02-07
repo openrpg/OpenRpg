@@ -44,7 +44,7 @@ namespace OpenRpg.Items.Extensions
             return true;
         }
         
-        public static IEnumerable<Effect> GetEffects(this Equipment equipment, ITemplateAccessor templateAccessor)
+        public static IEnumerable<StaticEffect> GetEffects(this Equipment equipment, ITemplateAccessor templateAccessor)
         {
             return equipment.Slots.Values
                 .Where(x => x != null)
