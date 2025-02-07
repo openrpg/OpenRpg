@@ -11,7 +11,7 @@ namespace OpenRpg.Entities.Effects
     /// Generally some parent object like a Character will have various effects all combined together to drive the
     /// stats, but can be used any way required
     /// </remarks>
-    public class StaticEffect : IHasRequirements
+    public class StaticEffect : IHasRequirements, IEffect
     {
         /// <summary>
         /// The effect type to apply

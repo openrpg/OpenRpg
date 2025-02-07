@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Data", "OpenRpg.Dat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRpg.Localization", "OpenRpg.Localization\OpenRpg.Localization.csproj", "{5C2FF42D-8E29-4EDE-84D0-47D24FFFFBB9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{6BE3D2A4-F53A-4879-868E-A7522A445FE9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{6BE3D2A4-F53A-4879-868E-A7522A445FE9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Items", "Items", "{7C187634-FF6B-4A6E-AAD2-FCA3C97C1E5A}"
 EndProject
