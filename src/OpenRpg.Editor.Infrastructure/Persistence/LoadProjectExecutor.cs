@@ -1,15 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using OpenRpg.Core.Classes.Templates;
-using OpenRpg.Core.Races.Templates;
 using OpenRpg.Core.Templates;
 using OpenRpg.Editor.Core.Extensions;
 using OpenRpg.Editor.Core.Models;
 using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Editor.Infrastructure.Extensions;
+using OpenRpg.Entities.Classes.Templates;
+using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
 using OpenRpg.Quests;
 

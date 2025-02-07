@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using OpenRpg.Core.Classes.Templates;
-using OpenRpg.Core.Races.Templates;
 using OpenRpg.Core.Templates;
 using OpenRpg.Data;
 using OpenRpg.Data.InMemory;
 using OpenRpg.Demos.Infrastructure.Builders;
 using OpenRpg.Demos.Infrastructure.Data;
 using OpenRpg.Demos.Infrastructure.Extensions;
+using OpenRpg.Entities.Classes.Templates;
+using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.TradeSkills.Templates;
 using OpenRpg.Localization.Data.DataSources;

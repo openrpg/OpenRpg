@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using OpenRpg.Combat.Extensions;
-using OpenRpg.Core.Effects;
-using OpenRpg.Core.Entity;
-using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Templates;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Entity;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Items.Extensions;
 
 namespace OpenRpg.Genres.Extensions

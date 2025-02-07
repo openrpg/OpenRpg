@@ -1,4 +1,4 @@
-using OpenRpg.Core.Types;
+using OpenRpg.Entities.Types;
 
 namespace OpenRpg.Genres.Types
 {

@@ -1,6 +1,6 @@
 using System.Linq;
 using OpenRpg.Combat.Effects;
-using OpenRpg.Core.Effects;
+using OpenRpg.Entities.Effects;
 using OpenRpg.Genres.Fantasy.Effects;
 using OpenRpg.Genres.Fantasy.Types;
 

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using OpenRpg.Combat.Attacks;
-using OpenRpg.Core.Effects;
-using OpenRpg.Core.Extensions;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Extensions;
 
 namespace OpenRpg.Combat.Extensions
 {

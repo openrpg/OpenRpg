@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using OpenRpg.Core.Effects;
-using OpenRpg.Core.Stats.Variables;
 using OpenRpg.Core.Variables;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Extensions;
 
 namespace OpenRpg.Genres.Populators.Entity.Stats.Conventions

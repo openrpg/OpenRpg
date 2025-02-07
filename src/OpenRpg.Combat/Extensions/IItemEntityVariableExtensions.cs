@@ -1,6 +1,6 @@
 using OpenRpg.Combat.Effects;
 using OpenRpg.Combat.Types;
-using OpenRpg.Core.Entity.Variables;
+using OpenRpg.Entities.Entity.Variables;
 
 namespace OpenRpg.Combat.Extensions
 {

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using OpenRpg.Cards.Types;
 using OpenRpg.Cards.Variables;
-using OpenRpg.Core.Effects;
+using OpenRpg.Entities.Effects;
 using OpenRpg.Items;
 using OpenRpg.Items.Extensions;
-using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Cards.Genres
 {

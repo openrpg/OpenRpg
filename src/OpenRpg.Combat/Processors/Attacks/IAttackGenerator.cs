@@ -1,5 +1,5 @@
 using OpenRpg.Combat.Attacks;
-using OpenRpg.Core.Stats;
+using OpenRpg.Entities.Stats;
 
 namespace OpenRpg.Combat.Processors.Attacks
 {

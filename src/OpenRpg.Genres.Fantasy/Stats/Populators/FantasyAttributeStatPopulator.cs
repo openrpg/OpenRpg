@@ -1,5 +1,5 @@
-using OpenRpg.Core.Stats.Populators;
-using OpenRpg.Core.Stats.Variables;
+using OpenRpg.Entities.Stats.Populators;
+using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Genres.Populators.Entity.Stats;
 using OpenRpg.Genres.Populators.Entity.Stats.Conventions;

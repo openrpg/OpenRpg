@@ -14,6 +14,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.Core\OpenRpg.Core.csproj" />
+      <ProjectReference Include="..\OpenRpg.Entities\OpenRpg.Entities.csproj" />
     </ItemGroup>
 
 

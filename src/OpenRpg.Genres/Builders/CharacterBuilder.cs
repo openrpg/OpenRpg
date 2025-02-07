@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenRpg.Core.Classes;
-using OpenRpg.Core.Entity.Variables;
-using OpenRpg.Core.Extensions;
-using OpenRpg.Core.Races;
-using OpenRpg.Core.State.Variables;
 using OpenRpg.Core.Utils;
+using OpenRpg.Entities.Classes;
+using OpenRpg.Entities.Entity.Variables;
+using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Races;
+using OpenRpg.Entities.State.Variables;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Items.Equippables;
 using OpenRpg.Items.Equippables.Slots;

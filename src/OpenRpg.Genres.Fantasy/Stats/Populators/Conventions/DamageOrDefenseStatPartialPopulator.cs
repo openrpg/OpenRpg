@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using OpenRpg.Combat.Attacks;
 using OpenRpg.Combat.Extensions;
-using OpenRpg.Core.Effects;
-using OpenRpg.Core.Extensions;
-using OpenRpg.Core.Stats.Variables;
 using OpenRpg.Core.Variables;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Populators.Entity.Stats;
 
 namespace OpenRpg.Genres.Fantasy.Stats.Populators.Conventions

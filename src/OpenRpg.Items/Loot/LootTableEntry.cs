@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Variables.General;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.Variables;
 

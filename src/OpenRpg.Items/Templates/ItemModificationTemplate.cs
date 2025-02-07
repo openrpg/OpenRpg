@@ -1,4 +1,4 @@
-using OpenRpg.Core.Modifications;
+using OpenRpg.Entities.Modifications;
 
 namespace OpenRpg.Items.Templates
 {

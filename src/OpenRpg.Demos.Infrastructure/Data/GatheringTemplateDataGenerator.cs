@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using OpenRpg.Core.Requirements;
 using OpenRpg.Demos.Infrastructure.Lookups;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.TradeSkills;
 using OpenRpg.Items.TradeSkills.Extensions;

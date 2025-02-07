@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using OpenRpg.Core.Effects;
-using OpenRpg.Core.Races.Templates;
 using OpenRpg.Demos.Infrastructure.Extensions;
 using OpenRpg.Demos.Infrastructure.Lookups;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Genres.Fantasy.Types;
 
 namespace OpenRpg.Demos.Infrastructure.Data

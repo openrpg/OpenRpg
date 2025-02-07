@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using OpenRpg.Core.Effects;
-using OpenRpg.Core.Modifications;
-using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Templates;
-using OpenRpg.Core.Variables.General;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Modifications;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Templates

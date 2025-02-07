@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using OpenRpg.Core.Effects;
 using OpenRpg.Core.Templates;
+using OpenRpg.Entities.Effects;
 using OpenRpg.Items.Equippables;
 using OpenRpg.Items.Equippables.Slots;
 using OpenRpg.Items.Templates;

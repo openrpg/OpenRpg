@@ -1,6 +1,6 @@
-using OpenRpg.Core.Classes.Templates;
 using OpenRpg.Core.Common;
-using OpenRpg.Core.Races.Templates;
+using OpenRpg.Entities.Classes.Templates;
+using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
 using OpenRpg.Localization.Data.Extensions;
 using OpenRpg.Localization.Data.Repositories;

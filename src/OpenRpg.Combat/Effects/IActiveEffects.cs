@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using OpenRpg.Combat.Variables;
-using OpenRpg.Core.Effects;
 using OpenRpg.Core.Variables.General;
+using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Combat.Effects
 {

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using OpenRpg.Core.Classes.Templates;
-using OpenRpg.Core.Races.Templates;
 using OpenRpg.Editor.Infrastructure.Data;
+using OpenRpg.Entities.Classes.Templates;
+using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
 using OpenRpg.Localization;
 using OpenRpg.Quests;

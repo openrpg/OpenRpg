@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenRpg.Core.Effects;
-using OpenRpg.Core.Modifications;
-using OpenRpg.Core.Requirements;
 using OpenRpg.Demos.Infrastructure.Extensions;
 using OpenRpg.Demos.Infrastructure.Lookups;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Modifications;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Templates;

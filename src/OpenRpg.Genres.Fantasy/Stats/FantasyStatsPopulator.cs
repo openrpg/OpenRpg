@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using OpenRpg.Core.Stats.Populators;
-using OpenRpg.Core.Stats.Variables;
+using OpenRpg.Entities.Stats.Populators;
+using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Fantasy.Stats.Populators;
 using OpenRpg.Genres.Populators.Entity.Stats;
 

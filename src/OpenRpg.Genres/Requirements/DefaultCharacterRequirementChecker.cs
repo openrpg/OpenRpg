@@ -1,6 +1,6 @@
 using System.Linq;
-using OpenRpg.Core.Extensions;
-using OpenRpg.Core.Requirements;
+using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Types;

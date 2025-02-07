@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using OpenRpg.Core.Stats;
-using OpenRpg.Core.Stats.Variables;
+using OpenRpg.Entities.Stats;
+using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
 

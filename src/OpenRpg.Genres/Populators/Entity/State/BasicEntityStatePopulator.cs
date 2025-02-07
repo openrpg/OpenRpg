@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using OpenRpg.Core.Effects;
-using OpenRpg.Core.State.Variables;
-using OpenRpg.Core.Stats.Variables;
-using OpenRpg.Core.Types;
 using OpenRpg.Core.Variables;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.State.Variables;
+using OpenRpg.Entities.Stats.Variables;
+using OpenRpg.Entities.Types;
 using OpenRpg.Genres.Extensions;
 
 namespace OpenRpg.Genres.Populators.Entity.State

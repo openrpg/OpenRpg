@@ -1,4 +1,4 @@
-using OpenRpg.Core.Requirements;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;

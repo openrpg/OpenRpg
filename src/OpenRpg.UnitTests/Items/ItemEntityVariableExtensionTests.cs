@@ -1,7 +1,4 @@
-using OpenRpg.Core.Classes;
-using OpenRpg.Core.Entity.Variables;
-using OpenRpg.Core.Extensions;
-using OpenRpg.Core.Races;
+using OpenRpg.Entities.Entity.Variables;
 using OpenRpg.Items.Equippables;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Inventories;

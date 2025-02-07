@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using OpenRpg.Core.Effects;
-using OpenRpg.Core.Extensions;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Genres.Types;
 
 namespace OpenRpg.Genres.Extensions
