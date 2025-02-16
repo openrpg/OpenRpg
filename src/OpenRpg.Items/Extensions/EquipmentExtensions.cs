@@ -43,12 +43,5 @@ namespace OpenRpg.Items.Extensions
             equipment.Slots[slotType] = itemData;
             return true;
         }
-        
-        public static IEnumerable<StaticEffect> GetEffects(this Equipment equipment, ITemplateAccessor templateAccessor)
-        {
-            return equipment.Slots.Values
-                .Where(x => x != null)
-                .SelectMany(x => x.GetItemEffects(templateAccessor.GetItemTemplate(x.TemplateId)));
-        }
     }
 }

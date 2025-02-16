@@ -3,7 +3,6 @@ using OpenRpg.Cards.Types;
 using OpenRpg.Cards.Variables;
 using OpenRpg.Entities.Effects;
 using OpenRpg.Items;
-using OpenRpg.Items.Extensions;
 
 namespace OpenRpg.Cards.Genres
 {
@@ -18,6 +17,6 @@ namespace OpenRpg.Cards.Genres
 
         public string NameLocaleId => Data.Template.NameLocaleId;
         public string DescriptionLocaleId => Data.Template.DescriptionLocaleId;
-        public IReadOnlyCollection<StaticEffect> Effects => Data.GetItemEffects();
+        public IReadOnlyCollection<IEffect> Effects => Data.Template.Effects;
     }
 }

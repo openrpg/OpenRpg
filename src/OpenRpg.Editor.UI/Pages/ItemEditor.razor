@@ -7,6 +7,7 @@
 @using OpenRpg.Editor.Infrastructure.Helpers
 @using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Modifications
 @using OpenRpg.Entities.Requirements
 @using OpenRpg.Items.Extensions
@@ -112,7 +113,7 @@
             </Accordion>
 
             <Accordion Title="Item Effects" IsExpanded="true">
-                <EffectsEditor Effects="CurrentItemTemplate.Effects" OnUpdate="@UpdateEffect"></EffectsEditor>
+                <EffectsEditor Effects="CurrentItemTemplate.Effects.GetStaticEffects()" OnUpdate="@UpdateEffect"></EffectsEditor>
             </Accordion>
 
             <Accordion Title="Item Requirements" IsExpanded="true">

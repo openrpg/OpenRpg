@@ -108,7 +108,7 @@
     public void RandomizeCharacter()
     {
         _randomCharacter = CharacterBuilder.CreateNew().Build();
-        StatPopulator.Populate(_randomCharacter.Stats, _randomCharacter.GetEffects(TemplateAccessor).ToArray(), null);
+        StatPopulator.Populate(_randomCharacter.Stats, _randomCharacter.ComputeEffects(TemplateAccessor).ToArray(), null);
     }
 
     public string GetDamageTypeText(int damageType)

@@ -3,6 +3,7 @@ using System.Linq;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Classes;
 using OpenRpg.Entities.Classes.Templates;
+using OpenRpg.Entities.Modifications;
 using OpenRpg.Entities.Races;
 using OpenRpg.Entities.Races.Templates;
 
@@ -30,5 +31,8 @@ namespace OpenRpg.Entities.Extensions
             var template = templateAccessor.Get<RaceTemplate>(raceDataData.TemplateId);
             return new Race() { Data = raceDataData, Template = template };
         }
+                
+        public static T GetModificationTemplate<T>(this ITemplateAccessor templateAccessor, int modificationTemplateId) where T : ModificationTemplate
+        { return templateAccessor.Get<T>(modificationTemplateId); }
     }
 }

@@ -163,11 +163,11 @@
             <div class="columns">
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
-                    <EffectList Effects="@AutoStatTemplateAccessor.GetRaceTemplate(AutoStatsExample.Variables.Race().TemplateId).Effects" />
+                    <EffectList Effects="@AutoStatsExample.Variables.Race().ComputeEffects(AutoStatTemplateAccessor).ToArray()" />
                 </div>
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
-                    <EffectList Effects="@AutoStatTemplateAccessor.GetClassTemplate(AutoStatsExample.Variables.Class().TemplateId).Effects" />
+                    <EffectList Effects="@AutoStatsExample.Variables.Class().ComputeEffects(AutoStatTemplateAccessor).ToArray()" />
                 </div>
             </div>
         </CardSection>
@@ -184,11 +184,11 @@
             <div class="columns">
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
-                    <EffectList Effects="@AutoStatTemplateAccessor.GetRaceTemplate(AutoStatsExample2.Variables.Race().TemplateId).Effects" />
+                    <EffectList Effects="@AutoStatsExample2.Variables.Race().ComputeEffects(AutoStatTemplateAccessor).ToArray()" />
                 </div>
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
-                    <EffectList Effects="@AutoStatTemplateAccessor.GetClassTemplate(AutoStatsExample2.Variables.Class().TemplateId).Effects" />
+                    <EffectList Effects="@AutoStatsExample2.Variables.Class().ComputeEffects(AutoStatTemplateAccessor).ToArray()" />
                 </div>
             </div>
         </CardSection>
@@ -277,8 +277,8 @@
         AutoStatsExample2.Variables.Class(new ClassData { TemplateId = fighterClass.Id });
         
         var statsCalculator = new FantasyStatsPopulator();
-        statsCalculator.Populate(AutoStatsExample.Stats, AutoStatsExample.GetEffects(AutoStatTemplateAccessor), null);
-        statsCalculator.Populate(AutoStatsExample2.Stats, AutoStatsExample.GetEffects(AutoStatTemplateAccessor), null);
+        statsCalculator.Populate(AutoStatsExample.Stats, AutoStatsExample.ComputeEffects(AutoStatTemplateAccessor), null);
+        statsCalculator.Populate(AutoStatsExample2.Stats, AutoStatsExample.ComputeEffects(AutoStatTemplateAccessor), null);
     }
 
     protected override void OnInitialized()

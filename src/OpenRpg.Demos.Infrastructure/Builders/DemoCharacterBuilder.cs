@@ -42,7 +42,7 @@ namespace OpenRpg.Demos.Infrastructure.Builders
 
         protected override void PostProcessCharacter(Character character)
         {
-            StatPopulator.Populate(character.Stats, character.GetEffects(TemplateAccessor), null);
+            StatPopulator.Populate(character.Stats, character.ComputeEffects(TemplateAccessor), null);
             
             var health = character.Stats.MaxHealth();
             var magic = character.Stats.MaxMagic();

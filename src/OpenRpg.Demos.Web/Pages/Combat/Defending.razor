@@ -133,13 +133,13 @@
     public void RandomizeAttacker()
     {
         _attackingCharacter = CharacterBuilder.CreateNew().Build();
-        StatPopulator.Populate(_attackingCharacter.Stats, _attackingCharacter.GetEffects(TemplateAccessor).ToArray(), null);
+        StatPopulator.Populate(_attackingCharacter.Stats, _attackingCharacter.ComputeEffects(TemplateAccessor).ToArray(), null);
     }
 
     public void RandomizeDefender()
     {
         _defendingCharacter = CharacterBuilder.CreateNew().Build();
-        StatPopulator.Populate(_defendingCharacter.Stats, _defendingCharacter.GetEffects(TemplateAccessor).ToArray(), null);
+        StatPopulator.Populate(_defendingCharacter.Stats, _defendingCharacter.ComputeEffects(TemplateAccessor).ToArray(), null);
     }
 
     public string GetDamageTypeText(int damageType)

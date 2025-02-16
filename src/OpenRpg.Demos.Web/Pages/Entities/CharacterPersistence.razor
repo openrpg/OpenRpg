@@ -180,7 +180,7 @@
     public void ReloadCharacterFromData()
     {
         _regeneratedCharacter = JsonConvert.DeserializeObject<Character>(_persistedData, _jsonSettings);
-        StatPopulator.Populate(_regeneratedCharacter.Stats, _regeneratedCharacter.GetEffects(TemplateAccessor), null);
+        StatPopulator.Populate(_regeneratedCharacter.Stats, _regeneratedCharacter.ComputeEffects(TemplateAccessor), null);
         StateHasChanged();
     }
 }

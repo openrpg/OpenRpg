@@ -10,6 +10,6 @@ namespace OpenRpg.Cards.Genres.Conventions
         protected GenericDataCardWithEffects(T data) : base(data)
         { }
         
-        public override IReadOnlyCollection<StaticEffect> Effects => Data.Effects;
+        public override IReadOnlyCollection<IEffect> Effects => Data.Effects;
     }
 }

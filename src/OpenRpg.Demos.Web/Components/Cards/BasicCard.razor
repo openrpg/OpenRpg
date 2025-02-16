@@ -1,6 +1,7 @@
 ﻿@using OpenRpg.Cards.Types
 @using OpenRpg.Cards
 @using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Localization.Data.Extensions
 @using OpenRpg.Localization.Data.Repositories
 
@@ -15,7 +16,7 @@
                 </h3>
                 <div class="card-body">
                     <div class="card-effects">
-                        <EffectList Effects=@Card.Effects.ToArray()></EffectList>
+                        <EffectList Effects=@Card.Effects.GetStaticEffects().ToArray()></EffectList>
                     </div>
                     @if (Card.CardType == CardTypes.EquipmentCard)
                     {
@@ -45,6 +46,6 @@
 
     public string CardTypeClass => $"card-type-{Card.CardType}";
     public string CardTypeText => LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.CardTypesTextKey, Card.CardType));
-    public StaticEffect GetMaximumStaticEffectPotency => Card.Effects.OrderByDescending(x => x.Potency).FirstOrDefault();
+    public StaticEffect GetMaximumStaticEffectPotency => Card.Effects.GetStaticEffects().OrderByDescending(x => x.Potency).FirstOrDefault();
 
 }

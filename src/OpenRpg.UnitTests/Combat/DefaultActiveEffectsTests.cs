@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Combat.Effects;
+using OpenRpg.Entities.Effects;
 using Xunit;
 
 namespace OpenRpg.UnitTests.Combat;
@@ -343,6 +344,6 @@ public class DefaultActiveEffectsTests
         
         Assert.Single(passiveEffects);
         Assert.Equal(passiveEffect.EffectType, passiveEffects[0].EffectType);
-        Assert.Equal(6, passiveEffects[0].Potency);
+        Assert.Equal(6, ((passiveEffects[0] as StaticEffect)!).Potency);
     }
 }

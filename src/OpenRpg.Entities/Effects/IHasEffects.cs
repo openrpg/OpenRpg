@@ -4,6 +4,6 @@ namespace OpenRpg.Entities.Effects
 {
     public interface IHasEffects
     {
-        IReadOnlyCollection<StaticEffect> Effects { get; }
+        IReadOnlyCollection<IEffect> Effects { get; }
     }
 }

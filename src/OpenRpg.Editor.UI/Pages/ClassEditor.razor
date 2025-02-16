@@ -7,6 +7,7 @@
 @using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Entities.Classes.Templates
 @using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Requirements
 @using OpenRpg.Localization.Data.Repositories
 
@@ -38,7 +39,7 @@
         </Accordion>
         
         <Accordion Title="Class Effects" IsExpanded="true">
-            <EffectsEditor Effects="CurrentClassTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
+            <EffectsEditor Effects="CurrentClassTemplate.Effects.GetStaticEffects()" OnUpdate="UpdateEffect"></EffectsEditor>
         </Accordion>
         
         <Accordion Title="Class Requirements" IsExpanded="true">
