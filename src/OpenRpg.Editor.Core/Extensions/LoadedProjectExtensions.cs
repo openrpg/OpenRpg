@@ -42,4 +42,7 @@ public static class LoadedProjectExtensions
         var base64String = Convert.ToBase64String(binaryData);
         return $"data:image/png;base64,{base64String}";
     }
+    
+    public static string GetProjectFilePath(this LoadedProject project)
+    { return $"{project.ProjectPath}/project.json"; }
 }

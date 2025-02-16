@@ -4,7 +4,7 @@
 @inject EditorState EditorState;
 
 <figure class="image is-128x128 pixilize is-margin-auto is-rounded has-background-grey-dark p-md @(CustomClasses)">
-    <img src="@(EditorState.Project.GetImageAssetAsDataUrl(AssetType, AssetCode, "png"))" />
+    <img src="@(EditorState.CurrentProject.GetImageAssetAsDataUrl(AssetType, AssetCode, "png"))" />
 </figure>
 
 @code {

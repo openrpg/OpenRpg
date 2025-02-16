@@ -15,7 +15,7 @@
 <h1 class="title is-1">OpenRpg Data Editor</h1>
 
 <div class="box">
-    @if (EditorState.Project == null)
+    @if (EditorState.CurrentProject == null)
     {
         <p class="content">Please create or load an existing project.</p>
         <div class="field">
@@ -34,7 +34,7 @@
     }
     else
     {
-        <p class="content">Using Project: <span class="tag">@EditorState.Project.ProjectPath</span></p>
+        <p class="content">Using Project: <span class="tag">@EditorState.CurrentProject.ProjectPath</span></p>
     }
 </div>
 
@@ -47,7 +47,7 @@
         if(string.IsNullOrEmpty(projectFolder)) { return; }
 
         var newProject = await CreateProjectExecutor.Execute(projectFolder);
-        EditorState.Project = newProject;
+        EditorState.CurrentProject = newProject;
         EventBus.PublishAsync(new ProjectChangedEvent());
     }
     

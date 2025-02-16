@@ -18,7 +18,7 @@
         <div class="navbar-start">
             <span class="tag is-dark app-logo">OpenRpg Editor - v@(GetType().Assembly.GetName().Version) (Alpha)</span>
         </div>
-        @if (EditorState.Project != null)
+        @if (EditorState.CurrentProject != null)
         {
             <div class="navbar ml-0">
                 <div class="navbar-item has-dropdown is-hoverable">

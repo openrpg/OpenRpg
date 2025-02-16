@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OpenRpg.Core.Templates;
 using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Localization;
@@ -19,11 +20,11 @@ public static class EditorLocaleDatasourceExtensions
     }
     
     public static string SerializeData(this LocaleDataset dataset)
-    { return JsonConvert.SerializeObject(dataset, Formatting.Indented); }
+    { return JsonConvert.SerializeObject(dataset,  new JsonSerializerSettings{ TypeNameHandling = TypeNameHandling.Auto, Formatting = Formatting.Indented }); }
     
-    public static void DeserializeData(this EditorLocaleDatasource datasource, string data, bool replace = false)
+    public static void DeserializeData(this EditorLocaleDatasource datasource, JObject jsonData, bool replace = false)
     {
-        var localeData = JsonConvert.DeserializeObject<LocaleDataset>(data);
+        var localeData = jsonData.ToObject<LocaleDataset>(new JsonSerializer{ TypeNameHandling = TypeNameHandling.Auto });
 
         if (!datasource.LocaleDatasets.ContainsKey(localeData.LocaleCode))
         {
