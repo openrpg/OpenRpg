@@ -18,15 +18,18 @@
         {
             var requirementsMet = AreAllRequirementsMet(effect);
             <li style="list-style: none;">
-                <span class="effect-section @(effect.Potency > 0 ? "has-text-success" : "has-text-danger")">
-                    <span class="@(requirementsMet ? "" : "is-strikethrough")">@(effect.Potency > 0 ? "+":"")@(effect.Potency) @GetEffectText(effect.EffectType)</span>
-                    @if (HasRequirements(effect))
-                    {
-                        <div class="requirement-section">
-                            <RequirementList Character="Character" Requirements="effect.Requirements.ToArray()"></RequirementList>
-                        </div>
-                    }
-                </span>
+                @if (effect is StaticEffect staticEffect)
+                {
+                    <span class="effect-section @(staticEffect.Potency > 0 ? "has-text-success" : "has-text-danger")">
+                        <span class="@(requirementsMet ? "" : "is-strikethrough")">@(staticEffect.Potency > 0 ? "+" : "")@(staticEffect.Potency) @GetEffectText(effect.EffectType)</span>
+                        @if (HasRequirements(staticEffect))
+                        {
+                            <div class="requirement-section">
+                                <RequirementList Character="Character" Requirements="effect.Requirements.ToArray()"></RequirementList>
+                            </div>
+                        }
+                    </span>
+                }
             </li>
         }
     </div>
@@ -34,7 +37,7 @@
 
 @code {
     [Parameter]
-    public IReadOnlyCollection<StaticEffect> Effects { get; set; }
+    public IReadOnlyCollection<IEffect> Effects { get; set; }
 
     [Parameter]
     public Character Character { get; set; }
@@ -67,7 +70,7 @@
     public string GetPotencySymbol(float potency)
     { return potency > 0 ? "+" : "-"; }
 
-    public bool HasRequirements(StaticEffect staticEffect)
+    public bool HasRequirements(IEffect staticEffect)
     {
         if (staticEffect.Requirements == null)
         { return false;}
@@ -78,7 +81,7 @@
         return true;
     }
 
-    public bool AreAllRequirementsMet(StaticEffect staticEffect)
+    public bool AreAllRequirementsMet(IEffect staticEffect)
     {
         if(Character == null)
         { return true; }

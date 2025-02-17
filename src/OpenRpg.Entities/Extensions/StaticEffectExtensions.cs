@@ -12,6 +12,7 @@ namespace OpenRpg.Entities.Extensions
         public static float GetPotencyFor(this IEnumerable<StaticEffect> effects, params int[] effectTypes)
         { return effects.Where(x => effectTypes.Contains(x.EffectType)).Sum(x => x.Potency); }
         
+        // TODO: This is a crutch until the IEffect stuff is fully mapped over
         public static IReadOnlyCollection<StaticEffect> GetStaticEffects(this IReadOnlyCollection<IEffect> effects) => 
             effects.Where(x => x is StaticEffect).Cast<StaticEffect>().ToArray();
     }
