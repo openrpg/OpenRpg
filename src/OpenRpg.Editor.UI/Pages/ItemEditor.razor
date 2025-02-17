@@ -113,7 +113,7 @@
             </Accordion>
 
             <Accordion Title="Item Effects" IsExpanded="true">
-                <EffectsEditor Effects="CurrentItemTemplate.Effects.GetStaticEffects()" OnUpdate="@UpdateEffect"></EffectsEditor>
+                <EffectsEditor Effects="CurrentItemTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
             </Accordion>
 
             <Accordion Title="Item Requirements" IsExpanded="true">
@@ -196,7 +196,7 @@
         StateHasChanged();
     }
 
-    public void UpdateEffect(IReadOnlyCollection<StaticEffect> updatedEffects)
+    public void UpdateEffect(IReadOnlyCollection<IEffect> updatedEffects)
     {
         CurrentItemTemplate.Effects = updatedEffects;
         StateHasChanged();

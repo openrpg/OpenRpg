@@ -2,48 +2,77 @@
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Requirements
 
-<ListEditor Data="Effects" OnUpdate="OnUpdate" TItem="StaticEffect">
-    <HeaderTemplate>
-        <th><abbr title="Effect Type">Effect Type</abbr></th>
-        <th><abbr title="Potency">Potency</abbr></th>
-    </HeaderTemplate>
-    <RowTemplate>
-        <td>
-            <div class="control">
-                <div class="select is-fullwidth">
-                    <select @bind="context.EffectType">
-                        @foreach (var effectType in TypesHelper.GetEffectTypes)
-                        {
-                            <option value=@effectType.Id>@effectType.Name</option>
-                        }
-                    </select>
+<div class="container">
+    <div class="is-pulled-right">
+        <button class="button is-primary" @onclick="AddStaticEffect">Add Static Effect</button>
+        <button class="button is-primary" @onclick="AddScaledEffect">Add Scaled Effect</button>
+    </div>
+</div>
+
+@{ var index = 0; }
+@foreach(var effect in Effects)
+{
+    <div class="box" @key="index">
+        <div class="columns">
+            <div class="column is-half">
+                <div class="field">
+                    <label class="label">Effect Type</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select @bind="effect.EffectType">
+                                @foreach (var effectType in TypesHelper.GetEffectTypes)
+                                {
+                                    <option value=@effectType.Id>@effectType.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </td>
-        <td>
-            <div class="control">
-                <input class="input" type="text" @bind="context.Potency" />
-            </div>
-        </td>
-    </RowTemplate>
-    <NestedRowTemplate>
+            @if (effect is StaticEffect staticEffect)
+            {
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label">Effect Potency</label>
+                        <div class="control">
+                            <input class="input" type="text" @bind="staticEffect.Potency"/>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
         <Accordion Title="Effect Requirements" HeaderClasses="is-info">
-            <RequirementsEditor Requirements="context.Requirements" OnUpdate="requirements => UpdateRequirements(context, requirements)">
+            <RequirementsEditor Requirements="effect.Requirements" OnUpdate="requirements => UpdateRequirements(effect, requirements)">
             </RequirementsEditor>
         </Accordion>
-    </NestedRowTemplate>
-</ListEditor>
+    </div>
+    index++;
+}
 
 @functions {
     [Parameter]
-    public IEnumerable<StaticEffect> Effects { get; set; }
+    public IReadOnlyCollection<IEffect> Effects { get; set; }
 
     [Parameter]
-    public EventCallback<List<StaticEffect>> OnUpdate { get; set; }
-    
-    public void UpdateRequirements(StaticEffect currentStaticEffect, IReadOnlyCollection<Requirement> updatedRequirements)
+    public EventCallback<IReadOnlyCollection<IEffect>> OnUpdate { get; set; }
+
+    public async Task AddStaticEffect()
     {
-        currentStaticEffect.Requirements = updatedRequirements;
+        var newEffects = new List<IEffect>(Effects);
+        newEffects.Add(new StaticEffect());
+        await OnUpdate.InvokeAsync(newEffects);
+    }
+
+    public async Task AddScaledEffect()
+    {
+        var newEffects = new List<IEffect>(Effects);
+        newEffects.Add(new ScaledEffect());
+        await OnUpdate.InvokeAsync(newEffects);
+    }
+    
+    public void UpdateRequirements(IEffect currentEffect, IReadOnlyCollection<Requirement> updatedRequirements)
+    {
+        currentEffect.Requirements = updatedRequirements;
         StateHasChanged();
     }
 }

@@ -39,7 +39,7 @@
         </Accordion>
         
         <Accordion Title="Class Effects" IsExpanded="true">
-            <EffectsEditor Effects="CurrentClassTemplate.Effects.GetStaticEffects()" OnUpdate="UpdateEffect"></EffectsEditor>
+            <EffectsEditor Effects="CurrentClassTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
         </Accordion>
         
         <Accordion Title="Class Requirements" IsExpanded="true">
@@ -116,7 +116,7 @@
         SelectDefault();
     }
     
-    public void UpdateEffect(IReadOnlyCollection<StaticEffect> updatedEffects)
+    public void UpdateEffect(IReadOnlyCollection<IEffect> updatedEffects)
     {
         CurrentClassTemplate.Effects = updatedEffects;
         StateHasChanged();
