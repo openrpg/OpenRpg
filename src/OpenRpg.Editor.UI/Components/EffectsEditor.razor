@@ -1,61 +1,128 @@
-﻿@using OpenRpg.Editor.Infrastructure.Helpers
+﻿@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Scaling
+@using OpenRpg.Editor.Core.Services.Modal
+@using OpenRpg.Editor.Infrastructure.Helpers
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Requirements
 
-<div class="container">
-    <div class="is-pulled-right">
-        <button class="button is-primary" @onclick="AddStaticEffect">Add Static Effect</button>
-        <button class="button is-primary" @onclick="AddScaledEffect">Add Scaled Effect</button>
+<div class="columns">
+    <div class="column">
+        <div class="is-pulled-right">
+            <button class="button is-primary" @onclick="AddStaticEffect">Add Static Effect</button>
+            <button class="button is-primary" @onclick="AddScaledEffect">Add Scaled Effect</button>
+        </div>
     </div>
 </div>
 
+    <div class="columns mb-0">
+        <div class="column is-one-third">
+            <label class="label">Effect Type</label>
+        </div>
+        <div class="column is-one-third">
+            <label class="label">Potency</label>
+        </div>
+        <div class="column is-one-third">
+            <label class="label">Requirements</label>
+        </div>
+    </div>
 @{ var index = 0; }
-@foreach(var effect in Effects)
+@foreach (var effect in Effects)
 {
-    <div class="box" @key="index">
-        <div class="columns">
-            <div class="column is-half">
-                <div class="field">
-                    <label class="label">Effect Type</label>
-                    <div class="control">
-                        <div class="select is-fullwidth">
-                            <select @bind="effect.EffectType">
-                                @foreach (var effectType in TypesHelper.GetEffectTypes)
-                                {
-                                    <option value=@effectType.Id>@effectType.Name</option>
-                                }
-                            </select>
-                        </div>
+    <div class="columns mb-0" @key="index">
+        <div class="column is-one-third">
+            <div class="field">
+                <div class="control">
+                    <div class="select is-fullwidth">
+                        <select @bind="effect.EffectType">
+                            @foreach (var effectType in TypesHelper.GetEffectTypes)
+                            {
+                                <option value=@effectType.Id>@effectType.Name</option>
+                            }
+                        </select>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="column is-one-thirds">
             @if (effect is StaticEffect staticEffect)
             {
-                <div class="column is-half">
-                    <div class="field">
-                        <label class="label">Effect Potency</label>
-                        <div class="control">
-                            <input class="input" type="text" @bind="staticEffect.Potency"/>
-                        </div>
+                <div class="field">
+                    <div class="control">
+                        <input class="input" type="text" @bind="staticEffect.Potency"/>
                     </div>
                 </div>
             }
+            @if (effect is ScaledEffect scaledEffect)
+            {
+                <div class="control">
+                    <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentEffect(effect); ShowScalingModal(); }">
+                        <span>Edit Scaling</span>
+                    </button>
+                </div>
+            }
         </div>
-        <Accordion Title="Effect Requirements" HeaderClasses="is-info">
-            <RequirementsEditor Requirements="effect.Requirements" OnUpdate="requirements => UpdateRequirements(effect, requirements)">
-            </RequirementsEditor>
-        </Accordion>
+        <div class="column is-one-thirds mt-auto">
+            <div class="control">
+                <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentEffect(effect); ShowRequirementModal(); }">
+                    <span class="tag mr-3">
+                        @effect.Requirements.Count
+                    </span>
+                    <span>Edit Requirements</span>
+                </button>
+            </div>
+        </div>
     </div>
     index++;
 }
 
+<ModalContent Id="effect-requirement-modal" @ref="EditRequirementModal">
+    <DynamicContentModal OnClosed="ModalService.CloseModal">
+        @if (CurrentEffect != null)
+        {
+            <RequirementsEditor Requirements="CurrentEffect.Requirements" 
+                                OnUpdate="requirements => UpdateRequirements(CurrentEffect, requirements)">
+            </RequirementsEditor>
+        }
+    </DynamicContentModal>
+</ModalContent>
+
+<ModalContent Id="effect-scaling-modal" @ref="EditScalingModal">
+    <DynamicContentModal OnClosed="ModalService.CloseModal">
+        @if (CurrentEffect != null && CurrentEffect is ScaledEffect scaledEffect)
+        {
+            <ScalingFunctionEditor ScalingFunction="scaledEffect.PotencyFunction" 
+                                   OnUpdate="scalingFunction => UpdateScalingFunction(CurrentEffect, scalingFunction)" />
+        }
+    </DynamicContentModal>
+</ModalContent>
+
 @functions {
+    [CascadingParameter]
+    public IModalInteractionService ModalService { get; set; }
+    
     [Parameter]
     public IReadOnlyCollection<IEffect> Effects { get; set; }
 
     [Parameter]
     public EventCallback<IReadOnlyCollection<IEffect>> OnUpdate { get; set; }
+    
+    public IEffect CurrentEffect { get; set; }
 
+    bool IsRequirementModalActive { get; set; }
+    bool IsScalingModalActive { get; set; }
+    
+    public ModalElementReference EditRequirementModal { get; set; }
+    public ModalElementReference EditScalingModal { get; set; }
+
+    void ShowRequirementModal() => ModalService.ShowModal(EditRequirementModal.Reference);
+    void ShowScalingModal() => ModalService.ShowModal(EditScalingModal.Reference);
+
+    public void SetCurrentEffect(IEffect effect)
+    {
+        CurrentEffect = effect;
+        StateHasChanged();
+    }
+    
     public async Task AddStaticEffect()
     {
         var newEffects = new List<IEffect>(Effects);
@@ -66,13 +133,23 @@
     public async Task AddScaledEffect()
     {
         var newEffects = new List<IEffect>(Effects);
-        newEffects.Add(new ScaledEffect());
+        newEffects.Add(new ScaledEffect()
+        {
+            ScalingType = 1,
+            PotencyFunction = new ScalingFunction(PresetCurves.Linear, 1, 100, 1, 100)
+        });
         await OnUpdate.InvokeAsync(newEffects);
     }
     
     public void UpdateRequirements(IEffect currentEffect, IReadOnlyCollection<Requirement> updatedRequirements)
     {
         currentEffect.Requirements = updatedRequirements;
+        StateHasChanged();
+    }
+    
+    public void UpdateScalingFunction(IEffect currentEffect, ScalingFunction updatedFunction)
+    {
+        (currentEffect as ScaledEffect).PotencyFunction = updatedFunction;
         StateHasChanged();
     }
 }

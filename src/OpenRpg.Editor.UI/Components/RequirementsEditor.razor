@@ -11,7 +11,7 @@
         <td>
             <div class="control">
                 <div class="select is-fullwidth">
-                    <select bind="@context.RequirementType">
+                    <select @bind="context.RequirementType">
                         @foreach (var requirementType in TypesHelper.GetRequirementTypes)
                         {
                             <option value=@requirementType.Id>@requirementType.Name</option>
@@ -22,12 +22,12 @@
         </td>
         <td>
             <div class="control">
-                <input class="input" type="text" bind="@context.AssociatedId" />
+                <input class="input" type="text" @bind="context.AssociatedId" />
             </div>
         </td>
         <td>
             <div class="control">
-                <input class="input" type="text" bind="@context.AssociatedValue" />
+                <input class="input" type="text" @bind="context.AssociatedValue" />
             </div>
         </td>
     </RowTemplate>

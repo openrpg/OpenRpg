@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using ApexCharts;
 using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Editor.Core.Services.Paths;
 using OpenRpg.Editor.Infrastructure.Extensions;
@@ -17,6 +18,7 @@ class Program
         var appBuilder = PhotinoBlazorAppBuilder.CreateDefault(args);
 
         appBuilder.Services.AddLogging();
+        appBuilder.Services.AddApexCharts();
         DataServiceModule.Setup(appBuilder.Services);
         appBuilder.RootComponents.Add<App>("#app");
 

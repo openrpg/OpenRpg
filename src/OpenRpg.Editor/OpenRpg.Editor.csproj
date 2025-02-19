@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -10,8 +10,6 @@
         <StaticWebAssetsFingerprintContent>false</StaticWebAssetsFingerprintContent>
         <DisableBuildCompression>true</DisableBuildCompression>
     </PropertyGroup>
-    
-    
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
         <OutputType>Exe</OutputType>
@@ -26,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Blazor-ApexCharts" Version="5.1.0" />
       <PackageReference Include="Photino.Blazor" Version="3.2.0" />
     </ItemGroup>
 
@@ -35,10 +34,20 @@
         </None>
     </ItemGroup>
 
-    <ItemGroup>
-        <Content Include="wwwroot\**">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
+    <Target Name="_StaticWebAssetsComputeFilesToBuild" AfterTargets="GetCopyToOutputDirectoryItems" DependsOnTargets="ResolveStaticWebAssetsInputs">
+        <ItemGroup>
+            <!-- Filter the static web assets foreign to the project and then add them to the list of resolved
+                 files to publish.
+             -->
+            <_ExternalBuildStaticWebAsset Include="%(StaticWebAsset.FullPath)" Condition="'%(SourceType)' != ''">
+                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+                <TargetPath>$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)','$([MSBuild]::NormalizePath('wwwroot\%(BasePath)\%(RelativePath)'))'))</TargetPath>
+            </_ExternalBuildStaticWebAsset>
+            <!-- Remove any existing external static web asset that might have been added as part of the
+                 regular publish pipeline. -->
+            <_SourceItemsToCopyToOutputDirectory Remove="@(_ExternalBuildStaticWebAsset)" />
+            <_SourceItemsToCopyToOutputDirectory Include="@(_ExternalBuildStaticWebAsset)" />
+        </ItemGroup>
+    </Target>
     
 </Project>

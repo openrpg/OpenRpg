@@ -1,0 +1,108 @@
+@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Scaling
+@using OpenRpg.Editor.UI.Models
+
+<div class="columns">
+    <div class="column is-half">
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Input Scale</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <input class="input" @bind="InputScaleMin" placeholder="Min" @bind:after="OnUpdated"/>
+                </div>
+                <div class="field">
+                    <input class="input" @bind="InputScaleMax" placeholder="Max" @bind:after="OnUpdated"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Output Scale</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <input class="input" @bind="OutputScaleMin" placeholder="Min" @bind:after="OnUpdated"/>
+                </div>
+                <div class="field">
+                    <input class="input" @bind="OutputScaleMax" placeholder="Max" @bind:after="OnUpdated"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Test Input</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <input class="input" placeholder="Test Input Value" @bind="TestInputValue" @bind:after="() => { TestOutputValue = ScalingFunction.Plot(TestInputValue); }"/>
+                </div>
+                <div class="field">
+                    <input class="input" value="@TestOutputValue" disabled/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column is-half">
+        <div class="field">
+            <div class="control">
+                <PresetCurveFunctionEditor CurveFunction="CurveFunction" ShowChart="false" OnUpdate="OnCurveFunctionUpdated"/>
+            </div>
+        </div>
+        <div class="field">
+            <ScalingFunctionChart ScalingFunction="ScalingFunction" XAxisName="@XAxisLabel" YAxisName="@YAxisLabel" @ref="ScalingChartRefreshable"/>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ScalingFunction ScalingFunction { get; set; }
+    
+    [Parameter]
+    public IRefreshable ScalingChartRefreshable { get; set; }
+    
+    [Parameter]
+    public EventCallback<ScalingFunction> OnUpdate { get; set; }
+
+    public string XAxisLabel => "Level";
+    public string YAxisLabel => "Potency";
+    public float TestOutputValue { get; set; }
+    
+    public ICurveFunction CurveFunction { get; set; }
+    public float InputScaleMin { get; set; }
+    public float InputScaleMax { get; set; }
+    public float OutputScaleMin { get; set; }
+    public float OutputScaleMax { get; set; }
+    
+    public float TestInputValue { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        CurveFunction = ScalingFunction.CurveFunction ?? PresetCurves.Linear;
+        InputScaleMin = ScalingFunction.InputScaleMin;
+        InputScaleMax = ScalingFunction.InputScaleMax;
+        OutputScaleMin = ScalingFunction.OutputScaleMin;
+        OutputScaleMax = ScalingFunction.OutputScaleMax;
+    }
+
+    private async Task OnCurveFunctionUpdated(ICurveFunction x)
+    {
+        CurveFunction = x;
+        await OnUpdated();
+    }
+
+    public async Task OnUpdated()
+    {
+        ScalingFunction = new ScalingFunction(CurveFunction, OutputScaleMin, OutputScaleMax, InputScaleMin, InputScaleMax);
+        await OnUpdate.InvokeAsync(ScalingFunction);
+        await ScalingChartRefreshable.Refresh();
+        await ScalingChartRefreshable.Refresh();
+    }
+
+}

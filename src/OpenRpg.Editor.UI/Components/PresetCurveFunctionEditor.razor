@@ -1,0 +1,83 @@
+@using System.Reflection
+@using OpenRpg.CurveFunctions
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Models
+@using OpenRpg.Editor.UI.Models
+
+<div class="container">
+    <div class="field">
+        <label class="label">Curve Type</label>
+        <div class="control">
+            <div class="select is-fullwidth">
+                <select @bind="CurveType" @bind:after="OnUpdated">
+                    @foreach (var curveType in CurveOptions)
+                    {
+                        <option value=@curveType.Id>@curveType.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+    @if (ShowChart)
+    {        
+        <div class="field">
+            <div class="control">
+                <CurveFunctionChart CurveFunction="CurveFunction" ShowLabels="false" @ref="ChartRef" />
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public ICurveFunction CurveFunction { get; set; }
+    
+    [Parameter]
+    public bool ShowChart { get; set; }
+    
+    public IRefreshable ChartRef { get; set; }
+    
+    [Parameter]
+    public EventCallback<ICurveFunction> OnUpdate { get; set; }
+
+    public int CurveType { get; set; } = 1;
+
+    private Dictionary<int, ICurveFunction> PresetLookups { get; } = new();
+    private List<OptionData> CurveOptions { get; set; } = new();
+
+    public async Task OnUpdated()
+    {
+        await OnUpdate.InvokeAsync(PresetLookups[CurveType]);
+        if (ChartRef != null)
+        {
+            await ChartRef.Refresh();
+            await ChartRef.Refresh();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        CachePresetData();
+
+        foreach (var curve in PresetLookups)
+        {
+            if(CurveFunction.Equals(curve.Value))
+            { CurveType = curve.Key; }
+        }
+    }
+
+    private void CachePresetData()
+    {
+        PresetLookups.Clear();
+        CurveOptions.Clear();
+        var fields = typeof(PresetCurves).GetFields(BindingFlags.Public | BindingFlags.Static);
+        for (var i = 0; i < fields.Length; i++)
+        {
+            var currentField = fields[i];
+            PresetLookups.Add(i, (ICurveFunction)currentField.GetValue(null));
+            CurveOptions.Add(new OptionData(i, currentField.Name.MakeReadable()));
+        }
+    }
+
+}

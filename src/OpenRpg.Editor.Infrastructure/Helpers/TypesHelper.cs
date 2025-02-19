@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using OpenRpg.CurveFunctions;
 using OpenRpg.Editor.Infrastructure.Extensions;
 using OpenRpg.Editor.Infrastructure.Models;
 using OpenRpg.Genres.Fantasy.Types;
