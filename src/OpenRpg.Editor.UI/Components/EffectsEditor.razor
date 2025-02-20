@@ -90,8 +90,7 @@
     <DynamicContentModal OnClosed="ModalService.CloseModal">
         @if (CurrentEffect != null && CurrentEffect is ScaledEffect scaledEffect)
         {
-            <ScalingFunctionEditor ScalingFunction="scaledEffect.PotencyFunction" 
-                                   OnUpdate="scalingFunction => UpdateScalingFunction(CurrentEffect, scalingFunction)" />
+            <ScaledEffectEditor ScaledEffect="scaledEffect" /> 
         }
     </DynamicContentModal>
 </ModalContent>

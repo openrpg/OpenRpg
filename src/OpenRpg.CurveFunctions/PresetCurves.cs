@@ -15,8 +15,8 @@ namespace OpenRpg.CurveFunctions
         public static PolynomialCurveFunction QuadraticUpperRight = new PolynomialCurveFunction(-1.0f, 0f, 1.0f, 4.0f);
         public static LogisticCurveFunction Logistic = new LogisticCurveFunction(1.0f, 0f, 0.0f, 1.0f);
         public static LogisticCurveFunction InverseLogistic = new LogisticCurveFunction(-1.0f, 0f, 1.0f, 1.0f);
-        public static LogitCurveFunction Logit = new LogitCurveFunction(1.0f, 0, 0);
-        public static LogitCurveFunction InverseLogit = new LogitCurveFunction(-1.0f, 0, 0);
+        public static LogitCurveFunction Logit = new LogitCurveFunction(0.5f, 0.001f, 0);
+        public static LogitCurveFunction InverseLogit = new LogitCurveFunction(-0.5f, -0.001f, 0);
         public static NormalCurveFunction BellCurve = new NormalCurveFunction(1.0f, 0, 0, 1.0f);
         public static NormalCurveFunction InverseBellCurve = new NormalCurveFunction(-1.0f, 0, 1.0f, 1.0f);
         public static SineCurveFunction SineWave = new SineCurveFunction(1.0f, 0, 0);

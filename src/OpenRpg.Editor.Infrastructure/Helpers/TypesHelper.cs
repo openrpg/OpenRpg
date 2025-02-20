@@ -5,6 +5,7 @@ using System.Reflection;
 using OpenRpg.CurveFunctions;
 using OpenRpg.Editor.Infrastructure.Extensions;
 using OpenRpg.Editor.Infrastructure.Models;
+using OpenRpg.Entities.Types;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Quests.Types;
 
@@ -32,5 +33,6 @@ namespace OpenRpg.Editor.Infrastructure.Helpers
         public static readonly OptionData[] GetEffectTypes = GetTypesFor(typeof(FantasyEffectTypes)).OrderBy(x => x.Id).ToArray();
         public static readonly OptionData[] GetRewardTypes = GetTypesFor(typeof(FantasyRewardTypes)).OrderBy(x => x.Id).ToArray();
         public static readonly OptionData[] GetObjectiveTypes = GetTypesFor(typeof(ObjectiveTypes)).OrderBy(x => x.Id).ToArray();
+        public static readonly OptionData[] GetEffectScalingType = GetTypesFor(typeof(CoreEffectScalingTypes)).OrderBy(x => x.Id).ToArray();
     }
 }

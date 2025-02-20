@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using OpenRpg.Core.Common;
 using OpenRpg.CurveFunctions.Scaling;
 using OpenRpg.Entities.Requirements;
 
@@ -19,6 +20,11 @@ namespace OpenRpg.Entities.Effects
         /// The type of value required for scaling, i.e level, index etc
         /// </summary>
         public int ScalingType { get; set; }
+        
+        /// <summary>
+        /// Used for certain scaling types
+        /// </summary>
+        public int ScalingIndex { get; set; }
         
         /// <summary>
         /// The function that calculates the potency of the effect

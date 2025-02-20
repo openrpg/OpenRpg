@@ -1,0 +1,51 @@
+@using OpenRpg.CurveFunctions.Scaling
+@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Entities.Effects
+
+<div class="field">
+    <label class="label">Scaling Type</label>
+    <div class="control">
+        <div class="select is-fullwidth">
+            <select @bind="ScaledEffect.ScalingType">
+                @foreach (var scalingType in TypesHelper.GetEffectScalingType)
+                {
+                    <option value=@scalingType.Id>@scalingType.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+<div class="field">
+    <ScalingFunctionEditor ScalingFunction="@ScaledEffect.PotencyFunction" XAxisLabel="@XAxisLabel" YAxisLabel="@YAxisLabel" OnUpdate="OnScalingFunctionUpdated"/>
+</div>
+<div class="field">
+    <label class="label">Test Potency Scaling</label>
+</div>
+<div class="field is-horizontal">
+    <div class="field-body">
+        <div class="field">
+            <input class="input" placeholder="Test Input Value" @bind="TestInputValue" @bind:after="() => { TestOutputValue = ScaledEffect.PotencyFunction.Plot(TestInputValue); }"/>
+        </div>
+        <div class="field">
+            <input class="input" value="@TestOutputValue" disabled/>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public ScaledEffect ScaledEffect { get; set; }
+    
+    public string XAxisLabel => "Level";
+    public string YAxisLabel => "Potency";
+    
+    public float TestOutputValue { get; set; }
+    public float TestInputValue { get; set; }
+
+    public async Task OnScalingFunctionUpdated(ScalingFunction scalingFunction)
+    {
+        ScaledEffect.PotencyFunction = scalingFunction;
+    }
+
+}
