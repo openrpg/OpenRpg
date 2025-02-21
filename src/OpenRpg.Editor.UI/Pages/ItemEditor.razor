@@ -6,8 +6,8 @@
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Helpers
 @using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Editor.UI.Extensions
 @using OpenRpg.Entities.Effects
-@using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Modifications
 @using OpenRpg.Entities.Requirements
 @using OpenRpg.Items.Extensions
@@ -113,15 +113,16 @@
             </Accordion>
 
             <Accordion Title="Item Effects" IsExpanded="true">
-                <EffectsEditor Effects="CurrentItemTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
+                <EffectsEditor Effects="CurrentItemTemplate.Effects" OnAdded="AddEffect" OnRemoved="RemoveEffect" />
             </Accordion>
 
             <Accordion Title="Item Requirements" IsExpanded="true">
-                <RequirementsEditor Requirements="CurrentItemTemplate.Requirements" OnUpdate="@UpdateRequirements"></RequirementsEditor>
+                <RequirementsEditor Requirements="CurrentItemTemplate.Requirements" OnAdded="AddRequirement" OnRemoved="RemoveRequirement" />
             </Accordion>
 
             <Accordion Title="Item Modification Allowances" IsExpanded="true">
-                <ModificationAllowancesEditor ModificationAllowances="CurrentItemTemplate.ModificationAllowances" OnUpdate="UpdateModificationAllowances"></ModificationAllowancesEditor>
+                <ModificationAllowancesEditor ModificationAllowances="CurrentItemTemplate.ModificationAllowances" 
+                                              OnAdded="AddModificationAllowances" OnRemoved="RemoveModificationAllowances" />
             </Accordion>
         
             <div class="field is-grouped has-text-centered">
@@ -196,23 +197,23 @@
         StateHasChanged();
     }
 
-    public void UpdateEffect(IReadOnlyCollection<IEffect> updatedEffects)
-    {
-        CurrentItemTemplate.Effects = updatedEffects;
-        StateHasChanged();
-    }
+    public void AddEffect(IEffect effect)
+    { CurrentItemTemplate.Effects = CurrentItemTemplate.Effects.Add(effect); }
     
-    public void UpdateRequirements(IReadOnlyCollection<Requirement> updatedRequirements)
-    {
-        CurrentItemTemplate.Requirements = updatedRequirements;
-        StateHasChanged();
-    }
+    public void RemoveEffect(IEffect effect)
+    { CurrentItemTemplate.Effects = CurrentItemTemplate.Effects.Remove(effect); }
     
-    public void UpdateModificationAllowances(IReadOnlyCollection<ModificationAllowance> updatedModificationAllowances)
-    {
-        CurrentItemTemplate.ModificationAllowances = updatedModificationAllowances;
-        StateHasChanged();
-    }
+    public void AddRequirement(Requirement requirement)
+    { CurrentItemTemplate.Requirements = CurrentItemTemplate.Requirements.Add(requirement); }
+    
+    public void RemoveRequirement(Requirement requirement)
+    { CurrentItemTemplate.Requirements = CurrentItemTemplate.Requirements.Remove(requirement); }
+    
+    public void AddModificationAllowances(ModificationAllowance modificationAllowances)
+    { CurrentItemTemplate.ModificationAllowances = CurrentItemTemplate.ModificationAllowances.Add(modificationAllowances); }
+    
+    public void RemoveModificationAllowances(ModificationAllowance modificationAllowances)
+    { CurrentItemTemplate.ModificationAllowances = CurrentItemTemplate.ModificationAllowances.Remove(modificationAllowances); }
 
     public void OnAssetCodeChanged(string newAssetCode)
     { CurrentItemTemplate.UpdateLocale(newAssetCode, LocaleRepository); }

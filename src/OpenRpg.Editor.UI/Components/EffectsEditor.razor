@@ -1,87 +1,77 @@
-﻿@using OpenRpg.CurveFunctions
-@using OpenRpg.CurveFunctions.Scaling
-@using OpenRpg.Editor.Core.Services.Modal
+﻿@using OpenRpg.Editor.Core.Services.Modal
 @using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Editor.UI.Extensions
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Requirements
 
-<div class="columns">
-    <div class="column">
-        <div class="is-pulled-right">
-            <button class="button is-primary" @onclick="AddStaticEffect">Add Static Effect</button>
-            <button class="button is-primary" @onclick="AddScaledEffect">Add Scaled Effect</button>
-        </div>
-    </div>
-</div>
-
-    <div class="columns mb-0">
-        <div class="column is-one-third">
-            <label class="label">Effect Type</label>
-        </div>
-        <div class="column is-one-third">
-            <label class="label">Potency</label>
-        </div>
-        <div class="column is-one-third">
-            <label class="label">Requirements</label>
-        </div>
-    </div>
-@{ var index = 0; }
-@foreach (var effect in Effects)
-{
-    <div class="columns mb-0" @key="index">
-        <div class="column is-one-third">
-            <div class="field">
-                <div class="control">
-                    <div class="select is-fullwidth">
-                        <select @bind="effect.EffectType">
-                            @foreach (var effectType in TypesHelper.GetEffectTypes)
-                            {
-                                <option value=@effectType.Id>@effectType.Name</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="column is-one-thirds">
-            @if (effect is StaticEffect staticEffect)
-            {
-                <div class="field">
-                    <div class="control">
-                        <input class="input" type="text" @bind="staticEffect.Potency"/>
-                    </div>
-                </div>
-            }
-            @if (effect is ScaledEffect scaledEffect)
-            {
-                <div class="control">
-                    <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentEffect(effect); ShowScalingModal(); }">
-                        <span>Edit Scaling</span>
-                    </button>
-                </div>
-            }
-        </div>
-        <div class="column is-one-thirds mt-auto">
-            <div class="control">
-                <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentEffect(effect); ShowRequirementModal(); }">
-                    <span class="tag mr-3">
-                        @effect.Requirements.Count
+<ListEditor Data="Effects" OnAdded="OnAdded" OnRemoved="OnRemoved" TItem="IEffect">
+    <HeaderTemplate>
+        <th><abbr title="Effect Type">Effect Type</abbr></th>
+        <th><abbr title="Potency">Potency</abbr></th>
+        <th><abbr title="Requirements">Requirements</abbr></th>
+    </HeaderTemplate>
+    <ButtonOverrideTemplate>
+        <div class="dropdown @(IsDropdownActive ? "is-active" : "")" @onclick="() => IsDropdownActive = !IsDropdownActive">
+            <div class="dropdown-trigger">
+                <button class="button is-primary" aria-haspopup="true" aria-controls="dropdown-menu">
+                    <span>Add Effect</span>
+                    <span class="icon is-small">
+                        <i class="fas fa-angle-down" aria-hidden="true"></i>
                     </span>
-                    <span>Edit Requirements</span>
                 </button>
             </div>
+            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                <div class="dropdown-content">
+                    <a class="dropdown-item" @onclick="x => context.InvokeAsync(new StaticEffect())">Add Static Effect</a>
+                    <a class="dropdown-item" @onclick="x => context.InvokeAsync(new ScaledEffect())">Add Scaled Effect</a>
+                </div>
+            </div>
         </div>
-    </div>
-    index++;
-}
+    </ButtonOverrideTemplate>
+    <RowTemplate>
+        <td>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select @bind="context.EffectType">
+                        @foreach (var effectType in TypesHelper.GetEffectTypes)
+                        {
+                            <option value=@effectType.Id>@effectType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                @if (context is StaticEffect staticEffect)
+                {
+                    <input class="input" type="text" @bind="staticEffect.Potency"/>
+                }
+                @if (context is ScaledEffect scaledEffect)
+                {
+                    <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentEffect(scaledEffect); ShowScalingModal(); }">
+                        <span>Edit Potency Scaling</span>
+                    </button>
+                }
+            </div>
+        </td>
+        <td>
+            <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentEffect(context); ShowRequirementModal(); }">
+                    <span class="tag mr-3">
+                        @context.Requirements.Count
+                    </span>
+                <span>Edit Requirements</span>
+            </button>
+        </td>
+    </RowTemplate>
+</ListEditor>
 
 <ModalContent Id="effect-requirement-modal" @ref="EditRequirementModal">
     <DynamicContentModal OnClosed="ModalService.CloseModal">
         @if (CurrentEffect != null)
         {
-            <RequirementsEditor Requirements="CurrentEffect.Requirements" 
-                                OnUpdate="requirements => UpdateRequirements(CurrentEffect, requirements)">
-            </RequirementsEditor>
+            <RequirementsEditor Requirements="CurrentEffect.Requirements" OnAdded="AddRequirement" OnRemoved="RemoveRequirement" />
+            
         }
     </DynamicContentModal>
 </ModalContent>
@@ -103,10 +93,14 @@
     public IReadOnlyCollection<IEffect> Effects { get; set; }
 
     [Parameter]
-    public EventCallback<IReadOnlyCollection<IEffect>> OnUpdate { get; set; }
+    public EventCallback<IEffect> OnAdded { get; set; }
+    
+    [Parameter]
+    public EventCallback<IEffect> OnRemoved { get; set; }
     
     public IEffect CurrentEffect { get; set; }
 
+    bool IsDropdownActive { get; set; }
     bool IsRequirementModalActive { get; set; }
     bool IsScalingModalActive { get; set; }
     
@@ -119,36 +113,13 @@
     public void SetCurrentEffect(IEffect effect)
     {
         CurrentEffect = effect;
+        CurrentEffect.Requirements = CurrentEffect.Requirements.ToList();
         StateHasChanged();
-    }
-    
-    public async Task AddStaticEffect()
-    {
-        var newEffects = new List<IEffect>(Effects);
-        newEffects.Add(new StaticEffect());
-        await OnUpdate.InvokeAsync(newEffects);
     }
 
-    public async Task AddScaledEffect()
-    {
-        var newEffects = new List<IEffect>(Effects);
-        newEffects.Add(new ScaledEffect()
-        {
-            ScalingType = 1,
-            PotencyFunction = new ScalingFunction(PresetCurves.Linear, 1, 100, 1, 100)
-        });
-        await OnUpdate.InvokeAsync(newEffects);
-    }
-    
-    public void UpdateRequirements(IEffect currentEffect, IReadOnlyCollection<Requirement> updatedRequirements)
-    {
-        currentEffect.Requirements = updatedRequirements;
-        StateHasChanged();
-    }
-    
-    public void UpdateScalingFunction(IEffect currentEffect, ScalingFunction updatedFunction)
-    {
-        (currentEffect as ScaledEffect).PotencyFunction = updatedFunction;
-        StateHasChanged();
-    }
+    public void AddRequirement(Requirement newRequirement)
+    { CurrentEffect.Requirements = CurrentEffect.Requirements.Add(newRequirement); }
+
+    public void RemoveRequirement(Requirement removedRequirement)
+    { CurrentEffect.Requirements = CurrentEffect.Requirements.Remove(removedRequirement); }
 }

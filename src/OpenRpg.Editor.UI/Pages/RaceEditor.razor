@@ -5,6 +5,7 @@
 @using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Editor.UI.Extensions
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races.Templates
@@ -37,11 +38,11 @@
         </Accordion>
         
         <Accordion Title="Race Effects" IsExpanded="true">
-            <EffectsEditor Effects="CurrentRaceTemplate.Effects" OnUpdate="UpdateEffect"></EffectsEditor>
+            <EffectsEditor Effects="CurrentRaceTemplate.Effects" OnAdded="AddEffect" OnRemoved="RemoveEffect"/>
         </Accordion>
         
         <Accordion Title="Race Requirements" IsExpanded="true">
-            <RequirementsEditor Requirements="CurrentRaceTemplate.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
+            <RequirementsEditor Requirements="CurrentRaceTemplate.Requirements" OnAdded="AddRequirement" OnRemoved="RemoveRequirement" />
         </Accordion>
         
         <div class="field is-grouped has-text-centered">
@@ -115,17 +116,17 @@
         SelectDefault();
     }
     
-    public void UpdateEffect(IReadOnlyCollection<IEffect> updatedEffects)
-    {
-        CurrentRaceTemplate.Effects = updatedEffects;
-        StateHasChanged();
-    }
+    public void AddEffect(IEffect effect)
+    { CurrentRaceTemplate.Effects = CurrentRaceTemplate.Effects.Add(effect); }
     
-    public void UpdateRequirements(IReadOnlyCollection<Requirement> updatedRequirements)
-    {
-        CurrentRaceTemplate.Requirements = updatedRequirements;
-        StateHasChanged();
-    }
+    public void RemoveEffect(IEffect effect)
+    { CurrentRaceTemplate.Effects = CurrentRaceTemplate.Effects.Remove(effect); }
+    
+    public void AddRequirement(Requirement requirement)
+    { CurrentRaceTemplate.Requirements = CurrentRaceTemplate.Requirements.Add(requirement); }
+        
+    public void RemoveRequirement(Requirement requirement)
+    { CurrentRaceTemplate.Requirements = CurrentRaceTemplate.Requirements.Remove(requirement); }
     
     public void OnAssetCodeChanged(string newAssetCode)
     { CurrentRaceTemplate.UpdateLocale(newAssetCode, LocaleRepository); }

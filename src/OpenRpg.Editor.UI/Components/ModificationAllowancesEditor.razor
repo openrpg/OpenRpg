@@ -2,7 +2,7 @@
 @using OpenRpg.Entities.Modifications
 @using OpenRpg.Entities.Requirements
 
-<ListEditor Data="ModificationAllowances" OnUpdate="OnUpdate" TItem="ModificationAllowance">
+<ListEditor Data="ModificationAllowances" OnAdded="OnAdded" OnRemoved="OnRemoved" TItem="ModificationAllowance">
     <HeaderTemplate>
         <th><abbr title="Modification Type">Allowance Type</abbr></th>
         <th><abbr title="Allowed Amount">Allowed Amount</abbr></th>
@@ -28,7 +28,9 @@
     </RowTemplate>
     <NestedRowTemplate>
         <Accordion Title="Modification Allowance Requirements" HeaderClasses="is-info">
-            <RequirementsEditor Requirements="context.Requirements" OnUpdate="requirements => UpdateRequirements(context, requirements)">
+            <RequirementsEditor Requirements="context.Requirements" 
+                                OnAdded="x => AddRequirement(context, x)"
+                                OnRemoved="x => RemoveRequirement(context, x)">
             </RequirementsEditor>
         </Accordion>
     </NestedRowTemplate>
@@ -36,14 +38,37 @@
 
 @functions {
     [Parameter]
-    public IEnumerable<ModificationAllowance> ModificationAllowances { get; set; }
+    public IReadOnlyCollection<ModificationAllowance> ModificationAllowances { get; set; }
     
     [Parameter]
-    public EventCallback<List<ModificationAllowance>> OnUpdate { get; set; }
+    public EventCallback<ModificationAllowance> OnAdded { get; set; }
     
-    public void UpdateRequirements(ModificationAllowance currentModification, IReadOnlyCollection<Requirement> updatedRequirements)
+    [Parameter]
+    public EventCallback<ModificationAllowance> OnRemoved { get; set; }
+    
+    public void AddRequirement(ModificationAllowance context, Requirement newRequirement)
     {
-        currentModification.Requirements = updatedRequirements;
-        StateHasChanged();
+        if (context.Requirements is List<Requirement> list)
+        {
+            list.Add(newRequirement);
+            return;
+        }
+
+        var newList = context.Requirements.ToList();
+        newList.Add(newRequirement);
+        context.Requirements = newList;
+    }
+    
+    public void RemoveRequirement(ModificationAllowance context, Requirement removedRequirement)
+    {
+        if (context.Requirements is List<Requirement> list)
+        {
+            list.Remove(removedRequirement);
+            return;
+        }
+        
+        var newList = context.Requirements.ToList();
+        newList.Remove(removedRequirement);
+        context.Requirements = newList;
     }
 }

@@ -5,6 +5,7 @@
 @using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Editor.UI.Extensions
 @using OpenRpg.Entities.Requirements
 @using OpenRpg.Localization.Data.Repositories
 @using OpenRpg.Quests
@@ -36,19 +37,19 @@
         </Accordion>
         
         <Accordion Title="Quest Objectives" IsExpanded="true">
-            <ObjectivesEditor Objectives="CurrentQuest.Objectives" OnUpdate="UpdateObjectives"></ObjectivesEditor>
+            <ObjectivesEditor Objectives="CurrentQuest.Objectives" OnAdded="AddObjective" OnRemoved="RemoveObjective" />
         </Accordion>
         
         <Accordion Title="Quest Gifts" IsExpanded="true">
-            <RewardsEditor Rewards="CurrentQuest.Gifts" OnUpdate="UpdateGifts"></RewardsEditor>
+            <RewardsEditor Rewards="CurrentQuest.Gifts" OnAdded="AddGift" OnRemoved="RemoveGift" />
         </Accordion>
         
         <Accordion Title="Quest Rewards" IsExpanded="true">
-            <RewardsEditor Rewards="CurrentQuest.Rewards" OnUpdate="UpdateRewards"></RewardsEditor>
+            <RewardsEditor Rewards="CurrentQuest.Rewards" OnAdded="AddReward" OnRemoved="RemoveReward" />
         </Accordion>
         
         <Accordion Title="Quest Requirements" IsExpanded="true">
-            <RequirementsEditor Requirements="CurrentQuest.Requirements" OnUpdate="UpdateRequirements"></RequirementsEditor>
+            <RequirementsEditor Requirements="CurrentQuest.Requirements" OnAdded="AddRequirement" OnRemoved="RemoveRequirement" />
         </Accordion>
         
         <div class="field is-grouped has-text-centered">
@@ -121,29 +122,29 @@
         SelectDefault();
     }
     
-    public void UpdateObjectives(IReadOnlyCollection<Objective> updatedObjectives)
-    {
-        CurrentQuest.Objectives = updatedObjectives;
-        StateHasChanged();
-    }
+    public void AddRequirement(Requirement newRequirement)
+    { CurrentQuest.Requirements = CurrentQuest.Requirements.Add(newRequirement); }
     
-    public void UpdateRewards(IReadOnlyCollection<Reward> updatedRewards)
-    {
-        CurrentQuest.Rewards = updatedRewards;
-        StateHasChanged();
-    }
+    public void RemoveRequirement(Requirement removedRequirement)
+    { CurrentQuest.Requirements = CurrentQuest.Requirements.Remove(removedRequirement); }
     
-    public void UpdateGifts(IReadOnlyCollection<Reward> updatedGifts)
-    {
-        CurrentQuest.Gifts = updatedGifts;
-        StateHasChanged();
-    }
+    public void AddObjective(Objective newObjective)
+    { CurrentQuest.Objectives = CurrentQuest.Objectives.Add(newObjective); }
     
-    public void UpdateRequirements(IReadOnlyCollection<Requirement> updatedRequirements)
-    {
-        CurrentQuest.Requirements = updatedRequirements;
-        StateHasChanged();
-    }
+    public void RemoveObjective(Objective removedObjective)
+    { CurrentQuest.Objectives = CurrentQuest.Objectives.Remove(removedObjective); }
+
+    public void AddReward(Reward newReward)
+    { CurrentQuest.Rewards = CurrentQuest.Rewards.Add(newReward); }
+    
+    public void RemoveReward(Reward removedReward)
+    { CurrentQuest.Rewards = CurrentQuest.Rewards.Remove(removedReward); }
+    
+    public void AddGift(Reward newGift)
+    { CurrentQuest.Gifts = CurrentQuest.Gifts.Add(newGift); }
+    
+    public void RemoveGift(Reward removeGift)
+    { CurrentQuest.Gifts = CurrentQuest.Gifts.Remove(removeGift); }
     
     public void OnAssetCodeChanged(string newAssetCode)
     { CurrentQuest.UpdateLocale(newAssetCode, LocaleRepository); }

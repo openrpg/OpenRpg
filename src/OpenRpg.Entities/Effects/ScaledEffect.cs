@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using OpenRpg.Core.Common;
+using OpenRpg.CurveFunctions;
 using OpenRpg.CurveFunctions.Scaling;
 using OpenRpg.Entities.Requirements;
 
@@ -25,11 +25,11 @@ namespace OpenRpg.Entities.Effects
         /// Used for certain scaling types
         /// </summary>
         public int ScalingIndex { get; set; }
-        
+
         /// <summary>
         /// The function that calculates the potency of the effect
         /// </summary>
-        public ScalingFunction PotencyFunction { get; set; }
+        public ScalingFunction PotencyFunction { get; set; } = new ScalingFunction(PresetCurves.Linear, 1, 100, 1, 20);
 
         /// <summary>
         /// The applicable requirements for this effect to be active

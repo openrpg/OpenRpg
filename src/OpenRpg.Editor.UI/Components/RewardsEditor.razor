@@ -1,7 +1,7 @@
 ﻿@using OpenRpg.Editor.Infrastructure.Helpers
 @using OpenRpg.Quests
 
-<ListEditor Data="Rewards" OnUpdate="OnUpdate" TItem="Reward">
+<ListEditor Data="Rewards" OnAdded="OnAdded" OnRemoved="OnRemoved" TItem="Reward">
     <HeaderTemplate>
         <th><abbr title="Reward Type">Reward Type</abbr></th>
         <th><abbr title="Reward Chance">Reward Chance</abbr></th>
@@ -40,6 +40,7 @@
 </ListEditor>
 
 @functions {
-    [Parameter] public IEnumerable<Reward> Rewards { get; set; }
-    [Parameter] public EventCallback<List<Reward>> OnUpdate { get; set; }
+    [Parameter] public IReadOnlyCollection<Reward> Rewards { get; set; }
+    [Parameter] public EventCallback<Reward> OnAdded { get; set; }
+    [Parameter] public EventCallback<Reward> OnRemoved { get; set; }
 }
