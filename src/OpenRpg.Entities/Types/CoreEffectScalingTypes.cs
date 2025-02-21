@@ -9,6 +9,6 @@ namespace OpenRpg.Entities.Types
         public static int Level = 1;
         public static int Value = 2;
         public static int StatIndex = 3;
-        public static int StateIndex = 3;
+        public static int StateIndex = 4;
     }
 }
