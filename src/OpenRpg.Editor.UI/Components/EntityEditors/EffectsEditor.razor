@@ -4,7 +4,7 @@
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Requirements
 
-<ListEditor Data="Effects" OnAdded="OnAdded" OnRemoved="OnRemoved" TItem="IEffect">
+<ListEditor Data="Effects" TItem="IEffect">
     <HeaderTemplate>
         <th><abbr title="Effect Type">Effect Type</abbr></th>
         <th><abbr title="Potency">Potency</abbr></th>
@@ -49,14 +49,14 @@
                 }
                 @if (context is ScaledEffect scaledEffect)
                 {
-                    <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentEffect(scaledEffect); ShowScalingModal(); }">
+                    <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentContext(scaledEffect); ShowScalingModal(); }">
                         <span>Edit Potency Scaling</span>
                     </button>
                 }
             </div>
         </td>
         <td>
-            <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentEffect(context); ShowRequirementModal(); }">
+            <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentContext(context); ShowRequirementModal(); }">
                     <span class="tag mr-3">
                         @context.Requirements.Count
                     </span>
@@ -68,9 +68,9 @@
 
 <ModalContent Id="effect-requirement-modal" @ref="EditRequirementModal">
     <DynamicContentModal OnClosed="ModalService.CloseModal">
-        @if (CurrentEffect != null)
+        @if (CurrentContext != null)
         {
-            <RequirementsEditor Requirements="CurrentEffect.Requirements" OnAdded="AddRequirement" OnRemoved="RemoveRequirement" />
+            <RequirementsEditor Requirements="CurrentContext.Requirements as List<Requirement>" />
             
         }
     </DynamicContentModal>
@@ -78,7 +78,7 @@
 
 <ModalContent Id="effect-scaling-modal" @ref="EditScalingModal">
     <DynamicContentModal OnClosed="ModalService.CloseModal">
-        @if (CurrentEffect != null && CurrentEffect is ScaledEffect scaledEffect)
+        @if (CurrentContext != null && CurrentContext is ScaledEffect scaledEffect)
         {
             <ScaledEffectEditor ScaledEffect="scaledEffect" /> 
         }
@@ -90,15 +90,9 @@
     public IModalInteractionService ModalService { get; set; }
     
     [Parameter]
-    public IReadOnlyCollection<IEffect> Effects { get; set; }
-
-    [Parameter]
-    public EventCallback<IEffect> OnAdded { get; set; }
+    public List<IEffect> Effects { get; set; }
     
-    [Parameter]
-    public EventCallback<IEffect> OnRemoved { get; set; }
-    
-    public IEffect CurrentEffect { get; set; }
+    public IEffect CurrentContext { get; set; }
 
     bool IsDropdownActive { get; set; }
     bool IsRequirementModalActive { get; set; }
@@ -110,16 +104,10 @@
     void ShowRequirementModal() => ModalService.ShowModal(EditRequirementModal.Reference);
     void ShowScalingModal() => ModalService.ShowModal(EditScalingModal.Reference);
 
-    public void SetCurrentEffect(IEffect effect)
+    public void SetCurrentContext(IEffect effect)
     {
-        CurrentEffect = effect;
-        CurrentEffect.Requirements = CurrentEffect.Requirements.ToList();
+        effect.Requirements = effect.Requirements.AsList();
+        CurrentContext = effect;
         StateHasChanged();
     }
-
-    public void AddRequirement(Requirement newRequirement)
-    { CurrentEffect.Requirements = CurrentEffect.Requirements.Add(newRequirement); }
-
-    public void RemoveRequirement(Requirement removedRequirement)
-    { CurrentEffect.Requirements = CurrentEffect.Requirements.Remove(removedRequirement); }
 }

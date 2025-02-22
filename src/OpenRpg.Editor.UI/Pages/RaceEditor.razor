@@ -38,11 +38,11 @@
         </Accordion>
         
         <Accordion Title="Race Effects" IsExpanded="true">
-            <EffectsEditor Effects="CurrentRaceTemplate.Effects" OnAdded="AddEffect" OnRemoved="RemoveEffect"/>
+            <EffectsEditor Effects="CurrentRaceTemplate.Effects as List<IEffect>" />
         </Accordion>
         
         <Accordion Title="Race Requirements" IsExpanded="true">
-            <RequirementsEditor Requirements="CurrentRaceTemplate.Requirements" OnAdded="AddRequirement" OnRemoved="RemoveRequirement" />
+            <RequirementsEditor Requirements="CurrentRaceTemplate.Requirements as List<Requirement>" />
         </Accordion>
         
         <div class="field is-grouped has-text-centered">
@@ -73,23 +73,27 @@
     {
         var firstRaceTemplate = Repository.GetAll<RaceTemplate>().FirstOrDefault();
         if (firstRaceTemplate != null)
-        { CurrentRaceTemplate = firstRaceTemplate; }
+        { SelectRace(firstRaceTemplate); }
         else
         { AddRace(); }
     }
     
     public void AddRace()
     {
-        CurrentRaceTemplate = new RaceTemplate();
-        CurrentRaceTemplate.Id = Repository.GetAll<RaceTemplate>().Count() + 1;
-        CurrentRaceTemplate.Variables.AssetCode($"race-new-{CurrentRaceTemplate.Id}");
-        CurrentRaceTemplate.GenerateLocaleCodes(CurrentRaceTemplate.Variables.AssetCode());
-        Repository.Create(CurrentRaceTemplate);
+        var newTemplate = new RaceTemplate();
+        newTemplate.Id = Repository.GetAll<RaceTemplate>().Count() + 1;
+        newTemplate.Variables.AssetCode($"race-new-{newTemplate.Id}");
+        newTemplate.GenerateLocaleCodes(newTemplate.Variables.AssetCode());
+        Listify(newTemplate);
+        Repository.Create(newTemplate);
+        
+        CurrentRaceTemplate = newTemplate;
         StateHasChanged();
     }
 
     public void SelectRace(RaceTemplate template)
     {
+        Listify(template);
         CurrentRaceTemplate = template;
         StateHasChanged();
     }
@@ -100,7 +104,8 @@
         clone.Id = Repository.GetAll<RaceTemplate>().Count() + 1;
         clone.Variables.AssetCode($"{CurrentRaceTemplate.Variables.AssetCode()}-clone");
         clone.GenerateLocaleCodes(clone.Variables.AssetCode());
-        Repository.Create<RaceTemplate>(clone);
+        Listify(clone);
+        Repository.Create(clone);
 
         await Notifier.ShowNotification($"Cloned Class {CurrentRaceTemplate.Variables.AssetCode()}");
         
@@ -115,18 +120,12 @@
         await Notifier.ShowNotification($"Deleted Item {CurrentRaceTemplate.Variables.AssetCode()}");
         SelectDefault();
     }
-    
-    public void AddEffect(IEffect effect)
-    { CurrentRaceTemplate.Effects = CurrentRaceTemplate.Effects.Add(effect); }
-    
-    public void RemoveEffect(IEffect effect)
-    { CurrentRaceTemplate.Effects = CurrentRaceTemplate.Effects.Remove(effect); }
-    
-    public void AddRequirement(Requirement requirement)
-    { CurrentRaceTemplate.Requirements = CurrentRaceTemplate.Requirements.Add(requirement); }
-        
-    public void RemoveRequirement(Requirement requirement)
-    { CurrentRaceTemplate.Requirements = CurrentRaceTemplate.Requirements.Remove(requirement); }
+
+    public void Listify(RaceTemplate template)
+    {
+        template.Requirements = template.Requirements.AsList();
+        template.Effects = template.Effects.AsList();
+    }
     
     public void OnAssetCodeChanged(string newAssetCode)
     { CurrentRaceTemplate.UpdateLocale(newAssetCode, LocaleRepository); }

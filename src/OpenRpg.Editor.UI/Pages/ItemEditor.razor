@@ -109,20 +109,19 @@
             </Accordion>
 
             <Accordion Title="Locale Details" IsExpanded="true">
-                <LocaleDetails LocaleData="CurrentItemTemplate"></LocaleDetails>
+                <LocaleDetails LocaleData="CurrentItemTemplate" />
             </Accordion>
 
             <Accordion Title="Item Effects" IsExpanded="true">
-                <EffectsEditor Effects="CurrentItemTemplate.Effects" OnAdded="AddEffect" OnRemoved="RemoveEffect" />
+                <EffectsEditor Effects="CurrentItemTemplate.Effects as List<IEffect>"/>
             </Accordion>
 
             <Accordion Title="Item Requirements" IsExpanded="true">
-                <RequirementsEditor Requirements="CurrentItemTemplate.Requirements" OnAdded="AddRequirement" OnRemoved="RemoveRequirement" />
+                <RequirementsEditor Requirements="CurrentItemTemplate.Requirements as List<Requirement>" />
             </Accordion>
 
             <Accordion Title="Item Modification Allowances" IsExpanded="true">
-                <ModificationAllowancesEditor ModificationAllowances="CurrentItemTemplate.ModificationAllowances" 
-                                              OnAdded="AddModificationAllowances" OnRemoved="RemoveModificationAllowances" />
+                <ModificationAllowancesEditor ModificationAllowances="CurrentItemTemplate.ModificationAllowances as List<ModificationAllowance>" />
             </Accordion>
         
             <div class="field is-grouped has-text-centered">
@@ -155,25 +154,36 @@
     {
         var firstItemTemplate = Repository.GetAll<ItemTemplate>().FirstOrDefault();
         if (firstItemTemplate != null)
-        { CurrentItemTemplate = firstItemTemplate; }
+        { SelectItem(firstItemTemplate); }
         else
         { AddItem(); }
     }
 
     public void AddItem()
     {
-        CurrentItemTemplate = new ItemTemplate();
-        CurrentItemTemplate.Id = Repository.GetAll<ItemTemplate>().Count() + 1;
-        CurrentItemTemplate.Variables.AssetCode($"item-{CurrentItemTemplate.Id}");
-        CurrentItemTemplate.GenerateLocaleCodes(CurrentItemTemplate.Variables.AssetCode());
-        Repository.Create(CurrentItemTemplate);
+        var newTemplate = new ItemTemplate();
+        newTemplate.Id = Repository.GetAll<ItemTemplate>().Count() + 1;
+        newTemplate.Variables.AssetCode($"item-{newTemplate.Id}");
+        newTemplate.GenerateLocaleCodes(newTemplate.Variables.AssetCode());
+        Listify(newTemplate);
+        Repository.Create(newTemplate);
+
+        CurrentItemTemplate = newTemplate;
         StateHasChanged();
     }
 
     public void SelectItem(ItemTemplate itemTemplate)
     {
+        Listify(itemTemplate);
         CurrentItemTemplate = itemTemplate;
         StateHasChanged();
+    }
+
+    public void Listify(ItemTemplate template)
+    {
+        template.Effects = template.Effects.AsList();
+        template.Requirements = template.Requirements.AsList();
+        template.ModificationAllowances = template.ModificationAllowances.AsList();
     }
 
     public async Task DeleteTemplate()
@@ -189,6 +199,7 @@
         clone.Id = Repository.GetAll<ItemTemplate>().Count() + 1;
         clone.Variables.AssetCode($"{CurrentItemTemplate.Variables.AssetCode()}-clone");
         clone.GenerateLocaleCodes(clone.Variables.AssetCode());
+        Listify(clone);
         Repository.Create(clone);
         
         await Notifier.ShowNotification($"Cloned Item {CurrentItemTemplate.Variables.AssetCode()}");
@@ -196,24 +207,6 @@
         CurrentItemTemplate = clone;
         StateHasChanged();
     }
-
-    public void AddEffect(IEffect effect)
-    { CurrentItemTemplate.Effects = CurrentItemTemplate.Effects.Add(effect); }
-    
-    public void RemoveEffect(IEffect effect)
-    { CurrentItemTemplate.Effects = CurrentItemTemplate.Effects.Remove(effect); }
-    
-    public void AddRequirement(Requirement requirement)
-    { CurrentItemTemplate.Requirements = CurrentItemTemplate.Requirements.Add(requirement); }
-    
-    public void RemoveRequirement(Requirement requirement)
-    { CurrentItemTemplate.Requirements = CurrentItemTemplate.Requirements.Remove(requirement); }
-    
-    public void AddModificationAllowances(ModificationAllowance modificationAllowances)
-    { CurrentItemTemplate.ModificationAllowances = CurrentItemTemplate.ModificationAllowances.Add(modificationAllowances); }
-    
-    public void RemoveModificationAllowances(ModificationAllowance modificationAllowances)
-    { CurrentItemTemplate.ModificationAllowances = CurrentItemTemplate.ModificationAllowances.Remove(modificationAllowances); }
 
     public void OnAssetCodeChanged(string newAssetCode)
     { CurrentItemTemplate.UpdateLocale(newAssetCode, LocaleRepository); }

@@ -39,11 +39,11 @@
         </Accordion>
         
         <Accordion Title="Class Effects" IsExpanded="true">
-            <EffectsEditor Effects="CurrentClassTemplate.Effects" OnAdded="AddEffect" OnRemoved="RemoveEffect" />
+            <EffectsEditor Effects="CurrentClassTemplate.Effects as List<IEffect>" />
         </Accordion>
         
         <Accordion Title="Class Requirements" IsExpanded="true">
-            <RequirementsEditor Requirements="CurrentClassTemplate.Requirements" OnAdded="AddRequirement" OnRemoved="RemoveRequirement" />
+            <RequirementsEditor Requirements="CurrentClassTemplate.Requirements as List<Requirement>" />
         </Accordion>
         
         <div class="field is-grouped has-text-centered">
@@ -75,33 +75,44 @@
         var firstClassTemplate = Repository.GetAll<ClassTemplate>().FirstOrDefault();
         
         if (firstClassTemplate != null)
-        { CurrentClassTemplate = firstClassTemplate; }
+        { SelectClass(firstClassTemplate); }
         else
         { AddClass(); }
     }
 
     public void AddClass()
     {
-        CurrentClassTemplate = new ClassTemplate();
-        CurrentClassTemplate.Id = Repository.GetAll<ClassTemplate>().Count() + 1;
-        CurrentClassTemplate.Variables.AssetCode($"class-{CurrentClassTemplate.Id}");
-        CurrentClassTemplate.GenerateLocaleCodes(CurrentClassTemplate.Variables.AssetCode());
-        Repository.Create(CurrentClassTemplate);
+        var newTemplate = new ClassTemplate();
+        newTemplate.Id = Repository.GetAll<ClassTemplate>().Count() + 1;
+        newTemplate.Variables.AssetCode($"class-{newTemplate.Id}");
+        newTemplate.GenerateLocaleCodes(newTemplate.Variables.AssetCode());
+        Listify(newTemplate);
+        Repository.Create(newTemplate);
+        
+        CurrentClassTemplate = newTemplate;
         StateHasChanged();
     }
 
     public void SelectClass(ClassTemplate classTemplate)
     {
+        Listify(classTemplate);
         CurrentClassTemplate = classTemplate;
         StateHasChanged();
     }
-    
+
+    public void Listify(ClassTemplate template)
+    {
+        template.Effects = template.Effects.AsList();
+        template.Requirements = template.Requirements.AsList();
+    }
+
     public async Task CloneTemplate()
     {
         var clone = Cloner.Clone(CurrentClassTemplate);
         clone.Id = Repository.GetAll<ClassTemplate>().Count() + 1;
         clone.Variables.AssetCode($"{CurrentClassTemplate.Variables.AssetCode()}-clone");
         clone.GenerateLocaleCodes(clone.Variables.AssetCode());
+        Listify(clone);
         Repository.Create(clone);
         await Notifier.ShowNotification($"Cloned Class {CurrentClassTemplate.Variables.AssetCode()}");
         
@@ -115,18 +126,6 @@
         await Notifier.ShowNotification($"Deleted Item {CurrentClassTemplate.Variables.AssetCode()}");
         SelectDefault();
     }
-    
-    public void AddEffect(IEffect effect)
-    { CurrentClassTemplate.Effects = CurrentClassTemplate.Effects.Add(effect); }
-    
-    public void RemoveEffect(IEffect effect)
-    { CurrentClassTemplate.Effects = CurrentClassTemplate.Effects.Remove(effect); }
-    
-    public void AddRequirement(Requirement requirement)
-    { CurrentClassTemplate.Requirements = CurrentClassTemplate.Requirements.Add(requirement); }
-    
-    public void RemoveRequirement(Requirement requirement)
-    { CurrentClassTemplate.Requirements = CurrentClassTemplate.Requirements.Remove(requirement); }
     
     public void OnAssetCodeChanged(string newAssetCode)
     { CurrentClassTemplate.UpdateLocale(newAssetCode, LocaleRepository); }

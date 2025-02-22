@@ -1,7 +1,7 @@
 ﻿@using OpenRpg.Editor.Infrastructure.Helpers
 @using OpenRpg.Entities.Requirements
 
-<ListEditor Data="Requirements" OnAdded="OnAdded" OnRemoved="OnRemoved" TItem="Requirement">
+<ListEditor Data="Requirements" TItem="Requirement">
     <HeaderTemplate>
         <th><abbr title="Requirement Type">Requirement Type</abbr></th>
         <th><abbr title="Associated Id">Associated Id</abbr></th>
@@ -35,11 +35,5 @@
 
 @functions {
     [Parameter]
-    public IReadOnlyCollection<Requirement> Requirements { get; set; }
-    
-    [Parameter]
-    public EventCallback<Requirement> OnAdded { get; set; }
-    
-    [Parameter]
-    public EventCallback<Requirement> OnRemoved { get; set; }
+    public List<Requirement> Requirements { get; set; }
 }

@@ -1,60 +1,18 @@
 ﻿@typeparam TItem
 
-<table class="table is-fullwidth is-rounded">
-    <thead>
-    <tr>
-        @HeaderTemplate
-        @if (OnAdded.HasDelegate)
-        {
-            <th style="max-width: 6em;">
-            @if (ButtonOverrideTemplate == null)
-            { <a class="tag is-primary" @onclick="x => OnAdded.InvokeAsync(Activator.CreateInstance<TItem>())">Add</a> }
-            else
-            { @ButtonOverrideTemplate(OnAdded); }
-            </th>
-        }
-    </tr>
-    </thead>
-    <tbody>
-    @if (ShowNoCount && !Data.Any())
-    {
-        <tr>
-            <td colspan="10000" class="has-text-centered">
-                <p>Collection contains no data</p>
-            </td>
-        </tr>
-    }
-
-    @foreach (var element in Data)
-    {
-        <tr @key="element">
-            @RowTemplate(element)
-            @if (OnRemoved.HasDelegate)
-            {
-                <td>
-                    <button class="button is-danger" @onclick="() => { OnRemoved.InvokeAsync(element); }">X</button>
-                </td>  
-            }
-        </tr>
-        if (NestedRowTemplate != null)
-        {
-            <tr>
-                <td colspan="10000">
-                    @NestedRowTemplate(element)
-                </td>
-            </tr>
-        }
-    }
-    </tbody>
-</table>
+<CollectionEditor TItem="TItem" 
+                  Data="Data" OnAdded="OnAdded" OnRemoved="OnRemoved" ShowNoCount="ShowNoCount" 
+                  HeaderTemplate="HeaderTemplate" RowTemplate="RowTemplate" 
+                  NestedRowTemplate="NestedRowTemplate" ButtonOverrideTemplate="ButtonOverrideTemplate" />
 
 @functions {
     [Parameter] public RenderFragment HeaderTemplate { get; set; }
     [Parameter] public RenderFragment<EventCallback<TItem>> ButtonOverrideTemplate { get; set; }
     [Parameter] public RenderFragment<TItem> RowTemplate { get; set; }
     [Parameter] public RenderFragment<TItem> NestedRowTemplate { get; set; }
-    [Parameter] public IReadOnlyCollection<TItem> Data { get; set; }
-    [Parameter] public EventCallback<TItem> OnAdded { get; set; } // This is enumerable to force the consumer to copy data to something else
-    [Parameter] public EventCallback<TItem> OnRemoved { get; set; } // This is enumerable to force the consumer to copy data to something else
+    [Parameter] public List<TItem> Data { get; set; }
     [Parameter] public bool ShowNoCount { get; set; } = true;
+
+    public void OnAdded(TItem added) => Data.Add(added);
+    public void OnRemoved(TItem removed) => Data.Remove(removed);
 }

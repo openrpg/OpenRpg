@@ -37,19 +37,19 @@
         </Accordion>
         
         <Accordion Title="Quest Objectives" IsExpanded="true">
-            <ObjectivesEditor Objectives="CurrentQuest.Objectives" OnAdded="AddObjective" OnRemoved="RemoveObjective" />
+            <ObjectivesEditor Objectives="CurrentQuest.Objectives as List<Objective>" />
         </Accordion>
         
         <Accordion Title="Quest Gifts" IsExpanded="true">
-            <RewardsEditor Rewards="CurrentQuest.Gifts" OnAdded="AddGift" OnRemoved="RemoveGift" />
+            <RewardsEditor Rewards="CurrentQuest.Gifts as List<Reward>" />
         </Accordion>
         
         <Accordion Title="Quest Rewards" IsExpanded="true">
-            <RewardsEditor Rewards="CurrentQuest.Rewards" OnAdded="AddReward" OnRemoved="RemoveReward" />
+            <RewardsEditor Rewards="CurrentQuest.Rewards as List<Reward>" />
         </Accordion>
         
         <Accordion Title="Quest Requirements" IsExpanded="true">
-            <RequirementsEditor Requirements="CurrentQuest.Requirements" OnAdded="AddRequirement" OnRemoved="RemoveRequirement" />
+            <RequirementsEditor Requirements="CurrentQuest.Requirements as List<Requirement>" />
         </Accordion>
         
         <div class="field is-grouped has-text-centered">
@@ -80,25 +80,37 @@
     {
         var firstQuest = Repository.GetAll<Quest>().FirstOrDefault();
         if (firstQuest != null)
-        { CurrentQuest = firstQuest; }
+        { SelectQuest(firstQuest); }
         else
         { AddQuest(); }
     }
 
     public void AddQuest()
     {
-        CurrentQuest = new Quest();
-        CurrentQuest.Id = Repository.GetAll<Quest>().Count() + 1;
-        CurrentQuest.Variables.AssetCode($"quest-{CurrentQuest.Id}");
-        CurrentQuest.GenerateLocaleCodes(CurrentQuest.Variables.AssetCode());
-        Repository.Create(CurrentQuest);
+        var newQuest = new Quest();
+        newQuest.Id = Repository.GetAll<Quest>().Count() + 1;
+        newQuest.Variables.AssetCode($"quest-{newQuest.Id}");
+        newQuest.GenerateLocaleCodes(newQuest.Variables.AssetCode());
+        Listify(newQuest);
+        Repository.Create(newQuest);
+        
+        CurrentQuest = newQuest;
         StateHasChanged();
     }
 
     public void SelectQuest(Quest quest)
     {
+        Listify(quest);
         CurrentQuest = quest;
         StateHasChanged();
+    }
+
+    public void Listify(Quest template)
+    {
+        template.Requirements = template.Requirements.AsList();
+        template.Rewards = template.Rewards.AsList();
+        template.Gifts = template.Gifts.AsList();
+        template.Objectives = template.Objectives.AsList();
     }
     
     public async Task CloneTemplate()
@@ -107,7 +119,8 @@
         clone.Id = Repository.GetAll<Quest>().Count() + 1;
         clone.Variables.AssetCode($"{CurrentQuest.Variables.AssetCode()}-clone");
         clone.GenerateLocaleCodes(clone.Variables.AssetCode());
-        Repository.Create<Quest>(clone);
+        Listify(clone);
+        Repository.Create(clone);
 
         await Notifier.ShowNotification($"Cloned Quest {CurrentQuest.Variables.AssetCode()}");
         
@@ -121,30 +134,6 @@
         await Notifier.ShowNotification($"Deleted Item {CurrentQuest.Variables.AssetCode()}");
         SelectDefault();
     }
-    
-    public void AddRequirement(Requirement newRequirement)
-    { CurrentQuest.Requirements = CurrentQuest.Requirements.Add(newRequirement); }
-    
-    public void RemoveRequirement(Requirement removedRequirement)
-    { CurrentQuest.Requirements = CurrentQuest.Requirements.Remove(removedRequirement); }
-    
-    public void AddObjective(Objective newObjective)
-    { CurrentQuest.Objectives = CurrentQuest.Objectives.Add(newObjective); }
-    
-    public void RemoveObjective(Objective removedObjective)
-    { CurrentQuest.Objectives = CurrentQuest.Objectives.Remove(removedObjective); }
-
-    public void AddReward(Reward newReward)
-    { CurrentQuest.Rewards = CurrentQuest.Rewards.Add(newReward); }
-    
-    public void RemoveReward(Reward removedReward)
-    { CurrentQuest.Rewards = CurrentQuest.Rewards.Remove(removedReward); }
-    
-    public void AddGift(Reward newGift)
-    { CurrentQuest.Gifts = CurrentQuest.Gifts.Add(newGift); }
-    
-    public void RemoveGift(Reward removeGift)
-    { CurrentQuest.Gifts = CurrentQuest.Gifts.Remove(removeGift); }
     
     public void OnAssetCodeChanged(string newAssetCode)
     { CurrentQuest.UpdateLocale(newAssetCode, LocaleRepository); }

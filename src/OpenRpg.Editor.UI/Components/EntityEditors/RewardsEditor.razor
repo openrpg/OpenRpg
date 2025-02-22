@@ -1,9 +1,10 @@
 ﻿@using OpenRpg.Editor.Infrastructure.Helpers
 @using OpenRpg.Quests
 
-<ListEditor Data="Objectives" OnAdded="OnAdded" OnRemoved="OnRemoved" TItem="Objective">
+<ListEditor Data="Rewards" TItem="Reward">
     <HeaderTemplate>
-        <th><abbr title="Objective Type">Objective Type</abbr></th>
+        <th><abbr title="Reward Type">Reward Type</abbr></th>
+        <th><abbr title="Reward Chance">Reward Chance</abbr></th>
         <th><abbr title="Associated Id">Associated Id</abbr></th>
         <th><abbr title="Associated Value">Associated Value</abbr></th>
     </HeaderTemplate>
@@ -11,13 +12,18 @@
         <td>
             <div class="control">
                 <div class="select is-fullwidth">
-                    <select bind="@context.ObjectiveType">
-                        @foreach (var objectiveType in TypesHelper.GetObjectiveTypes)
+                    <select bind="@context.RewardType">
+                        @foreach (var rewardType in TypesHelper.GetRewardTypes)
                         {
-                            <option value=@objectiveType.Id>@objectiveType.Name</option>
+                            <option value=@rewardType.Id>@rewardType.Name</option>
                         }
                     </select>
                 </div>
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" placeholder="i.e. 0.1 for 10%" bind="@context.RewardChance" />
             </div>
         </td>
         <td>
@@ -34,12 +40,5 @@
 </ListEditor>
 
 @functions {
-    [Parameter]
-    public IReadOnlyCollection<Objective> Objectives { get; set; }
-    
-    [Parameter]
-    public EventCallback<Objective> OnAdded { get; set; }
-    
-    [Parameter]
-    public EventCallback<Objective> OnRemoved { get; set; }
+    [Parameter] public List<Reward> Rewards { get; set; }
 }

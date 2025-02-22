@@ -30,4 +30,7 @@ public static class EntityCollectionExtensions
         newList.Remove(removeThing);
         return newList;
     }
+
+    public static List<T> AsList<T>(this IReadOnlyCollection<T> context)
+    { return context as List<T> ?? new List<T>(context); }
 }
