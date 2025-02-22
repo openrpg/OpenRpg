@@ -6,14 +6,14 @@
 
 <ListEditor Data="Effects" TItem="IEffect">
     <HeaderTemplate>
-        <th><abbr title="Effect Type">Effect Type</abbr></th>
-        <th><abbr title="Potency">Potency</abbr></th>
-        <th><abbr title="Requirements">Requirements</abbr></th>
+        <th>Effect Type</th>
+        <th>Potency</th>
+        <th>Requirements</th>
     </HeaderTemplate>
     <ButtonOverrideTemplate>
         <div class="dropdown @(IsDropdownActive ? "is-active" : "")" @onclick="() => IsDropdownActive = !IsDropdownActive">
             <div class="dropdown-trigger">
-                <button class="button is-primary" aria-haspopup="true" aria-controls="dropdown-menu">
+                <button class="button is-primary is-small" aria-haspopup="true" aria-controls="dropdown-menu">
                     <span>Add Effect</span>
                     <span class="icon is-small">
                         <i class="fas fa-angle-down" aria-hidden="true"></i>
