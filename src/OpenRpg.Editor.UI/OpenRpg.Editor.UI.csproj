@@ -52,4 +52,8 @@
       <AdditionalFiles Include="Components\Modals\LocaleEditorModal.razor" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Extensions\" />
+    </ItemGroup>
+
 </Project>

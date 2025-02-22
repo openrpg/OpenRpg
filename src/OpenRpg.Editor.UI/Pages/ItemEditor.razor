@@ -1,213 +1,88 @@
 ﻿@page "/items"
 
-@using OpenRpg.Data
-@using OpenRpg.Data.Conventions.Extensions
-@using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Helpers
-@using OpenRpg.Editor.Infrastructure.Services
-@using OpenRpg.Editor.UI.Extensions
-@using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Modifications
-@using OpenRpg.Entities.Requirements
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
-@using OpenRpg.Localization.Data.Repositories
 
-@inject INotifier Notifier
-@inject IRepository Repository
-@inject ILocaleRepository LocaleRepository;
-@inject ICloner Cloner;
-
-<div class="columns">
-    <div class="column is-one-fifth">
-        <ContentSidebar Title="Item Templates" Data="Repository.GetAll<ItemTemplate>()" SelectedItem="CurrentItemTemplate"
-                    OnAdd="@AddItem" OnSelected="@((selected) => SelectItem(selected as ItemTemplate))">
-        </ContentSidebar>
-    </div>
-    <div class="column">
-        
-        <div>
-            <Accordion Title="Item Template" IsExpanded="true">
-                <BasicDetailsEditor Data="CurrentItemTemplate">
-                    <AvatarContent>
-                        <AssetImage CustomClasses="@($"item-image quality-type-{CurrentItemTemplate.Variables.QualityType()}")" 
-                                    AssetType="items" AssetCode="@CurrentItemTemplate.Variables.AssetCode()" />
-                    </AvatarContent>
-                    <AdditionalContent>
-                        <AssetCodeEditor Variables="CurrentItemTemplate.Variables" 
-                                         DefaultAssetCode="@($"item-{CurrentItemTemplate.Id}")" 
-                                         OnAssetCodeChanged="OnAssetCodeChanged"/>
-                    </AdditionalContent>
-                </BasicDetailsEditor>
-            </Accordion>
-        
-            <Accordion Title="Item Details" IsExpanded="true">
-                <div class="field is-horizontal">
-                    <div class="field-label">
-                        <label class="label">Stack Amount</label>
-                    </div>
-                    <div class="field-body">
-                        <div class="field">
-                            <div class="control">
-                                <input class="input" type="text" placeholder="i.e 25" 
-                                       value="@CurrentItemTemplate.Variables.MaxStacks()" 
-                                       @onchange="e => CurrentItemTemplate.Variables.MaxStacks(int.Parse(e.Value?.ToString()))"/>
-                            </div>
+<GenericTemplateEditor TTemplate="ItemTemplate" AssetCodePrefix="item">
+    <AvatarContent>
+        <AssetImage CustomClasses="@($"item-image quality-type-{context.Variables.QualityType()}")"
+                    AssetType="items" AssetCode="@context.Variables.AssetCode()" />
+    </AvatarContent>
+    <PrimaryDetailsContent>
+        <Accordion Title="Item Details" IsExpanded="true">
+            <div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label">Stack Amount</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="text" placeholder="i.e 25"
+                                   value="@context.Variables.MaxStacks()"
+                                   @onchange="e => context.Variables.MaxStacks(int.Parse(e.Value?.ToString()))"/>
                         </div>
                     </div>
                 </div>
-                <div class="field is-horizontal">
-                    <div class="field-label">
-                        <label class="label">Value</label>
-                    </div>
-                    <div class="field-body">
-                        <div class="field">
-                            <div class="control">
-                                <input class="input" type="text" placeholder="i.e 100" 
-                                       value="@CurrentItemTemplate.Variables.Value()"
-                                       @onchange="e => CurrentItemTemplate.Variables.Value(int.Parse(e.Value?.ToString()))"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label">
-                        <label class="label">Item Type</label>
-                    </div>
-                    <div class="field-body">
-                        <div class="field">
-                            <div class="control">
-                                <div class="select is-fullwidth">
-                                    <select @bind="CurrentItemTemplate.ItemType">
-                                        @foreach (var itemType in TypesHelper.GetItemTypes)
-                                        {
-                                            <option value=@itemType.Id>@itemType.Name</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field-label">
-                            <label class="label">Item Quality</label>
-                        </div>
-                        <div class="field">
-                            <div class="control">
-                                <div class="select is-fullwidth">
-                                    <select value="@CurrentItemTemplate.Variables.QualityType()" 
-                                            @onchange="e => CurrentItemTemplate.Variables.QualityType(int.Parse(e.Value?.ToString()))">
-                                        @foreach (var itemType in TypesHelper.GetItemQualityTypes)
-                                        {
-                                            <option value=@itemType.Id>@itemType.Name</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </Accordion>
-
-            <Accordion Title="Locale Details" IsExpanded="true">
-                <LocaleDetails LocaleData="CurrentItemTemplate" />
-            </Accordion>
-
-            <Accordion Title="Item Effects" IsExpanded="true">
-                <EffectsEditor Effects="CurrentItemTemplate.Effects as List<IEffect>"/>
-            </Accordion>
-
-            <Accordion Title="Item Requirements" IsExpanded="true">
-                <RequirementsEditor Requirements="CurrentItemTemplate.Requirements as List<Requirement>" />
-            </Accordion>
-
-            <Accordion Title="Item Modification Allowances" IsExpanded="true">
-                <ModificationAllowancesEditor ModificationAllowances="CurrentItemTemplate.ModificationAllowances as List<ModificationAllowance>" />
-            </Accordion>
-        
-            <div class="field is-grouped has-text-centered">
-                <p class="control">
-                    <a class="button is-info" @onclick="CloneTemplate">
-                        Clone Template
-                    </a>
-                </p>
-                <p class="control">
-                    <a class="button is-danger" @onclick="DeleteTemplate">
-                        Delete Template
-                    </a>
-                </p>
             </div>
-        </div>
-        
-    </div>
-</div>
+            <div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label">Value</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="text" placeholder="i.e 100"
+                                   value="@context.Variables.Value()"
+                                   @onchange="e => context.Variables.Value(int.Parse(e.Value?.ToString()))"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label">Item Type</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select @bind="context.ItemType">
+                                    @foreach (var itemType in TypesHelper.GetItemTypes)
+                                    {
+                                        <option value=@itemType.Id>@itemType.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-label">
+                        <label class="label">Item Quality</label>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select value="@context.Variables.QualityType()"
+                                        @onchange="e => context.Variables.QualityType(int.Parse(e.Value?.ToString()))">
+                                    @foreach (var itemType in TypesHelper.GetItemQualityTypes)
+                                    {
+                                        <option value=@itemType.Id>@itemType.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Accordion>
+        <Accordion Title="Item Modification Allowances" IsExpanded="true">
+            <ModificationAllowancesEditor ModificationAllowances="context.ModificationAllowances as List<ModificationAllowance>" />
+        </Accordion>
+    </PrimaryDetailsContent>
+</GenericTemplateEditor>
 
-@functions {
-    
-    public ItemTemplate CurrentItemTemplate;
 
-    protected override void OnInitialized()
-    {
-        SelectDefault();
-    }
-    
-    public void SelectDefault()
-    {
-        var firstItemTemplate = Repository.GetAll<ItemTemplate>().FirstOrDefault();
-        if (firstItemTemplate != null)
-        { SelectItem(firstItemTemplate); }
-        else
-        { AddItem(); }
-    }
-
-    public void AddItem()
-    {
-        var newTemplate = new ItemTemplate();
-        newTemplate.Id = Repository.GetAll<ItemTemplate>().Count() + 1;
-        newTemplate.Variables.AssetCode($"item-{newTemplate.Id}");
-        newTemplate.GenerateLocaleCodes(newTemplate.Variables.AssetCode());
-        Listify(newTemplate);
-        Repository.Create(newTemplate);
-
-        CurrentItemTemplate = newTemplate;
-        StateHasChanged();
-    }
-
-    public void SelectItem(ItemTemplate itemTemplate)
-    {
-        Listify(itemTemplate);
-        CurrentItemTemplate = itemTemplate;
-        StateHasChanged();
-    }
-
-    public void Listify(ItemTemplate template)
-    {
-        template.Effects = template.Effects.AsList();
-        template.Requirements = template.Requirements.AsList();
-        template.ModificationAllowances = template.ModificationAllowances.AsList();
-    }
-
-    public async Task DeleteTemplate()
-    {
-        Repository.Delete<ItemTemplate>(CurrentItemTemplate.Id);
-        await Notifier.ShowNotification($"Deleted Item {CurrentItemTemplate.Variables.AssetCode()}");
-        SelectDefault();
-    }
-
-    public async Task CloneTemplate()
-    {
-        var clone = Cloner.Clone(CurrentItemTemplate);
-        clone.Id = Repository.GetAll<ItemTemplate>().Count() + 1;
-        clone.Variables.AssetCode($"{CurrentItemTemplate.Variables.AssetCode()}-clone");
-        clone.GenerateLocaleCodes(clone.Variables.AssetCode());
-        Listify(clone);
-        Repository.Create(clone);
-        
-        await Notifier.ShowNotification($"Cloned Item {CurrentItemTemplate.Variables.AssetCode()}");
-        
-        CurrentItemTemplate = clone;
-        StateHasChanged();
-    }
-
-    public void OnAssetCodeChanged(string newAssetCode)
-    { CurrentItemTemplate.UpdateLocale(newAssetCode, LocaleRepository); }
+@code {
 }

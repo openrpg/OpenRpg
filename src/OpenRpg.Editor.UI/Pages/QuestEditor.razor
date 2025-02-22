@@ -1,140 +1,22 @@
 ﻿@page "/quests"
-
-@using OpenRpg.Data
-@using OpenRpg.Data.Conventions.Extensions
-@using OpenRpg.Editor.Core.Services.Notifications
-@using OpenRpg.Editor.Infrastructure.Extensions
-@using OpenRpg.Editor.Infrastructure.Services
-@using OpenRpg.Editor.UI.Extensions
-@using OpenRpg.Entities.Requirements
-@using OpenRpg.Localization.Data.Repositories
 @using OpenRpg.Quests
 
-@inject INotifier Notifier
-@inject IRepository Repository
-@inject ILocaleRepository LocaleRepository;
-@inject ICloner Cloner;
-
-<div class="columns">
-    <div class="column is-one-fifth">
-        <ContentSidebar Title="Quests" Data="Repository.GetAll<Quest>()" SelectedItem="CurrentQuest"
-                    OnAdd="AddQuest" OnSelected="selected => SelectQuest(selected as Quest)">
-        </ContentSidebar>
-    </div>
-    <div class="column">
-        
-        <Accordion Title="Quest Template" IsExpanded="true">
-            <BasicDetailsEditor Data="CurrentQuest">
-                <AdditionalContent>
-                    <AssetCodeEditor Variables="CurrentQuest.Variables" DefaultAssetCode="@($"item-{CurrentQuest.Id}")" 
-                                     OnAssetCodeChanged="OnAssetCodeChanged"/>
-                </AdditionalContent>
-            </BasicDetailsEditor>
-        </Accordion>
-
-        <Accordion Title="Locale Details" IsExpanded="true">
-            <LocaleDetails LocaleData="CurrentQuest"></LocaleDetails>
-        </Accordion>
-        
+<GenericTemplateEditor TTemplate="Quest" AssetCodePrefix="race">
+    <PrimaryDetailsContent>
         <Accordion Title="Quest Objectives" IsExpanded="true">
-            <ObjectivesEditor Objectives="CurrentQuest.Objectives as List<Objective>" />
+            <ObjectivesEditor Objectives="context.Objectives as List<Objective>" />
         </Accordion>
-        
+
         <Accordion Title="Quest Gifts" IsExpanded="true">
-            <RewardsEditor Rewards="CurrentQuest.Gifts as List<Reward>" />
+            <RewardsEditor Rewards="context.Gifts as List<Reward>" />
         </Accordion>
-        
+
         <Accordion Title="Quest Rewards" IsExpanded="true">
-            <RewardsEditor Rewards="CurrentQuest.Rewards as List<Reward>" />
+            <RewardsEditor Rewards="context.Rewards as List<Reward>" />
         </Accordion>
-        
-        <Accordion Title="Quest Requirements" IsExpanded="true">
-            <RequirementsEditor Requirements="CurrentQuest.Requirements as List<Requirement>" />
-        </Accordion>
-        
-        <div class="field is-grouped has-text-centered">
-            <p class="control">
-                <a class="button is-info" @onclick="CloneTemplate">
-                    Clone Template
-                </a>
-            </p>
-            <p class="control">
-                <a class="button is-danger" @onclick="DeleteTemplate">
-                    Delete Template
-                </a>
-            </p>
-        </div>
-        
-    </div>
-</div>
+    </PrimaryDetailsContent>
+</GenericTemplateEditor>
 
-@functions {
-    public Quest CurrentQuest;
-
-    protected override void OnInitialized()
-    {
-        SelectDefault();
-    }
-
-    public void SelectDefault()
-    {
-        var firstQuest = Repository.GetAll<Quest>().FirstOrDefault();
-        if (firstQuest != null)
-        { SelectQuest(firstQuest); }
-        else
-        { AddQuest(); }
-    }
-
-    public void AddQuest()
-    {
-        var newQuest = new Quest();
-        newQuest.Id = Repository.GetAll<Quest>().Count() + 1;
-        newQuest.Variables.AssetCode($"quest-{newQuest.Id}");
-        newQuest.GenerateLocaleCodes(newQuest.Variables.AssetCode());
-        Listify(newQuest);
-        Repository.Create(newQuest);
-        
-        CurrentQuest = newQuest;
-        StateHasChanged();
-    }
-
-    public void SelectQuest(Quest quest)
-    {
-        Listify(quest);
-        CurrentQuest = quest;
-        StateHasChanged();
-    }
-
-    public void Listify(Quest template)
-    {
-        template.Requirements = template.Requirements.AsList();
-        template.Rewards = template.Rewards.AsList();
-        template.Gifts = template.Gifts.AsList();
-        template.Objectives = template.Objectives.AsList();
-    }
-    
-    public async Task CloneTemplate()
-    {
-        var clone = Cloner.Clone(CurrentQuest);
-        clone.Id = Repository.GetAll<Quest>().Count() + 1;
-        clone.Variables.AssetCode($"{CurrentQuest.Variables.AssetCode()}-clone");
-        clone.GenerateLocaleCodes(clone.Variables.AssetCode());
-        Listify(clone);
-        Repository.Create(clone);
-
-        await Notifier.ShowNotification($"Cloned Quest {CurrentQuest.Variables.AssetCode()}");
-        
-        CurrentQuest = clone;
-        StateHasChanged();
-    }
-    
-    public async Task DeleteTemplate()
-    {
-        Repository.Delete<Quest>(CurrentQuest.Id);
-        await Notifier.ShowNotification($"Deleted Item {CurrentQuest.Variables.AssetCode()}");
-        SelectDefault();
-    }
-    
-    public void OnAssetCodeChanged(string newAssetCode)
-    { CurrentQuest.UpdateLocale(newAssetCode, LocaleRepository); }
+@code {
+   
 }

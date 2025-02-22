@@ -21,5 +21,13 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
             }
             return newText.ToString();
         }
+
+        public static string Capitalize(this string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            { return string.Empty; }
+
+            return char.ToUpper(text[0]) + text[1..];
+        }
     }
 }

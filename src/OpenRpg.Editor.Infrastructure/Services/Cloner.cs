@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Persistity.Core.Serialization;
 using Persistity.Extensions;
 
@@ -16,8 +17,9 @@ namespace OpenRpg.Editor.Infrastructure.Services
 
         public T Clone<T>(T source) where T : new()
         {
-            var data = Serializer.Serialize(source);
-            return Deserializer.Deserialize<T>(data);
+            var serializationSettings = new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto };
+            var data = Serializer.Serialize(source, serializationSettings);
+            return Deserializer.Deserialize<T>(data, serializationSettings);
         }
     }
 }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OpenRpg.Editor.UI.Extensions;
+namespace OpenRpg.Editor.Infrastructure.Extensions;
 
 public static class EntityCollectionExtensions
 {
