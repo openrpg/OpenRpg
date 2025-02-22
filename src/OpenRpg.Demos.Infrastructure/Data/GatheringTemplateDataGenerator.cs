@@ -28,7 +28,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             return new ItemGatheringTemplate()
             {
                 Id = ItemGatheringTemplateLookups.CopperOre,
-                SkillType = FantasyTradeSkillTypes.Mining,
+                SkillType = FantasyCraftingTradeSkillTypes.Mining,
                 SkillDifficulty = 5,
                 TimeToComplete = 1.0f,
                 OutputItems = new List<TradeSkillItemEntry>() { itemEntry }
@@ -43,13 +43,13 @@ namespace OpenRpg.Demos.Infrastructure.Data
             return new ItemGatheringTemplate()
             {
                 Id = ItemGatheringTemplateLookups.IronOre,
-                SkillType = FantasyTradeSkillTypes.Mining,
+                SkillType = FantasyCraftingTradeSkillTypes.Mining,
                 SkillDifficulty = 15,
                 TimeToComplete = 1.0f,
                 OutputItems = new List<TradeSkillItemEntry>() { itemEntry },
                 Requirements =  new []
                 {
-                    new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, AssociatedId = FantasyTradeSkillTypes.Mining, AssociatedValue = 10 }
+                    new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, AssociatedId = FantasyCraftingTradeSkillTypes.Mining, AssociatedValue = 10 }
                 },
             };
         }
@@ -62,7 +62,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             return new ItemGatheringTemplate()
             {
                 Id = ItemGatheringTemplateLookups.OakLog,
-                SkillType = FantasyTradeSkillTypes.Logging,
+                SkillType = FantasyCraftingTradeSkillTypes.Logging,
                 SkillDifficulty = 0,
                 TimeToComplete = 1.0f,
                 OutputItems = new List<TradeSkillItemEntry>() { itemEntry }

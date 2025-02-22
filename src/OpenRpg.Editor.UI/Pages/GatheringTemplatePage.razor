@@ -1,0 +1,18 @@
+@page "/gathering"
+
+@using OpenRpg.Items.TradeSkills.Templates
+
+<GenericTemplateSection TTemplate="ItemGatheringTemplate" AssetCodePrefix="gathering">
+    <PrimaryDetailsContent>
+        <Accordion Title="Gathering Skill Details" IsExpanded="true">
+            <TradeSkillDetailsEditor IsGatheringSkill="true" TradeSkillData="context" />
+        </Accordion>
+        <Accordion Title="Output Item Details" IsExpanded="true">
+            <TradeSkillItemEntriesEditor TradeSkillItemEntries="context.OutputItems" />
+        </Accordion>
+    </PrimaryDetailsContent>
+</GenericTemplateSection>
+
+@code {
+   
+}

@@ -1,7 +1,6 @@
 ﻿@page "/items"
 
 @using OpenRpg.Editor.Infrastructure.Extensions
-@using OpenRpg.Editor.Infrastructure.Helpers
 @using OpenRpg.Entities.Modifications
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
@@ -13,69 +12,7 @@
     </AvatarContent>
     <PrimaryDetailsContent>
         <Accordion Title="Item Details" IsExpanded="true">
-            <div class="field is-horizontal">
-                <div class="field-label">
-                    <label class="label">Stack Amount</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="i.e 25"
-                                   value="@context.Variables.MaxStacks()"
-                                   @onchange="e => context.Variables.MaxStacks(int.Parse(e.Value?.ToString()))"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="field is-horizontal">
-                <div class="field-label">
-                    <label class="label">Value</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="i.e 100"
-                                   value="@context.Variables.Value()"
-                                   @onchange="e => context.Variables.Value(int.Parse(e.Value?.ToString()))"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="field is-horizontal">
-                <div class="field-label">
-                    <label class="label">Item Type</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                <select @bind="context.ItemType">
-                                    @foreach (var itemType in TypesHelper.GetItemTypes)
-                                    {
-                                        <option value=@itemType.Id>@itemType.Name</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field-label">
-                        <label class="label">Item Quality</label>
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                <select value="@context.Variables.QualityType()"
-                                        @onchange="e => context.Variables.QualityType(int.Parse(e.Value?.ToString()))">
-                                    @foreach (var itemType in TypesHelper.GetItemQualityTypes)
-                                    {
-                                        <option value=@itemType.Id>@itemType.Name</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ItemTemplateDetailsEditor Template="context" />
         </Accordion>
         <Accordion Title="Item Modification Allowances" IsExpanded="true">
             <ModificationAllowancesEditor ModificationAllowances="context.ModificationAllowances as List<ModificationAllowance>" />

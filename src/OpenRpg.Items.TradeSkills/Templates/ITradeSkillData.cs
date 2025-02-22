@@ -11,7 +11,7 @@ namespace OpenRpg.Items.TradeSkills.Templates
         public float TimeToComplete { get; set; }
 
         /// <summary>
-        /// The category of skill type used for Gathering
+        /// The category of skill type used for Gathering/Crafting
         /// </summary>
         public int SkillType { get; set; }
     

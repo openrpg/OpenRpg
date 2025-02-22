@@ -3,6 +3,7 @@ using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
+using OpenRpg.Items.TradeSkills.Templates;
 using OpenRpg.Localization.Data.Extensions;
 using OpenRpg.Localization.Data.Repositories;
 using OpenRpg.Quests;
@@ -32,6 +33,16 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
             {
                 quest.NameLocaleId = $"{newAssetCode}-name";
                 quest.DescriptionLocaleId = $"{newAssetCode}-description";
+            }
+            else if (localeEntity is ItemCraftingTemplate craftingTemplate)
+            {
+                craftingTemplate.NameLocaleId = $"{newAssetCode}-name";
+                craftingTemplate.DescriptionLocaleId = $"{newAssetCode}-description";
+            }
+            else if (localeEntity is ItemGatheringTemplate gatheringTemplate)
+            {
+                gatheringTemplate.NameLocaleId = $"{newAssetCode}-name";
+                gatheringTemplate.DescriptionLocaleId = $"{newAssetCode}-description";
             }
         }
 
@@ -65,6 +76,10 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
             { raceTemplate.Id = id; }
             else if (dataObject is Quest quest)
             { quest.Id = id; }
+            else if (dataObject is ItemCraftingTemplate craftingTemplate)
+            { craftingTemplate.Id = id; }
+            else if (dataObject is ItemGatheringTemplate gatheringTemplate)
+            { gatheringTemplate.Id = id; }
         }
         
         public static void ListifyProperties(this ITemplate template)
@@ -91,6 +106,14 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
                 quest.Objectives = quest.Objectives.AsList();
                 quest.Rewards = quest.Rewards.AsList();
                 quest.Requirements = quest.Requirements.AsList();
+            }
+            else if (template is ItemCraftingTemplate craftingTemplate)
+            {
+                craftingTemplate.Requirements = craftingTemplate.Requirements.AsList();
+            }
+            else if (template is ItemGatheringTemplate gatheringTemplate)
+            {
+                gatheringTemplate.Requirements = gatheringTemplate.Requirements.AsList();
             }
         }
     }

@@ -10,6 +10,7 @@ using OpenRpg.Editor.Infrastructure.Extensions;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
+using OpenRpg.Items.TradeSkills.Templates;
 using OpenRpg.Quests;
 
 namespace OpenRpg.Editor.Infrastructure.Persistence;
@@ -42,6 +43,8 @@ public class SaveProjectExecutor
         await SaveTemplateData<ClassTemplate>();
         await SaveTemplateData<RaceTemplate>();
         await SaveTemplateData<Quest>();
+        await SaveTemplateData<ItemCraftingTemplate>();
+        await SaveTemplateData<ItemGatheringTemplate>();
 
         await SaveLocaleData();
         await SaveProject();

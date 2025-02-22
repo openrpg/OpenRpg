@@ -30,7 +30,7 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
         return new ItemCraftingTemplate()
         {
             Id = ItemCraftingTemplateLookups.CopperIngot,
-            SkillType = FantasyTradeSkillTypes.Smelting,
+            SkillType = FantasyCraftingTradeSkillTypes.Smelting,
             SkillDifficulty = 0,
             TimeToComplete = 2.0f,
             InputItems = new List<TradeSkillItemEntry>() { inputItemEntry },
@@ -51,14 +51,14 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
         return new ItemCraftingTemplate()
         {
             Id = ItemCraftingTemplateLookups.CopperSword,
-            SkillType = FantasyTradeSkillTypes.Smithing,
+            SkillType = FantasyCraftingTradeSkillTypes.Smithing,
             SkillDifficulty = 10,
             TimeToComplete = 2.0f,
             InputItems = new List<TradeSkillItemEntry>() { inputItem1Entry, inputItem2Entry },
             OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry },
             Requirements = new []
             {
-                new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, AssociatedId = FantasyTradeSkillTypes.Smithing, AssociatedValue = 5 }
+                new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, AssociatedId = FantasyCraftingTradeSkillTypes.Smithing, AssociatedValue = 5 }
             }
         };
     }

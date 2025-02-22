@@ -1,0 +1,40 @@
+﻿@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Items.Templates
+@using OpenRpg.Items.TradeSkills
+@using OpenRpg.Items.TradeSkills.Extensions
+
+@inject IRepository Repository
+
+<ListEditor Data="TradeSkillItemEntries" TItem="TradeSkillItemEntry">
+    <HeaderTemplate>
+        <th>Item Template</th>
+        <th>Amount</th>
+    </HeaderTemplate>
+    <RowTemplate>
+        <td>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select @bind="context.TemplateId">
+                        @foreach (var itemTemplate in Repository.GetAll<ItemTemplate>())
+                        {
+                            <option value=@itemTemplate.Id>@itemTemplate.Variables.AssetCode()</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" value="@context.Variables.Amount()"
+                       @onchange="e => context.Variables.Amount(int.Parse(e.Value?.ToString()))"/>
+            </div>
+        </td>
+    </RowTemplate>
+</ListEditor>
+
+@functions {
+    [Parameter]
+    public List<TradeSkillItemEntry> TradeSkillItemEntries { get; set; }
+}

@@ -36,5 +36,7 @@ namespace OpenRpg.Editor.Infrastructure.Helpers
         public static readonly OptionData[] GetEffectScalingType = GetTypesFor(typeof(CoreEffectScalingTypes)).OrderBy(x => x.Id).ToArray();
         public static readonly OptionData[] GetStatTypes = GetTypesFor(typeof(FantasyEntityStatsVariableTypes)).OrderBy(x => x.Id).ToArray();
         public static readonly OptionData[] GetStateTypes = GetTypesFor(typeof(FantasyEntityStateVariableTypes)).OrderBy(x => x.Id).ToArray();
+        public static readonly OptionData[] GetCraftingSkillTypes = GetTypesFor(typeof(FantasyCraftingTradeSkillTypes)).OrderBy(x => x.Id).ToArray();
+        public static readonly OptionData[] GetGatheringSkillTypes = GetTypesFor(typeof(FantasyGatheringTradeSkillTypes)).OrderBy(x => x.Id).ToArray();
     }
 }

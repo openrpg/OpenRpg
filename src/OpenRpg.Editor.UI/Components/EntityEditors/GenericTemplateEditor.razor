@@ -21,12 +21,12 @@
         </BasicDetailsEditor>
     </Accordion>
 
-    @if(PrimaryDetailsContent != null)
-    { @PrimaryDetailsContent(Template) }
-
     <Accordion Title="Locale Details" IsExpanded="true">
         <LocaleDetails LocaleData="Template" />
     </Accordion>
+
+    @if(PrimaryDetailsContent != null)
+    { @PrimaryDetailsContent(Template) }
     
     @if (Template is IHasEffects hasEffects)
     {

@@ -14,6 +14,7 @@ using OpenRpg.Editor.Infrastructure.Persistence.Migrations;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
+using OpenRpg.Items.TradeSkills.Templates;
 using OpenRpg.Quests;
 
 namespace OpenRpg.Editor.Infrastructure.Persistence;
@@ -48,6 +49,8 @@ public class LoadProjectExecutor
         await RefreshTemplateData<ClassTemplate>();
         await RefreshTemplateData<RaceTemplate>();
         await RefreshTemplateData<Quest>();
+        await RefreshTemplateData<ItemCraftingTemplate>();
+        await RefreshTemplateData<ItemGatheringTemplate>();
 
         await RefreshLocaleData();
         
@@ -66,6 +69,8 @@ public class LoadProjectExecutor
         { throw new Exception("Template path does not exist on file system"); }
 
         var dataFile = $"{EditorState.CurrentProject.GetTemplatePath()}/{typeof(T).Name}.json";
+        if(!File.Exists(dataFile)) { await File.WriteAllTextAsync(dataFile, "[]"); }
+        
         var fileContent = await File.ReadAllTextAsync(dataFile);
         var jsonData = JArray.Parse(fileContent);
         
