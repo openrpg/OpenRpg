@@ -1,7 +1,7 @@
 ﻿@page "/quests"
 @using OpenRpg.Quests
 
-<GenericTemplateEditor TTemplate="Quest" AssetCodePrefix="race">
+<GenericTemplateSection TTemplate="Quest" AssetCodePrefix="race">
     <PrimaryDetailsContent>
         <Accordion Title="Quest Objectives" IsExpanded="true">
             <ObjectivesEditor Objectives="context.Objectives as List<Objective>" />
@@ -15,7 +15,7 @@
             <RewardsEditor Rewards="context.Rewards as List<Reward>" />
         </Accordion>
     </PrimaryDetailsContent>
-</GenericTemplateEditor>
+</GenericTemplateSection>
 
 @code {
    

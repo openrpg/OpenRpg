@@ -1,83 +1,56 @@
-@using OpenRpg.Data
-@using OpenRpg.Data.Conventions.Extensions
-@using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
-@using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Requirements
 @using OpenRpg.Localization.Data.Repositories
 @typeparam TTemplate where TTemplate : class, OpenRpg.Core.Templates.ITemplate, OpenRpg.Core.Variables.General.IHasVariables<OpenRpg.Core.Variables.IVariables<object>>, new()
 
-@inject INotifier Notifier
-@inject IRepository Repository
 @inject ILocaleRepository LocaleRepository;
-@inject ICloner Cloner;
 
-<div class="columns">
-    <div class="column is-one-fifth">
-        <ContentSidebar Title="Templates" Data="Repository.GetAll<TTemplate>()" 
-                        SelectedItem="CurrentTemplate" OnAdd="@AddTemplate" 
-                        OnSelected="@((selected) => SelectTemplate(selected as TTemplate))">
-        </ContentSidebar>
-    </div>
-    <div class="column">
-        <div>
-            <Accordion Title="Template Asset Details" IsExpanded="true">
-                <BasicDetailsEditor Data="CurrentTemplate">
-                    <AvatarContent>
-                        @if (AvatarContent != null)
-                        { @AvatarContent(CurrentTemplate) }
-                    </AvatarContent>
-                    <AdditionalContent>
-                        <AssetCodeEditor Variables="CurrentTemplate.Variables" 
-                                         DefaultAssetCode="@($"{AssetCodePrefix}-{CurrentTemplate.Id}")" 
-                                         OnAssetCodeChanged="OnAssetCodeChanged"/>
-                    </AdditionalContent>
-                </BasicDetailsEditor>
-            </Accordion>
+<div class="container">
+    <Accordion Title="Template Asset Details" IsExpanded="true">
+        <BasicDetailsEditor Data="Template">
+            <AvatarContent>
+                @if (AvatarContent != null)
+                { @AvatarContent(Template) }
+            </AvatarContent>
+            <AdditionalContent>
+                <AssetCodeEditor Variables="Template.Variables" 
+                                 DefaultAssetCode="@($"{AssetCodePrefix}-{Template.Id}")" 
+                                 OnAssetCodeChanged="OnAssetCodeChanged"/>
+            </AdditionalContent>
+        </BasicDetailsEditor>
+    </Accordion>
+
+    @if(PrimaryDetailsContent != null)
+    { @PrimaryDetailsContent(Template) }
+
+    <Accordion Title="Locale Details" IsExpanded="true">
+        <LocaleDetails LocaleData="Template" />
+    </Accordion>
+    
+    @if (Template is IHasEffects hasEffects)
+    {
+        <Accordion Title="Template Effects" IsExpanded="true">
+            <EffectsEditor Effects="hasEffects.Effects as List<IEffect>"/>
+        </Accordion>
+    }
+
+    @if (Template is IHasRequirements hasRequirements)
+    {
+        <Accordion Title="Template Requirements" IsExpanded="true">
+            <RequirementsEditor Requirements="hasRequirements.Requirements as List<Requirement>" />
+        </Accordion>
+    }
+
+    @if (SecondaryDetailsContent != null)
+    { @SecondaryDetailsContent(Template) }
         
-            @if(PrimaryDetailsContent != null)
-            { @PrimaryDetailsContent(CurrentTemplate) }
-
-            <Accordion Title="Locale Details" IsExpanded="true">
-                <LocaleDetails LocaleData="CurrentTemplate" />
-            </Accordion>
-            
-            @if (CurrentTemplate is IHasEffects hasEffects)
-            {
-                <Accordion Title="Template Effects" IsExpanded="true">
-                    <EffectsEditor Effects="hasEffects.Effects as List<IEffect>"/>
-                </Accordion>
-            }
-
-            @if (CurrentTemplate is IHasRequirements hasRequirements)
-            {
-                <Accordion Title="Template Requirements" IsExpanded="true">
-                    <RequirementsEditor Requirements="hasRequirements.Requirements as List<Requirement>" />
-                </Accordion>
-            }
-
-            @if (SecondaryDetailsContent != null)
-            { @SecondaryDetailsContent(CurrentTemplate) }
-                    
-            <div class="field is-grouped has-text-centered">
-                <p class="control">
-                    <a class="button is-info" @onclick="CloneTemplate">
-                        Clone @(FriendlyName) Template
-                    </a>
-                </p>
-                <p class="control">
-                    <a class="button is-danger" @onclick="DeleteTemplate">
-                        Delete @(FriendlyName) Template
-                    </a>
-                </p>
-            </div>
-        </div>
-        
-    </div>
 </div>
-
+        
 @functions {
+    
+    [Parameter]
+    public TTemplate Template { get; set; }
     
     [Parameter]
     public RenderFragment<TTemplate> AvatarContent { get; set; }
@@ -91,79 +64,15 @@
     [Parameter]
     public string AssetCodePrefix { get; set; }
     
-    [Parameter]
-    public EventCallback<TTemplate> OnTemplateCreated { get; set; }
-    
-    [Parameter]
-    public EventCallback<TTemplate> OnTemplateRemoved { get; set; }
-
-    public TTemplate CurrentTemplate;
     public string FriendlyName { get; set; } = "";
 
     protected override void OnInitialized()
     {
         FriendlyName = AssetCodePrefix.Capitalize();
-        SelectDefault();
+        Template.ListifyProperties();
         base.OnInitialized();
     }
     
-    public void SelectDefault()
-    {
-        var firstTemplate = Repository.GetAll<TTemplate>().FirstOrDefault();
-        if (firstTemplate != null)
-        { SelectTemplate(firstTemplate); }
-        else
-        { AddTemplate(); }
-    }
-
-    public int GetNewId() => Repository.GetAll<TTemplate>().Count() + 1;
-    
-    public void AddTemplate()
-    {
-        var newId = GetNewId();
-        var newTemplate = new TTemplate();
-        newTemplate.SetId(newId);
-        newTemplate.ListifyProperties();
-        newTemplate.Variables.AssetCode($"{AssetCodePrefix}-{newTemplate.Id}");
-        newTemplate.GenerateLocaleCodes(newTemplate.Variables.AssetCode());
-        Repository.Create(newTemplate);
-
-        OnTemplateCreated.InvokeAsync(newTemplate);
-        CurrentTemplate = newTemplate;
-        StateHasChanged();
-    }
-
-    public void SelectTemplate(TTemplate template)
-    {
-        template.ListifyProperties();
-        CurrentTemplate = template;
-        StateHasChanged();
-    }
-    
-    public async Task DeleteTemplate()
-    {
-        Repository.Delete<TTemplate>(CurrentTemplate.Id);
-        OnTemplateRemoved.InvokeAsync(CurrentTemplate);
-        await Notifier.ShowNotification($"Deleted {FriendlyName} Template {CurrentTemplate.Variables.AssetCode()}");
-        SelectDefault();
-    }
-
-    public async Task CloneTemplate()
-    {
-        var clone = Cloner.Clone(CurrentTemplate);
-        clone.SetId(GetNewId());
-        clone.ListifyProperties();
-        clone.Variables.AssetCode($"{CurrentTemplate.Variables.AssetCode()}-clone");
-        clone.GenerateLocaleCodes(clone.Variables.AssetCode());
-        Repository.Create(clone);
-        
-        await Notifier.ShowNotification($"Cloned {FriendlyName} Template {CurrentTemplate.Variables.AssetCode()}");
-        
-        OnTemplateCreated.InvokeAsync(clone);
-        CurrentTemplate = clone;
-        StateHasChanged();
-    }
-
     public void OnAssetCodeChanged(string newAssetCode)
-    { CurrentTemplate.UpdateLocale(newAssetCode, LocaleRepository); }
+    { Template.UpdateLocale(newAssetCode, LocaleRepository); }
 }

@@ -35,7 +35,7 @@
                     <select @bind="context.EffectType">
                         @foreach (var effectType in TypesHelper.GetEffectTypes)
                         {
-                            <option value=@effectType.Id>@effectType.Name</option>
+                            <option value="@effectType.Id">@effectType.Name</option>
                         }
                     </select>
                 </div>

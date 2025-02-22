@@ -6,7 +6,7 @@
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 
-<GenericTemplateEditor TTemplate="ItemTemplate" AssetCodePrefix="item">
+<GenericTemplateSection TTemplate="ItemTemplate" AssetCodePrefix="item">
     <AvatarContent>
         <AssetImage CustomClasses="@($"item-image quality-type-{context.Variables.QualityType()}")"
                     AssetType="items" AssetCode="@context.Variables.AssetCode()" />
@@ -81,7 +81,7 @@
             <ModificationAllowancesEditor ModificationAllowances="context.ModificationAllowances as List<ModificationAllowance>" />
         </Accordion>
     </PrimaryDetailsContent>
-</GenericTemplateEditor>
+</GenericTemplateSection>
 
 
 @code {
