@@ -1,7 +1,11 @@
 ﻿@page "/classes"
 @using OpenRpg.Entities.Classes.Templates
 
-<GenericTemplateSection TTemplate="ClassTemplate" AssetCodePrefix="class" />
+<GenericTemplateSection TTemplate="ClassTemplate" AssetCodePrefix="class">
+    <TemplateEditor>
+        <ClassTemplateEditor Template="context" />
+    </TemplateEditor>
+</GenericTemplateSection>
 
 @code {
    

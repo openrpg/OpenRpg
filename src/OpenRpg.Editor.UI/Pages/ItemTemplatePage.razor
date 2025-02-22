@@ -1,25 +1,12 @@
 ﻿@page "/items"
 
-@using OpenRpg.Editor.Infrastructure.Extensions
-@using OpenRpg.Entities.Modifications
-@using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 
 <GenericTemplateSection TTemplate="ItemTemplate" AssetCodePrefix="item">
-    <AvatarContent>
-        <AssetImage CustomClasses="@($"item-image quality-type-{context.Variables.QualityType()}")"
-                    AssetType="items" AssetCode="@context.Variables.AssetCode()" />
-    </AvatarContent>
-    <PrimaryDetailsContent>
-        <Accordion Title="Item Details" IsExpanded="true">
-            <ItemTemplateDetailsEditor Template="context" />
-        </Accordion>
-        <Accordion Title="Item Modification Allowances" IsExpanded="true">
-            <ModificationAllowancesEditor ModificationAllowances="context.ModificationAllowances as List<ModificationAllowance>" />
-        </Accordion>
-    </PrimaryDetailsContent>
+    <TemplateEditor>
+        <ItemTemplateEditor Template="context" />
+    </TemplateEditor>
 </GenericTemplateSection>
-
 
 @code {
 }

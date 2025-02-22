@@ -20,9 +20,7 @@
         </ContentSidebar>
     </div>
     <div class="column">
-        <GenericTemplateEditor TTemplate="TTemplate" Template="CurrentTemplate" AssetCodePrefix="@AssetCodePrefix"
-                               AvatarContent="AvatarContent" PrimaryDetailsContent="PrimaryDetailsContent"
-                               SecondaryDetailsContent="SecondaryDetailsContent"/>
+        @TemplateEditor(CurrentTemplate)
                     
         <div class="container m-4">
             <div class="field is-grouped has-text-centered">
@@ -45,22 +43,16 @@
 @functions {
     
     [Parameter]
-    public RenderFragment<TTemplate> AvatarContent { get; set; }
-    
-    [Parameter]
-    public RenderFragment<TTemplate> PrimaryDetailsContent { get; set; }
-    
-    [Parameter]
-    public RenderFragment<TTemplate> SecondaryDetailsContent { get; set; }
-    
-    [Parameter]
-    public string AssetCodePrefix { get; set; }
+    public RenderFragment<TTemplate> TemplateEditor { get; set; }
     
     [Parameter]
     public EventCallback<TTemplate> OnTemplateCreated { get; set; }
     
     [Parameter]
     public EventCallback<TTemplate> OnTemplateRemoved { get; set; }
+    
+    [Parameter]
+    public string AssetCodePrefix { get; set; }
 
     public TTemplate CurrentTemplate;
     public string FriendlyName { get; set; } = "";
@@ -129,6 +121,5 @@
         StateHasChanged();
     }
 
-    public void OnAssetCodeChanged(string newAssetCode)
-    { CurrentTemplate.UpdateLocale(newAssetCode, LocaleRepository); }
+
 }

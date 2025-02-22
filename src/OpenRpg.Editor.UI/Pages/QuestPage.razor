@@ -1,20 +1,11 @@
 ﻿@page "/quests"
+
 @using OpenRpg.Quests
 
-<GenericTemplateSection TTemplate="Quest" AssetCodePrefix="race">
-    <PrimaryDetailsContent>
-        <Accordion Title="Quest Objectives" IsExpanded="true">
-            <ObjectivesEditor Objectives="context.Objectives as List<Objective>" />
-        </Accordion>
-
-        <Accordion Title="Quest Gifts" IsExpanded="true">
-            <RewardsEditor Rewards="context.Gifts as List<Reward>" />
-        </Accordion>
-
-        <Accordion Title="Quest Rewards" IsExpanded="true">
-            <RewardsEditor Rewards="context.Rewards as List<Reward>" />
-        </Accordion>
-    </PrimaryDetailsContent>
+<GenericTemplateSection TTemplate="Quest" AssetCodePrefix="quest">
+    <TemplateEditor>
+        <QuestEditor Template="context" />
+    </TemplateEditor>
 </GenericTemplateSection>
 
 @code {

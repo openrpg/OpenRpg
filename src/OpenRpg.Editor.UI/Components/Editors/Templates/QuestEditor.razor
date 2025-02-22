@@ -1,0 +1,22 @@
+@using OpenRpg.Quests
+
+<GenericTemplateEditor TTemplate="Quest" AssetCodePrefix="quest" Template="Template">
+    <PrimaryDetailsContent>
+        <Accordion Title="Quest Objectives" IsExpanded="true">
+            <ObjectivesEditor Objectives="context.Objectives as List<Objective>" />
+        </Accordion>
+
+        <Accordion Title="Quest Gifts" IsExpanded="true">
+            <RewardsEditor Rewards="context.Gifts as List<Reward>" />
+        </Accordion>
+
+        <Accordion Title="Quest Rewards" IsExpanded="true">
+            <RewardsEditor Rewards="context.Rewards as List<Reward>" />
+        </Accordion>
+    </PrimaryDetailsContent>
+</GenericTemplateEditor>
+
+@code {
+    [Parameter]
+    public Quest Template { get; set; }
+}
