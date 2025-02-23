@@ -3,12 +3,14 @@
 @using OpenRpg.Cards.Genres
 @using OpenRpg.Core.Templates
 @using OpenRpg.Entities.Effects
-@using OpenRpg.Genres.Extensions
+@using OpenRpg.Entities.Effects.Processors
+@using OpenRpg.Items.Extensions
 @using OpenRpg.Localization.Data.Extensions
 @using OpenRpg.Localization.Data.Repositories
 
 @inject ILocaleRepository LocaleRepository
 @inject ITemplateAccessor TemplateAccessor
+@inject IEffectProcessor EffectProcessor
 
 <div class="container game-card" card-type="@Card.CardType">
     <div class="card @CardTypeClass">
@@ -49,6 +51,14 @@
 
     public string CardTypeClass => $"card-type-{Card.CardType}";
     public string CardTypeText => LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.CardTypesTextKey, Card.CardType));
-    public StaticEffect GetMaximumStaticEffectPotency => (Card as EquipmentCard).Data.Data.ComputeEffects(TemplateAccessor).OrderByDescending(x => x.Potency).FirstOrDefault();
+    public StaticEffect GetMaximumStaticEffectPotency
+    {
+        get
+        {
+            var itemData = (Card as EquipmentCard).Data.Data;
+            var itemTemplate = TemplateAccessor.GetItemTemplate(itemData.TemplateId);
+            return EffectProcessor.ComputeEffects(itemTemplate).OrderByDescending(x => x.Potency).FirstOrDefault();
+        }
+    }
 
 }

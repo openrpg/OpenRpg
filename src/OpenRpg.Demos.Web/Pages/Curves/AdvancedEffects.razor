@@ -6,12 +6,12 @@
 @using OpenRpg.Entities.Classes
 @using OpenRpg.Entities.Classes.Templates
 @using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Effects.Processors
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Entities.Races.Templates
 @using OpenRpg.Entities.Types
 @using OpenRpg.Genres.Characters
-@using OpenRpg.Genres.Extensions
 @using OpenRpg.Genres.Fantasy.Extensions
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Genres.Populators.Entity.Stats
@@ -122,6 +122,8 @@
             <CharacterStats Stats="@ExampleCharacter.Stats"/>
             <br />
             <CharacterVitals Stats="@ExampleCharacter.Stats"/>
+            <br />
+            <EffectList Effects="ComputedEffects" Character="ExampleCharacter" />
         </CardSection>
     </div>
 </div>
@@ -131,7 +133,9 @@
     public IRefreshable DamageScalingChart { get; set; }
 
     public ManualTemplateAccessor TemplateAccessor { get; set; } = new();
+    public IEffectProcessor EffectProcessor { get; set; }
     public Character ExampleCharacter { get; set; } = new();
+    public List<StaticEffect> ComputedEffects { get; set; } = new();
 
     public int CharacterLevel
     {
@@ -141,6 +145,7 @@
     
     protected override void OnInitialized()
     {
+        EffectProcessor = new EffectProcessor(TemplateAccessor);
         DamageScaledWithStrengthEffect = new ScaledEffect()
         {
             EffectType = FantasyEffectTypes.DamageBonusAmount,
@@ -221,8 +226,10 @@
 
     public void RefreshStats()
     {
-        var effects = ExampleCharacter.ComputeEffects(TemplateAccessor);
-        StatPopulator.Populate(ExampleCharacter.Stats, effects, Array.Empty<IVariables>());
+        var effects = EffectProcessor.ComputeEffects(ExampleCharacter);
+        ComputedEffects.Clear();
+        ComputedEffects.AddRange(effects);
+        StatPopulator.Populate(ExampleCharacter.Stats, ComputedEffects, Array.Empty<IVariables>());
     }
 
 }

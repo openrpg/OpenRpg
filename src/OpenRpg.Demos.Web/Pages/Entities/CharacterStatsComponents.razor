@@ -8,11 +8,13 @@
 @using OpenRpg.Entities.Classes
 @using OpenRpg.Entities.Classes.Templates
 @using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Effects.Processors
 @using OpenRpg.Entities.Entity
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Entities.Races.Templates
 @using OpenRpg.Entities.Stats.Variables
+@using OpenRpg.Genres.Effects
 
 <Markdown>
     ## Stats Components
@@ -162,11 +164,11 @@
             <div class="columns">
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
-                    <EffectList Effects="@AutoStatsExample.Variables.Race().ComputeEffects(AutoStatTemplateAccessor).ToArray()" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample.Variables.Race())" />
                 </div>
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
-                    <EffectList Effects="@AutoStatsExample.Variables.Class().ComputeEffects(AutoStatTemplateAccessor).ToArray()" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample.Variables.Class())" />
                 </div>
             </div>
         </CardSection>
@@ -183,11 +185,11 @@
             <div class="columns">
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
-                    <EffectList Effects="@AutoStatsExample2.Variables.Race().ComputeEffects(AutoStatTemplateAccessor).ToArray()" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample2.Variables.Race())" />
                 </div>
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
-                    <EffectList Effects="@AutoStatsExample2.Variables.Class().ComputeEffects(AutoStatTemplateAccessor).ToArray()" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample2.Variables.Class())" />
                 </div>
             </div>
         </CardSection>
@@ -203,6 +205,8 @@
     
     public ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new();
     public ManualTemplateAccessor AutoStatTemplateAccessor { get; } = new();
+    public IEffectProcessor EffectProcessor { get; set; }
+
     
     protected void SetupManualStats()
     {
@@ -237,6 +241,8 @@
 
     protected void SetupAutoStats1()
     {
+        EffectProcessor = new GenreEffectProcessor(AutoStatTemplateAccessor);
+        
         var raceEffects = new[]
         {
           new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.StrengthBonusAmount},
@@ -276,8 +282,23 @@
         AutoStatsExample2.Variables.Class(new ClassData { TemplateId = fighterClass.Id });
         
         var statsCalculator = new FantasyStatsPopulator();
-        statsCalculator.Populate(AutoStatsExample.Stats, AutoStatsExample.ComputeEffects(AutoStatTemplateAccessor), null);
-        statsCalculator.Populate(AutoStatsExample2.Stats, AutoStatsExample.ComputeEffects(AutoStatTemplateAccessor), null);
+        var example1Effects = EffectProcessor.ComputeEffects(AutoStatsExample);
+        statsCalculator.Populate(AutoStatsExample.Stats, example1Effects.ToArray(), null);
+        
+        var example2Effects = EffectProcessor.ComputeEffects(AutoStatsExample2);
+        statsCalculator.Populate(AutoStatsExample2.Stats, example2Effects.ToArray(), null);
+    }
+
+    public IReadOnlyCollection<StaticEffect> GetEffectsFor(RaceData race)
+    {
+        var template = AutoStatTemplateAccessor.GetRaceTemplate(race.TemplateId);
+        return EffectProcessor.ComputeEffects(template).ToArray();
+    }
+    
+    public IReadOnlyCollection<StaticEffect> GetEffectsFor(ClassData @class)
+    {
+        var template = AutoStatTemplateAccessor.GetClassTemplate(@class.TemplateId);
+        return EffectProcessor.ComputeEffects(template).ToArray();
     }
 
     protected override void OnInitialized()

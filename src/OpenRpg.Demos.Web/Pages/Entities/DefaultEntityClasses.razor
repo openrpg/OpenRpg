@@ -6,6 +6,7 @@
 @using OpenRpg.Core.Utils
 @using OpenRpg.Demos.Infrastructure.Lookups
 @using OpenRpg.Entities.Classes
+@using OpenRpg.Entities.Effects.Processors
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Genres.Characters
@@ -14,6 +15,7 @@
 @inject IRandomizer Randomizer;
 @inject IEntityStatPopulator StatPopulator;
 @inject ITemplateAccessor TemplateAccessor;
+@inject IEffectProcessor EffectProcessor;
 
 <Markdown>
     ## Custom Scenarios
@@ -138,7 +140,7 @@
     
     protected override void OnInitialized()
     {
-        CharacterBuilder = new DemoCharacterBuilder(Randomizer, StatPopulator, TemplateAccessor);
+        CharacterBuilder = new DemoCharacterBuilder(Randomizer, StatPopulator, TemplateAccessor, EffectProcessor);
         
         _manualCharacter = new Character();
         _manualCharacter.NameLocaleId = "John Doe";

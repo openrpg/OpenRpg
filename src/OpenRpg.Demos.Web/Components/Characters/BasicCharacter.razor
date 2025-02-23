@@ -2,11 +2,14 @@
 @using OpenRpg.Core.Templates
 @using OpenRpg.Entities.Classes
 @using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Effects.Processors
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Entities.State.Variables
 @using OpenRpg.Entities.Stats.Variables
 @using OpenRpg.Genres.Extensions
+
+@inject IEffectProcessor EffectProcessor;
 
 <CardSection>
     <div class="container">
@@ -42,8 +45,8 @@
     public ITemplateAccessor TemplateAccessor { get; set; }
 
     public IReadOnlyCollection<StaticEffect> GetRaceEffects()
-    { return Character.Variables.Race().ComputeEffects(TemplateAccessor).ToArray(); }
+    { return EffectProcessor.ComputeEffects(TemplateAccessor.GetRaceTemplate(Character.Variables.Race().TemplateId), Character).ToArray(); }
     
     public IReadOnlyCollection<StaticEffect> GetClassEffects()
-    { return Character.Variables.Class().ComputeEffects(TemplateAccessor).ToArray(); }
+    { return EffectProcessor.ComputeEffects(TemplateAccessor.GetClassTemplate(Character.Variables.Class().TemplateId), Character).ToArray(); ; }
 }

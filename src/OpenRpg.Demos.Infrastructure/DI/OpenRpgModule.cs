@@ -4,7 +4,9 @@ using OpenRpg.Combat.Processors.Attacks;
 using OpenRpg.Combat.Processors.Attacks.Entity;
 using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Scheduling;
+using OpenRpg.Entities.Effects.Processors;
 using OpenRpg.Entities.Stats.Variables;
+using OpenRpg.Genres.Effects;
 using OpenRpg.Genres.Fantasy.Combat;
 using OpenRpg.Genres.Fantasy.Requirements;
 using OpenRpg.Genres.Fantasy.Stats;
@@ -24,6 +26,7 @@ namespace OpenRpg.Demos.Infrastructure.DI
             services.AddSingleton<IEntityAttackGenerator, BasicAttackGenerator>();
             services.AddSingleton<IAttackProcessor<EntityStatsVariables>, DefaultAttackProcessor>();
             services.AddSingleton<ICharacterRequirementChecker, DefaultFantasyCharacterRequirementChecker>();
+            services.AddSingleton<IEffectProcessor, GenreEffectProcessor>();
         }
     }
 }
