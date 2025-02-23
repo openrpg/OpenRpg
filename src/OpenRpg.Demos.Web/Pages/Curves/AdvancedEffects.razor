@@ -1,0 +1,228 @@
+﻿@page "/curves/advanced-effects"
+@using OpenRpg.Core.Variables
+@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Scaling
+@using OpenRpg.Demos.Infrastructure.Templates
+@using OpenRpg.Entities.Classes
+@using OpenRpg.Entities.Classes.Templates
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Entities.Races
+@using OpenRpg.Entities.Races.Templates
+@using OpenRpg.Entities.Types
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Genres.Populators.Entity.Stats
+@using OpenRpg.Items.Equippables
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+
+@inject IEntityStatPopulator StatPopulator;
+
+<Markdown>
+   ## Advanced Effects
+   Hopefully by now you have a basic understanding of 2 key things, `Effects` and `ScalingFunctions` and if we combine
+   those two things we get an interesting result known as `ScaledEffect`.
+   
+   So far everything you have been touching on uses the `StaticEffect` behind the scenes which expresses an `EffectType`
+   and a `Potency`, however the potency is a fixed value, so if its 10, its always going to be 10. For most use cases
+   this is perfectly fine, however imagine if you were making a Souls-like game and you wanted to make a weapon whos
+   `Damage` stat scaled with your `Strength` stat, or if your `Necromancer` class got a `MaxMagic` boost at night time.
+   
+   `ScaledEffects` let you achieve these sorts of use cases by replacing the static `Potency` with a `PotencyFunction` 
+   that allows us to *compute* the effects potency based off other factors and plot it on a curve.
+</Markdown>
+
+<br/>
+
+
+<br />
+
+<div class="columns">
+    <div class="column is-half">
+        <Markdown>
+            ## Example `ScaledEffects`
+
+            Lets make a quick example, where we have a scaled effect that scales off a value (lets pretend its the Strength stat)
+            and see how it works.
+
+            ```csharp
+            var DamageScaledWithStrengthEffect = new ScaledEffect()
+            {
+            EffectType = FantasyEffectTypes.DamageBonusAmount,
+            ScalingType = CoreEffectScalingTypes.Value,
+            PotencyFunction = new ScalingFunction(PresetCurves.Linear, 100, 300, 5, 20)
+            };
+            ```
+
+            This says we will scale with a value (we can use stats, states, levels and all other types), and it will give a 
+            damage bonus effect based on the value provided. 
+            
+            The damage will scale between 100-300, and it expects the minimum strength to scale off from a range of 5-20.
+            i.e if you have less than 5 strength it will only be 100, if you are higher than 20 you will only get 300.
+            
+            > All these values are all flexible and can be whatever you want, and as we said you can add your own `ScalingType`
+            > handlers combined with the `ScalingIndex`.
+            
+            If you then play with the example test strength value you can see how the damage would be scaled.
+            
+            To make things more interesting lets do another example where we have an entity and an item etc and see
+            how it all works together in reality with populators and computing the values etc.
+        </Markdown>
+    </div>
+    <div class="column is-half">
+        <CardSection>
+            <ScalingFunctionChart Title="Damage Scaling With Strength" @ref="DamageScalingChart"
+                                  ScalingFunction="DamageScaledWithStrengthEffect.PotencyFunction" XAxisName="Strength" YAxisName="Damage" />
+        </CardSection>
+        <CardSection>
+            <div class="field">
+                <label class="label">Strength Value</label>
+                <div class="control">
+                    <input class="input" type="text" @bind="FakeStrengthStat" />
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Computed Damage Value</label>
+                <div class="control">
+                    <input class="input" type="text" disabled value="@(DamageScaledWithStrengthEffect.PotencyFunction.Plot(FakeStrengthStat))" />
+                </div>
+            </div>
+        </CardSection>
+    </div>
+</div>
+
+<br />
+
+<div class="columns">
+    <div class="column is-half">
+        <CardSection>
+            <Markdown Containerless="true">
+                ## Computing Stats with Mixed Effects
+
+
+
+            </Markdown>
+            <div class="field">
+                <label class="label">Level Value</label>
+                <div class="control">
+                    <input class="input" type="text" @bind="CharacterLevel" @bind:after="RefreshStats"/>
+                </div>
+            </div>
+        </CardSection>
+    </div>
+    <div class="column is-half">
+        <CardSection>
+            <br />
+            <CharacterDetails Name="@ExampleCharacter.NameLocaleId"
+                              Race="@TemplateAccessor.ToInstance(ExampleCharacter.Variables.Race())"
+                              Class="@TemplateAccessor.ToInstance(ExampleCharacter.Variables.Class())"/>
+            <CharacterStats Stats="@ExampleCharacter.Stats"/>
+            <br />
+            <CharacterVitals Stats="@ExampleCharacter.Stats"/>
+        </CardSection>
+    </div>
+</div>
+@code {
+    public int FakeStrengthStat { get; set; } = 10;
+    public ScaledEffect DamageScaledWithStrengthEffect { get; set; }
+    public IRefreshable DamageScalingChart { get; set; }
+
+    public ManualTemplateAccessor TemplateAccessor { get; set; } = new();
+    public Character ExampleCharacter { get; set; } = new();
+
+    public int CharacterLevel
+    {
+        get => ExampleCharacter.Variables.Class().Variables.Level();
+        set => ExampleCharacter.Variables.Class().Variables.Level(value);
+    }
+    
+    protected override void OnInitialized()
+    {
+        DamageScaledWithStrengthEffect = new ScaledEffect()
+        {
+            EffectType = FantasyEffectTypes.DamageBonusAmount,
+            ScalingType = CoreEffectScalingTypes.Value,
+            PotencyFunction = new ScalingFunction(PresetCurves.Linear, 100, 300, 5, 20)
+        };
+
+        var pretendFighterClassTemplate = new ClassTemplate
+        {
+            Id = 5,
+            NameLocaleId = "Fighter",
+            Effects = new IEffect[]
+            {
+                new ScaledEffect()
+                {
+                    EffectType = FantasyEffectTypes.StrengthBonusAmount,
+                    ScalingType = CoreEffectScalingTypes.Level,
+                    PotencyFunction = new ScalingFunction(PresetCurves.Linear, 2, 5, 1, 10)
+                },
+                new StaticEffect()
+                {
+                    EffectType = FantasyEffectTypes.StrengthBonusPercentage,
+                    Potency = 0.1f
+                }
+            }
+        };
+
+        var pretendHumanRace = new RaceTemplate
+        {
+            Id = 2,
+            NameLocaleId = "Human",
+            Effects = new[]
+            {
+                new ScaledEffect()
+                {
+                    EffectType = FantasyEffectTypes.AllAttributeBonusAmount,
+                    ScalingType = CoreEffectScalingTypes.Level,
+                    PotencyFunction = new ScalingFunction(PresetCurves.Linear, 7, 10, 1, 10)
+                }
+            }
+        };
+
+        var pretendWeapon = new ItemTemplate
+        {
+            Id = 23,
+            NameLocaleId = "Super Fighter Sword",
+            Effects = new IEffect[]
+            {
+                new StaticEffect()
+                {
+                    EffectType = FantasyEffectTypes.StrengthBonusAmount,
+                    Potency = 1
+                },
+                new ScaledEffect()
+                {
+                    EffectType = FantasyEffectTypes.DamageBonusAmount,
+                    ScalingType = CoreEffectScalingTypes.StatIndex,
+                    ScalingIndex = FantasyEntityStatsVariableTypes.Strength,
+                    PotencyFunction = new ScalingFunction(PresetCurves.Linear, 10, 30, 1, 10)
+                }
+            }
+        };
+        
+        var equipment = new Equipment();
+        equipment.MainHandSlot(new ItemData() { TemplateId = pretendWeapon.Id });
+
+        ExampleCharacter.Variables.Race(new RaceData() { TemplateId = pretendHumanRace.Id });
+        ExampleCharacter.Variables.Class(new ClassData() { TemplateId = pretendFighterClassTemplate.Id });
+        ExampleCharacter.Variables.Equipment(equipment);
+
+        TemplateAccessor.AddTemplate(pretendHumanRace);
+        TemplateAccessor.AddTemplate(pretendFighterClassTemplate);
+        TemplateAccessor.AddTemplate(pretendWeapon);
+
+        RefreshStats();
+        base.OnInitialized();
+    }
+
+    public void RefreshStats()
+    {
+        var effects = ExampleCharacter.ComputeEffects(TemplateAccessor);
+        StatPopulator.Populate(ExampleCharacter.Stats, effects, Array.Empty<IVariables>());
+    }
+
+}

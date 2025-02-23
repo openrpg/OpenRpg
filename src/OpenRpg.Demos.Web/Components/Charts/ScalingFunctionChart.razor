@@ -7,7 +7,7 @@
 <ApexChart TItem="DataPoint" Title="@Title" @ref="ChartInstance" Options="ChartOptions" XAxisType="XAxisType.Numeric">
     <ApexPointSeries TItem="DataPoint"
         Items="Data"
-        SeriesType="SeriesType.Line"
+        SeriesType="SeriesType.Area"
         Stroke="new SeriesStroke() { Width = 2, Color = ChartColor }"
         YValue="@(e => e.OutputValue)"
         XValue="@(e => e.InputValue)"/>

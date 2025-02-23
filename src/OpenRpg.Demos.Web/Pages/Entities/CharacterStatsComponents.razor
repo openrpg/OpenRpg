@@ -12,7 +12,6 @@
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Entities.Races.Templates
-@using OpenRpg.Entities.State.Variables
 @using OpenRpg.Entities.Stats.Variables
 
 <Markdown>
@@ -202,8 +201,8 @@
     private Entity AutoStatsExample = new Entity();
     private Entity AutoStatsExample2 = new Entity();
     
-    public ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new ManualTemplateAccessor();
-    public ManualTemplateAccessor AutoStatTemplateAccessor { get; } = new ManualTemplateAccessor();
+    public ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new();
+    public ManualTemplateAccessor AutoStatTemplateAccessor { get; } = new();
     
     protected void SetupManualStats()
     {

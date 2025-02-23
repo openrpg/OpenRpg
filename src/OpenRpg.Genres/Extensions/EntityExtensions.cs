@@ -7,6 +7,7 @@ using OpenRpg.Entities.Effects;
 using OpenRpg.Entities.Entity;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Races;
+using OpenRpg.Entities.Types;
 using OpenRpg.Items.Equippables;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Templates;
@@ -15,7 +16,31 @@ namespace OpenRpg.Genres.Extensions
 {
     public static class EntityExtensions
     {
-        public static IEnumerable<StaticEffect> ComputeEffects(this RaceData raceData, ITemplateAccessor templateAccessor)
+        public static StaticEffect ComputeScalingType(this ScaledEffect scaledEffect, Entity relatedEntity = null)
+        {
+            if (relatedEntity == null)
+            { return scaledEffect.Compute(1); }
+            
+            if (scaledEffect.ScalingType == CoreEffectScalingTypes.Level)
+            {
+                var level = relatedEntity?.Variables.Class()?.Variables.Level() ?? 1;
+                return scaledEffect.Compute(level);
+            }
+            if (scaledEffect.ScalingType == CoreEffectScalingTypes.StateIndex)
+            {
+                var stateValue = relatedEntity?.State.Get(scaledEffect.ScalingIndex) ?? 1;
+                return scaledEffect.Compute(stateValue);
+            }
+            if (scaledEffect.ScalingType == CoreEffectScalingTypes.StatIndex)
+            {
+                var stateValue = relatedEntity?.Stats.Get(scaledEffect.ScalingIndex) ?? 1;
+                return scaledEffect.Compute(stateValue);
+            }
+            
+            return scaledEffect.Compute(1); 
+        }
+        
+        public static IEnumerable<StaticEffect> ComputeEffects(this RaceData raceData, ITemplateAccessor templateAccessor, Entity relatedEntity = null)
         {
             var template = templateAccessor.GetRaceTemplate(raceData.TemplateId);
             foreach (var effect in template.Effects)
@@ -24,14 +49,11 @@ namespace OpenRpg.Genres.Extensions
                 { yield return staticEffect; }
 
                 if (effect is ScaledEffect scaledEffect)
-                {
-                    if (scaledEffect.ScalingType == 1)
-                    { yield return scaledEffect.Compute(1); }
-                }
+                { yield return scaledEffect.ComputeScalingType(relatedEntity); }
             }
         }
         
-        public static IEnumerable<StaticEffect> ComputeEffects(this ClassData classData, ITemplateAccessor templateAccessor)
+        public static IEnumerable<StaticEffect> ComputeEffects(this ClassData classData, ITemplateAccessor templateAccessor, Entity relatedEntity = null)
         {
             var template = templateAccessor.GetClassTemplate(classData.TemplateId);
             foreach (var effect in template.Effects)
@@ -40,16 +62,11 @@ namespace OpenRpg.Genres.Extensions
                 { yield return staticEffect; }
 
                 if (effect is ScaledEffect scaledEffect)
-                {
-                    if (scaledEffect.ScalingType == 1)
-                    { yield return scaledEffect.Compute(classData.Variables.Level()); }
-                    else
-                    { yield return scaledEffect.Compute(1); }
-                }
+                { yield return scaledEffect.ComputeScalingType(relatedEntity); }
             }
         }
         
-        public static IEnumerable<StaticEffect> ComputeEffects(this ItemModificationData modificationData, ITemplateAccessor templateAccessor)
+        public static IEnumerable<StaticEffect> ComputeEffects(this ItemModificationData modificationData, ITemplateAccessor templateAccessor, Entity relatedEntity)
         {
             var template = templateAccessor.GetModificationTemplate<ItemModificationTemplate>(modificationData.TemplateId);
             foreach (var effect in template.Effects)
@@ -58,11 +75,11 @@ namespace OpenRpg.Genres.Extensions
                 { yield return staticEffect; }
 
                 if (effect is ScaledEffect scaledEffect)
-                { yield return scaledEffect.Compute(1); }
+                { yield return scaledEffect.ComputeScalingType(relatedEntity); }
             }
         }
         
-        public static IEnumerable<StaticEffect> ComputeEffects(this ItemData itemData, ITemplateAccessor templateAccessor)
+        public static IEnumerable<StaticEffect> ComputeEffects(this ItemData itemData, ITemplateAccessor templateAccessor, Entity relatedEntity = null)
         {
             var template = templateAccessor.GetItemTemplate(itemData.TemplateId);
             foreach (var effect in template.Effects)
@@ -71,7 +88,7 @@ namespace OpenRpg.Genres.Extensions
                 { yield return staticEffect; }
 
                 if (effect is ScaledEffect scaledEffect)
-                { yield return scaledEffect.Compute(1); }
+                { yield return scaledEffect.ComputeScalingType(relatedEntity); }
             }
 
             if (!itemData.Modifications.Any())
@@ -79,17 +96,17 @@ namespace OpenRpg.Genres.Extensions
 
             foreach (var modification in itemData.Modifications)
             {
-                var modificationEffects = modification.ComputeEffects(templateAccessor);
+                var modificationEffects = modification.ComputeEffects(templateAccessor, relatedEntity);
                 foreach(var modificationEffect in modificationEffects)
                 { yield return modificationEffect; }
             }
         }
         
-        public static IEnumerable<StaticEffect> ComputeEffects(this Equipment equipment, ITemplateAccessor templateAccessor)
+        public static IEnumerable<StaticEffect> ComputeEffects(this Equipment equipment, ITemplateAccessor templateAccessor, Entity relatedEntity = null)
         {
             return equipment.Slots.Values
                 .Where(x => x != null)
-                .SelectMany(x => x.ComputeEffects(templateAccessor));
+                .SelectMany(x => x.ComputeEffects(templateAccessor, relatedEntity));
         }
         
         /// <summary>
@@ -98,25 +115,25 @@ namespace OpenRpg.Genres.Extensions
         /// <param name="entity">The entity to process</param>
         /// <returns>All known effects that are applied to the entity</returns>
         /// <remarks>Multiclass are not included as that's likely to need complex mapping logic</remarks>
-        public static IReadOnlyCollection<StaticEffect> ComputeEffects(this Entity entity, ITemplateAccessor templateAccessor)
+        public static IReadOnlyCollection<StaticEffect> ComputeEffects(this Entity entity, ITemplateAccessor templateAccessor, Entity relatedEntity = null)
         {
             var effects = new List<StaticEffect>();
 
             if (entity.Variables.HasRace())
             {
-                var computedEffects = entity.Variables.Race().ComputeEffects(templateAccessor);
+                var computedEffects = entity.Variables.Race().ComputeEffects(templateAccessor, relatedEntity);
                 effects.AddRange(computedEffects);
             }
 
             if (entity.Variables.HasClass())
             {
-                var computedEffects = entity.Variables.Class().ComputeEffects(templateAccessor);
+                var computedEffects = entity.Variables.Class().ComputeEffects(templateAccessor, relatedEntity);
                 effects.AddRange(computedEffects);
             }
 
             if (entity.Variables.HasEquipment())
             {
-                var computedEffects = entity.Variables.Equipment().ComputeEffects(templateAccessor);
+                var computedEffects = entity.Variables.Equipment().ComputeEffects(templateAccessor, relatedEntity);
                 effects.AddRange(computedEffects);
             }
 
