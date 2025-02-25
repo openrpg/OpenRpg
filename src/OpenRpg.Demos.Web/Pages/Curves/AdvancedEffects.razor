@@ -8,6 +8,7 @@
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Effects.Processors
 @using OpenRpg.Entities.Entity
+@using OpenRpg.Entities.Entity.Populators.Stats
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Entities.Races.Templates
@@ -17,13 +18,14 @@
 @using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Fantasy.Extensions
 @using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Genres.Populators.Entity
 @using OpenRpg.Genres.Populators.Entity.Stats
 @using OpenRpg.Genres.Requirements
 @using OpenRpg.Items.Equippables
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 
-@inject IEntityStatPopulator StatPopulator;
+@inject ICharacterPopulator CharacterPopulator;
 @inject ICharacterRequirementChecker RequirementsChecker
 
 <Markdown>
@@ -230,9 +232,6 @@
     }
 
     public void RefreshStats()
-    {
-        var computedEffects = EffectProcessor.ComputeEffects(ExampleCharacter);
-        StatPopulator.Populate(ExampleCharacter.Stats, computedEffects, Array.Empty<IVariables>());
-    }
+    { CharacterPopulator.Populate(ExampleCharacter, true); }
 
 }

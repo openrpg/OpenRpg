@@ -7,6 +7,7 @@ using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Fantasy.Builders;
 using OpenRpg.Genres.Fantasy.Requirements;
+using OpenRpg.Genres.Populators.Entity;
 using OpenRpg.Items.Templates;
 using Xunit;
 using Xunit.Abstractions;
@@ -26,8 +27,9 @@ namespace OpenRpg.UnitTests.Genres.Fantasy
         public void should_json_serialization_sanity_test()
         {
             var mockRandomizer = new Mock<IRandomizer>();
+            var mockCharacterPopulator = new Mock<ICharacterPopulator>();
             
-            var characterBuilder = new FantasyCharacterBuilder(mockRandomizer.Object);
+            var characterBuilder = new FantasyCharacterBuilder(mockRandomizer.Object, mockCharacterPopulator.Object);
             var character = characterBuilder
                 .CreateNew()
                 .WithGender(1)

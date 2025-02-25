@@ -3,6 +3,7 @@ using OpenRpg.Combat.Attacks;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Variables;
 using OpenRpg.Entities.Effects.Processors;
+using OpenRpg.Entities.Entity.Populators.Stats;
 using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Fantasy.Effects;
 using OpenRpg.Genres.Fantasy.Extensions;

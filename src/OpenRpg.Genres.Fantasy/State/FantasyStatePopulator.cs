@@ -7,18 +7,21 @@ using OpenRpg.Entities.State.Variables;
 using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Entities.Types;
 using OpenRpg.Genres.Extensions;
+using OpenRpg.Genres.Fantasy.Extensions;
+using OpenRpg.Genres.Populators.Entity.State;
 
-namespace OpenRpg.Genres.Populators.Entity.State
+namespace OpenRpg.Genres.Fantasy.State
 {
-    public class BasicEntityStatePopulator : IEntityStatePopulator
+    public class FantasyStatePopulator : IEntityStatePopulator
     {
-        public void Populate(EntityStateVariables varsToPopulate, ComputedEffects computedEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public void Populate(EntityStateVariables state, ComputedEffects computedEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
             var statsVars = relatedVars.SingleOrDefault(x => x.VariableType == CoreVariableTypes.EntityStatsVariables);
             if(statsVars == null) { return; }
 
             var entityStats = statsVars as EntityStatsVariables;
-            varsToPopulate.Health(entityStats.MaxHealth());
+            state.Health(entityStats.MaxHealth());
+            state.Magic(entityStats.MaxMagic());
         }
     }
 }

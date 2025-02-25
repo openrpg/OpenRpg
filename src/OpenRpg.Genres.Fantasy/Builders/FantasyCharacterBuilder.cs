@@ -1,15 +1,13 @@
 ﻿using OpenRpg.Core.Utils;
 using OpenRpg.Genres.Builders;
-using OpenRpg.Genres.Characters;
-using OpenRpg.Genres.Extensions;
-using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
+using OpenRpg.Genres.Populators.Entity;
 
 namespace OpenRpg.Genres.Fantasy.Builders
 {
     public class FantasyCharacterBuilder : CharacterBuilder
     {
-        public FantasyCharacterBuilder(IRandomizer randomizer) : base(randomizer)
+        public FantasyCharacterBuilder(IRandomizer randomizer, ICharacterPopulator characterPopulator) : base(randomizer, characterPopulator)
         {
         }
 
@@ -28,17 +26,6 @@ namespace OpenRpg.Genres.Fantasy.Builders
             _equipment.TryAdd(FantasyEquipmentSlotTypes.WristSlot, null);
 
             base.PreProcessCharacter();
-        }
-
-        protected override void PostProcessCharacter(Character character)
-        {
-            if (!character.State.ContainsKey(FantasyEntityStateVariableTypes.Health))
-            { character.State.Health(character.Stats.MaxHealth()); }
-            
-            if (!character.State.ContainsKey(FantasyEntityStateVariableTypes.Magic))
-            { character.State.Magic(character.Stats.MaxMagic()); }
-            
-            base.PostProcessCharacter(character);
         }
     }
 }

@@ -7,6 +7,7 @@ using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Races;
 using OpenRpg.Entities.State.Variables;
 using OpenRpg.Genres.Characters;
+using OpenRpg.Genres.Populators.Entity;
 using OpenRpg.Items.Equippables;
 using OpenRpg.Items.Equippables.Slots;
 using OpenRpg.Items.Extensions;
@@ -18,6 +19,7 @@ namespace OpenRpg.Genres.Builders
     public class CharacterBuilder
     {
         public IRandomizer Randomizer { get; }
+        public ICharacterPopulator CharacterPopulator { get; }
 
         protected int _raceId, _classId, _classLevels;
         protected byte _genderId;
@@ -29,9 +31,10 @@ namespace OpenRpg.Genres.Builders
         
         protected EntityVariables _variables;
 
-        public CharacterBuilder(IRandomizer randomizer)
+        public CharacterBuilder(IRandomizer randomizer, ICharacterPopulator characterPopulator)
         {
             Randomizer = randomizer;
+            CharacterPopulator = characterPopulator;
         }
 
         public virtual CharacterBuilder CreateNew()
@@ -157,7 +160,7 @@ namespace OpenRpg.Genres.Builders
             _variables.Inventory(ProcessInventory());
             _variables.Gender(_genderId);
 
-            return new Character()
+            var character = new Character()
             {
                 UniqueId = Guid.NewGuid(),
                 NameLocaleId = _name,
@@ -165,6 +168,11 @@ namespace OpenRpg.Genres.Builders
                 Variables = _variables,
                 State = new EntityStateVariables(_state)
             };
+
+            var needsStateRefresh = _state.Count == 0;
+            CharacterPopulator.Populate(character, needsStateRefresh);
+            
+            return character;
         }
         
         public Character Build()

@@ -72,5 +72,15 @@ namespace OpenRpg.Entities.Extensions
             var potency= deferredEffect.ScaledEffect.PotencyFunction.Plot(relatedValue);
             return (deferredEffect.ScaledEffect.EffectType, potency);
         }
+
+        public static void ProcessDeferredEffects(this ComputedEffects computedEffects, Entity.Entity relatedEntity)
+        {
+            foreach (var deferredEffect in computedEffects.DeferredEffects)
+            {
+                var deferredResult = deferredEffect.ComputeDeferredEffect(relatedEntity);
+                computedEffects.Add(deferredResult.EffectType, deferredResult.Potency);
+            }
+            computedEffects.DeferredEffects.Clear();
+        }
     }
 }

@@ -1,17 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Core.Extensions;
-using OpenRpg.Core.Templates;
 using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Extensions;
 using OpenRpg.Demos.Infrastructure.Lookups;
-using OpenRpg.Entities.Effects.Processors;
 using OpenRpg.Genres.Builders;
-using OpenRpg.Genres.Characters;
-using OpenRpg.Genres.Effects;
-using OpenRpg.Genres.Extensions;
-using OpenRpg.Genres.Fantasy.Extensions;
-using OpenRpg.Genres.Populators.Entity.Stats;
+using OpenRpg.Genres.Populators.Entity;
 using RandomNameGenerator;
 
 namespace OpenRpg.Demos.Infrastructure.Builders
@@ -20,21 +14,13 @@ namespace OpenRpg.Demos.Infrastructure.Builders
     {
         public IReadOnlyCollection<int> RaceTypes { get; }
         public IReadOnlyCollection<int> ClassTypes { get; }
-        
-        public IEntityStatPopulator StatPopulator { get; }
-        public ITemplateAccessor TemplateAccessor { get; }
-        public ICharacterEffectProcessor EffectProcessor { get; }
-        
-        public DemoCharacterBuilder(IRandomizer randomizer, IEntityStatPopulator statPopulator, ITemplateAccessor templateAccessor, ICharacterEffectProcessor effectProcessor) : base(randomizer)
+
+        public DemoCharacterBuilder(IRandomizer randomizer, ICharacterPopulator characterPopulator) : base(randomizer, characterPopulator)
         {
             RaceTypes = typeof(RaceTypeLookups).GetTypeFieldsDictionary().Keys.Where(x => x > 0).ToArray();
             ClassTypes = typeof(ClassTypeLookups).GetTypeFieldsDictionary().Keys.Where(x => x > 0).ToArray();
-
-            StatPopulator = statPopulator;
-            TemplateAccessor = templateAccessor;
-            EffectProcessor = effectProcessor;
         }
-
+        
         protected override void RandomizeDefaults()
         {
             if (_raceId == 0) { _raceId = Randomizer.TakeRandomFrom(RaceTypes); }
@@ -42,17 +28,6 @@ namespace OpenRpg.Demos.Infrastructure.Builders
             if (_genderId == 0) { _genderId = (byte)Randomizer.Random(1,2); }
             if (_classLevels == 0) { _classLevels = Randomizer.Random(1,5); }
             if (string.IsNullOrEmpty(_name)) { _name = NameGenerator.Generate(_genderId == 1 ? Gender.Male : Gender.Female); }
-        }
-
-        protected override void PostProcessCharacter(Character character)
-        {
-            var computedEffects = EffectProcessor.ComputeEffects(character);
-            StatPopulator.Populate(character.Stats, computedEffects, null);
-            
-            var health = character.Stats.MaxHealth();
-            var magic = character.Stats.MaxMagic();
-            character.State.Health(health);
-            character.State.Magic(magic);
         }
     }
 }

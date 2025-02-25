@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Variables;
 using OpenRpg.Entities.Effects.Processors;
+using OpenRpg.Entities.Entity.Populators.Stats;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Extensions;
