@@ -5,6 +5,7 @@
 @using OpenRpg.Core.Templates
 @using OpenRpg.Entities.Effects.Processors
 @using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Extensions
 @using OpenRpg.Genres.Populators.Entity.Stats
 @using OpenRpg.Localization.Data.Extensions
@@ -14,7 +15,7 @@
 @inject ILocaleRepository LocaleRepository
 @inject IEntityStatPopulator StatPopulator;
 @inject ITemplateAccessor TemplateAccessor;
-@inject IEffectProcessor EffectProcessor;
+@inject ICharacterEffectProcessor EffectProcessor;
 
 <Markdown>
     ## Attacking
@@ -110,8 +111,8 @@
     public void RandomizeCharacter()
     {
         _randomCharacter = CharacterBuilder.CreateNew().Build();
-        var effects = EffectProcessor.ComputeEffects(_randomCharacter);
-        StatPopulator.Populate(_randomCharacter.Stats, effects.ToArray(), null);
+        var computedEffects = EffectProcessor.ComputeEffects(_randomCharacter);
+        StatPopulator.Populate(_randomCharacter.Stats, computedEffects, null);
     }
 
     public string GetDamageTypeText(int damageType)

@@ -4,13 +4,15 @@
 @using OpenRpg.Core.Templates
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Effects.Processors
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Localization.Data.Extensions
 @using OpenRpg.Localization.Data.Repositories
 
 @inject ILocaleRepository LocaleRepository
 @inject ITemplateAccessor TemplateAccessor
-@inject IEffectProcessor EffectProcessor
+@inject ICharacterEffectProcessor EffectProcessor
 
 <div class="container game-card" card-type="@Card.CardType">
     <div class="card @CardTypeClass">
@@ -57,7 +59,7 @@
         {
             var itemData = (Card as EquipmentCard).Data.Data;
             var itemTemplate = TemplateAccessor.GetItemTemplate(itemData.TemplateId);
-            return EffectProcessor.ComputeEffects(itemTemplate).OrderByDescending(x => x.Potency).FirstOrDefault();
+            return itemTemplate.Effects.GetStaticEffects().OrderByDescending(x => x.Potency).FirstOrDefault();
         }
     }
 

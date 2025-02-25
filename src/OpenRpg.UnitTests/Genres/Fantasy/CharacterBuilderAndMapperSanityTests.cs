@@ -2,8 +2,11 @@ using System;
 using Moq;
 using Newtonsoft.Json;
 using OpenRpg.Core.Utils;
+using OpenRpg.Entities.Entity;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Fantasy.Builders;
+using OpenRpg.Genres.Fantasy.Requirements;
 using OpenRpg.Items.Templates;
 using Xunit;
 using Xunit.Abstractions;
@@ -46,6 +49,15 @@ namespace OpenRpg.UnitTests.Genres.Fantasy
             
             _testOutputHelper.WriteLine(jsonData);
             Assert.Equal(jsonData, recreatedJson);
+        }
+
+        [Fact]
+        public void a()
+        {
+            var characterRequirementChecker = new DefaultFantasyCharacterRequirementChecker();
+            var convertedChecker = characterRequirementChecker as IEntityRequirementChecker<Character>;
+
+            Assert.NotNull(convertedChecker);
         }
     }
 }

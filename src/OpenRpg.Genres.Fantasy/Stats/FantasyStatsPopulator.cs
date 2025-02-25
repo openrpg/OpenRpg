@@ -14,10 +14,8 @@ namespace OpenRpg.Genres.Fantasy.Stats
             {
                 new FantasyAttributeStatPopulator(),
                 new FantasyVitalsStatPopulator(),
-                new FantasyMeleeDamageStatPopulator(),
-                new FantasyElementalDamageStatPopulator(),
-                new FantasyMeleeDefenseStatPopulator(),
-                new FantasyElementalDefenseStatPopulator()
+                new FantasyMeleeStatPopulator(),
+                new FantasyElementalStatPopulator(),
             };
 
             if (additionalStatPopulators != null)

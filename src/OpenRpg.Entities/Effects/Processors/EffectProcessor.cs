@@ -1,76 +1,77 @@
-using System.Collections.Generic;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Entities.Types;
 
 using BaseEntity = OpenRpg.Entities.Entity.Entity;
 
 namespace OpenRpg.Entities.Effects.Processors
 {
-    public class EffectProcessor : IEffectProcessor
+    public class EffectProcessor<T> : IEffectProcessor<T> where T : BaseEntity
     {
         public ITemplateAccessor TemplateAccessor { get; }
+        public IEntityRequirementChecker<T> RequirementChecker { get; }
 
-        public EffectProcessor(ITemplateAccessor templateAccessor)
+        public EffectProcessor(ITemplateAccessor templateAccessor, IEntityRequirementChecker<T> requirementChecker)
         {
             TemplateAccessor = templateAccessor;
+            RequirementChecker = requirementChecker;
         }
 
-        public virtual IEnumerable<StaticEffect> ComputeEffects(IHasEffects context, BaseEntity relatedEntity = null)
+        public virtual ComputedEffects ComputeEffects(IHasEffects context, T relatedEntity)
+        {
+            var computedEffects = new ComputedEffects();
+            ComputeEffects(context, relatedEntity, computedEffects);
+            return computedEffects;
+        }
+        
+        public virtual void ComputeEffects(IHasEffects context, T relatedEntity, ComputedEffects computedEffects)
         {
             foreach (var effect in context.Effects)
             {
+                if(!RequirementChecker.AreRequirementsMet(relatedEntity, effect.Requirements))
+                { continue; }
+                
                 if(effect is StaticEffect staticEffect) 
-                { yield return staticEffect; }
+                { computedEffects.Add(staticEffect.EffectType, staticEffect.Potency); }
 
                 if (effect is ScaledEffect scaledEffect)
-                { yield return ComputeScaledEffect(scaledEffect, context, relatedEntity); }
+                { ComputeScaledEffect(scaledEffect, context, computedEffects, relatedEntity); }
             }
         }
 
-        public virtual IEnumerable<StaticEffect> ComputeEffects(BaseEntity entity)
+        public virtual ComputedEffects ComputeEffects(T entity)
         {
-            var effects = new List<StaticEffect>();
+            var computedEffects = new ComputedEffects();
             
             if (entity.Variables.HasRace())
             {
                 var template = TemplateAccessor.GetRaceTemplate(entity.Variables.Race().TemplateId);
-                var computedEffects = ComputeEffects(template, entity);
-                effects.AddRange(computedEffects);
+                ComputeEffects(template, entity, computedEffects);
             }
             
             if (entity.Variables.HasClass())
             {
                 var template = TemplateAccessor.GetClassTemplate(entity.Variables.Class().TemplateId);
-                var computedEffects = ComputeEffects(template, entity);
-                effects.AddRange(computedEffects);
+                ComputeEffects(template, entity, computedEffects);
             }
 
-            return effects;
+            return computedEffects;
         }
 
-        public virtual StaticEffect ComputeScaledEffect(ScaledEffect effect, IHasEffects context, BaseEntity relatedEntity = null)
+        public virtual void ComputeScaledEffect(ScaledEffect effect, IHasEffects context, ComputedEffects computedEffects, BaseEntity relatedEntity)
         {
-            if (relatedEntity == null)
-            { return effect.Compute(1); }
-            
             if (effect.ScalingType == CoreEffectScalingTypes.Level)
             {
                 var level = relatedEntity?.Variables.Class()?.Variables.Level() ?? 1;
-                return effect.Compute(level);
+                computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(level));
             }
             if (effect.ScalingType == CoreEffectScalingTypes.StateIndex)
-            {
-                var stateValue = relatedEntity?.State.Get(effect.ScalingIndex) ?? 1;
-                return effect.Compute(stateValue);
-            }
+            { computedEffects.AddDeferred(effect, context); }
             if (effect.ScalingType == CoreEffectScalingTypes.StatIndex)
-            {
-                var statValue = relatedEntity?.Stats.Get(effect.ScalingIndex) ?? 1;
-                return effect.Compute(statValue);
-            }
+            { computedEffects.AddDeferred(effect, context); }
             
-            return effect.Compute(1); 
+            computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(effect.PotencyFunction.InputScaleMin));
         }
     }
 }

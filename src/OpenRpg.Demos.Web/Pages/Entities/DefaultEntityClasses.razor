@@ -10,12 +10,13 @@
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Populators.Entity.Stats
 
 @inject IRandomizer Randomizer;
 @inject IEntityStatPopulator StatPopulator;
 @inject ITemplateAccessor TemplateAccessor;
-@inject IEffectProcessor EffectProcessor;
+@inject ICharacterEffectProcessor EffectProcessor;
 
 <Markdown>
     ## Custom Scenarios

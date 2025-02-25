@@ -8,6 +8,7 @@ using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Entities.Effects.Processors;
 using OpenRpg.Genres.Builders;
 using OpenRpg.Genres.Characters;
+using OpenRpg.Genres.Effects;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Populators.Entity.Stats;
@@ -22,9 +23,9 @@ namespace OpenRpg.Demos.Infrastructure.Builders
         
         public IEntityStatPopulator StatPopulator { get; }
         public ITemplateAccessor TemplateAccessor { get; }
-        public IEffectProcessor EffectProcessor { get; }
+        public ICharacterEffectProcessor EffectProcessor { get; }
         
-        public DemoCharacterBuilder(IRandomizer randomizer, IEntityStatPopulator statPopulator, ITemplateAccessor templateAccessor, IEffectProcessor effectProcessor) : base(randomizer)
+        public DemoCharacterBuilder(IRandomizer randomizer, IEntityStatPopulator statPopulator, ITemplateAccessor templateAccessor, ICharacterEffectProcessor effectProcessor) : base(randomizer)
         {
             RaceTypes = typeof(RaceTypeLookups).GetTypeFieldsDictionary().Keys.Where(x => x > 0).ToArray();
             ClassTypes = typeof(ClassTypeLookups).GetTypeFieldsDictionary().Keys.Where(x => x > 0).ToArray();
@@ -45,8 +46,8 @@ namespace OpenRpg.Demos.Infrastructure.Builders
 
         protected override void PostProcessCharacter(Character character)
         {
-            var effects = EffectProcessor.ComputeEffects(character);
-            StatPopulator.Populate(character.Stats, effects.ToArray(), null);
+            var computedEffects = EffectProcessor.ComputeEffects(character);
+            StatPopulator.Populate(character.Stats, computedEffects, null);
             
             var health = character.Stats.MaxHealth();
             var magic = character.Stats.MaxMagic();

@@ -7,19 +7,24 @@
 @using OpenRpg.Entities.Classes.Templates
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Effects.Processors
+@using OpenRpg.Entities.Entity
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Entities.Races.Templates
+@using OpenRpg.Entities.Requirements
 @using OpenRpg.Entities.Types
 @using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Fantasy.Extensions
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Genres.Populators.Entity.Stats
+@using OpenRpg.Genres.Requirements
 @using OpenRpg.Items.Equippables
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 
 @inject IEntityStatPopulator StatPopulator;
+@inject ICharacterRequirementChecker RequirementsChecker
 
 <Markdown>
    ## Advanced Effects
@@ -133,7 +138,7 @@
     public IRefreshable DamageScalingChart { get; set; }
 
     public ManualTemplateAccessor TemplateAccessor { get; set; } = new();
-    public IEffectProcessor EffectProcessor { get; set; }
+    public ICharacterEffectProcessor EffectProcessor { get; set; }
     public Character ExampleCharacter { get; set; } = new();
     public List<StaticEffect> ComputedEffects { get; set; } = new();
 
@@ -145,7 +150,7 @@
     
     protected override void OnInitialized()
     {
-        EffectProcessor = new EffectProcessor(TemplateAccessor);
+        EffectProcessor = new CharacterEffectProcessor(TemplateAccessor, RequirementsChecker);
         DamageScaledWithStrengthEffect = new ScaledEffect()
         {
             EffectType = FantasyEffectTypes.DamageBonusAmount,
@@ -226,10 +231,8 @@
 
     public void RefreshStats()
     {
-        var effects = EffectProcessor.ComputeEffects(ExampleCharacter);
-        ComputedEffects.Clear();
-        ComputedEffects.AddRange(effects);
-        StatPopulator.Populate(ExampleCharacter.Stats, ComputedEffects, Array.Empty<IVariables>());
+        var computedEffects = EffectProcessor.ComputeEffects(ExampleCharacter);
+        StatPopulator.Populate(ExampleCharacter.Stats, computedEffects, Array.Empty<IVariables>());
     }
 
 }

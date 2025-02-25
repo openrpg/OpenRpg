@@ -1,26 +1,26 @@
-using OpenRpg.Entities.Stats.Populators;
+using System.Collections.Generic;
+using OpenRpg.Core.Variables;
+using OpenRpg.Entities.Effects.Processors;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Stats.Variables;
+using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Genres.Populators.Entity.Stats;
-using OpenRpg.Genres.Populators.Entity.Stats.Conventions;
 
 namespace OpenRpg.Genres.Fantasy.Stats.Populators
 {
-    public class FantasyAttributeStatPopulator : CompositeStatPopulator<EntityStatsVariables>, IEntityPartialStatPopulator
+    public class FantasyAttributeStatPopulator : IEntityPartialStatPopulator
     {
         public int Priority => 100;
 
-        public FantasyAttributeStatPopulator()
+        public void Populate(EntityStatsVariables stats, ComputedEffects computedEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
-            PartialPopulators = new[]
-            {
-                new BasicAttributePartialPopulator(FantasyEffectTypes.StrengthBonusAmount, FantasyEffectTypes.StrengthBonusPercentage, FantasyEntityStatsVariableTypes.Strength, Priority),
-                new BasicAttributePartialPopulator(FantasyEffectTypes.DexterityBonusAmount, FantasyEffectTypes.DexterityBonusPercentage, FantasyEntityStatsVariableTypes.Dexterity, Priority),
-                new BasicAttributePartialPopulator(FantasyEffectTypes.ConstitutionBonusAmount, FantasyEffectTypes.ConstitutionBonusPercentage, FantasyEntityStatsVariableTypes.Constitution, Priority),
-                new BasicAttributePartialPopulator(FantasyEffectTypes.IntelligenceBonusAmount, FantasyEffectTypes.IntelligenceBonusPercentage, FantasyEntityStatsVariableTypes.Intelligence, Priority),
-                new BasicAttributePartialPopulator(FantasyEffectTypes.WisdomBonusAmount, FantasyEffectTypes.WisdomBonusPercentage, FantasyEntityStatsVariableTypes.Wisdom, Priority),
-                new BasicAttributePartialPopulator(FantasyEffectTypes.CharismaBonusAmount, FantasyEffectTypes.CharismaBonusPercentage, FantasyEntityStatsVariableTypes.Charisma, Priority),
-            };
+            stats.Strength((int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.StrengthBonusAmount, FantasyEffectTypes.StrengthBonusPercentage));
+            stats.Dexterity((int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.DexterityBonusAmount, FantasyEffectTypes.DexterityBonusPercentage));
+            stats.Constitution((int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.ConstitutionBonusAmount, FantasyEffectTypes.ConstitutionBonusPercentage));
+            stats.Intelligence((int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.IntelligenceBonusAmount, FantasyEffectTypes.IntelligenceBonusPercentage));
+            stats.Wisdom((int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.WisdomBonusAmount, FantasyEffectTypes.WisdomBonusPercentage));
+            stats.Charisma((int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.CharismaBonusAmount, FantasyEffectTypes.CharismaBonusPercentage));
         }
     }
 }

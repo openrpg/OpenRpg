@@ -8,13 +8,15 @@
 @using OpenRpg.Entities.Classes
 @using OpenRpg.Entities.Classes.Templates
 @using OpenRpg.Entities.Effects
-@using OpenRpg.Entities.Effects.Processors
-@using OpenRpg.Entities.Entity
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Entities.Races.Templates
 @using OpenRpg.Entities.Stats.Variables
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Requirements
 @using OpenRpg.Genres.Effects
+
+@inject ICharacterRequirementChecker RequirementChecker;
 
 <Markdown>
     ## Stats Components
@@ -199,13 +201,13 @@
 
 @code {
     public const int CustomEffectsKey = 1000;
-    private Entity ManualStatsExample = new Entity();
-    private Entity AutoStatsExample = new Entity();
-    private Entity AutoStatsExample2 = new Entity();
+    private Character ManualStatsExample = new();
+    private Character AutoStatsExample = new();
+    private Character AutoStatsExample2 = new();
     
     public ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new();
     public ManualTemplateAccessor AutoStatTemplateAccessor { get; } = new();
-    public IEffectProcessor EffectProcessor { get; set; }
+    public ICharacterEffectProcessor EffectProcessor { get; set; }
 
     
     protected void SetupManualStats()
@@ -241,7 +243,7 @@
 
     protected void SetupAutoStats1()
     {
-        EffectProcessor = new GenreEffectProcessor(AutoStatTemplateAccessor);
+        EffectProcessor = new CharacterEffectProcessor(AutoStatTemplateAccessor, RequirementChecker);
         
         var raceEffects = new[]
         {
@@ -282,23 +284,23 @@
         AutoStatsExample2.Variables.Class(new ClassData { TemplateId = fighterClass.Id });
         
         var statsCalculator = new FantasyStatsPopulator();
-        var example1Effects = EffectProcessor.ComputeEffects(AutoStatsExample);
-        statsCalculator.Populate(AutoStatsExample.Stats, example1Effects.ToArray(), null);
+        var computedEffects1 = EffectProcessor.ComputeEffects(AutoStatsExample);
+        statsCalculator.Populate(AutoStatsExample.Stats, computedEffects1, null);
         
-        var example2Effects = EffectProcessor.ComputeEffects(AutoStatsExample2);
-        statsCalculator.Populate(AutoStatsExample2.Stats, example2Effects.ToArray(), null);
+        var computedEffects2 = EffectProcessor.ComputeEffects(AutoStatsExample2);
+        statsCalculator.Populate(AutoStatsExample2.Stats, computedEffects2, null);
     }
 
     public IReadOnlyCollection<StaticEffect> GetEffectsFor(RaceData race)
     {
         var template = AutoStatTemplateAccessor.GetRaceTemplate(race.TemplateId);
-        return EffectProcessor.ComputeEffects(template).ToArray();
+        return template.Effects.GetStaticEffects();
     }
     
     public IReadOnlyCollection<StaticEffect> GetEffectsFor(ClassData @class)
     {
         var template = AutoStatTemplateAccessor.GetClassTemplate(@class.TemplateId);
-        return EffectProcessor.ComputeEffects(template).ToArray();
+        return template.Effects.GetStaticEffects();
     }
 
     protected override void OnInitialized()

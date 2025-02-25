@@ -6,12 +6,13 @@
 @using OpenRpg.Entities.Effects.Processors
 @using OpenRpg.Entities.Entity
 @using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Populators.Entity.Stats
 
 @inject DemoCharacterBuilder CharacterBuilder;
 @inject IEntityStatPopulator StatPopulator;
 @inject ITemplateAccessor TemplateAccessor;
-@inject IEffectProcessor EffectProcessor;
+@inject ICharacterEffectProcessor EffectProcessor;
 
 <Markdown>
    #### Character Persistence
@@ -110,8 +111,8 @@
     {
         _regeneratedCharacter = JsonConvert.DeserializeObject<Character>(_persistedData, _jsonSettings);
 
-        var effects = EffectProcessor.ComputeEffects(_regeneratedCharacter);
-        StatPopulator.Populate(_regeneratedCharacter.Stats, effects.ToArray(), null);
+        var computedEffects = EffectProcessor.ComputeEffects(_regeneratedCharacter);
+        StatPopulator.Populate(_regeneratedCharacter.Stats, computedEffects, null);
         StateHasChanged();
     }
 }

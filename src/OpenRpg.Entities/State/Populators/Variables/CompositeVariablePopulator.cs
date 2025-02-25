@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Core.Variables;
-using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Effects.Processors;
 
 namespace OpenRpg.Entities.State.Populators.Variables
 {
@@ -15,10 +15,11 @@ namespace OpenRpg.Entities.State.Populators.Variables
         protected CompositeVariablePopulator()
         {}
 
-        public void Populate(T vars, IReadOnlyCollection<StaticEffect> activeEffects, IReadOnlyCollection<IVariables> relatedVars)
+        public void Populate(T vars, ComputedEffects computedEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
-            foreach (var populator in PartialPopulators.OrderByDescending(x => x.Priority))
-            { populator.Populate(vars, activeEffects, relatedVars); }
+            var orderedPopulators = PartialPopulators.OrderByDescending(x => x.Priority).ToArray();
+            foreach (var populator in orderedPopulators)
+            { populator.Populate(vars, computedEffects, relatedVars); }
         }
     }
 }
