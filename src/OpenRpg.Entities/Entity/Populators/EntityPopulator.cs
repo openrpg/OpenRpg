@@ -23,7 +23,7 @@ namespace OpenRpg.Entities.Entity.Populators
             StatPopulator.Populate(entity.Stats, computedEffects, null);
             
             if(refreshState)
-            { StatePopulator.Populate(entity.State, computedEffects, null); }
+            { StatePopulator.Populate(entity.State, computedEffects, new [] { entity.Stats }); }
         }
 
         public void Populate(T entity, bool refreshState = false)

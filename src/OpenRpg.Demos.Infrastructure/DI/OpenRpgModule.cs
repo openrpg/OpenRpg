@@ -5,11 +5,13 @@ using OpenRpg.Combat.Processors.Attacks.Entity;
 using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Scheduling;
 using OpenRpg.Entities.Effects.Processors;
+using OpenRpg.Entities.Entity.Populators.State;
 using OpenRpg.Entities.Entity.Populators.Stats;
 using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Effects;
 using OpenRpg.Genres.Fantasy.Combat;
 using OpenRpg.Genres.Fantasy.Requirements;
+using OpenRpg.Genres.Fantasy.State;
 using OpenRpg.Genres.Fantasy.Stats;
 using OpenRpg.Genres.Populators.Entity;
 using OpenRpg.Genres.Populators.Entity.Stats;
@@ -23,7 +25,8 @@ namespace OpenRpg.Demos.Infrastructure.DI
         {
             services.AddSingleton<IUpdateScheduler, DefaultUpdateScheduler>();
          
-            services.AddSingleton<IEntityStatPopulator>(new FantasyStatsPopulator(new IEntityPartialStatPopulator[] {new DamageStatPopulator(), new DefenseStatPopulator()}));
+            services.AddSingleton<IEntityStatPopulator>(new FantasyStatsPopulator([new DamageStatPopulator(), new DefenseStatPopulator()]));
+            services.AddSingleton<IEntityStatePopulator, FantasyStatePopulator>();
             services.AddSingleton<IRandomizer>(x => new DefaultRandomizer(new Random()));
             services.AddSingleton<IEntityAttackGenerator, BasicAttackGenerator>();
             services.AddSingleton<IAttackProcessor<EntityStatsVariables>, DefaultAttackProcessor>();
