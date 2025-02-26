@@ -68,10 +68,10 @@
         base.OnInitialized();
 
         CurveFunction = ScalingFunction.CurveFunction ?? PresetCurves.Linear;
-        InputScaleMin = ScalingFunction.InputScaleMin;
-        InputScaleMax = ScalingFunction.InputScaleMax;
-        OutputScaleMin = ScalingFunction.OutputScaleMin;
-        OutputScaleMax = ScalingFunction.OutputScaleMax;
+        InputScaleMin = ScalingFunction.InputScale.Min;
+        InputScaleMax = ScalingFunction.InputScale.Max;
+        OutputScaleMin = ScalingFunction.OutputScale.Min;
+        OutputScaleMax = ScalingFunction.OutputScale.Max;
     }
 
     private async Task OnCurveFunctionUpdated(ICurveFunction x)

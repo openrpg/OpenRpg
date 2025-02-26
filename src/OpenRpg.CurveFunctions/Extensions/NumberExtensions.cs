@@ -1,4 +1,5 @@
 using System;
+using OpenRpg.Core.Utils;
 
 namespace OpenRpg.CurveFunctions.Extensions
 {
@@ -20,7 +21,16 @@ namespace OpenRpg.CurveFunctions.Extensions
             return SanitizeAndClamp(normalizedValue);
         }
         
+        public static float NormalizeBetween(this float value, RangeF range)
+        {
+            var normalizedValue = (value - range.Min) / (range.Max - range.Min);
+            return SanitizeAndClamp(normalizedValue);
+        }
+        
         public static float DenormalizeBetween(this float value, float min, float max)
         { return value * (max - min) + min; }
+        
+        public static float DenormalizeBetween(this float value, RangeF range)
+        { return value * (range.Max - range.Min) + range.Min; }
     }
 }

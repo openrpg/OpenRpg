@@ -80,7 +80,7 @@ namespace OpenRpg.Entities.Effects.Processors
                 return;
             }
             
-            computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(effect.PotencyFunction.InputScaleMin));
+            computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(effect.PotencyFunction.InputScale.Min));
         }
     }
 }

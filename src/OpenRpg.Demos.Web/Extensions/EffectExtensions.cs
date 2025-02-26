@@ -22,9 +22,9 @@ public static class EffectExtensions
 
         if (effect is ScaledEffect scaledEffect)
         {
-            var potencySymbol = GetPotencySymbol(scaledEffect.PotencyFunction.OutputScaleMin);
+            var potencySymbol = GetPotencySymbol(scaledEffect.PotencyFunction.OutputScale.Min);
             var potencySuffix = IsPercentageEffect(effect.EffectType) ? "%" : "";
-            return $"{potencySymbol}{scaledEffect.PotencyFunction.OutputScaleMin}-{scaledEffect.PotencyFunction.OutputScaleMax}{potencySuffix}";
+            return $"{potencySymbol}{scaledEffect.PotencyFunction.OutputScale.Min}-{scaledEffect.PotencyFunction.OutputScale.Max}{potencySuffix}";
         }
 
         return "?";
@@ -48,7 +48,7 @@ public static class EffectExtensions
         { return staticEffect.Potency >= 0; }
         
         if(effect is ScaledEffect scaledEffect)
-        { return scaledEffect.PotencyFunction.OutputScaleMin >= 0; }
+        { return scaledEffect.PotencyFunction.OutputScale.Min >= 0; }
 
         return true;
     }

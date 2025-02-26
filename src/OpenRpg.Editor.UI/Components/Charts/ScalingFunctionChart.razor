@@ -43,7 +43,7 @@
         Data.Clear();
 
         var newPoints = FixedDataRanges.NormalizedZeroToOne
-            .Denormalize(ScalingFunction.InputScaleMin, ScalingFunction.InputScaleMax)
+            .Denormalize(ScalingFunction.InputScale.Min, ScalingFunction.InputScale.Max)
             .Select(GenerateDataPoint)
             .ToArray();
         
@@ -55,8 +55,8 @@
         ChartOptions.Xaxis = new XAxis()
         {
             Labels = new XAxisLabels() { Show  = ShowLabels, HideOverlappingLabels = true}, 
-            Min = (decimal)ScalingFunction.InputScaleMin,
-            Max = (decimal)ScalingFunction.InputScaleMax
+            Min = (decimal)ScalingFunction.InputScale.Min,
+            Max = (decimal)ScalingFunction.InputScale.Max
         };
         
         ChartOptions.Yaxis = new List<YAxis>()
@@ -64,8 +64,8 @@
             new()
             {
                 Labels = new YAxisLabels() { Formatter = @"function (value) { return value.toFixed(1); }", Show = ShowLabels },
-                Min = (decimal)ScalingFunction.OutputScaleMin,
-                Max = (decimal)ScalingFunction.OutputScaleMax,
+                Min = (decimal)ScalingFunction.OutputScale.Min,
+                Max = (decimal)ScalingFunction.OutputScale.Max,
             }
         };
         

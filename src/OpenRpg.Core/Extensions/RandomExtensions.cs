@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Core.Utils;
+using Range = OpenRpg.Core.Utils.Range;
 
 namespace OpenRpg.Core.Extensions
 {
@@ -42,5 +43,17 @@ namespace OpenRpg.Core.Extensions
         
         public static IEnumerable<T> TakeRandom<T>(this IEnumerable<T> source, int count, IRandomizer randomizer)
         { return TakeRandomFrom(randomizer, source, count); }
+
+        public static int Random(this Range range, IRandomizer randomizer)
+        { return randomizer.Random(range.Min, range.Max); }
+        
+        public static float Random(this RangeF range, IRandomizer randomizer)
+        { return randomizer.Random(range.Min, range.Max); }
+        
+        public static int Random(this IRandomizer randomizer, Range range)
+        { return randomizer.Random(range.Min, range.Max); }
+        
+        public static float Random(this IRandomizer randomizer, RangeF range)
+        { return randomizer.Random(range.Min, range.Max); }
     }
 }
