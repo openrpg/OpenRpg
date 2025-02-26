@@ -1,32 +1,31 @@
 ﻿@page "/curves/advanced-effects"
-@using OpenRpg.Core.Variables
+
 @using OpenRpg.CurveFunctions
 @using OpenRpg.CurveFunctions.Scaling
 @using OpenRpg.Demos.Infrastructure.Templates
 @using OpenRpg.Entities.Classes
 @using OpenRpg.Entities.Classes.Templates
 @using OpenRpg.Entities.Effects
-@using OpenRpg.Entities.Effects.Processors
-@using OpenRpg.Entities.Entity
+@using OpenRpg.Entities.Entity.Populators.State
 @using OpenRpg.Entities.Entity.Populators.Stats
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Entities.Races.Templates
-@using OpenRpg.Entities.Requirements
 @using OpenRpg.Entities.Types
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Effects
+@using OpenRpg.Genres.Extensions
 @using OpenRpg.Genres.Fantasy.Extensions
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Genres.Populators.Entity
-@using OpenRpg.Genres.Populators.Entity.Stats
 @using OpenRpg.Genres.Requirements
 @using OpenRpg.Items.Equippables
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 
-@inject ICharacterPopulator CharacterPopulator;
 @inject ICharacterRequirementChecker RequirementsChecker
+@inject IEntityStatPopulator StatPopulator
+@inject IEntityStatePopulator StatePopulator
 
 <Markdown>
    ## Advanced Effects
@@ -128,9 +127,9 @@
                               Class="@TemplateAccessor.ToInstance(ExampleCharacter.Variables.Class())"/>
             <CharacterStats Stats="@ExampleCharacter.Stats"/>
             <br />
-            <CharacterVitals Stats="@ExampleCharacter.Stats"/>
+            <CharacterVitals Stats="@ExampleCharacter.Stats" State="ExampleCharacter.State"/>
             <br />
-            <EffectList Effects="ComputedEffects" Character="ExampleCharacter" />
+            <EffectList Effects="AllEffects" Character="ExampleCharacter" />
         </CardSection>
     </div>
 </div>
@@ -142,7 +141,8 @@
     public ManualTemplateAccessor TemplateAccessor { get; set; } = new();
     public ICharacterEffectProcessor EffectProcessor { get; set; }
     public Character ExampleCharacter { get; set; } = new();
-    public List<StaticEffect> ComputedEffects { get; set; } = new();
+    public CharacterPopulator CharacterPopulator { get; set; }
+    public List<StaticEffect> AllEffects { get; set; } = new();
 
     public int CharacterLevel
     {
@@ -153,6 +153,7 @@
     protected override void OnInitialized()
     {
         EffectProcessor = new CharacterEffectProcessor(TemplateAccessor, RequirementsChecker);
+        CharacterPopulator = new CharacterPopulator(StatPopulator, StatePopulator, EffectProcessor);
         DamageScaledWithStrengthEffect = new ScaledEffect()
         {
             EffectType = FantasyEffectTypes.DamageBonusAmount,
@@ -228,6 +229,7 @@
         TemplateAccessor.AddTemplate(pretendWeapon);
 
         RefreshStats();
+        AllEffects = ExampleCharacter.GetEffects(TemplateAccessor).GetStaticEffects().ToList();
         base.OnInitialized();
     }
 
