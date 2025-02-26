@@ -112,9 +112,9 @@
 
             </Markdown>
             <div class="field">
-                <label class="label">Level Value</label>
+                <label class="label">Level Value: @(CharacterLevel)</label>
                 <div class="control">
-                    <input class="input" type="text" @bind="CharacterLevel" @bind:after="RefreshStats"/>
+                    <input class="slider is-fullwidth is-success has-output-tooltip" step="1" min="1" max="10" @bind="CharacterLevel" @bind:after="RefreshStats" type="range">
                 </div>
             </div>
         </CardSection>
@@ -176,7 +176,7 @@
                 new StaticEffect()
                 {
                     EffectType = FantasyEffectTypes.StrengthBonusPercentage,
-                    Potency = 0.1f
+                    Potency = 0.2f
                 }
             }
         };
@@ -205,14 +205,14 @@
                 new StaticEffect()
                 {
                     EffectType = FantasyEffectTypes.StrengthBonusAmount,
-                    Potency = 1
+                    Potency = 2
                 },
                 new ScaledEffect()
                 {
                     EffectType = FantasyEffectTypes.DamageBonusAmount,
                     ScalingType = CoreEffectScalingTypes.StatIndex,
                     ScalingIndex = FantasyEntityStatsVariableTypes.Strength,
-                    PotencyFunction = new ScalingFunction(PresetCurves.Linear, 10, 30, 1, 10)
+                    PotencyFunction = new ScalingFunction(PresetCurves.Linear, 10, 30, 10, 20)
                 }
             }
         };
