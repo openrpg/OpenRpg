@@ -8,9 +8,8 @@ using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Entities.Types;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
-using OpenRpg.Genres.Populators.Entity.State;
 
-namespace OpenRpg.Genres.Fantasy.State
+namespace OpenRpg.Genres.Fantasy.State.Populators
 {
     public class FantasyStatePopulator : IEntityStatePopulator
     {

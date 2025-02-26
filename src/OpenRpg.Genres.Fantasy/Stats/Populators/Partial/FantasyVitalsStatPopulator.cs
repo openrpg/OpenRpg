@@ -7,9 +7,8 @@ using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
-using OpenRpg.Genres.Populators.Entity.Stats;
 
-namespace OpenRpg.Genres.Fantasy.Stats.Populators
+namespace OpenRpg.Genres.Fantasy.Stats.Populators.Partial
 {
     public class FantasyVitalsStatPopulator : IEntityPartialStatPopulator
     {

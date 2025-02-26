@@ -65,11 +65,20 @@ namespace OpenRpg.Entities.Effects.Processors
             {
                 var level = relatedEntity?.Variables.Class()?.Variables.Level() ?? 1;
                 computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(level));
+                return;
             }
+
             if (effect.ScalingType == CoreEffectScalingTypes.StateIndex)
-            { computedEffects.AddDeferred(effect, context); }
+            {
+                computedEffects.AddDeferred(effect, context);
+                return;
+            }
+
             if (effect.ScalingType == CoreEffectScalingTypes.StatIndex)
-            { computedEffects.AddDeferred(effect, context); }
+            {
+                computedEffects.AddDeferred(effect, context);
+                return;
+            }
             
             computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(effect.PotencyFunction.InputScaleMin));
         }

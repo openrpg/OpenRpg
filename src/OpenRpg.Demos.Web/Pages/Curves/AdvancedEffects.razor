@@ -142,7 +142,7 @@
     public ICharacterEffectProcessor EffectProcessor { get; set; }
     public Character ExampleCharacter { get; set; } = new();
     public CharacterPopulator CharacterPopulator { get; set; }
-    public List<StaticEffect> AllEffects { get; set; } = new();
+    public List<IEffect> AllEffects { get; set; } = new();
 
     public int CharacterLevel
     {
@@ -229,7 +229,7 @@
         TemplateAccessor.AddTemplate(pretendWeapon);
 
         RefreshStats();
-        AllEffects = ExampleCharacter.GetEffects(TemplateAccessor).GetStaticEffects().ToList();
+        AllEffects = ExampleCharacter.GetEffects(TemplateAccessor).ToList();
         base.OnInitialized();
     }
 
