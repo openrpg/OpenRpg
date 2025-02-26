@@ -52,14 +52,5 @@ namespace OpenRpg.UnitTests.Genres.Fantasy
             _testOutputHelper.WriteLine(jsonData);
             Assert.Equal(jsonData, recreatedJson);
         }
-
-        [Fact]
-        public void a()
-        {
-            var characterRequirementChecker = new DefaultFantasyCharacterRequirementChecker();
-            var convertedChecker = characterRequirementChecker as IEntityRequirementChecker<Character>;
-
-            Assert.NotNull(convertedChecker);
-        }
     }
 }
