@@ -29,5 +29,8 @@ namespace OpenRpg.Items.Extensions
         
         public static float Weight(this ItemVariables variables) => variables.GetFloat(ItemVariableTypes.Weight);
         public static void Weight(this ItemVariables variables, float value) => variables[ItemVariableTypes.Weight] = value;
+        
+        public static List<int> ProceduralEffects(this ItemVariables variables) => variables.GetAsOrDefault(ItemVariableTypes.ProceduralEffects, () => new List<int>());
+        public static void AddProceduralEffect(this ItemVariables variables, int effectIndex, int effectValue)
     }
 }

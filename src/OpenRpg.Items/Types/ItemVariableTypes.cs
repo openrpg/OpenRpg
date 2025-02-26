@@ -6,5 +6,6 @@ namespace OpenRpg.Items.Types
 
         public static int Amount = 1;
         public static int Weight = 2;
+        public static int ProceduralEffects = 2;
     }
 }
