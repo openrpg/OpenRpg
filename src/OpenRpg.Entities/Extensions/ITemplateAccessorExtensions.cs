@@ -4,6 +4,7 @@ using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Classes;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Modifications;
+using OpenRpg.Entities.Modifications.Templates;
 using OpenRpg.Entities.Races;
 using OpenRpg.Entities.Races.Templates;
 

@@ -3,14 +3,17 @@
 @using Newtonsoft.Json
 @using OpenRpg.Core.Templates
 @using OpenRpg.Demos.Infrastructure.JSON
+@using OpenRpg.Entities.Effects.Processors
 @using OpenRpg.Entities.Entity
+@using OpenRpg.Entities.Entity.Populators.Stats
 @using OpenRpg.Genres.Characters
-@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Populators.Entity.Stats
 
 @inject DemoCharacterBuilder CharacterBuilder;
 @inject IEntityStatPopulator StatPopulator;
 @inject ITemplateAccessor TemplateAccessor;
+@inject ICharacterEffectProcessor EffectProcessor;
 
 <Markdown>
    #### Character Persistence
@@ -108,7 +111,9 @@
     public void ReloadCharacterFromData()
     {
         _regeneratedCharacter = JsonConvert.DeserializeObject<Character>(_persistedData, _jsonSettings);
-        StatPopulator.Populate(_regeneratedCharacter.Stats, _regeneratedCharacter.ComputeEffects(TemplateAccessor), null);
+
+        var computedEffects = EffectProcessor.ComputeEffects(_regeneratedCharacter);
+        StatPopulator.Populate(_regeneratedCharacter.Stats, computedEffects, null);
         StateHasChanged();
     }
 }

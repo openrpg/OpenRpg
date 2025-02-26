@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Effects;
 
-namespace OpenRpg.Entities.Modifications
+namespace OpenRpg.Entities.Modifications.Templates
 {
     public class ModificationTemplate : ITemplate, IHasEffects
     {

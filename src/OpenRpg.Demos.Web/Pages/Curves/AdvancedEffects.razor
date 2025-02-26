@@ -1,25 +1,31 @@
 ﻿@page "/curves/advanced-effects"
-@using OpenRpg.Core.Variables
+
 @using OpenRpg.CurveFunctions
 @using OpenRpg.CurveFunctions.Scaling
 @using OpenRpg.Demos.Infrastructure.Templates
 @using OpenRpg.Entities.Classes
 @using OpenRpg.Entities.Classes.Templates
 @using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Entity.Populators.State
+@using OpenRpg.Entities.Entity.Populators.Stats
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races
 @using OpenRpg.Entities.Races.Templates
 @using OpenRpg.Entities.Types
 @using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Extensions
 @using OpenRpg.Genres.Fantasy.Extensions
 @using OpenRpg.Genres.Fantasy.Types
-@using OpenRpg.Genres.Populators.Entity.Stats
+@using OpenRpg.Genres.Populators.Entity
+@using OpenRpg.Genres.Requirements
 @using OpenRpg.Items.Equippables
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 
-@inject IEntityStatPopulator StatPopulator;
+@inject ICharacterRequirementChecker RequirementsChecker
+@inject IEntityStatPopulator StatPopulator
+@inject IEntityStatePopulator StatePopulator
 
 <Markdown>
    ## Advanced Effects
@@ -106,9 +112,9 @@
 
             </Markdown>
             <div class="field">
-                <label class="label">Level Value</label>
+                <label class="label">Level Value: @(CharacterLevel)</label>
                 <div class="control">
-                    <input class="input" type="text" @bind="CharacterLevel" @bind:after="RefreshStats"/>
+                    <input class="slider is-fullwidth is-success has-output-tooltip" step="1" min="1" max="10" @bind="CharacterLevel" @bind:after="RefreshStats" type="range">
                 </div>
             </div>
         </CardSection>
@@ -121,7 +127,9 @@
                               Class="@TemplateAccessor.ToInstance(ExampleCharacter.Variables.Class())"/>
             <CharacterStats Stats="@ExampleCharacter.Stats"/>
             <br />
-            <CharacterVitals Stats="@ExampleCharacter.Stats"/>
+            <CharacterVitals Stats="@ExampleCharacter.Stats" State="ExampleCharacter.State"/>
+            <br />
+            <EffectList Effects="AllEffects" Character="ExampleCharacter" />
         </CardSection>
     </div>
 </div>
@@ -131,7 +139,10 @@
     public IRefreshable DamageScalingChart { get; set; }
 
     public ManualTemplateAccessor TemplateAccessor { get; set; } = new();
+    public ICharacterEffectProcessor EffectProcessor { get; set; }
     public Character ExampleCharacter { get; set; } = new();
+    public CharacterPopulator CharacterPopulator { get; set; }
+    public List<IEffect> AllEffects { get; set; } = new();
 
     public int CharacterLevel
     {
@@ -141,6 +152,8 @@
     
     protected override void OnInitialized()
     {
+        EffectProcessor = new CharacterEffectProcessor(TemplateAccessor, RequirementsChecker);
+        CharacterPopulator = new CharacterPopulator(StatPopulator, StatePopulator, EffectProcessor);
         DamageScaledWithStrengthEffect = new ScaledEffect()
         {
             EffectType = FantasyEffectTypes.DamageBonusAmount,
@@ -163,7 +176,7 @@
                 new StaticEffect()
                 {
                     EffectType = FantasyEffectTypes.StrengthBonusPercentage,
-                    Potency = 0.1f
+                    Potency = 0.2f
                 }
             }
         };
@@ -192,14 +205,14 @@
                 new StaticEffect()
                 {
                     EffectType = FantasyEffectTypes.StrengthBonusAmount,
-                    Potency = 1
+                    Potency = 2
                 },
                 new ScaledEffect()
                 {
                     EffectType = FantasyEffectTypes.DamageBonusAmount,
                     ScalingType = CoreEffectScalingTypes.StatIndex,
                     ScalingIndex = FantasyEntityStatsVariableTypes.Strength,
-                    PotencyFunction = new ScalingFunction(PresetCurves.Linear, 10, 30, 1, 10)
+                    PotencyFunction = new ScalingFunction(PresetCurves.Linear, 10, 30, 10, 20)
                 }
             }
         };
@@ -216,13 +229,11 @@
         TemplateAccessor.AddTemplate(pretendWeapon);
 
         RefreshStats();
+        AllEffects = ExampleCharacter.GetEffects(TemplateAccessor).ToList();
         base.OnInitialized();
     }
 
     public void RefreshStats()
-    {
-        var effects = ExampleCharacter.ComputeEffects(TemplateAccessor);
-        StatPopulator.Populate(ExampleCharacter.Stats, effects, Array.Empty<IVariables>());
-    }
+    { CharacterPopulator.Populate(ExampleCharacter, true); }
 
 }

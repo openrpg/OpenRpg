@@ -1,10 +1,10 @@
 using System.Collections.Generic;
+using OpenRpg.Entities.Entity.Populators.Stats;
 using OpenRpg.Entities.Stats.Populators;
 using OpenRpg.Entities.Stats.Variables;
-using OpenRpg.Genres.Fantasy.Stats.Populators;
-using OpenRpg.Genres.Populators.Entity.Stats;
+using OpenRpg.Genres.Fantasy.Stats.Populators.Partial;
 
-namespace OpenRpg.Genres.Fantasy.Stats
+namespace OpenRpg.Genres.Fantasy.Stats.Populators
 {
     public class FantasyStatsPopulator : CompositeStatPopulator<EntityStatsVariables>, IEntityStatPopulator
     {
@@ -14,10 +14,8 @@ namespace OpenRpg.Genres.Fantasy.Stats
             {
                 new FantasyAttributeStatPopulator(),
                 new FantasyVitalsStatPopulator(),
-                new FantasyMeleeDamageStatPopulator(),
-                new FantasyElementalDamageStatPopulator(),
-                new FantasyMeleeDefenseStatPopulator(),
-                new FantasyElementalDefenseStatPopulator()
+                new FantasyMeleeStatPopulator(),
+                new FantasyElementalStatPopulator(),
             };
 
             if (additionalStatPopulators != null)

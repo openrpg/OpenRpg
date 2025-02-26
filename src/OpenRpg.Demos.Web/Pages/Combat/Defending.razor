@@ -4,9 +4,10 @@
 @using OpenRpg.Combat.Processors.Attacks
 @using OpenRpg.Combat.Processors.Attacks.Entity
 @using OpenRpg.Core.Templates
+@using OpenRpg.Entities.Entity.Populators.Stats
 @using OpenRpg.Entities.Stats.Variables
 @using OpenRpg.Genres.Characters
-@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Populators.Entity.Stats
 @using OpenRpg.Localization.Data.Extensions
 @using OpenRpg.Localization.Data.Repositories
@@ -17,6 +18,7 @@
 @inject ILocaleRepository LocaleRepository
 @inject IEntityStatPopulator StatPopulator;
 @inject ITemplateAccessor TemplateAccessor;
+@inject ICharacterEffectProcessor EffectProcessor;
 
 <Markdown>
     ## Defending
@@ -133,13 +135,15 @@
     public void RandomizeAttacker()
     {
         _attackingCharacter = CharacterBuilder.CreateNew().Build();
-        StatPopulator.Populate(_attackingCharacter.Stats, _attackingCharacter.ComputeEffects(TemplateAccessor).ToArray(), null);
+        var computedEffects = EffectProcessor.ComputeEffects(_attackingCharacter);
+        StatPopulator.Populate(_attackingCharacter.Stats, computedEffects, null);
     }
 
     public void RandomizeDefender()
     {
         _defendingCharacter = CharacterBuilder.CreateNew().Build();
-        StatPopulator.Populate(_defendingCharacter.Stats, _defendingCharacter.ComputeEffects(TemplateAccessor).ToArray(), null);
+        var computeEffects = EffectProcessor.ComputeEffects(_defendingCharacter);
+        StatPopulator.Populate(_defendingCharacter.Stats, computeEffects, null);
     }
 
     public string GetDamageTypeText(int damageType)

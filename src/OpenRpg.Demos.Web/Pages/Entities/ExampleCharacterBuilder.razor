@@ -4,14 +4,16 @@
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Core.Templates
 @using OpenRpg.Entities.Classes.Templates
+@using OpenRpg.Entities.Entity.Populators.Stats
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Races.Templates
-@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Populators.Entity.Stats
 
 @inject DemoCharacterBuilder CharacterBuilder;
 @inject ITemplateAccessor TemplateAccessor;
 @inject IEntityStatPopulator StatPopulator;
+@inject ICharacterEffectProcessor EffectProcessor;
 
 <Markdown>
     # Character Builder
@@ -163,7 +165,8 @@
         { builder = builder.AsFemale(); }
 
         _generatedCharacter = builder.Build();
-        StatPopulator.Populate(_generatedCharacter.Stats, _generatedCharacter.ComputeEffects(TemplateAccessor).ToArray(), null);
+        var computedEffects = EffectProcessor.ComputeEffects(_generatedCharacter);
+        StatPopulator.Populate(_generatedCharacter.Stats, computedEffects, null);
 
         StateHasChanged();
     }

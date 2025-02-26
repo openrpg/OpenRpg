@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Variables;
-using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Effects.Processors;
 
 namespace OpenRpg.Entities.State.Populators.Variables
 {
@@ -14,6 +14,6 @@ namespace OpenRpg.Entities.State.Populators.Variables
     /// </remarks>
     public interface IVariablePopulator<in T> where T : IVariables
     {
-        void Populate(T varsToPopulate, IReadOnlyCollection<StaticEffect> activeEffects, IReadOnlyCollection<IVariables> relatedVars);
+        void Populate(T varsToPopulate, ComputedEffects computedEffects, IReadOnlyCollection<IVariables> relatedVars);
     }
 }
