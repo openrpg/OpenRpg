@@ -1,3 +1,5 @@
+using OpenRpg.Core.Utils;
+
 namespace OpenRpg.Core.Common
 {
     /// <summary>
@@ -11,14 +13,6 @@ namespace OpenRpg.Core.Common
     /// </remarks>
     public interface IHasAssociation
     {
-        /// <summary>
-        /// The required id of whatever is associated
-        /// </summary>
-        int AssociatedId { get; }
-        
-        /// <summary>
-        /// The required value of whatever is associated (may be a minimum threshold not equality)
-        /// </summary>
-        int AssociatedValue { get; }
+        Association Association { get; }
     }
 }

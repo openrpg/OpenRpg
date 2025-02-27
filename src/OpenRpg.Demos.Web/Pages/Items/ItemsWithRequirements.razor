@@ -1,6 +1,7 @@
 @page "/items/item-requirements"
 
 @using OpenRpg.Core.Templates
+@using OpenRpg.Core.Utils
 @using OpenRpg.Demos.Infrastructure.Extensions
 @using OpenRpg.Demos.Infrastructure.Lookups
 @using OpenRpg.Entities.Effects
@@ -123,7 +124,7 @@
             ItemType = FantasyItemTypes.GenericWeapon,
             Requirements = new[]
             {
-                new Requirement {RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 10 }
+                new Requirement {RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 10) }
                 },
             Effects = new[]
             {
@@ -148,7 +149,7 @@
             ItemType = FantasyItemTypes.GenericWeapon,
             Requirements = new[]
             {
-                new Requirement { RequirementType = FantasyRequirementTypes.ClassRequirement, AssociatedId = ClassTypeLookups.Mage, AssociatedValue = 3},
+                new Requirement { RequirementType = FantasyRequirementTypes.ClassRequirement, Association = new Association(ClassTypeLookups.Mage, 3)},
             },
             Effects = new[]
             {
@@ -175,26 +176,26 @@
             ItemType = FantasyItemTypes.GenericWeapon,
             Requirements = new[]
             {
-                new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 8 },
+                new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 8) },
             },
             Effects = new[]
             {
                 new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 20 },
                 new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 5.0f, Requirements = new []
             {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 9 }
+                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement,  Association = new Association(0, 9)  }
                 }},
                 new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 7.5f, Requirements = new []
             {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 10 }
+                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 10)  }
                 }},
                 new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f, Requirements = new []
             {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 11 }
+                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 11)  }
                 }},
                 new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 12.5f, Requirements = new []
             {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, AssociatedValue = 12 }
+                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 12)  }
                 }},
             }
         };

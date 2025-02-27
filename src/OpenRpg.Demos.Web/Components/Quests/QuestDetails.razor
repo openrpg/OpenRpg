@@ -30,7 +30,7 @@
             {
                 if (gift.RewardType == FantasyRewardTypes.ItemReward)
                 {
-                    <ItemIcon Item="GetItemFor(gift.AssociatedId, gift.AssociatedValue)" Character="Character"></ItemIcon>
+                    <ItemIcon Item="GetItemFor(gift.Association.AssociatedId, gift.Association.AssociatedValue)" Character="Character"></ItemIcon>
                 }
             }
         </div>
@@ -45,7 +45,7 @@
                 {
                     if (objective.ObjectiveType == ObjectiveTypes.ItemObjective)
                     {
-                        <ItemIcon Item="GetItemFor(objective.AssociatedId, objective.AssociatedValue)" Character="Character"></ItemIcon>
+                        <ItemIcon Item="GetItemFor(objective.Association.AssociatedId, objective.Association.AssociatedValue)" Character="Character"></ItemIcon>
                     }
                     else if (objective.ObjectiveType == ObjectiveTypes.TriggerObjective)
                     {
@@ -64,15 +64,15 @@
             {
                 if (reward.RewardType == FantasyRewardTypes.ItemReward)
                 {
-                    <ItemIcon Item="@GetItemFor(reward.AssociatedId, reward.AssociatedValue)" Character="Character"></ItemIcon>
+                    <ItemIcon Item="@GetItemFor(reward.Association.AssociatedId, reward.Association.AssociatedValue)" Character="Character"></ItemIcon>
                 }
                 else if (reward.RewardType == FantasyRewardTypes.CurrencyReward)
                 {
-                    <div class="subtitle is-6 has-text-dark">@(reward.AssociatedValue) Gold</div>
+                    <div class="subtitle is-6 has-text-dark">@(reward.Association.AssociatedValue) Gold</div>
                 }
                 else if (reward.RewardType == FantasyRewardTypes.ExperienceReward)
                 {
-                    <div class="subtitle is-6 has-text-dark">@(reward.AssociatedValue) Experience</div>
+                    <div class="subtitle is-6 has-text-dark">@(reward.Association.AssociatedValue) Experience</div>
                 }
             }
         </div>

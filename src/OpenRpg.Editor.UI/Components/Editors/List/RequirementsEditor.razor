@@ -1,4 +1,5 @@
-﻿@using OpenRpg.Editor.Infrastructure.Helpers
+﻿@using OpenRpg.Core.Utils
+@using OpenRpg.Editor.Infrastructure.Helpers
 @using OpenRpg.Entities.Requirements
 
 <ListEditor Data="Requirements" TItem="Requirement">
@@ -22,12 +23,14 @@
         </td>
         <td>
             <div class="control">
-                <input class="input" type="text" @bind="context.AssociatedId" />
+                <input class="input" type="text" @bind:get="@context.Association.AssociatedId"
+                       @bind:set="id => context.Association = new Association(id, context.Association.AssociatedValue)" />
             </div>
         </td>
         <td>
             <div class="control">
-                <input class="input" type="text" @bind="context.AssociatedValue" />
+                <input class="input" type="text"  @bind:get="@context.Association.AssociatedValue"
+                       @bind:set="value => context.Association = new Association(context.Association.AssociatedId, value)" />
             </div>
         </td>
     </RowTemplate>

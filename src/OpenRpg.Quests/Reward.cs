@@ -1,12 +1,12 @@
 using OpenRpg.Core.Common;
+using OpenRpg.Core.Utils;
 
 namespace OpenRpg.Quests
 {
     public class Reward : IHasAssociation
     {
         public int RewardType { get; set; }
-        public int AssociatedId { get; set; }
-        public int AssociatedValue { get; set; }
+        public Association Association { get; set; }
         public float RewardChance { get; set; }
     }
 }

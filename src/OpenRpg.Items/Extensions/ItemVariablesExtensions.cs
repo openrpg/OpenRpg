@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Extensions;
+using OpenRpg.Core.Utils;
 using OpenRpg.Items.Types;
 using OpenRpg.Items.Variables;
 
@@ -31,6 +32,9 @@ namespace OpenRpg.Items.Extensions
         public static void Weight(this ItemVariables variables, float value) => variables[ItemVariableTypes.Weight] = value;
         
         public static List<int> ProceduralEffects(this ItemVariables variables) => variables.GetAsOrDefault(ItemVariableTypes.ProceduralEffects, () => new List<int>());
-        public static void AddProceduralEffect(this ItemVariables variables, int effectIndex, int effectValue)
+
+        public static void AddProceduralEffect(this ItemVariables variables, Association effectAssociation)
+        {
+        }
     }
 }

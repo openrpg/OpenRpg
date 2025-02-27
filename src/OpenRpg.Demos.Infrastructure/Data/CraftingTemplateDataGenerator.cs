@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
@@ -58,7 +59,7 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
             OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry },
             Requirements = new []
             {
-                new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, AssociatedId = FantasyCraftingTradeSkillTypes.Smithing, AssociatedValue = 5 }
+                new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, Association = new Association(FantasyCraftingTradeSkillTypes.Smithing, 5) }
             }
         };
     }

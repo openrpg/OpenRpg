@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
@@ -49,7 +50,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 OutputItems = new List<TradeSkillItemEntry>() { itemEntry },
                 Requirements =  new []
                 {
-                    new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, AssociatedId = FantasyGatheringTradeSkillTypes.Mining, AssociatedValue = 10 }
+                    new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, Association = new Association(FantasyGatheringTradeSkillTypes.Mining, 10) }
                 },
             };
         }

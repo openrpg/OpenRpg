@@ -1,4 +1,5 @@
 using OpenRpg.Core.Common;
+using OpenRpg.Core.Utils;
 
 namespace OpenRpg.Entities.Requirements
 {
@@ -11,18 +12,12 @@ namespace OpenRpg.Entities.Requirements
         /// The type of requirement that needs to be met
         /// </summary>
         public int RequirementType { get; set; }
-        
+
         /// <summary>
-        /// The associated id for the requirement
-        /// i.e Requires item id 1
+        /// The associated data for the requirement
+        /// i.e Requires item id 1, Requires Level > 5
         /// </summary>
         /// <remarks>This may be empty in some cases depending on requirement type</remarks>
-        public int AssociatedId { get; set; }
-        
-        /// <summary>
-        /// The associated value for the associated type (or requirement type)
-        /// i.e Requires Level > 5, with the requirement type indicating level, and the value being 5
-        /// </summary>
-        public int AssociatedValue { get; set; }
+        public Association Association { get; set; }
     }
 }
