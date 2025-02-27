@@ -1,4 +1,5 @@
 using System.Linq;
+using OpenRpg.Core.Effects;
 using OpenRpg.Entities.Effects;
 using OpenRpg.Entities.Effects.Processors;
 using OpenRpg.Entities.Types;

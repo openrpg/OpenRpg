@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Combat.Variables;
+using OpenRpg.Core.Effects;
 using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Combat.Effects

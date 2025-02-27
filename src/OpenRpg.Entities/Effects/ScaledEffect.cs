@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Requirements;
 using OpenRpg.CurveFunctions;
 using OpenRpg.CurveFunctions.Scaling;
 using OpenRpg.Entities.Requirements;

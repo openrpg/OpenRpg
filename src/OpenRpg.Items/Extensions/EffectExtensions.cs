@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using OpenRpg.Core.Effects;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Classes;
 using OpenRpg.Entities.Effects;

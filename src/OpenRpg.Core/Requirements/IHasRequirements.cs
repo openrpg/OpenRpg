@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace OpenRpg.Entities.Requirements
+namespace OpenRpg.Core.Requirements
 {
     /// <summary>
     /// Implies the implementation has requirements before it can function/be used

@@ -1,3 +1,4 @@
+using OpenRpg.Core.Associations;
 using OpenRpg.Core.Utils;
 
 namespace OpenRpg.Quests

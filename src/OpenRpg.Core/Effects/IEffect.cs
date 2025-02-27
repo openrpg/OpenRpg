@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using OpenRpg.Entities.Requirements;
+using OpenRpg.Core.Requirements;
 
-namespace OpenRpg.Entities.Effects
+namespace OpenRpg.Core.Effects
 {
     /// <summary>
     /// Generic effect interface that lets us all agree every effect has a type and requirements

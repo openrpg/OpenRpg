@@ -1,3 +1,4 @@
+using OpenRpg.Core.Effects;
 using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Entities.Extensions

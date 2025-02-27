@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using OpenRpg.Core.Requirements;
 using OpenRpg.Entities.Requirements;
 
 namespace OpenRpg.Entities.Modifications

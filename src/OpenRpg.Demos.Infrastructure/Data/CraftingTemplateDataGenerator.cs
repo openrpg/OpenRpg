@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Associations;
+using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Entities.Requirements;

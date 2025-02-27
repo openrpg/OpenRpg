@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using OpenRpg.Core.Common;
+using OpenRpg.Core.Effects;
 using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Cards.Genres.Conventions

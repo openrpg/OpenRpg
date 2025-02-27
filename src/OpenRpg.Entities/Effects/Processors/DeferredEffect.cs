@@ -1,3 +1,5 @@
+using OpenRpg.Core.Effects;
+
 namespace OpenRpg.Entities.Effects.Processors
 {
     public class DeferredEffect

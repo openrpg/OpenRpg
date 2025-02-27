@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using OpenRpg.Entities.Requirements;
+using OpenRpg.Core.Requirements;
 
-namespace OpenRpg.Entities.Effects
+namespace OpenRpg.Core.Effects
 {
     /// <summary>
     /// The effect object indicates a type of effect with a potency that can be applied to anything
@@ -11,7 +11,7 @@ namespace OpenRpg.Entities.Effects
     /// Generally some parent object like a Character will have various effects all combined together to drive the
     /// stats, but can be used any way required
     /// </remarks>
-    public class StaticEffect : IHasRequirements, IEffect
+    public class StaticEffect : IEffect
     {
         /// <summary>
         /// The effect type to apply

@@ -1,7 +1,6 @@
-using OpenRpg.Core.Common;
-using OpenRpg.Core.Utils;
+using OpenRpg.Core.Associations;
 
-namespace OpenRpg.Entities.Requirements
+namespace OpenRpg.Core.Requirements
 {
     /// <summary>
     /// Represents a requirement that must be met 

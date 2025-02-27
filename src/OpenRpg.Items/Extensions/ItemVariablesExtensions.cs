@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Associations;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Utils;
 using OpenRpg.Items.Types;

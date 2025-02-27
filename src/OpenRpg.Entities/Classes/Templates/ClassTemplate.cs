@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Classes.Variables;
 using OpenRpg.Entities.Effects;

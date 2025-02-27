@@ -1,4 +1,4 @@
-namespace OpenRpg.Core.Utils
+namespace OpenRpg.Core.Associations
 {
     public struct Association
     {

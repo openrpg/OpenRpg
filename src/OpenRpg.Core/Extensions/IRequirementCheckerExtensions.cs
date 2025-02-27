@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using OpenRpg.Entities.Requirements;
+using OpenRpg.Core.Requirements;
 
-namespace OpenRpg.Entities.Extensions
+namespace OpenRpg.Core.Extensions
 {
     public static class IRequirementCheckerExtensions
     {

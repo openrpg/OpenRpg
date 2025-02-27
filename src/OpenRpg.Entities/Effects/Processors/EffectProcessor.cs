@@ -1,3 +1,5 @@
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Requirements;

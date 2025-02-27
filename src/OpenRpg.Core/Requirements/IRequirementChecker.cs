@@ -1,4 +1,4 @@
-namespace OpenRpg.Entities.Requirements
+namespace OpenRpg.Core.Requirements
 {
     public interface IRequirementChecker<in T>
     {

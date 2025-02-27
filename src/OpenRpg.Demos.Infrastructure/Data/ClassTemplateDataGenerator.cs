@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using OpenRpg.Core.Effects;
 using OpenRpg.Demos.Infrastructure.Extensions;
 using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Entities.Classes.Templates;

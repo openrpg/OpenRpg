@@ -1,4 +1,5 @@
 using System.Reflection;
+using OpenRpg.Core.Effects;
 using OpenRpg.Entities.Effects;
 using OpenRpg.Genres.Fantasy.Types;
 
