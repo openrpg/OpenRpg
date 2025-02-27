@@ -6,7 +6,7 @@ namespace OpenRpg.Entities.Requirements
     /// <summary>
     /// Represents a requirement that must be met 
     /// </summary>
-    public class Requirement : IHasAssociation
+    public class Requirement
     {
         /// <summary>
         /// The type of requirement that needs to be met
