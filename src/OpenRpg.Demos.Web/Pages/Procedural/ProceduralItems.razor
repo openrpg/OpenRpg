@@ -84,7 +84,7 @@
             Here is a real example of the above, click the button a few times and see how it changes the item instance.
         </Markdown>
     </div>
-    <div class="column">
+    <div class="column is-one-third">
         <CardSection>
             <div class="control">
                 <a class="button is-info" @onclick="RefreshProceduralItem">Generate New Item</a>
@@ -93,9 +93,9 @@
                 <ItemDetails Item="Item" OverriddenTemplateAccessor="TemplateAccessor"/>
             </div>
             <div class="control">
-                <pre>
-                    @_serializedItemData
-                </pre>
+                <div class="content">
+                    <pre>@_serializedItemData</pre>
+                </div>
             </div>
         </CardSection>
     </div>

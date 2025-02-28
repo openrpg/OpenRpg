@@ -13,8 +13,11 @@ namespace OpenRpg.Entities.Extensions
     {
         public static Association AssociateEffect(ProceduralEffects proceduralEffects, IRandomizer randomizer, GroupedEffect effect)
         {
-            var effectValue = effect.PotencyFunction.InputScale.Random(randomizer);
             var effectIndex = proceduralEffects.Effects.IndexOf(effect);
+            if (effect.ScalingType != CoreEffectScalingTypes.Value)
+            { return new Association(effectIndex, 0); }
+            
+            var effectValue = effect.PotencyFunction.InputScale.Random(randomizer);
             return new Association(effectIndex, (int)effectValue);
         }
         

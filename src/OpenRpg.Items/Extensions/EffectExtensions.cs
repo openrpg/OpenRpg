@@ -3,6 +3,7 @@ using System.Linq;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Types;
 using OpenRpg.Items.Equippables;
 using OpenRpg.Items.Templates;
 
@@ -17,12 +18,17 @@ namespace OpenRpg.Items.Extensions
             var effects = new List<IEffect>(template.Effects);
             if (itemData.Variables.HasProceduralAssociation())
             {
+                var proceduralEffects = template.Variables.ProceduralEffects();
                 foreach (var proceduralEffect in itemData.Variables.ProceduralAssociation())
                 {
-                    var staticEffect = template.Variables.ProceduralEffects()
-                        .Effects[proceduralEffect.AssociatedId]
-                        .Compute(proceduralEffect.AssociatedValue);
-                    effects.Add(staticEffect);
+                    var effect = proceduralEffects.Effects[proceduralEffect.AssociatedId];
+                    if (effect.ScalingType == CoreEffectScalingTypes.Value)
+                    {
+                        var computedEffect = effect.Compute(proceduralEffect.AssociatedValue);
+                        effects.Add(computedEffect);
+                    }
+                    else
+                    { effects.Add(effect); }
                 }
             }
             
