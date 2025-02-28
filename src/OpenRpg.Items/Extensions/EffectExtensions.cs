@@ -15,11 +15,11 @@ namespace OpenRpg.Items.Extensions
             var template = templateAccessor.GetItemTemplate(itemData.TemplateId);
             
             var effects = new List<IEffect>(template.Effects);
-            if (itemData is ProceduralItemData proceduralItemData)
+            if (itemData.Variables.HasProceduralAssociation())
             {
-                foreach (var proceduralEffect in proceduralItemData.ProceduralEffectAssociations)
+                foreach (var proceduralEffect in itemData.Variables.ProceduralAssociation())
                 {
-                    var staticEffect = (template as ProceduralItemTemplate).ProceduralEffects
+                    var staticEffect = template.Variables.ProceduralEffects()
                         .Effects[proceduralEffect.AssociatedId]
                         .Compute(proceduralEffect.AssociatedValue);
                     effects.Add(staticEffect);

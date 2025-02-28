@@ -2,7 +2,7 @@ using OpenRpg.Entities.Types;
 
 namespace OpenRpg.Genres.Types
 {
-    public interface GenreEntityStatsVariableTypes : EntityStatsVariableTypes
+    public interface GenreEntityStatsVariableTypes : CoreEntityStatsVariableTypes
     {
         // Base stats
         public static readonly int MaxHealth = 1;

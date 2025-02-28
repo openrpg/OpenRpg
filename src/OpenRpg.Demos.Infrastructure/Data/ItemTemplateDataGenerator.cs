@@ -5,6 +5,7 @@ using OpenRpg.Core.Requirements;
 using OpenRpg.Demos.Infrastructure.Extensions;
 using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Modifications;
 using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;

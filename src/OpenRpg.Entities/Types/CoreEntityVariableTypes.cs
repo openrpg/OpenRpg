@@ -1,6 +1,6 @@
 namespace OpenRpg.Entities.Types
 {
-    public interface EntityVariableTypes
+    public interface CoreEntityVariableTypes
     {
         public static readonly int Unknown = 0;
         

@@ -79,7 +79,7 @@
     
     private bool IsWeapon => Item.Template.ItemType == FantasyItemTypes.GenericWeapon;
 
-    private bool IsProcedural => Item.Template is ProceduralItemTemplate;
+    private bool IsProcedural => Item.Template.Variables.HasProceduralEffects();
     private IReadOnlyCollection<IEffect> Effects { get; set; }
     
     private bool IsArmour

@@ -4,6 +4,7 @@ using OpenRpg.Demos.Infrastructure.Extensions;
 using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
 
 namespace OpenRpg.Demos.Infrastructure.Data

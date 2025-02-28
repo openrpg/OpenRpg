@@ -1,5 +1,5 @@
 using OpenRpg.Core.Common;
-using OpenRpg.Core.Variables;
+using OpenRpg.Core.Templates.Variables;
 using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Core.Templates
@@ -9,7 +9,7 @@ namespace OpenRpg.Core.Templates
         
     }
 
-    public interface ITemplate<out T> : ITemplate, IHasVariables<T> where T : IVariables<object>
+    public interface ITemplate<out T> : ITemplate, IHasVariables<T> where T : ITemplateVariables
     {
         
     }

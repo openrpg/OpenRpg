@@ -3,6 +3,7 @@ using OpenRpg.Core.Effects;
 using OpenRpg.Demos.Infrastructure.Extensions;
 using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Genres.Fantasy.Types;
 
