@@ -4,6 +4,7 @@ namespace OpenRpg.Genres.Fantasy.Effects
 {
     public static class EffectTypeGroups
     {
+        // TODO: Should this contain the bonus amount?
         public static int[] DamageEffectTypes =
         {
             FantasyEffectTypes.SlashingDamageAmount, FantasyEffectTypes.PiercingDamageAmount, FantasyEffectTypes.BluntDamageAmount, FantasyEffectTypes.UnarmedDamageAmount,

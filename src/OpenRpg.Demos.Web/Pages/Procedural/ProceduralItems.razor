@@ -56,8 +56,8 @@
         TemplateAccessor = new ManualTemplateAccessor();
         var possibleEffects = new List<ProceduralEffect> 
         {
-            new() { GroupType = ProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.BluntBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { GroupType = ProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.PiercingBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+            new() { GroupType = ProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.BluntDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+            new() { GroupType = ProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.PiercingDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
             new() { EffectType = FantasyEffectTypes.StrengthBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
             new() { EffectType = FantasyEffectTypes.DexterityBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
             new() { EffectType = FantasyEffectTypes.FireDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
