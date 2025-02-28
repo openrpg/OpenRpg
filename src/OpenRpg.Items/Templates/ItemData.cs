@@ -9,7 +9,7 @@ namespace OpenRpg.Items.Templates
 {
     public class ItemData : ITemplateData<ItemVariables>, IHasModifications<ItemModificationData>, IIsUnique
     {
-        public Guid UniqueId { get; set; }
+        public Guid UniqueId { get; set; } = Guid.NewGuid();
         public int TemplateId { get; set; }
         
         public IEnumerable<ItemModificationData> Modifications { get; set;} = new List<ItemModificationData>();

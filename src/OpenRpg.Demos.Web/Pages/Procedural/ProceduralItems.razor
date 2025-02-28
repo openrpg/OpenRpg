@@ -1,12 +1,8 @@
 @page "/procedural/procedural-items"
-
-@using OpenRpg.Core.Effects
-@using OpenRpg.Core.Templates
+@using Newtonsoft.Json
 @using OpenRpg.Core.Utils
 @using OpenRpg.CurveFunctions
 @using OpenRpg.CurveFunctions.Scaling
-@using OpenRpg.Data
-@using OpenRpg.Demos.Infrastructure.Extensions
 @using OpenRpg.Demos.Infrastructure.Templates
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Extensions
@@ -21,28 +17,87 @@
 @inject IRandomizer Randomizer;
 
 <Markdown>
-    ## Procedrual Items
-    GOOD STUFF
+    ## Procedural Templates
+    Everything we have gone over so far has been related to making static templates, then making instances of those templates.
     
+    This is all well and good, but what if we wanted to have some sort of procedural content, like a weapon that has various possible effects
+    and they all share the same template but are able to have slight different effects per instance.
+    
+    Well as it happens we have you covered, you can make use of the optional `ProceduralEffects` variable on any template to provide procedural
+    effects that can be references from the instance. Lets take a look at how it works.
 </Markdown>
 
 <br />
+
 <div class="columns">
     <div class="column is-two-thirds">
         <Markdown>
-            ### A More Complex Item
-            So now lets make an item which has some fancy effects on it,
+            ### A Simple Procedural Weapon Template
+            Lets do something simple like creating a basic weapon template which will have some varying effects.
+            
+            To start with we need to setup our `ProceduralEffects` configuration, here is an example:
+            ```csharp
+            var possibleEffects = new List&lt;GroupedEffect&gt;
+            {
+                new() { GroupType = CoreProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.BluntDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+                new() { GroupType = CoreProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.PiercingDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+                new() { EffectType = FantasyEffectTypes.StrengthBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+                new() { EffectType = FantasyEffectTypes.DexterityBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+                new() { EffectType = FantasyEffectTypes.FireDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+                new() { EffectType = FantasyEffectTypes.WindDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+            };
 
-            blah
+            var proceduralEffects = new ProceduralEffects()
+            {
+                EffectAmount = new Range(1, 3),
+                Effects = possibleEffects,
+            };
+            ```
+            
+            I know its a lot of code but its quite simple in whats going on, its making 2 `Primary` effects to choose from, which means you will ALWAYS get 1 of them
+            applied to the generated item, and it wont count towards the effect amount. Then we have 4 `Optional` effects to choose from, and we setup in the `ProceduralEffects` 
+            configuration that we will allow the generated instance to take between 1 to 3 of the optional effects.
+            
+            > You dont NEED `Primary` effects, and by default all `GroupedEffect` instances are `Optional`, it is also worth mentioning that this all works with the default
+            > `IHasEffects` interface, so you can have the template have `Effects` that are ALWAYS applied just like any normal template, then the procedural content is 
+            > added on top as optional content.
+            
+            Once we have setup that procedural content we just need to apply it to a template, like so:
+            ```csharp
+            var proceduralTemplate = new ItemTemplate()
+            {
+                Id = 1,
+                NameLocaleId = "Magical Random Sword",
+                ItemType = FantasyItemTypes.GenericWeapon
+            };
+            proceduralTemplate.Variables.ProceduralEffects(proceduralEffects);
+            ```
+            
+            Now we have done that, we can call `proceduralTemplate.GenerateProceduralInstance(Randomizer)` which will use the procedural config to randomly
+            work out what effects to use and then generate an `ItemData` instance with the given effects associated.
+            
+            > When we say associated we mean that the `ItemData` has a link to the template as usual, but internally it will have a list of `Association`
+            > variables stored inside its `Variables` which contain the `id/index` of the effect on the template it uses, as well as a `Value` if needed
+            > which indicates how potent the effect is, as we use scaled effects so if it is using `Value` scaling type it will auto randomize a value
+            > and treat it like a static effect.
+            
+            Here is a real example of the above, click the button a few times and see how it changes the item instance.
         </Markdown>
     </div>
-    <div class="column is-one-third">
-        <div class="control">
-            <a class="button is-info" @onclick="RefreshProceduralItem">Generate New Item</a>
-        </div>
-        <div class="control">
-            <ItemDetails Item="Item" OverriddenTemplateAccessor="TemplateAccessor" />
-        </div>
+    <div class="column">
+        <CardSection>
+            <div class="control">
+                <a class="button is-info" @onclick="RefreshProceduralItem">Generate New Item</a>
+            </div>
+            <div class="control">
+                <ItemDetails Item="Item" OverriddenTemplateAccessor="TemplateAccessor"/>
+            </div>
+            <div class="control">
+                <pre>
+                    @_serializedItemData
+                </pre>
+            </div>
+        </CardSection>
     </div>
 </div>
 
@@ -50,8 +105,15 @@
     private ItemTemplate proceduralItemTemplate;
     private ItemData _proceduralItemData;
     private ManualTemplateAccessor TemplateAccessor;
-
+    private string _serializedItemData = string.Empty;
+    
     public Item Item => new() { Template = proceduralItemTemplate, Data = _proceduralItemData };
+
+    private JsonSerializerSettings JsonSettings = new()
+    {
+        TypeNameHandling = TypeNameHandling.Auto,
+        Formatting = Formatting.Indented
+    };
 
     protected override void OnInitialized()
     {
@@ -89,6 +151,7 @@
 
     private void RefreshProceduralItem()
     {
-        _proceduralItemData = proceduralItemTemplate.GenerateItem(Randomizer);
+        _proceduralItemData = proceduralItemTemplate.GenerateProceduralInstance(Randomizer);
+        _serializedItemData = JsonConvert.SerializeObject(_proceduralItemData, JsonSettings);
     }
 }
