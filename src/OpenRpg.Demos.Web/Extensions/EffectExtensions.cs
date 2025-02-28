@@ -18,14 +18,14 @@ public static class EffectExtensions
         {
             var potencySymbol = GetPotencySymbol(staticEffect.Potency);
             var potencySuffix = IsPercentageEffect(effect.EffectType) ? "%" : "";
-            return $"{potencySymbol}{staticEffect.Potency}{potencySuffix}";
+            return $"{potencySymbol}{staticEffect.Potency:0}{potencySuffix}";
         }
 
         if (effect is ScaledEffect scaledEffect)
         {
             var potencySymbol = GetPotencySymbol(scaledEffect.PotencyFunction.OutputScale.Min);
             var potencySuffix = IsPercentageEffect(effect.EffectType) ? "%" : "";
-            return $"{potencySymbol}{scaledEffect.PotencyFunction.OutputScale.Min}-{scaledEffect.PotencyFunction.OutputScale.Max}{potencySuffix}";
+            return $"{potencySymbol}{scaledEffect.PotencyFunction.OutputScale.Min:0}-{scaledEffect.PotencyFunction.OutputScale.Max:0}{potencySuffix}";
         }
 
         return "?";

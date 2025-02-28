@@ -10,5 +10,11 @@ namespace OpenRpg.Core.Utils
             Min = min;
             Max = max;
         }
+        
+        public static RangeF ZeroToOne => new RangeF(0, 1);
+        public static RangeF ZeroToOneHundred => new RangeF(0, 100);
+        
+        public static implicit operator RangeF(Range range)
+        { return new RangeF(range.Min, range.Max); }
     }
 }

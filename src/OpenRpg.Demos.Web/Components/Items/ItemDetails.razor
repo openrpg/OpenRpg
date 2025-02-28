@@ -1,0 +1,134 @@
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Templates
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+@using OpenRpg.Items.Types
+@using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Requirements
+@using OpenRpg.Items
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject ILocaleRepository LocaleRepository;
+@inject ICharacterRequirementChecker RequirementsChecker
+@inject ITemplateAccessor TemplateAccessor
+
+<CardSection customClasses="@cardClasses">
+    <h4 class="title is-4 has-text-centered item-quality-@(_itemQualityTypeId)">@(Item.Template.NameLocaleId ?? "Unnamed Item")</h4>
+    @if (!string.IsNullOrEmpty(Item.Template.DescriptionLocaleId))
+    {
+        <h6 class="subtitle is-7 has-text-dark has-text-centered">@(Item.Template.DescriptionLocaleId)</h6>
+    }
+    <div class="columns">
+        <div class="column">
+            <figure class="image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
+                <img src="images/items/@(Item.Template.Variables.AssetCode()).png">
+            </figure>
+        </div>
+        <div class="column">
+            @if (IsWeapon)
+            {
+                <h4 class="title is-4 has-text-dark has-text-centered">@(TotalDamage.ToString("0"))</h4>
+                <h6 class="subtitle is-7 has-text-dark has-text-centered">Damage</h6>
+            }
+            @if (IsArmour)
+            {
+                <h4 class="title is-4 has-text-dark has-text-centered">@(TotalDefense.ToString("0"))</h4>
+                <h6 class="subtitle is-7 has-text-dark has-text-centered">Defense</h6>
+            }
+        </div>
+        <div class="column">
+            @if (_itemQualityTypeId != 0)
+            {
+                <h6 class="subtitle is-5 has-text-dark has-text-centered mb-1">@(LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.ItemQualityTextKey, _itemQualityTypeId)))</h6>
+            }
+            <h6 class="subtitle is-6 has-text-dark has-text-centered">@(LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.ItemTypesTextKey, Item.Template.ItemType)))</h6>
+        </div>
+    </div>
+    @if (DisplayEffects.Any())
+    {
+        <h5 class="title is-5 has-text-centered has-text-dark mb-1 mt-1">Effects</h5>
+        <div>
+            <EffectList Effects="DisplayEffects.ToArray()" Character="@Character"></EffectList>
+        </div>
+    }
+    @if (Item.Template.Requirements.Any())
+    {
+        <h5 class="title is-5 has-text-centered has-text-dark mb-1 mt-3">Requirements</h5>
+        <div>
+            <RequirementList Requirements="@Item.Template.Requirements.ToArray()" Character="@Character"></RequirementList>
+        </div>
+    }
+</CardSection>
+
+@code {
+        
+    [Parameter]
+    public Item Item { get; set; }
+    
+    [Parameter]
+    public Character Character { get; set; }
+
+    [Parameter]
+    public ITemplateAccessor OverriddenTemplateAccessor { get; set; }
+    
+    private bool IsWeapon => Item.Template.ItemType == FantasyItemTypes.GenericWeapon;
+
+    private bool IsProcedural => Item.Template is ProceduralItemTemplate;
+    private IReadOnlyCollection<IEffect> Effects { get; set; }
+    
+    private bool IsArmour
+    {
+        get
+        {
+            var type = Item.Template.ItemType;
+            return type == FantasyItemTypes.BackArmour ||
+                   type == FantasyItemTypes.FootArmour ||
+                   type == FantasyItemTypes.HeadItem ||
+                   type == FantasyItemTypes.WristItem ||
+                   type == FantasyItemTypes.LowerBodyArmour ||
+                   type == FantasyItemTypes.UpperBodyArmour;
+        }
+    }
+
+    public float TotalDamage => Effects.GetStaticEffects()
+        .Where(x => x.IsDamagingEffect() || x.EffectType == FantasyEffectTypes.DamageBonusAmount)
+        .Sum(x => x.Potency);
+
+    public float TotalDefense => Effects.GetStaticEffects()
+        .Where(x => x.IsDefensiveEffect() || x.EffectType == FantasyEffectTypes.DefenseBonusAmount)
+        .Sum(x => x.Potency);
+
+    
+    private IEnumerable<IEffect> DisplayEffects
+    {
+        get
+        {
+            if (IsWeapon) { return Effects.Where(x => x.EffectType != FantasyEffectTypes.DamageBonusAmount); }
+            if (IsArmour) { return Effects.Where(x => x.EffectType != FantasyEffectTypes.DefenseBonusAmount); }
+            return Effects;
+        }
+    }
+
+    private int _itemQualityTypeId;
+    private string cardClasses;
+
+    protected override void OnParametersSet()
+    {
+        var areRequirementsMet = RequirementsChecker.AreRequirementsMet(Character, Item.Template);
+        var requirementsClass = !areRequirementsMet ? "has-background-danger-light" : "";
+        cardClasses = $"item-border item-quality-{_itemQualityTypeId} {requirementsClass}";
+
+        Effects = Item.Data.GetEffects(OverriddenTemplateAccessor != null ? OverriddenTemplateAccessor : TemplateAccessor).ToArray();
+        
+        if (Item.Template.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
+        { _itemQualityTypeId = Item.Template.Variables.QualityType(); }
+        
+        base.OnParametersSet();
+    }
+}

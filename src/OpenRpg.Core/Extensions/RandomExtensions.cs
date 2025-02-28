@@ -16,6 +16,16 @@ namespace OpenRpg.Core.Extensions
             var random = randomizer.Random(0, availableCount-1);
             return source.Skip(random).First();
         }
+        
+        public static (T element, int index) TakeRandomWithIndexFrom<T>(this IRandomizer randomizer, IEnumerable<T> source)
+        {
+            var availableCount = source.Count();
+            if(availableCount == 0) { throw new Exception("Unable to pick random number from empty list"); }
+
+            var random = randomizer.Random(0, availableCount-1);
+            var result = source.Skip(random).First();
+            return (result, random);
+        }
 
         public static IEnumerable<T> TakeRandomFrom<T>(this IRandomizer randomizer, IEnumerable<T> source, int count)
         {
@@ -40,6 +50,9 @@ namespace OpenRpg.Core.Extensions
         
         public static T TakeRandom<T>(this IEnumerable<T> source, IRandomizer randomizer)
         { return TakeRandomFrom(randomizer, source); }
+        
+        public static (T element, int index) TakeRandomWithIndex<T>(this IEnumerable<T> source, IRandomizer randomizer)
+        { return TakeRandomWithIndexFrom(randomizer, source); }
         
         public static IEnumerable<T> TakeRandom<T>(this IEnumerable<T> source, int count, IRandomizer randomizer)
         { return TakeRandomFrom(randomizer, source, count); }

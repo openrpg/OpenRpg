@@ -2,10 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Templates;
-using OpenRpg.Entities.Classes;
-using OpenRpg.Entities.Effects;
 using OpenRpg.Entities.Extensions;
-using OpenRpg.Entities.Races;
 using OpenRpg.Items.Equippables;
 using OpenRpg.Items.Templates;
 
@@ -16,10 +13,19 @@ namespace OpenRpg.Items.Extensions
         public static IEnumerable<IEffect> GetEffects(this ItemData itemData, ITemplateAccessor templateAccessor)
         {
             var template = templateAccessor.GetItemTemplate(itemData.TemplateId);
-            if(template.ModificationAllowances.Count == 0 || !itemData.Modifications.Any())
-            { return template.Effects; }
             
             var effects = new List<IEffect>(template.Effects);
+            if (itemData is ProceduralItemData proceduralItemData)
+            {
+                foreach (var proceduralEffect in proceduralItemData.ProceduralEffectAssociations)
+                {
+                    var staticEffect = (template as ProceduralItemTemplate).ProceduralEffects
+                        .Effects[proceduralEffect.AssociatedId]
+                        .Compute(proceduralEffect.AssociatedValue);
+                    effects.Add(staticEffect);
+                }
+            }
+            
             foreach (var modification in itemData.Modifications)
             {
                 var modEffects = modification.GetEffects(templateAccessor);

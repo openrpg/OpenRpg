@@ -22,7 +22,7 @@
             var requirementsMet = AreAllRequirementsMet(effect);
             <li style="list-style: none;">
                 <span class="effect-section @(effect.IsPositiveEffect() ? "has-text-success" : "has-text-danger")">
-                    <span class="@(requirementsMet ? "" : "is-strikethrough")">@(effect.GeneratePotencyText()) @GetEffectText(effect.EffectType)</span>
+                    <span class="@(requirementsMet ? "" : "has-text-grey")">@(effect.GeneratePotencyText()) @GetEffectText(effect.EffectType)</span>
                     @if (HasRequirements(effect))
                     {
                         <div class="requirement-section">

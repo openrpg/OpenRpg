@@ -1,0 +1,92 @@
+@page "/procedural/procedural-items"
+
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Templates
+@using OpenRpg.Core.Utils
+@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Scaling
+@using OpenRpg.Data
+@using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Demos.Infrastructure.Templates
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Types
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items
+@using OpenRpg.Items.Extensions
+@using Range = OpenRpg.Core.Utils.Range
+@using OpenRpg.Items.Templates
+
+@inject IRandomizer Randomizer;
+
+<Markdown>
+    ## Procedrual Items
+    GOOD STUFF
+    
+</Markdown>
+
+<br />
+<div class="columns">
+    <div class="column is-two-thirds">
+        <Markdown>
+            ### A More Complex Item
+            So now lets make an item which has some fancy effects on it,
+
+            blah
+        </Markdown>
+    </div>
+    <div class="column is-one-third">
+        <div class="control">
+            <a class="button is-info" @onclick="RefreshProceduralItem">Generate New Item</a>
+        </div>
+        <div class="control">
+            <ItemDetails Item="Item" OverriddenTemplateAccessor="TemplateAccessor" />
+        </div>
+    </div>
+</div>
+
+@code {
+    private ProceduralItemTemplate proceduralItemTemplate;
+    private ProceduralItemData _proceduralItemData;
+    private ManualTemplateAccessor TemplateAccessor;
+
+    public Item Item => new() { Template = proceduralItemTemplate, Data = _proceduralItemData };
+
+    protected override void OnInitialized()
+    {
+        TemplateAccessor = new ManualTemplateAccessor();
+        var possibleEffects = new List<ProceduralEffect> 
+        {
+            new() { GroupType = ProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.BluntBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+            new() { GroupType = ProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.PiercingBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+            new() { EffectType = FantasyEffectTypes.StrengthBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+            new() { EffectType = FantasyEffectTypes.DexterityBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+            new() { EffectType = FantasyEffectTypes.FireDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+            new() { EffectType = FantasyEffectTypes.WindDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
+        };
+        
+        var proceduralEffects = new ProceduralEffects()
+        {
+            EffectAmount = new Range(1, 3),
+            Effects = possibleEffects,
+        };
+
+        proceduralItemTemplate = new ProceduralItemTemplate()
+        {
+            Id = 1,
+            NameLocaleId = "Magical Random Sword",
+            ItemType = FantasyItemTypes.GenericWeapon,
+            ProceduralEffects = proceduralEffects
+        };
+        proceduralItemTemplate.Variables.AssetCode("sword");
+        proceduralItemTemplate.Variables.QualityType(FantasyItemQualityTypes.EpicQuality);
+        TemplateAccessor.AddTemplate<ItemTemplate>(proceduralItemTemplate);
+
+        RefreshProceduralItem();
+        base.OnInitialized();
+    }
+
+    private void RefreshProceduralItem()
+    {
+        _proceduralItemData = proceduralItemTemplate.GenerateItem(Randomizer);
+    }
+}

@@ -1,15 +1,13 @@
+using System;
 using System.Collections.Generic;
-using OpenRpg.Core.Templates;
-using OpenRpg.Entities.Modifications;
-using OpenRpg.Items.Variables;
+using OpenRpg.Core.Associations;
+using OpenRpg.Core.Common;
 
 namespace OpenRpg.Items.Templates
 {
-    public class ProceduralItemData : ITemplateData<ItemVariables>, IHasModifications<ItemModificationData>
+    public class ProceduralItemData : ItemData, IIsUnique
     {
-        public int TemplateId { get; set; }
-        
-        public IEnumerable<ItemModificationData> Modifications { get; set;} = new List<ItemModificationData>();
-        public ItemVariables Variables { get; set; } = new ItemVariables();
+        public Guid UniqueId { get; set; } = Guid.NewGuid();
+        public IReadOnlyCollection<Association> ProceduralEffectAssociations { get; set; } = Array.Empty<Association>();
     }
 }
