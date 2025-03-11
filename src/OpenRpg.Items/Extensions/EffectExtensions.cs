@@ -24,7 +24,7 @@ namespace OpenRpg.Items.Extensions
                     var effect = proceduralEffects.Effects[proceduralEffect.AssociatedId];
                     if (effect.ScalingType == CoreEffectScalingTypes.Value)
                     {
-                        var computedEffect = effect.Compute(proceduralEffect.AssociatedValue);
+                        var computedEffect = effect.ToStatic(proceduralEffect.AssociatedValue);
                         effects.Add(computedEffect);
                     }
                     else

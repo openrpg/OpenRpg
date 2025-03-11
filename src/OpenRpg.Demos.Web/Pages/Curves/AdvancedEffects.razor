@@ -108,16 +108,80 @@
         <CardSection>
             <Markdown Containerless="true">
                 ## Computing Stats with Mixed Effects
-
-
-
             </Markdown>
             <div class="field">
                 <label class="label">Level Value: @(CharacterLevel)</label>
                 <div class="control">
-                    <input class="slider is-fullwidth is-success has-output-tooltip" step="1" min="1" max="10" @bind="CharacterLevel" @bind:after="RefreshStats" type="range">
+                    <input class="slider is-fullwidth is-success has-output-tooltip" step="1" min="1" max="10" 
+                           @bind="CharacterLevel" @bind:after="RefreshStats" type="range">
                 </div>
             </div>
+            <Markdown Containerless="true">
+                As you can see, if we up the level then skills that scale will be re-computed and will scale up accordingly.
+                Effects that don't scale will just remain static, hence them being `StaticEffects`.
+                
+                Here is the example code being used on the race, class, weapon objects for this example:
+                ```csharp
+                var pretendFighterClassTemplate = new ClassTemplate
+                {
+                    Id = 5,
+                    NameLocaleId = "Fighter",
+                    Effects = new IEffect[]
+                    {
+                        new ScaledEffect()
+                        {
+                            EffectType = FantasyEffectTypes.StrengthBonusAmount,
+                            ScalingType = CoreEffectScalingTypes.Level,
+                            PotencyFunction = new ScalingFunction(PresetCurves.Linear, 2, 5, 1, 10)
+                        },
+                        new StaticEffect()
+                        {
+                            EffectType = FantasyEffectTypes.StrengthBonusPercentage,
+                            Potency = 0.2f
+                        }
+                    }
+                };
+
+                var pretendHumanRace = new RaceTemplate
+                {
+                    Id = 2,
+                    NameLocaleId = "Human",
+                    Effects = new[]
+                    {
+                        new ScaledEffect()
+                        {
+                            EffectType = FantasyEffectTypes.AllAttributeBonusAmount,
+                            ScalingType = CoreEffectScalingTypes.Level,
+                            PotencyFunction = new ScalingFunction(PresetCurves.Linear, 7, 10, 1, 10)
+                        }
+                    }
+                };
+
+                var pretendWeapon = new ItemTemplate
+                {
+                    Id = 23,
+                    NameLocaleId = "Super Fighter Sword",
+                    Effects = new IEffect[]
+                    {
+                        new StaticEffect()
+                        {
+                            EffectType = FantasyEffectTypes.StrengthBonusAmount,
+                            Potency = 2
+                        },
+                        new ScaledEffect()
+                        {
+                            EffectType = FantasyEffectTypes.DamageBonusAmount,
+                            ScalingType = CoreEffectScalingTypes.StatIndex,
+                            ScalingIndex = FantasyEntityStatsVariableTypes.Strength,
+                            PotencyFunction = new ScalingFunction(PresetCurves.Linear, 10, 30, 10, 20)
+                        }
+                    }
+                };
+                ```
+                
+                > As you can see we mix static and scaled effects together which let you have flexibility in what effects
+                > should grow with your character and on what objects they should be applied to.
+            </Markdown>
         </CardSection>
     </div>
     <div class="column is-half">

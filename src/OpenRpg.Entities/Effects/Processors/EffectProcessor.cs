@@ -1,7 +1,10 @@
+using System.Collections.Generic;
+using OpenRpg.Core.Associations;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Procedural;
 using OpenRpg.Entities.Requirements;
 using OpenRpg.Entities.Types;
 
@@ -59,6 +62,21 @@ namespace OpenRpg.Entities.Effects.Processors
             }
 
             return computedEffects;
+        }
+        
+        public virtual void ComputeProceduralEffects(ProceduralEffects proceduralEffects, IReadOnlyCollection<Association> effectAssociations, IHasEffects context, ComputedEffects computedEffects, T relatedEntity)
+        {
+            foreach (var effectAssociation in effectAssociations)
+            {
+                var effect = proceduralEffects.Effects[effectAssociation.AssociatedId];
+                if (effect.ScalingType == CoreEffectScalingTypes.Value)
+                {
+                    var staticEffect = effect.ToStatic(effectAssociation.AssociatedValue);
+                    computedEffects.Add(staticEffect.EffectType, staticEffect.Potency);
+                }
+                else
+                { ComputeScaledEffect(effect, context, computedEffects, relatedEntity); }
+            }
         }
 
         public virtual void ComputeScaledEffect(ScaledEffect effect, IHasEffects context, ComputedEffects computedEffects, BaseEntity relatedEntity)

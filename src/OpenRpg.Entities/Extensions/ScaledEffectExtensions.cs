@@ -5,7 +5,7 @@ namespace OpenRpg.Entities.Extensions
 {
     public static class ScaledEffectExtensions
     {
-        public static StaticEffect Compute(this ScaledEffect scaledEffect, float scalingValue)
+        public static StaticEffect ToStatic(this ScaledEffect scaledEffect, float scalingValue)
         {
             return new StaticEffect
             {
