@@ -1,0 +1,88 @@
+@using OpenRpg.CurveFunctions.Scaling
+@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Types
+
+<div class="field">
+    <label class="label">Scaling Type</label>
+    <div class="control">
+        <div class="select is-fullwidth">
+            <select @bind="ScaledEffect.ScalingType">
+                @foreach (var scalingType in TypesHelper.GetEffectScalingType)
+                {
+                    <option value=@scalingType.Id>@scalingType.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+</div>
+@if (RequiresScalingIndex)
+{
+    <div class="field">
+        <label class="label">@ScalingTypeName Index</label>
+        <div class="control">
+            <div class="select is-fullwidth">
+                <select @bind="ScaledEffect.ScalingIndex">
+                    @{ var scalingIndexOptions = ScaledEffect.ScalingType == CoreEffectScalingTypes.StatIndex ? TypesHelper.GetStatTypes : TypesHelper.GetStateTypes; }
+                    @foreach (var scalingIndex in scalingIndexOptions)
+                    {
+                        <option value=@scalingIndex.Id>@scalingIndex.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+}
+<div class="field">
+    <ScalingFunctionEditor ScalingFunction="@ScaledEffect.PotencyFunction" XAxisLabel="@ChartScalingLabel" YAxisLabel="@YAxisLabel" OnUpdate="OnScalingFunctionUpdated"/>
+</div>
+<div class="field">
+    <label class="label">Test Potency Scaling</label>
+</div>
+<div class="field is-horizontal">
+    <div class="field-body">
+        <div class="field">
+            <input class="input" placeholder="Test Input Value" @bind="TestInputValue" @bind:after="() => { TestOutputValue = ScaledEffect.PotencyFunction.Plot(TestInputValue); }"/>
+        </div>
+        <div class="field">
+            <input class="input" value="@TestOutputValue" disabled/>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public ScaledEffect ScaledEffect { get; set; }
+    
+    public string ScalingTypeName => TypesHelper.GetEffectScalingType
+        .First(x => x.Id == ScaledEffect.ScalingType)
+        .Name;
+    
+    public string YAxisLabel => "Potency";
+    public string ChartScalingLabel
+    {
+        get
+        {
+            if(!RequiresScalingIndex)
+            { return ScalingTypeName; }
+
+            if (ScaledEffect.ScalingType == CoreEffectScalingTypes.StatIndex)
+            { return TypesHelper.GetStatTypes.First(x => x.Id == ScaledEffect.ScalingIndex).Name; }
+
+            return TypesHelper.GetStateTypes.First(x => x.Id == ScaledEffect.ScalingIndex).Name;
+        }
+    }
+
+    public float TestOutputValue { get; set; }
+    public float TestInputValue { get; set; }
+
+    public bool RequiresScalingIndex => ScaledEffect.ScalingType == CoreEffectScalingTypes.StatIndex 
+                                    || ScaledEffect.ScalingType == CoreEffectScalingTypes.StateIndex;
+
+    public async Task OnScalingFunctionUpdated(ScalingFunction scalingFunction)
+    {
+        ScaledEffect.PotencyFunction = scalingFunction;
+    }
+
+}

@@ -2,18 +2,18 @@
 
 @using RandomNameGenerator
 @using OpenRpg.Genres.Characters
-@using OpenRpg.Data
-@using OpenRpg.Core.Races
-@using OpenRpg.Core.Classes
-@using OpenRpg.Core.Classes.Templates
-@using OpenRpg.Core.Races.Templates
 @using OpenRpg.Core.Templates
-@using OpenRpg.Genres.Extensions
+@using OpenRpg.Entities.Classes.Templates
+@using OpenRpg.Entities.Entity.Populators.Stats
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Entities.Races.Templates
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Populators.Entity.Stats
 
 @inject DemoCharacterBuilder CharacterBuilder;
 @inject ITemplateAccessor TemplateAccessor;
 @inject IEntityStatPopulator StatPopulator;
+@inject ICharacterEffectProcessor EffectProcessor;
 
 <Markdown>
     # Character Builder
@@ -67,7 +67,7 @@
                         <CardSection customClasses="has-background-dark expand-full-width">
                             <h5 class="title is-5">@race.NameLocaleId</h5>
                             <div class="subtitle is-6">@race.DescriptionLocaleId</div>
-                            <EffectList Effects="race.Effects.ToArray()"></EffectList>
+                            <EffectList Effects="race.Effects.GetStaticEffects().ToArray()"></EffectList>
                             <a class="button @(_raceId == race.Id ? "is-success" : "")" @onclick="() => { SelectRace(race.Id); }">Select @(race.NameLocaleId)</a>
                         </CardSection>
                     </div>
@@ -90,7 +90,7 @@
                         <CardSection customClasses="has-background-dark expand-full-width">
                             <h5 class="title is-5">@classTemplate.NameLocaleId</h5>
                             <div class="subtitle is-6">@classTemplate.DescriptionLocaleId</div>
-                            <EffectList Effects="classTemplate.Effects.ToArray()"></EffectList>
+                            <EffectList Effects="classTemplate.Effects.GetStaticEffects().ToArray()"></EffectList>
                             <a class="button @(_classId == classTemplate.Id ? "is-success" : "")" @onclick="() => { SelectClass(classTemplate.Id); }">Select @(classTemplate.NameLocaleId)</a>
                         </CardSection>
                     </div>
@@ -165,7 +165,8 @@
         { builder = builder.AsFemale(); }
 
         _generatedCharacter = builder.Build();
-        StatPopulator.Populate(_generatedCharacter.Stats, _generatedCharacter.GetEffects(TemplateAccessor).ToArray(), null);
+        var computedEffects = EffectProcessor.ComputeEffects(_generatedCharacter);
+        StatPopulator.Populate(_generatedCharacter.Stats, computedEffects, null);
 
         StateHasChanged();
     }

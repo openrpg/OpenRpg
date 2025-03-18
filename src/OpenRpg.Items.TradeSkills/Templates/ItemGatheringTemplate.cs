@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Templates;
-using OpenRpg.Core.Variables.General;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Items.TradeSkills.Variables;
 
 namespace OpenRpg.Items.TradeSkills.Templates
@@ -13,10 +13,10 @@ namespace OpenRpg.Items.TradeSkills.Templates
         public int Id { get; set; }
 
         /// <inheritdoc />
-        public string NameLocaleId { get; }
+        public string NameLocaleId { get; set; }
         
         /// <inheritdoc />
-        public string DescriptionLocaleId { get; }
+        public string DescriptionLocaleId { get; set; }
         
         /// <inheritdoc />
         public float TimeToComplete { get; set; } = 1.0f;

@@ -1,45 +1,22 @@
 using System.Collections.Generic;
-using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Effects;
-using OpenRpg.Core.Entity;
-using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Templates;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Entity;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Items.Extensions;
 
 namespace OpenRpg.Genres.Extensions
 {
     public static class EntityExtensions
     {
-        /// <summary>
-        /// Gets all basic effects from known sources on an entity
-        /// </summary>
-        /// <param name="entity">The entity to process</param>
-        /// <returns>All known effects that are applied to the entity</returns>
-        /// <remarks>Multiclass are not included as that's likely to need complex mapping logic</remarks>
-        public static IReadOnlyCollection<Effect> GetEffects(this Entity entity, ITemplateAccessor templateAccessor)
+        public static IReadOnlyCollection<IEffect> GetEffects(this Entity entity, ITemplateAccessor templateAccessor)
         {
-            var effects = new List<Effect>();
+            var effects = new List<IEffect>();
 
-            if (entity.Variables.HasRace())
-            {
-                var race = entity.Variables.Race();
-                var raceTemplate = templateAccessor.GetRaceTemplate(race.TemplateId);
-                effects.AddRange(raceTemplate.Effects);
-            }
-
-            if (entity.Variables.HasClass())
-            {
-                var classData = entity.Variables.Class();
-                var classTemplate = templateAccessor.GetClassTemplate(classData.TemplateId);
-                effects.AddRange(classTemplate.Effects);
-            }
-            
-            if(entity.Variables.HasEquipment())
-            { effects.AddRange(entity.Variables.Equipment().GetEffects(templateAccessor)); }
-            
-            if(entity.Variables.HasActiveEffects())
-            { effects.AddRange(entity.Variables.ActiveEffects().Effects); }
-            
+            if (entity.Variables.HasRace()) { effects.AddRange(entity.Variables.Race().GetEffects(templateAccessor)); }
+            if (entity.Variables.HasClass()) { effects.AddRange(entity.Variables.Class().GetEffects(templateAccessor)); }
+            if (entity.Variables.HasEquipment()) { effects.AddRange(entity.Variables.Equipment().GetEffects(templateAccessor)); }
             return effects;
         }
     }

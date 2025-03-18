@@ -1,0 +1,113 @@
+﻿@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Editor.Core.Services.Modal
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Requirements
+
+<ListEditor Data="Effects" TItem="IEffect">
+    <HeaderTemplate>
+        <th>Effect Type</th>
+        <th>Potency</th>
+        <th>Requirements</th>
+    </HeaderTemplate>
+    <ButtonOverrideTemplate>
+        <div class="dropdown @(IsDropdownActive ? "is-active" : "")" @onclick="() => IsDropdownActive = !IsDropdownActive">
+            <div class="dropdown-trigger">
+                <button class="button is-primary is-small" aria-haspopup="true" aria-controls="dropdown-menu">
+                    <span>Add Effect</span>
+                    <span class="icon is-small">
+                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                    </span>
+                </button>
+            </div>
+            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                <div class="dropdown-content">
+                    <a class="dropdown-item" @onclick="x => context.InvokeAsync(new StaticEffect())">Add Static Effect</a>
+                    <a class="dropdown-item" @onclick="x => context.InvokeAsync(new ScaledEffect())">Add Scaled Effect</a>
+                </div>
+            </div>
+        </div>
+    </ButtonOverrideTemplate>
+    <RowTemplate>
+        <td>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select @bind="context.EffectType">
+                        @foreach (var effectType in TypesHelper.GetEffectTypes)
+                        {
+                            <option value="@effectType.Id">@effectType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                @if (context is StaticEffect staticEffect)
+                {
+                    <input class="input" type="text" @bind="staticEffect.Potency"/>
+                }
+                @if (context is ScaledEffect scaledEffect)
+                {
+                    <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentContext(scaledEffect); ShowScalingModal(); }">
+                        <span>Edit Potency Scaling</span>
+                    </button>
+                }
+            </div>
+        </td>
+        <td>
+            <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentContext(context); ShowRequirementModal(); }">
+                    <span class="tag mr-3">
+                        @context.Requirements.Count
+                    </span>
+                <span>Edit Requirements</span>
+            </button>
+        </td>
+    </RowTemplate>
+</ListEditor>
+
+<ModalContent Id="effect-requirement-modal" @ref="EditRequirementModal">
+    <DynamicContentModal OnClosed="ModalService.CloseModal">
+        @if (CurrentContext != null)
+        {
+            <RequirementsEditor Requirements="CurrentContext.Requirements as List<Requirement>" />
+            
+        }
+    </DynamicContentModal>
+</ModalContent>
+
+<ModalContent Id="effect-scaling-modal" @ref="EditScalingModal">
+    <DynamicContentModal OnClosed="ModalService.CloseModal">
+        @if (CurrentContext != null && CurrentContext is ScaledEffect scaledEffect)
+        {
+            <ScaledEffectEditor ScaledEffect="scaledEffect" /> 
+        }
+    </DynamicContentModal>
+</ModalContent>
+
+@functions {
+    [CascadingParameter]
+    public IModalInteractionService ModalService { get; set; }
+    
+    [Parameter]
+    public List<IEffect> Effects { get; set; }
+    
+    public IEffect CurrentContext { get; set; }
+
+    bool IsDropdownActive { get; set; }
+    
+    public ModalElementReference EditRequirementModal { get; set; }
+    public ModalElementReference EditScalingModal { get; set; }
+
+    void ShowRequirementModal() => ModalService.ShowModal(EditRequirementModal.Reference);
+    void ShowScalingModal() => ModalService.ShowModal(EditScalingModal.Reference);
+
+    public void SetCurrentContext(IEffect effect)
+    {
+        effect.Requirements = effect.Requirements.AsList();
+        CurrentContext = effect;
+        StateHasChanged();
+    }
+}

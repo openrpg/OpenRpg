@@ -1,0 +1,73 @@
+﻿@using OpenRpg.Core.Requirements
+@using OpenRpg.Editor.Core.Services.Modal
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Entities.Modifications
+@using OpenRpg.Entities.Requirements
+
+<ListEditor Data="ModificationAllowances" TItem="ModificationAllowance">
+    <HeaderTemplate>
+        <th>Allowance Type</th>
+        <th>Allowed Amount</th>
+        <th>Requirements</th>
+    </HeaderTemplate>
+    <RowTemplate>
+        <td>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select bind="@context.ModificationType">
+                        @foreach (var modificationType in TypesHelper.GetModificationTypes)
+                        {
+                            <option value=@modificationType.Id>@modificationType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" bind="@context.AmountAllowed" />
+            </div>
+        </td>
+        <td>
+            <button class="button is-info is-fullwidth" @onclick="x => { SetCurrentContext(context); ShowRequirementModal(); }">
+                    <span class="tag mr-3">
+                        @context.Requirements.Count
+                    </span>
+                <span>Edit Requirements</span>
+            </button>
+        </td>
+    </RowTemplate>
+</ListEditor>
+
+<ModalContent Id="effect-requirement-modal" @ref="EditRequirementModal">
+    <DynamicContentModal OnClosed="ModalService.CloseModal">
+        @if (CurrentContext != null)
+        {
+            <RequirementsEditor Requirements="@(CurrentContext.Requirements as List<Requirement>)" />
+
+        }
+    </DynamicContentModal>
+</ModalContent>
+
+@functions {
+    [CascadingParameter]
+    public IModalInteractionService ModalService { get; set; }
+    
+    [Parameter]
+    public List<ModificationAllowance> ModificationAllowances { get; set; }
+    
+    bool IsRequirementModalActive { get; set; }
+    
+    public ModificationAllowance CurrentContext { get; set; }
+    
+    public ModalElementReference EditRequirementModal { get; set; }
+    void ShowRequirementModal() => ModalService.ShowModal(EditRequirementModal.Reference);
+    
+    public void SetCurrentContext(ModificationAllowance modifcationAllowance)
+    {
+        modifcationAllowance.Requirements = modifcationAllowance.Requirements.AsList();
+        CurrentContext = modifcationAllowance;
+        StateHasChanged();
+    }    
+}

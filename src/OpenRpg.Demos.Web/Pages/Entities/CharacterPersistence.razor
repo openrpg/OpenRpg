@@ -1,58 +1,32 @@
 ﻿@page "/entities/persistence"
 
 @using Newtonsoft.Json
-@using OpenRpg.Core.Entity
 @using OpenRpg.Core.Templates
 @using OpenRpg.Demos.Infrastructure.JSON
+@using OpenRpg.Entities.Effects.Processors
+@using OpenRpg.Entities.Entity
+@using OpenRpg.Entities.Entity.Populators.Stats
 @using OpenRpg.Genres.Characters
-@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Populators.Entity.Stats
 
 @inject DemoCharacterBuilder CharacterBuilder;
 @inject IEntityStatPopulator StatPopulator;
 @inject ITemplateAccessor TemplateAccessor;
+@inject ICharacterEffectProcessor EffectProcessor;
 
 <Markdown>
    #### Character Persistence
-   As mentioned in the advanced stats page, we ideally need to transform the data from what it looks like at runtime to
-   something that is more easily serialized and read back in.
+   As mentioned in the advanced stats page, we only really need to care about the runtime data from our app/game, and
+   luckily our `Character` only really stores runtime information so we can just serialize it and rehydrate at will.
    
-   An example was shown in the previous section but to assist with common use cases we have some built in models and 
-   classes within the `OpenRpg.Genres` library which uses the `DefaultCharacter` and `Default*` objects under the hood
-   to convert from the `ICharacter` -> `PersistedCharacter` -> `ICharacter (Really a DefaultCharacter)`
-</Markdown>
-
-<br/>
-
-<Markdown>
-    #### Implementing Abstract Mapping Classes
-    
-    The built in classes for mapping from a persisted character back to an `ICharacter` are mainly abstract and require
-    you to implement a couple of methods. This is because we do not force any data paradigm upon you, so when going from a 
-    `PersistedCharacter` back to an `ICharacter` we need to convert the `RaceTemplateId` back into a fully fledged `IRaceTemplate`.
-    
-    In the repository for this project you can look in the `OpenRpg.Demos.Infrastructure.Persistence` namespace and see some
-    implementations which use the `IRepository` from the `OpenRpg.Data` lib, but ultimately however you do it you need to provide
-    an implementation on the mapper on how to resolve the id to the template.
-    
-    > Some genre libs like Fantasy and SciFi provide some extra implementations on top of the base abstract ones, so keep that in mind.
-</Markdown>
-
-<br/>
-
-<Markdown>
-   #### Persisting A Character
+   > In previous versions of the library we didnt have such a clean divide between static and state data, but now there
+   > is a much better division so you can pretty much serialize any `ITemplateData` implementation or `Entity` related
+   > object however/whenever you want.
    
-   If we look at this code snippet we can see how to use the built in `PersistedCharacter` model which accepts an `ICharacter`
-   and will extract the data that needs persisting from it.
+   If we look at this code snippet below we can see how to use the built in `Character` model which we can just throw into 
+   any old object serialization framework and see what it looks like (using `JSON.NET` here).
    
-   ```csharp
-   // Now we can build a character and convert it to the built in CharacterData model
-   var randomCharacter = CharacterBuilder.CreateNew().Build();
-   var characterData = randomCharacter.ToDataModel();
-   ```
-   
-   Once we are at this stage you can persist the data however you want, try the example below to see it getting put into JSON.
 </Markdown>
 
 <br/>
@@ -80,41 +54,17 @@
         <Markdown>
             ## Restoring A Persisted Character
            
-            Now we have a `CharacterData` object which purely contains the bits of a character we need to persist we can use an `IMapper`
-            implementation to convert the data back into its fully fledged form.
-           
-            Here is an example of the implementation we use within the demo project to repopulate a character:
-           
+            Now we have some serialized character data we can just pass it back through and deserialize it and get back
+            our previous `Character` instance, and it will contain all the important runtime data it had when we saved it.
+            
+            The only thing it wont have is the generated stats based off the effects of the related items, classes, races
+            etc, however this is easily fixed as all we need to do is regenerate all of that information using the `StatPopulator`
+            like so:
+            
             ```csharp
-            public class DemoCharacterMapper : CharacterMapper
-            {
-                public IRepository Repository { get; }
-
-                public DemoCharacterMapper(IItemMapper itemMapper, IClassMapper classMapper, IEquipmentMapper equipmentMapper, 
-                IInventoryMapper inventoryMapper, IStatPopulator statsPopulator, IRepository repository) 
-                : base(itemMapper, classMapper, equipmentMapper, inventoryMapper, statsPopulator)
-                { Repository = repository; }
-
-                public override IRaceTemplate GetRaceTemplateFor(int raceTemplateId)
-                { return Repository.Get&lt;IRaceTemplate&gt;(raceTemplateId); }
-            }
+            var regeneratedCharacter = JsonConvert.DeserializeObject&ltCharacter&gt(jsonData);
+            StatPopulator.Populate(regeneratedCharacter.Stats, regeneratedCharacter.ComputeEffects(TemplateAccessor), null);
             ```
-           
-            As you can see we just have to implement the abstract method `GetRaceTemplateFor`, which in this case uses the underlying
-            repository object to get the race template from the demos in memory store. So with that out of the way lets look at
-            how we use it.
-           
-            ```csharp
-            // The mapper inherits from CharacterMapper which implements ICharacterMapper
-            // Its also assumed you would be using DI to inject this in so lets ignore constructor
-            var characterMapper = new DemoCharacterMapper(/*...*/);
-            var character = characterMapper.Map(characterData);
-            ```
-           
-            Thats it, we now have an `ICharacter` again that we can use!
-           
-            You can use the example to the side to use this character mapper to turn the `CharacterData` json back
-            back into a real character object.
             
             > In the real world you can store it however you want, be it in a database, a file, as xml, binary json etc.
         </Markdown>
@@ -126,25 +76,6 @@
         </CardSection>
     </div>
 </div>
-
-<br/>
-
-<Markdown>
-    #### Persisting Other Things
-    
-    Now we have covered characters we can also persist other things on the entity, like Equipment, Inventories etc.
-    
-    > One thing worth noting is that because we have extensible `object` fields on the `Variables` the serialization
-    > frameworks may not know how to deserialize the data. In this example we have told `JSON.NET` to keep the type
-    > information for any fields that are of type `object` so it knows how to deserialize them, but for maximum
-    > compatability and control you can work out what parts of a character you will want to persist and can put
-    > them into strongly typed structures rather than how it is done here.
-    
-    The same approach can be taken for anything, just take the runtime object, extract the State from it into a new 
-    object and then write a mapper to rehydrate the data.
-    
-    > Check out the source code for this project as a basis for basic use cases
-</Markdown>
 
 @code {
     private Character _randomCharacter, _regeneratedCharacter;
@@ -180,7 +111,9 @@
     public void ReloadCharacterFromData()
     {
         _regeneratedCharacter = JsonConvert.DeserializeObject<Character>(_persistedData, _jsonSettings);
-        StatPopulator.Populate(_regeneratedCharacter.Stats, _regeneratedCharacter.GetEffects(TemplateAccessor), null);
+
+        var computedEffects = EffectProcessor.ComputeEffects(_regeneratedCharacter);
+        StatPopulator.Populate(_regeneratedCharacter.Stats, computedEffects, null);
         StateHasChanged();
     }
 }

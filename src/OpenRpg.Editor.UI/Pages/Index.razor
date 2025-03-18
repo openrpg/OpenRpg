@@ -1,10 +1,12 @@
 ﻿@page "/"
 
+@using OpenRpg.CurveFunctions
 @using OpenRpg.Editor.Core.Models
 @using OpenRpg.Editor.Core.Services.Events.Bus
 @using OpenRpg.Editor.Core.Services.FileSystem
 @using OpenRpg.Editor.Infrastructure.Events
 @using OpenRpg.Editor.Infrastructure.Persistence
+@using OpenRpg.Editor.UI.Models
 
 @inject IFileBrowser FileBrowser
 @inject EditorState EditorState
@@ -15,7 +17,7 @@
 <h1 class="title is-1">OpenRpg Data Editor</h1>
 
 <div class="box">
-    @if (EditorState.Project == null)
+    @if (EditorState.CurrentProject == null)
     {
         <p class="content">Please create or load an existing project.</p>
         <div class="field">
@@ -34,7 +36,7 @@
     }
     else
     {
-        <p class="content">Using Project: <span class="tag">@EditorState.Project.ProjectPath</span></p>
+        <p class="content">Using Project: <span class="tag">@EditorState.CurrentProject.ProjectPath</span></p>
     }
 </div>
 
@@ -47,7 +49,7 @@
         if(string.IsNullOrEmpty(projectFolder)) { return; }
 
         var newProject = await CreateProjectExecutor.Execute(projectFolder);
-        EditorState.Project = newProject;
+        EditorState.CurrentProject = newProject;
         EventBus.PublishAsync(new ProjectChangedEvent());
     }
     

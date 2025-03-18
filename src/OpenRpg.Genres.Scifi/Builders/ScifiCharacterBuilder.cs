@@ -1,12 +1,13 @@
 ﻿using OpenRpg.Core.Utils;
 using OpenRpg.Genres.Builders;
+using OpenRpg.Genres.Populators.Entity;
 using OpenRpg.Genres.Scifi.Types;
 
 namespace OpenRpg.Genres.Scifi.Builders
 {
     public class ScifiCharacterBuilder : CharacterBuilder
     {
-        public ScifiCharacterBuilder(IRandomizer randomizer) : base(randomizer)
+        public ScifiCharacterBuilder(IRandomizer randomizer, ICharacterPopulator characterPopulator) : base(randomizer, characterPopulator)
         {
         }
 

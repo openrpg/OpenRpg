@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Blazor-ApexCharts" Version="5.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0" PrivateAssets="all" />
         <PackageReference Include="Persistity" Version="2.0.47" />
@@ -48,7 +49,29 @@
     </ItemGroup>
 
     <ItemGroup>
+      <AdditionalFiles Include="Components\Editors\Common\AssetCodeEditor.razor" />
+      <AdditionalFiles Include="Components\Editors\Common\AssetImage.razor" />
+      <AdditionalFiles Include="Components\Editors\Common\CommonDetailsEditor.razor" />
+      <AdditionalFiles Include="Components\Editors\Common\LocaleDetails.razor" />
+      <AdditionalFiles Include="Components\Editors\Curves\CurveFunctionEditor.razor" />
+      <AdditionalFiles Include="Components\Editors\Curves\PresetCurveFunctionEditor.razor" />
+      <AdditionalFiles Include="Components\Editors\Curves\ScalingFunctionEditor.razor" />
+      <AdditionalFiles Include="Components\Editors\List\EffectsEditor.razor" />
+      <AdditionalFiles Include="Components\Editors\List\ModificationAllowancesEditor.razor" />
+      <AdditionalFiles Include="Components\Editors\List\ObjectivesEditor.razor" />
+      <AdditionalFiles Include="Components\Editors\List\RequirementsEditor.razor" />
+      <AdditionalFiles Include="Components\Editors\List\RewardsEditor.razor" />
       <AdditionalFiles Include="Components\Modals\LocaleEditorModal.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Extensions\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Components\Curves\CurveFunctionEditor.razor" />
+      <UpToDateCheckInput Remove="Components\Curves\PresetCurveFunctionEditor.razor" />
+      <UpToDateCheckInput Remove="Components\Curves\ScalingFunctionEditor.razor" />
     </ItemGroup>
 
 </Project>

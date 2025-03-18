@@ -2,6 +2,7 @@
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Variables.General;
+using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Cards
 {

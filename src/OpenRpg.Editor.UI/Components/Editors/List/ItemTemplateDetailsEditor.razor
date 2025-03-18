@@ -1,0 +1,72 @@
+@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Stack Amount</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="text" placeholder="i.e 25"
+                       value="@Template.Variables.MaxStacks()"
+                       @onchange="e => Template.Variables.MaxStacks(int.Parse(e.Value?.ToString()))"/>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Value</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="text" placeholder="i.e 100"
+                       value="@Template.Variables.Value()"
+                       @onchange="e => Template.Variables.Value(int.Parse(e.Value?.ToString()))"/>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Item Type</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select @bind="Template.ItemType">
+                        @foreach (var itemType in TypesHelper.GetItemTypes)
+                        {
+                            <option value=@itemType.Id>@itemType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="field-label">
+            <label class="label">Item Quality</label>
+        </div>
+        <div class="field">
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select value="@Template.Variables.QualityType()"
+                            @onchange="e => Template.Variables.QualityType(int.Parse(e.Value?.ToString()))">
+                        @foreach (var itemType in TypesHelper.GetItemQualityTypes)
+                        {
+                            <option value=@itemType.Id>@itemType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ItemTemplate Template { get; set; }
+}

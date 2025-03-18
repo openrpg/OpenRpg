@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OpenRpg.Core.Templates;
 using OpenRpg.Editor.Infrastructure.Data;
 
@@ -16,16 +17,16 @@ public static class EditorDatasourceExtensions
         { throw new Exception($"Editor contains no template data for type [{type.Name}]"); }
 
         var dataForType = datasource.GetAll<T>();
-        return JsonConvert.SerializeObject(dataForType, Formatting.Indented);
+        return JsonConvert.SerializeObject(dataForType, new JsonSerializerSettings{ TypeNameHandling = TypeNameHandling.Objects, Formatting = Formatting.Indented });
     }
     
-    public static void DeserializeData<T>(this EditorDatasource datasource, string data, bool replaceData = false) where T : ITemplate
+    public static void DeserializeData<T>(this EditorDatasource datasource, JArray jsonData, bool replaceData = false) where T : ITemplate
     {
         var type = typeof(T);
         if (!datasource.Database.ContainsKey(type))
         { datasource.Database[type] = new Dictionary<object, object>(); }
 
-        var dataForType = JsonConvert.DeserializeObject<IEnumerable<T>>(data);
+        var dataForType = jsonData.ToObject<T[]>(new JsonSerializer(){ TypeNameHandling = TypeNameHandling.Auto });
 
         if (replaceData)
         {

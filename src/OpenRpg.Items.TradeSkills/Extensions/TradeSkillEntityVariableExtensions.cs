@@ -1,5 +1,5 @@
-using OpenRpg.Core.Entity.Variables;
 using OpenRpg.Core.Extensions;
+using OpenRpg.Entities.Entity.Variables;
 using OpenRpg.Items.TradeSkills.State;
 using OpenRpg.Items.TradeSkills.Types;
 

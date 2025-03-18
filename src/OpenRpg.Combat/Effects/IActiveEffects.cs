@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenRpg.Combat.Variables;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Variables.General;
+using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Combat.Effects
 {
@@ -24,7 +25,7 @@ namespace OpenRpg.Combat.Effects
         /// <summary>
         /// This will attempt to add an effect, each implementation may differ how stacking is handled etc
         /// </summary>
-        bool AddEffect(TimedEffect effect);
+        bool AddEffect(TimedStaticEffect staticEffect);
 
         /// <summary>
         /// Updates the effects based off how much time has passed

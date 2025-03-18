@@ -1,5 +1,6 @@
 using System.Linq;
 using OpenRpg.Core.Requirements;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Requirements;
 using OpenRpg.Quests.State;

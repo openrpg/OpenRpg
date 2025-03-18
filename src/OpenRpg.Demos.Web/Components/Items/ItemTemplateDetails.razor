@@ -1,23 +1,21 @@
-@using OpenRpg.Core.Races
-@using OpenRpg.Core.Classes
 @using OpenRpg.Core.Effects
+@using OpenRpg.Core.Templates
 @using OpenRpg.Genres.Fantasy.Types
-@using OpenRpg.Items
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 @using OpenRpg.Items.Types
-@using System.Transactions
 @using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Extensions
-@using OpenRpg.Genres.Fantasy.Extensions
-@using OpenRpg.Genres.Fantasy.Requirements
 @using OpenRpg.Genres.Requirements
 @using OpenRpg.Localization.Data.Extensions
 @using OpenRpg.Localization.Data.Repositories
 
 @inject ILocaleRepository LocaleRepository;
 @inject ICharacterRequirementChecker RequirementsChecker
+@inject ITemplateAccessor TemplateAccessor
 
 <CardSection customClasses="@cardClasses">
     <h4 class="title is-4 has-text-centered item-quality-@(_itemQualityTypeId)">@(ItemTemplate.NameLocaleId ?? "Unnamed Item")</h4>
@@ -34,12 +32,12 @@
         <div class="column">
             @if (IsWeapon)
             {
-                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Effects.Where(x => x.EffectType == FantasyEffectTypes.DamageBonusAmount).Sum(x => x.Potency))</h4>
+                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType == FantasyEffectTypes.DamageBonusAmount).Sum(x => x.Potency))</h4>
                 <h6 class="subtitle is-7 has-text-dark has-text-centered">Damage</h6>
             }
             @if (IsArmour)
             {
-                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Effects.Where(x => x.EffectType == FantasyEffectTypes.DefenseBonusAmount).Sum(x => x.Potency))</h4>
+                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType == FantasyEffectTypes.DefenseBonusAmount).Sum(x => x.Potency))</h4>
                 <h6 class="subtitle is-7 has-text-dark has-text-centered">Defense</h6>
             }
         </div>
@@ -91,13 +89,13 @@
         }
     }
 
-    private IEnumerable<Effect> DisplayEffects
+    private IEnumerable<StaticEffect> DisplayEffects
     {
         get
         {
-            if (IsWeapon) { return ItemTemplate.Effects.Where(x => x.EffectType != FantasyEffectTypes.DamageBonusAmount); }
-            if (IsArmour) { return ItemTemplate.Effects.Where(x => x.EffectType != FantasyEffectTypes.DefenseBonusAmount); }
-            return ItemTemplate.Effects;
+            if (IsWeapon) { return ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType != FantasyEffectTypes.DamageBonusAmount); }
+            if (IsArmour) { return ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType != FantasyEffectTypes.DefenseBonusAmount); }
+            return ItemTemplate.Effects.GetStaticEffects();
         }
     }
 

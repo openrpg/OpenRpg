@@ -1,21 +1,18 @@
 @page "/cards/basic-components"
-@using OpenRpg.Core.Effects
+
 @using OpenRpg.Demos.Infrastructure.Extensions
 @using OpenRpg.Genres.Fantasy.Types
-@using OpenRpg.Items
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 @using OpenRpg.Cards.Genres
 @using OpenRpg.Cards
 @using OpenRpg.Cards.Effects
 @using OpenRpg.Combat.Abilities
-@using OpenRpg.Core.Classes
-@using OpenRpg.Core.Extensions
-@using OpenRpg.Core.Races
+@using OpenRpg.Core.Effects
 @using OpenRpg.Core.Templates
-@using OpenRpg.Data
-@using OpenRpg.Data.Conventions.Extensions
 @using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
 
 @inject ITemplateAccessor TemplateAccessor
 
@@ -115,7 +112,7 @@
             ItemType = FantasyItemTypes.GenericWeapon,
             Effects = new []
             {
-                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
             }
         };
         template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
@@ -148,7 +145,7 @@
             DescriptionLocaleId = "Increases the targets strength by 5",
             Effects = new[]
             {
-                new Effect
+                new StaticEffect
                 {
                     Potency = 5,
                     EffectType = FantasyEffectTypes.StrengthBonusAmount

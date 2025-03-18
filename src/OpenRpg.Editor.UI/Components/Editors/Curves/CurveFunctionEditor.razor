@@ -1,0 +1,196 @@
+@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Curves
+@using OpenRpg.Editor.Infrastructure.Models
+
+<div class="columns">
+    <div class="column is-half">
+        <div class="field">
+            <label class="label">Curve Type</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select @bind="CurveType" @bind:after="OnUpdated">
+                        @foreach (var curveType in GetCurveTypes())
+                        {
+                            <option value=@curveType.Id>@curveType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column is-half">
+        <div class="field">
+            <label class="label">@Value1Label</label>
+            <div class="control">
+                <input class="input" @bind="Value1" @bind:after="OnUpdated"/>
+            </div>
+        </div>
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">@Value2and3Label</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <input class="input" @bind="Value2" placeholder="Min" @bind:after="OnUpdated"/>
+                </div>
+                <div class="field">
+                    <input class="input" @bind="Value3" placeholder="Max" @bind:after="OnUpdated"/>
+                </div>
+            </div>
+        </div>
+        @if (ShouldShowValue4)
+        {
+            <div class="field">
+                <label class="label">@Value4Label</label>
+                <div class="control">
+                    <input class="input" @bind="Value4" @bind:after="OnUpdated"/>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ICurveFunction CurveFunction { get; set; }
+    
+    [Parameter]
+    public EventCallback<ICurveFunction> OnUpdate { get; set; }
+    
+    public int CurveType { get; set; }
+    
+    public float Value1 { get; set; }
+    public float Value2 { get; set; }
+    public float Value3 { get; set; }
+    public float Value4 { get; set; }
+
+    public string Value1Label
+    {
+        get
+        {
+            if (CurveType is 1 or 2 or 3 or 4 or 5) { return "Slope"; }
+            if(CurveType is 6) { return "Step Value"; }
+            return "Unknown";
+        }
+    }
+    
+    public string Value2and3Label
+    {
+        get
+        {
+            if (CurveType is 1 or 2 or 3 or 4 or 5) { return "X/Y Shift"; }
+            if(CurveType is 6) { return "Min/Max Value"; }
+            return "Unknown";
+        }
+    }
+    
+    public string Value4Label
+    {
+        get
+        {
+            if (CurveType is 1 ) { return "Vertical Size"; }
+            if(CurveType is 3 or 4) { return "Exponent"; }
+            return "Unknown";
+        }
+    }
+
+    public bool ShouldShowValue4 => CurveType is 1 or 3 or 4;
+
+    public static OptionData[] GetCurveTypes()
+    {
+        return new [] {
+            new OptionData(1, "Logistic"), 
+            new OptionData(2, "Logit"), 
+            new OptionData(3, "Normal"),
+            new OptionData(4, "Polynomial"), 
+            new OptionData(5, "Sine"), 
+            new OptionData(6, "Step"), 
+        };
+    }
+
+    public async Task OnUpdated()
+    {
+        ICurveFunction curveFunction;
+        
+        if (CurveType is 1)
+        { curveFunction = new LogisticCurveFunction(Value1, Value2, Value3, Value4); }
+        else if (CurveType is 2)
+        { curveFunction = new LogitCurveFunction(Value1, Value2, Value3); }
+        else if (CurveType is 3)
+        { curveFunction = new NormalCurveFunction(Value1, Value2, Value3, Value4); }
+        else if (CurveType is 4)
+        { curveFunction = new PolynomialCurveFunction(Value1, Value2, Value3, Value4); }
+        else if (CurveType is 5)
+        { curveFunction = new SineCurveFunction(Value1, Value2, Value3); }
+        else if (CurveType is 6)
+        { curveFunction = new StepCurveFunction(Value1, Value2, Value3); }
+        else
+        { curveFunction = PresetCurves.Linear; }
+
+        await OnUpdate.InvokeAsync(curveFunction);
+    }
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        if (CurveFunction is LogisticCurveFunction logistic)
+        {
+            CurveType = 1;
+            Value1 = logistic.Slope;
+            Value2 = logistic.XShift;
+            Value3 = logistic.YShift;
+            Value4 = logistic.VerticalSize;
+            return;
+        }
+
+        if (CurveFunction is LogitCurveFunction logit)
+        {
+            CurveType = 2;
+            Value1 = logit.Slope;
+            Value2 = logit.XShift;
+            Value3 = logit.YShift;
+            return;
+        }
+        
+        if (CurveFunction is NormalCurveFunction normal)
+        {
+            CurveType = 3;
+            Value1 = normal.Slope;
+            Value2 = normal.XShift;
+            Value3 = normal.YShift;
+            Value3 = normal.Exponent;
+            return;
+        }
+        
+        if (CurveFunction is PolynomialCurveFunction polynomial)
+        {
+            CurveType = 4;
+            Value1 = polynomial.Slope;
+            Value2 = polynomial.XShift;
+            Value3 = polynomial.YShift;
+            Value3 = polynomial.Exponent;
+            return;
+        }
+        
+        if (CurveFunction is SineCurveFunction sine)
+        {
+            CurveType = 5;
+            Value1 = sine.Slope;
+            Value2 = sine.XShift;
+            Value3 = sine.YShift;
+            return;
+        }
+        
+        if (CurveFunction is StepCurveFunction step)
+        {
+            CurveType = 6;
+            Value1 = step.StepValue;
+            Value2 = step.MinValue;
+            Value3 = step.MaxValue;
+            return;
+        }
+        
+    }
+
+}

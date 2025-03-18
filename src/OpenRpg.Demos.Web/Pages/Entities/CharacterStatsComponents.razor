@@ -1,18 +1,24 @@
 ﻿@page "/entities/stats-components"
 
 @using OpenRpg.Core.Effects
-@using OpenRpg.Core.Races
-@using OpenRpg.Core.Classes
-@using OpenRpg.Core.Entity
-@using OpenRpg.Core.Extensions
 @using OpenRpg.Genres.Extensions
 @using OpenRpg.Genres.Fantasy.Extensions
 @using OpenRpg.Genres.Fantasy.Stats
 @using OpenRpg.Genres.Fantasy.Types
-@using OpenRpg.Core.Races.Templates
-@using OpenRpg.Core.Classes.Templates
-@using OpenRpg.Core.Stats.Variables
 @using OpenRpg.Demos.Infrastructure.Templates
+@using OpenRpg.Entities.Classes
+@using OpenRpg.Entities.Classes.Templates
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Entities.Races
+@using OpenRpg.Entities.Races.Templates
+@using OpenRpg.Entities.Stats.Variables
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Requirements
+@using OpenRpg.Genres.Fantasy.Stats.Populators
+@using OpenRpg.Genres.Effects
+
+@inject ICharacterRequirementChecker RequirementChecker;
 
 <Markdown>
     ## Stats Components
@@ -162,11 +168,11 @@
             <div class="columns">
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
-                    <EffectList Effects="@AutoStatTemplateAccessor.GetRaceTemplate(AutoStatsExample.Variables.Race().TemplateId).Effects" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample.Variables.Race())" />
                 </div>
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
-                    <EffectList Effects="@AutoStatTemplateAccessor.GetClassTemplate(AutoStatsExample.Variables.Class().TemplateId).Effects" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample.Variables.Class())" />
                 </div>
             </div>
         </CardSection>
@@ -183,11 +189,11 @@
             <div class="columns">
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
-                    <EffectList Effects="@AutoStatTemplateAccessor.GetRaceTemplate(AutoStatsExample2.Variables.Race().TemplateId).Effects" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample2.Variables.Race())" />
                 </div>
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
-                    <EffectList Effects="@AutoStatTemplateAccessor.GetClassTemplate(AutoStatsExample2.Variables.Class().TemplateId).Effects" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample2.Variables.Class())" />
                 </div>
             </div>
         </CardSection>
@@ -197,12 +203,14 @@
 
 @code {
     public const int CustomEffectsKey = 1000;
-    private Entity ManualStatsExample = new Entity();
-    private Entity AutoStatsExample = new Entity();
-    private Entity AutoStatsExample2 = new Entity();
+    private Character ManualStatsExample = new();
+    private Character AutoStatsExample = new();
+    private Character AutoStatsExample2 = new();
     
-    public ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new ManualTemplateAccessor();
-    public ManualTemplateAccessor AutoStatTemplateAccessor { get; } = new ManualTemplateAccessor();
+    public ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new();
+    public ManualTemplateAccessor AutoStatTemplateAccessor { get; } = new();
+    public ICharacterEffectProcessor EffectProcessor { get; set; }
+
     
     protected void SetupManualStats()
     {
@@ -237,28 +245,30 @@
 
     protected void SetupAutoStats1()
     {
+        EffectProcessor = new CharacterEffectProcessor(AutoStatTemplateAccessor, RequirementChecker);
+        
         var raceEffects = new[]
         {
-          new Effect {Potency = 8, EffectType = FantasyEffectTypes.StrengthBonusAmount},
-          new Effect {Potency = 11, EffectType = FantasyEffectTypes.DexterityBonusAmount},
-          new Effect {Potency = 12, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
-          new Effect {Potency = 12, EffectType = FantasyEffectTypes.WisdomBonusAmount},
-          new Effect {Potency = 12, EffectType = FantasyEffectTypes.CharismaBonusAmount},
-          new Effect {Potency = 6, EffectType = FantasyEffectTypes.DamageBonusAmount},
-          new Effect {Potency = 5, EffectType = FantasyEffectTypes.DefenseBonusAmount},
-          new Effect {Potency = 1, EffectType = FantasyEffectTypes.DarkDamageAmount},
-          new Effect {Potency = 5, EffectType = FantasyEffectTypes.DarkDefenseAmount},
-          new Effect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount},
-          new Effect {Potency = 10, EffectType = FantasyEffectTypes.MagicBonusAmount}
+          new StaticEffect {Potency = 8, EffectType = FantasyEffectTypes.StrengthBonusAmount},
+          new StaticEffect {Potency = 11, EffectType = FantasyEffectTypes.DexterityBonusAmount},
+          new StaticEffect {Potency = 12, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
+          new StaticEffect {Potency = 12, EffectType = FantasyEffectTypes.WisdomBonusAmount},
+          new StaticEffect {Potency = 12, EffectType = FantasyEffectTypes.CharismaBonusAmount},
+          new StaticEffect {Potency = 6, EffectType = FantasyEffectTypes.DamageBonusAmount},
+          new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DefenseBonusAmount},
+          new StaticEffect {Potency = 1, EffectType = FantasyEffectTypes.DarkDamageAmount},
+          new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DarkDefenseAmount},
+          new StaticEffect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount},
+          new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.MagicBonusAmount}
         };
 
         var classEffects = new[]
         {
-          new Effect {Potency = 3, EffectType = FantasyEffectTypes.StrengthBonusAmount},
-          new Effect {Potency = 1, EffectType = FantasyEffectTypes.DexterityBonusAmount},
-          new Effect {Potency = 4, EffectType = FantasyEffectTypes.DamageBonusAmount},
-          new Effect {Potency = 3, EffectType = FantasyEffectTypes.DefenseBonusAmount},
-          new Effect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount}
+          new StaticEffect {Potency = 3, EffectType = FantasyEffectTypes.StrengthBonusAmount},
+          new StaticEffect {Potency = 1, EffectType = FantasyEffectTypes.DexterityBonusAmount},
+          new StaticEffect {Potency = 4, EffectType = FantasyEffectTypes.DamageBonusAmount},
+          new StaticEffect {Potency = 3, EffectType = FantasyEffectTypes.DefenseBonusAmount},
+          new StaticEffect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount}
         };
 
         var hobbitRace = new RaceTemplate { NameLocaleId = "Hobbit", Effects = raceEffects };
@@ -276,8 +286,23 @@
         AutoStatsExample2.Variables.Class(new ClassData { TemplateId = fighterClass.Id });
         
         var statsCalculator = new FantasyStatsPopulator();
-        statsCalculator.Populate(AutoStatsExample.Stats, AutoStatsExample.GetEffects(AutoStatTemplateAccessor), null);
-        statsCalculator.Populate(AutoStatsExample2.Stats, AutoStatsExample.GetEffects(AutoStatTemplateAccessor), null);
+        var computedEffects1 = EffectProcessor.ComputeEffects(AutoStatsExample);
+        statsCalculator.Populate(AutoStatsExample.Stats, computedEffects1, null);
+        
+        var computedEffects2 = EffectProcessor.ComputeEffects(AutoStatsExample2);
+        statsCalculator.Populate(AutoStatsExample2.Stats, computedEffects2, null);
+    }
+
+    public IReadOnlyCollection<StaticEffect> GetEffectsFor(RaceData race)
+    {
+        var template = AutoStatTemplateAccessor.GetRaceTemplate(race.TemplateId);
+        return template.Effects.GetStaticEffects();
+    }
+    
+    public IReadOnlyCollection<StaticEffect> GetEffectsFor(ClassData @class)
+    {
+        var template = AutoStatTemplateAccessor.GetClassTemplate(@class.TemplateId);
+        return template.Effects.GetStaticEffects();
     }
 
     protected override void OnInitialized()

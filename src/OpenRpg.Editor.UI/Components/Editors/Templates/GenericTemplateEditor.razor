@@ -1,0 +1,81 @@
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Requirements
+@using OpenRpg.Localization.Data.Repositories
+
+@typeparam TTemplate where TTemplate : class, OpenRpg.Core.Templates.ITemplate, OpenRpg.Core.Variables.General.IHasVariables<OpenRpg.Core.Variables.IVariables<object>>, new()
+
+@inject ILocaleRepository LocaleRepository;
+
+<div class="container">
+    <Accordion Title="Template Asset Details" IsExpanded="true">
+        <BasicDetailsEditor Data="Template">
+            <AvatarContent>
+                @if (AvatarContent != null)
+                { @AvatarContent(Template) }
+            </AvatarContent>
+            <AdditionalContent>
+                <AssetCodeEditor Variables="Template.Variables" 
+                                 DefaultAssetCode="@($"{AssetCodePrefix}-{Template.Id}")" 
+                                 OnAssetCodeChanged="OnAssetCodeChanged"/>
+            </AdditionalContent>
+        </BasicDetailsEditor>
+    </Accordion>
+
+    <Accordion Title="Locale Details" IsExpanded="true">
+        <LocaleDetails LocaleData="Template" />
+    </Accordion>
+
+    @if(PrimaryDetailsContent != null)
+    { @PrimaryDetailsContent(Template) }
+    
+    @if (Template is IHasEffects hasEffects)
+    {
+        <Accordion Title="Template Effects" IsExpanded="true">
+            <EffectsEditor Effects="hasEffects.Effects as List<IEffect>"/>
+        </Accordion>
+    }
+
+    @if (Template is IHasRequirements hasRequirements)
+    {
+        <Accordion Title="Template Requirements" IsExpanded="true">
+            <RequirementsEditor Requirements="hasRequirements.Requirements as List<Requirement>" />
+        </Accordion>
+    }
+
+    @if (SecondaryDetailsContent != null)
+    { @SecondaryDetailsContent(Template) }
+        
+</div>
+        
+@functions {
+    
+    [Parameter]
+    public TTemplate Template { get; set; }
+    
+    [Parameter]
+    public RenderFragment<TTemplate> AvatarContent { get; set; }
+    
+    [Parameter]
+    public RenderFragment<TTemplate> PrimaryDetailsContent { get; set; }
+    
+    [Parameter]
+    public RenderFragment<TTemplate> SecondaryDetailsContent { get; set; }
+    
+    [Parameter]
+    public string AssetCodePrefix { get; set; }
+    
+    public string FriendlyName { get; set; } = "";
+
+    protected override void OnInitialized()
+    {
+        FriendlyName = AssetCodePrefix.Capitalize();
+        Template.ListifyProperties();
+        base.OnInitialized();
+    }
+    
+    public void OnAssetCodeChanged(string newAssetCode)
+    { Template.UpdateLocale(newAssetCode, LocaleRepository); }
+}

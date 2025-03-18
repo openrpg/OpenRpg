@@ -1,11 +1,12 @@
 using System;
+using OpenRpg.Core.Utils;
+using OpenRpg.CurveFunctions.Extensions;
 
 namespace OpenRpg.AdviceEngine.Clampers
 {
     public class DynamicClamper : IClamper
     {
-        public float MinRange => _minRangeAccessor();
-        public float MaxRange => _maxRangeAccessor();
+        public RangeF Range => new RangeF(_minRangeAccessor(), _maxRangeAccessor());
         public bool Normalize { get; }
 
         private readonly Func<float> _minRangeAccessor;
@@ -21,10 +22,9 @@ namespace OpenRpg.AdviceEngine.Clampers
         public float Clamp(float input)
         {
             var result = input;
-            if(input < MinRange) { result = MinRange; }
-            if(input > MaxRange) { result = MaxRange; }
-            if(!Normalize){ return result; }
-            return (result - MinRange) / (MaxRange - MinRange);
+            if(input < Range.Min) { result = Range.Min; }
+            if(input > Range.Max) { result = Range.Max; }
+            return !Normalize ? result : result.NormalizeBetween(Range);
         }
     }
 }

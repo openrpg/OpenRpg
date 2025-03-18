@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using OpenRpg.Core.Associations;
 using OpenRpg.Core.Requirements;
+using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Lookups;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.TradeSkills;
 using OpenRpg.Items.TradeSkills.Extensions;
@@ -30,7 +33,7 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
         return new ItemCraftingTemplate()
         {
             Id = ItemCraftingTemplateLookups.CopperIngot,
-            SkillType = FantasyTradeSkillTypes.Smelting,
+            SkillType = FantasyCraftingTradeSkillTypes.Smelting,
             SkillDifficulty = 0,
             TimeToComplete = 2.0f,
             InputItems = new List<TradeSkillItemEntry>() { inputItemEntry },
@@ -51,14 +54,14 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
         return new ItemCraftingTemplate()
         {
             Id = ItemCraftingTemplateLookups.CopperSword,
-            SkillType = FantasyTradeSkillTypes.Smithing,
+            SkillType = FantasyCraftingTradeSkillTypes.Smithing,
             SkillDifficulty = 10,
             TimeToComplete = 2.0f,
             InputItems = new List<TradeSkillItemEntry>() { inputItem1Entry, inputItem2Entry },
             OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry },
             Requirements = new []
             {
-                new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, AssociatedId = FantasyTradeSkillTypes.Smithing, AssociatedValue = 5 }
+                new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, Association = new Association(FantasyCraftingTradeSkillTypes.Smithing, 5) }
             }
         };
     }

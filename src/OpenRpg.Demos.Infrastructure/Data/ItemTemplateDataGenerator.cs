@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenRpg.Core.Effects;
-using OpenRpg.Core.Modifications;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Demos.Infrastructure.Extensions;
 using OpenRpg.Demos.Infrastructure.Lookups;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Modifications;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Templates;
@@ -41,7 +44,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Requirements = Array.Empty<Requirement>(),
                 Effects = new[]
                 {
-                    new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
+                    new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
                 }
             };
             template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
@@ -55,11 +58,11 @@ namespace OpenRpg.Demos.Infrastructure.Data
         {
             var swordEffects = new[]
             {
-                new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 765.5f },
-                new Effect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 20.0f },
-                new Effect { EffectType = FantasyEffectTypes.DamageBonusPercentage, Potency = 10.0f },
-                new Effect { EffectType = FantasyEffectTypes.ConstitutionBonusAmount, Potency = 15.0f },
-                new Effect { EffectType = FantasyEffectTypes.DarkDefenseAmount, Potency = 15.0f }
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 765.5f },
+                new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 20.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusPercentage, Potency = 10.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.ConstitutionBonusAmount, Potency = 15.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.DarkDefenseAmount, Potency = 15.0f }
             };
 
             var template = new ItemTemplate
@@ -91,7 +94,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Requirements = Array.Empty<Requirement>(),
                 Effects = new[]
                 {
-                new Effect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = 30.0f }
+                new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = 30.0f }
             }
             };
             template.Variables.QualityType(FantasyItemQualityTypes.UncommonQuality);
@@ -114,7 +117,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Requirements = Array.Empty<Requirement>(),
                 Effects = new[]
                 {
-                new Effect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = -5.0f }
+                new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = -5.0f }
             }
             };
             template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
@@ -135,7 +138,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 ItemType = FantasyItemTypes.GenericItem,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
                 Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<Effect>(),
+                Effects = Array.Empty<StaticEffect>(),
             };
             template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
             template.Variables.Value(5);
@@ -155,7 +158,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 ItemType = FantasyItemTypes.GenericItem,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
                 Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<Effect>(),
+                Effects = Array.Empty<StaticEffect>(),
             };
             template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
             template.Variables.Value(1);
@@ -175,7 +178,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 ItemType = FantasyItemTypes.GenericItem,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
                 Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<Effect>(),
+                Effects = Array.Empty<StaticEffect>(),
             };
             template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
             template.Variables.Value(1);
@@ -195,7 +198,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 ItemType = FantasyItemTypes.GenericItem,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
                 Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<Effect>(),
+                Effects = Array.Empty<StaticEffect>(),
             };
             template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
             template.Variables.Value(1);
@@ -217,7 +220,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Requirements = Array.Empty<Requirement>(),
                 Effects = new[]
                 {
-                    new Effect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 50 }
+                    new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 50 }
                 }
             };
             template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);

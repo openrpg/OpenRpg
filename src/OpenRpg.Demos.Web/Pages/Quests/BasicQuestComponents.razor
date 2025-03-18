@@ -1,8 +1,11 @@
 ﻿@page "/quests/basic-components"
 
+@using OpenRpg.Core.Associations
 @using OpenRpg.Core.Templates
+@using OpenRpg.Core.Utils
 @using OpenRpg.Demos.Infrastructure.Extensions
 @using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Genres.Types
 @using OpenRpg.Quests
@@ -139,12 +142,12 @@
             IsRepeatable = false,
             Objectives = new List<Objective>
         {
-                new Objective {ObjectiveType = GenresObjectiveTypes.ItemObjective, AssociatedId = ItemTemplateLookups.HealingPotion, AssociatedValue = 5}
+                new() {ObjectiveType = GenresObjectiveTypes.ItemObjective, Association = new Association(ItemTemplateLookups.HealingPotion, 5)}
             },
             Rewards = new List<Reward>
         {
-                new Reward {RewardType = FantasyRewardTypes.ExperienceReward, AssociatedValue = 100},
-                new Reward {RewardType = FantasyRewardTypes.CurrencyReward, AssociatedValue = 50}
+                new() {RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 100)},
+                new() {RewardType = FantasyRewardTypes.CurrencyReward, Association = new Association(0, 50)}
             }
         };
         quest.Variables.AssetCode("default-quest");

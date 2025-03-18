@@ -1,6 +1,7 @@
 using System.Linq;
 using OpenRpg.Combat.Effects;
 using OpenRpg.Core.Effects;
+using OpenRpg.Entities.Effects;
 using OpenRpg.Genres.Fantasy.Effects;
 using OpenRpg.Genres.Fantasy.Types;
 
@@ -24,8 +25,8 @@ namespace OpenRpg.Genres.Fantasy.Extensions
             return FantasyDamageTypes.UnknownDamage;
         }
         
-        public static int GetApplicableDamageType(this Effect effect)
-        { return GetDamageTypeFrom(effect.EffectType); }
+        public static int GetApplicableDamageType(this StaticEffect staticEffect)
+        { return GetDamageTypeFrom(staticEffect.EffectType); }
         
         public static int GetBonusDamageEffectTypeFrom(int damageType)
         {
@@ -59,24 +60,24 @@ namespace OpenRpg.Genres.Fantasy.Extensions
             return FantasyDamageTypes.UnknownDamage;
         }
 
-        public static bool IsDamagingEffect(this Effect effect)
-        {  return EffectTypeGroups.DamageEffectTypes.Contains(effect.EffectType); }
+        public static bool IsDamagingEffect(this StaticEffect staticEffect)
+        {  return EffectTypeGroups.DamageEffectTypes.Contains(staticEffect.EffectType); }
         
-        public static bool IsDefensiveEffect(this Effect effect)
-        {  return EffectTypeGroups.DefenseEffectTypes.Contains(effect.EffectType); }
+        public static bool IsDefensiveEffect(this StaticEffect staticEffect)
+        {  return EffectTypeGroups.DefenseEffectTypes.Contains(staticEffect.EffectType); }
 
         public static bool IsBeneficialEffect(this ActiveEffect effect)
-        { return IsBeneficialEffect(effect.Effect); }
+        { return IsBeneficialEffect(effect.StaticEffect); }
         
-        public static bool IsBeneficialEffect(this Effect effect)
+        public static bool IsBeneficialEffect(this StaticEffect staticEffect)
         {
-            if(effect.EffectType != FantasyEffectTypes.LightBonusAmount)
+            if(staticEffect.EffectType != FantasyEffectTypes.LightBonusAmount)
             {
-                if (effect.IsDamagingEffect())
+                if (staticEffect.IsDamagingEffect())
                 { return false; }
             }
 
-            return effect.Potency >= 0;
+            return staticEffect.Potency >= 0;
         }
     }
 }

@@ -1,6 +1,6 @@
 using OpenRpg.Combat.Effects;
 using OpenRpg.Combat.Extensions;
-using OpenRpg.Core.Entity.Variables;
+using OpenRpg.Entities.Entity.Variables;
 using Xunit;
 
 namespace OpenRpg.UnitTests.Combat;

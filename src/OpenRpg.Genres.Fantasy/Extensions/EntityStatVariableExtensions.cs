@@ -1,4 +1,4 @@
-using OpenRpg.Core.Stats.Variables;
+using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Fantasy.Types;
 
 namespace OpenRpg.Genres.Fantasy.Extensions

@@ -1,10 +1,19 @@
-﻿@using OpenRpg.Core.Effects
-@using OpenRpg.Cards.Types
+﻿@using OpenRpg.Cards.Types
 @using OpenRpg.Cards
+@using OpenRpg.Cards.Genres
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Templates
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Effects.Processors
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Genres.Effects
+@using OpenRpg.Items.Extensions
 @using OpenRpg.Localization.Data.Extensions
 @using OpenRpg.Localization.Data.Repositories
 
 @inject ILocaleRepository LocaleRepository
+@inject ITemplateAccessor TemplateAccessor
+@inject ICharacterEffectProcessor EffectProcessor
 
 <div class="container game-card" card-type="@Card.CardType">
     <div class="card @CardTypeClass">
@@ -15,13 +24,13 @@
                 </h3>
                 <div class="card-body">
                     <div class="card-effects">
-                        <EffectList Effects=@Card.Effects.ToArray()></EffectList>
+                        <EffectList Effects=@Card.Effects></EffectList>
                     </div>
                     @if (Card.CardType == CardTypes.EquipmentCard)
                     {
                         <div class="box as-circle has-background-link-light">
                             <span class="is-size-4">
-                                @GetMaximumEffectPotency.Potency
+                                @GetMaximumStaticEffectPotency.Potency
                             </span>
                         </div>
                     }
@@ -45,6 +54,14 @@
 
     public string CardTypeClass => $"card-type-{Card.CardType}";
     public string CardTypeText => LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.CardTypesTextKey, Card.CardType));
-    public Effect GetMaximumEffectPotency => Card.Effects.OrderByDescending(x => x.Potency).FirstOrDefault();
+    public StaticEffect GetMaximumStaticEffectPotency
+    {
+        get
+        {
+            var itemData = (Card as EquipmentCard).Data.Data;
+            var itemTemplate = TemplateAccessor.GetItemTemplate(itemData.TemplateId);
+            return itemTemplate.Effects.GetStaticEffects().OrderByDescending(x => x.Potency).FirstOrDefault();
+        }
+    }
 
 }

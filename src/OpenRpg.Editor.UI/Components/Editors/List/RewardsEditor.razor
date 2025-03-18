@@ -1,0 +1,48 @@
+﻿@using OpenRpg.Core.Associations
+@using OpenRpg.Core.Utils
+@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Quests
+
+<ListEditor Data="Rewards" TItem="Reward">
+    <HeaderTemplate>
+        <th>>Reward Type</th>
+        <th>Reward Chance</th>
+        <th>Associated Id</th>
+        <th>Associated Value</th>
+    </HeaderTemplate>
+    <RowTemplate>
+        <td>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select bind="@context.RewardType">
+                        @foreach (var rewardType in TypesHelper.GetRewardTypes)
+                        {
+                            <option value=@rewardType.Id>@rewardType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" placeholder="i.e. 0.1 for 10%" bind="@context.RewardChance" />
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" @bind:get="@context.Association.AssociatedId"
+                       @bind:set="id => context.Association = new Association(id, context.Association.AssociatedValue)" />
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text"  @bind:get="@context.Association.AssociatedValue"
+                       @bind:set="value => context.Association = new Association(context.Association.AssociatedId, value)" />
+            </div>
+        </td>
+    </RowTemplate>
+</ListEditor>
+
+@functions {
+    [Parameter] public List<Reward> Rewards { get; set; }
+}

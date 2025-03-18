@@ -1,0 +1,44 @@
+﻿@using OpenRpg.Core.Associations
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Core.Utils
+@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Entities.Requirements
+
+<ListEditor Data="Requirements" TItem="Requirement">
+    <HeaderTemplate>
+        <th>Requirement Type</th>
+        <th>Associated Id</th>
+        <th>Associated Value</th>
+    </HeaderTemplate>
+    <RowTemplate>
+        <td>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select @bind="context.RequirementType">
+                        @foreach (var requirementType in TypesHelper.GetRequirementTypes)
+                        {
+                            <option value=@requirementType.Id>@requirementType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text" @bind:get="@context.Association.AssociatedId"
+                       @bind:set="id => context.Association = new Association(id, context.Association.AssociatedValue)" />
+            </div>
+        </td>
+        <td>
+            <div class="control">
+                <input class="input" type="text"  @bind:get="@context.Association.AssociatedValue"
+                       @bind:set="value => context.Association = new Association(context.Association.AssociatedId, value)" />
+            </div>
+        </td>
+    </RowTemplate>
+</ListEditor>
+
+@functions {
+    [Parameter]
+    public List<Requirement> Requirements { get; set; }
+}

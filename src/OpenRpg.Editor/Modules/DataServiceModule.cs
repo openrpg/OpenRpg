@@ -9,6 +9,7 @@ using OpenRpg.Editor.Core.Services.Notifications;
 using OpenRpg.Editor.Core.Services.Threading;
 using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Editor.Infrastructure.Persistence;
+using OpenRpg.Editor.Infrastructure.Persistence.Migrations;
 using OpenRpg.Editor.Infrastructure.Services;
 using OpenRpg.Editor.Services.FileSystem;
 using OpenRpg.Localization.Data.DataSources;
@@ -43,6 +44,8 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<EditorDatasource>();
             services.AddSingleton<IDataSource>(x => x.GetService<EditorDatasource>());
             services.AddSingleton<IRepository, Repository>();
+            
+            services.AddSingleton<IProjectMigration, ProjectMigration_1_0_0>();
 
             services.AddSingleton<EditorLocaleDatasource>();
             services.AddSingleton<ILocaleDataSource>(x => x.GetService<EditorLocaleDatasource>());

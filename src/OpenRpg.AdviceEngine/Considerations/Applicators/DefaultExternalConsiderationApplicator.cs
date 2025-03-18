@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using OpenRpg.AdviceEngine.Applicators;
 using OpenRpg.Core.Requirements;
+using OpenRpg.Entities.Requirements;
 
 namespace OpenRpg.AdviceEngine.Considerations.Applicators
 {

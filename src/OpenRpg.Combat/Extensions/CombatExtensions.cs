@@ -1,34 +1,36 @@
-using System.Collections.Generic;
 using OpenRpg.Combat.Attacks;
-using OpenRpg.Core.Effects;
-using OpenRpg.Core.Extensions;
+using OpenRpg.Entities.Effects.Processors;
+using OpenRpg.Entities.Extensions;
 
 namespace OpenRpg.Combat.Extensions
 {
     public static class CombatExtensions
     {
-        public static float CalculateTotalAmount(this IEnumerable<Effect> effects, int effectAmountType, int bonusAmountType)
-        { return effects.GetPotencyFor(effectAmountType, bonusAmountType); }
-        
-        public static float CalculateTotalPercentage(this IEnumerable<Effect> effects, int effectPercentageType, int bonusPercentageType)
-        { return effects.GetPotencyFor(effectPercentageType, bonusPercentageType); }
-        
-        public static float CalculateTotal(this IEnumerable<Effect> effects, int effectAmountType, int effectPercentageType, int bonusAmountType, int bonusPercentageType)
+        public static float CalculateTotalValueFor(this ComputedEffects computedEffects, EffectRelationship effectRelationship, float miscBonus = 0)
         {
-            var baseValue = effects.CalculateTotalAmount(effectAmountType, bonusAmountType);
-            if(baseValue == 0) { return 0; }
+            var total = computedEffects.CalculateTotalValueFor(
+                new[]{ effectRelationship.AmountType, effectRelationship.BonusAmountType}, 
+                new[]{ effectRelationship.PercentageType, effectRelationship.BonusPercentageType });
             
-            var percentageBonus = effects.CalculateTotalPercentage(effectPercentageType, bonusPercentageType);
-            if(percentageBonus != 0) { percentageBonus /= 100;}
-
-            var percentageValue = baseValue * percentageBonus;
-            return baseValue + percentageValue;
+            return total + miscBonus;
         }
         
-        public static float CalculateTotal(this IEnumerable<Effect> effects, EffectRelationship damageRelationship)
+        public static float CalculateTotalValueFor(this ComputedEffects computedEffects, EffectRelationship effectRelationship, int otherBonusType, int otherPercentageType, float miscBonus = 0)
         {
-            return effects.CalculateTotal(damageRelationship.AmountType, damageRelationship.PercentageType,
-                damageRelationship.BonusAmountType, damageRelationship.BonusPercentageType);
+            var baseTotal = computedEffects.CalculateTotalValueFor(effectRelationship, miscBonus);
+            baseTotal += computedEffects.Get(otherBonusType);
+
+            if (baseTotal == 0)
+            { return 0; }
+
+            var percentageBonus = computedEffects.Get(otherPercentageType);
+            if (percentageBonus != 0)
+            { 
+                var addition = baseTotal * (percentageBonus/100);
+                baseTotal += addition;
+            }
+            
+            return baseTotal;
         }
     }
 }

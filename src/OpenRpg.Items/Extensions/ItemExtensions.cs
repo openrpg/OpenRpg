@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenRpg.Core.Common;
-using OpenRpg.Core.Effects;
 using OpenRpg.Core.Requirements;
-using OpenRpg.Core.Variables;
-using OpenRpg.Core.Variables.General;
 using OpenRpg.Items.Loot;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.Variables;
@@ -24,7 +20,7 @@ namespace OpenRpg.Items.Extensions
             {
                 TemplateId = itemData.TemplateId,
                 Variables = itemData.Variables.Clone(),
-                Modifications = new List<ItemModificationTemplate>(itemData.Modifications.ToArray())
+                Modifications = new List<ItemModificationData>(itemData.Modifications.ToArray())
             };
         }
         
@@ -50,31 +46,6 @@ namespace OpenRpg.Items.Extensions
                 Requirements = requirements ?? Array.Empty<Requirement>(),
                 Variables = variables
             };
-        }
-        
-        public static IReadOnlyCollection<Effect> GetItemEffects(this ItemData itemData, ItemTemplate itemTemplate)
-        {
-            if(!itemData.Modifications.Any())
-            { return itemTemplate.Effects; }
-         
-            return itemTemplate.Effects.Union(itemData.Modifications.SelectMany(x => x.Effects)).ToArray();
-        }
-        
-        public static IReadOnlyCollection<Effect> GetItemEffects(this Item item)
-        {
-            if(!item.Data.Modifications.Any())
-            { return item.Template.Effects; }
-         
-            return item.Template.Effects.Union(item.Data.Modifications.SelectMany(x => x.Effects)).ToArray();
-        }
-        
-        
-        public static void TestMethod<T>(this T instance) 
-            where T : class, IHasVariables<IVariables<object>>, IHasLocaleDescription
-        {
-            instance.Variables[100] = 100;
-
-            new ItemTemplate().TestMethod();
         }
     }
 }

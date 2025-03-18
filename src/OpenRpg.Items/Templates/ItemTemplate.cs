@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using OpenRpg.Core.Effects;
-using OpenRpg.Core.Modifications;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Templates;
-using OpenRpg.Core.Variables.General;
+using OpenRpg.Entities.Effects;
+using OpenRpg.Entities.Modifications;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Templates
@@ -17,7 +18,7 @@ namespace OpenRpg.Items.Templates
         public string DescriptionLocaleId { get; set; }
         
         public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
-        public IReadOnlyCollection<Effect> Effects { get; set; } = Array.Empty<Effect>();
+        public IReadOnlyCollection<IEffect> Effects { get; set; } = Array.Empty<IEffect>();
         public IReadOnlyCollection<ModificationAllowance> ModificationAllowances { get; set; } = Array.Empty<ModificationAllowance>();
         public ItemTemplateVariables Variables { get; set; } = new ItemTemplateVariables();
     }

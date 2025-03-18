@@ -1,4 +1,4 @@
-﻿using OpenRpg.Core.Entity;
+﻿using OpenRpg.Entities.Entity;
 
 namespace OpenRpg.Genres.Characters
 {

@@ -1,7 +1,8 @@
 @using OpenRpg.Core.Effects
 @using OpenRpg.Genres.Characters
-@using OpenRpg.Core.Extensions
 @using OpenRpg.Core.Templates
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
 
 <CardSection>
     <div class="container">
@@ -36,15 +37,9 @@
     [Parameter]
     public ITemplateAccessor TemplateAccessor { get; set; }
 
-    public IReadOnlyCollection<Effect> GetRaceEffects()
-    {
-        var raceId = Character.Variables.Race().TemplateId;
-        return TemplateAccessor.GetRaceTemplate(raceId).Effects;
-    }
+    public IReadOnlyCollection<StaticEffect> GetRaceEffects()
+    { return TemplateAccessor.GetRaceTemplate(Character.Variables.Race().TemplateId).Effects.GetStaticEffects(); }
     
-    public IReadOnlyCollection<Effect> GetClassEffects()
-    {
-        var classId = Character.Variables.Class().TemplateId;
-        return TemplateAccessor.GetRaceTemplate(classId).Effects;
-    }
+    public IReadOnlyCollection<StaticEffect> GetClassEffects()
+    { return TemplateAccessor.GetClassTemplate(Character.Variables.Class().TemplateId).Effects.GetStaticEffects(); ; }
 }

@@ -1,13 +1,12 @@
-@using OpenRpg.Core.Stats
-@using OpenRpg.Genres.Fantasy.Extensions
-@using OpenRpg.Core.Effects
 @using OpenRpg.Genres.Fantasy.Types
 @using System.Reflection
+@using OpenRpg.Core.Effects
 @using OpenRpg.Core.Requirements
 @using OpenRpg.Demos.Web.Extensions
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Requirements
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Extensions
-@using OpenRpg.Genres.Fantasy.Requirements
 @using OpenRpg.Genres.Requirements
 @using OpenRpg.Localization.Data.Extensions
 @using OpenRpg.Localization.Data.Repositories
@@ -22,8 +21,8 @@
         {
             var requirementsMet = AreAllRequirementsMet(effect);
             <li style="list-style: none;">
-                <span class="effect-section @(effect.Potency > 0 ? "has-text-success" : "has-text-danger")">
-                    <span class="@(requirementsMet ? "" : "is-strikethrough")">@(effect.Potency > 0 ? "+":"")@(effect.Potency) @GetEffectText(effect.EffectType)</span>
+                <span class="effect-section @(effect.IsPositiveEffect() ? "has-text-success" : "has-text-danger")">
+                    <span class="@(requirementsMet ? "" : "has-text-grey")">@(effect.GeneratePotencyText()) @GetEffectText(effect.EffectType)</span>
                     @if (HasRequirements(effect))
                     {
                         <div class="requirement-section">
@@ -38,59 +37,34 @@
 
 @code {
     [Parameter]
-    public IReadOnlyCollection<Effect> Effects { get; set; }
+    public IReadOnlyCollection<IEffect> Effects { get; set; }
 
     [Parameter]
     public Character Character { get; set; }
-
-    private int[] _percentageEffectTypeCache;
-
-    protected override void OnInitialized()
-    {
-        // You could easily add other types in if you had custom ones
-        _percentageEffectTypeCache = GetAllPercentageEffectTypeIds(typeof(FantasyEffectTypes));
-        base.OnInitialized();
-    }
-
-    private int[] GetAllPercentageEffectTypeIds(Type effectTypes)
-    {
-        return effectTypes
-            .GetFields(BindingFlags.Public | BindingFlags.Static)
-            .Where(x => x.Name.Contains("Percentage"))
-            .Select(x => (int)x.GetValue(null))
-            .ToArray();
-    }
-
-
-    public bool IsPercentageEffect(int effectType)
-    { return _percentageEffectTypeCache.Contains(effectType); }
-
+    
     public string GetEffectText(int effectType)
     { return LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.EffectTextKey, effectType)); }
 
-    public string GetPotencySymbol(float potency)
-    { return potency > 0 ? "+" : "-"; }
-
-    public bool HasRequirements(Effect effect)
+    public bool HasRequirements(IEffect staticEffect)
     {
-        if (effect.Requirements == null)
+        if (staticEffect.Requirements == null)
         { return false;}
         
-        if(!effect.Requirements.Any())
+        if(!staticEffect.Requirements.Any())
         { return false; }
 
         return true;
     }
 
-    public bool AreAllRequirementsMet(Effect effect)
+    public bool AreAllRequirementsMet(IEffect staticEffect)
     {
         if(Character == null)
         { return true; }
 
-        if(!HasRequirements(effect))
+        if(!HasRequirements(staticEffect))
         { return true; }
 
-        return RequirementsChecker.AreRequirementsMet(Character, effect);
+        return RequirementsChecker.AreRequirementsMet(Character, staticEffect);
     }
 
     public bool IsRequirementMet(Requirement requirement)

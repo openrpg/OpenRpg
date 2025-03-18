@@ -1,7 +1,7 @@
-using OpenRpg.Core.State;
-using OpenRpg.Core.Stats;
 using OpenRpg.Core.Templates;
 using OpenRpg.Core.Variables.General;
+using OpenRpg.Entities.State;
+using OpenRpg.Entities.Stats;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Scifi.Variables;
 

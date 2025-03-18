@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Templates;
-using OpenRpg.Core.Variables.General;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Items.TradeSkills.Variables;
 
 namespace OpenRpg.Items.TradeSkills.Templates
@@ -17,12 +17,12 @@ namespace OpenRpg.Items.TradeSkills.Templates
         /// <summary>
         /// The name locale id for the crafting
         /// </summary>
-        public string NameLocaleId { get; }
+        public string NameLocaleId { get; set; }
         
         /// <summary>
         /// The description locale id
         /// </summary>
-        public string DescriptionLocaleId { get; }
+        public string DescriptionLocaleId { get; set; }
         
         /// <summary>
         /// Gathering time in seconds, per unit gathered

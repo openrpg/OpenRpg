@@ -117,7 +117,7 @@
          <div class="container">
             @foreach (var activeEffect in ActiveEffects.ActiveEffects)
             {
-               <TagLabel Label="@($"x{activeEffect.Stacks} {activeEffect.Effect.NameLocaleId}")" Content="@($"{(int)activeEffect.ActiveTime} seconds")"/>
+               <TagLabel Label="@($"x{activeEffect.Stacks} {activeEffect.StaticEffect.NameLocaleId}")" Content="@($"{(int)activeEffect.ActiveTime} seconds")"/>
             }
          </div>
       </CardSection>
@@ -138,7 +138,7 @@
 </div>
 
 @code {
-   public TimedEffect Poison1Effect = new() 
+   public TimedStaticEffect Poison1StaticEffect = new() 
    {
       Id = 1,
       NameLocaleId = "Poison I",
@@ -148,7 +148,7 @@
       Potency = 2.0f
    };
    
-   public TimedEffect Poison2Effect = new() 
+   public TimedStaticEffect Poison2StaticEffect = new() 
    {
       Id = 2,
       NameLocaleId = "Poison II",
@@ -158,7 +158,7 @@
       Potency = 4.0f
    };
    
-   public TimedEffect Regen1Effect = new() 
+   public TimedStaticEffect Regen1StaticEffect = new() 
    {
       Id = 3,
       NameLocaleId = "Regen I",
@@ -168,7 +168,7 @@
       Potency = 5.0f
    };
    
-   public TimedEffect Regen2Effect = new() 
+   public TimedStaticEffect Regen2StaticEffect = new() 
    {
       Id = 4,
       NameLocaleId = "Regen II",
@@ -178,7 +178,7 @@
       Potency = 10.0f
    };
    
-   public TimedEffect Protection1Effect = new() 
+   public TimedStaticEffect Protection1StaticEffect = new() 
    {
       Id = 5,
       NameLocaleId = "Protection I",
@@ -188,7 +188,7 @@
       Potency = 5.0f
    };
 
-   public TimedEffect[] AvailableEffects;
+   public TimedStaticEffect[] AvailableEffects;
 
    public record LogEntry(bool IsBeneficial, bool IsPassive, string Entry);
    
@@ -208,7 +208,7 @@
    {
       var effectTypeText = activeEffect.IsBeneficialEffect() ? "healing" : "damage";
       var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(),
-         $"Triggered <span class=\"has-text-info\">{activeEffect.Effect.NameLocaleId}</span> with {activeEffect.GetStackedPotency()} {effectTypeText}");
+         $"Triggered <span class=\"has-text-info\">{activeEffect.StaticEffect.NameLocaleId}</span> with {activeEffect.GetStackedPotency()} {effectTypeText}");
       
       LogOutput.Add(logEntry);
    }
@@ -216,7 +216,7 @@
    public void OnEffectExpired(ActiveEffect activeEffect)
    {
       var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(), 
-         $"Expired <span class=\"has-text-info\">{activeEffect.Effect.NameLocaleId}</span>");
+         $"Expired <span class=\"has-text-info\">{activeEffect.StaticEffect.NameLocaleId}</span>");
       
       LogOutput.Add(logEntry);
    }
@@ -224,7 +224,7 @@
    public void OnEffectAdded(ActiveEffect activeEffect)
    {
       var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(), 
-         $"Added <span class=\"has-text-info\">{activeEffect.Effect.NameLocaleId}</span>");
+         $"Added <span class=\"has-text-info\">{activeEffect.StaticEffect.NameLocaleId}</span>");
       
       LogOutput.Add(logEntry);
    }
@@ -248,9 +248,9 @@
    {
       AvailableEffects = new[]
       {
-         Poison1Effect, Poison2Effect,
-         Regen1Effect, Regen2Effect,
-         Protection1Effect
+         Poison1StaticEffect, Poison2StaticEffect,
+         Regen1StaticEffect, Regen2StaticEffect,
+         Protection1StaticEffect
       };
    }
    

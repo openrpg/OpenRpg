@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
+using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Cards.Genres.Conventions
 {
@@ -10,6 +11,6 @@ namespace OpenRpg.Cards.Genres.Conventions
         protected GenericDataCardWithEffects(T data) : base(data)
         { }
         
-        public override IReadOnlyCollection<Effect> Effects => Data.Effects;
+        public override IReadOnlyCollection<IEffect> Effects => Data.Effects;
     }
 }

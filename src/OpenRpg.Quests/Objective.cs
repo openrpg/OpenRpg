@@ -1,11 +1,11 @@
-using OpenRpg.Core.Common;
+using OpenRpg.Core.Associations;
+using OpenRpg.Core.Utils;
 
 namespace OpenRpg.Quests
 {
-    public class Objective : IHasAssociation
+    public class Objective
     {
         public int ObjectiveType { get; set; }
-        public int AssociatedId { get; set; }
-        public int AssociatedValue { get; set; }
+        public Association Association { get; set; }
     }
 }

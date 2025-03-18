@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using OpenRpg.Core.State;
 using OpenRpg.Core.Variables;
+using OpenRpg.Entities.State;
 using OpenRpg.Genres.Scifi.Types;
 
 namespace OpenRpg.Genres.Scifi.Variables

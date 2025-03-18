@@ -10,14 +10,6 @@
         <Description>An open source set of base components to build RPG games</Description>
         <PackageTags>rpg game-development xna monogame unity godot</PackageTags>
         <LangVersion>8</LangVersion>
-
-
-
-
-
     </PropertyGroup>
-
-
-
-
+    
 </Project>

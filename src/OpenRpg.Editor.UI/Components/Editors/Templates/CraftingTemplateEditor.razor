@@ -1,0 +1,20 @@
+@using OpenRpg.Items.TradeSkills.Templates
+
+<GenericTemplateEditor TTemplate="ItemCraftingTemplate" AssetCodePrefix="crafting" Template="Template">
+    <PrimaryDetailsContent>
+        <Accordion Title="Skill Details" IsExpanded="true">
+            <TradeSkillDetailsEditor IsGatheringSkill="true" TradeSkillData="context" />
+        </Accordion>
+        <Accordion Title="Input Item Details" IsExpanded="true">
+            <TradeSkillItemEntriesEditor TradeSkillItemEntries="context.InputItems" />
+        </Accordion>
+        <Accordion Title="Output Item Details" IsExpanded="true">
+            <TradeSkillItemEntriesEditor TradeSkillItemEntries="context.OutputItems" />
+        </Accordion>
+    </PrimaryDetailsContent>
+</GenericTemplateEditor>
+
+@code {
+    [Parameter]
+    public ItemCraftingTemplate Template { get; set; }
+}

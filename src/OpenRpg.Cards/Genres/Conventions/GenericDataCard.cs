@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using OpenRpg.Cards.Variables;
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
-using OpenRpg.Items;
+using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Cards.Genres.Conventions
 {
@@ -20,7 +19,7 @@ namespace OpenRpg.Cards.Genres.Conventions
 
         public virtual string NameLocaleId => Data.NameLocaleId;
         public virtual string DescriptionLocaleId => Data.DescriptionLocaleId;
-        public abstract IReadOnlyCollection<Effect> Effects { get; }
+        public abstract IReadOnlyCollection<IEffect> Effects { get; }
         
     }
 }

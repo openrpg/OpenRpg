@@ -1,0 +1,18 @@
+﻿<div class="container">
+    @ChildContent
+</div>
+<div class="field is-grouped">
+    <div class="control">
+        <button class="button is-link is-light" @onclick="Close">Close</button>
+    </div>
+</div>
+
+@functions {
+    [Parameter] 
+    public RenderFragment ChildContent { get; set; }
+    
+    [Parameter] 
+    public EventCallback OnClosed{ get; set; }
+
+    public void Close() => OnClosed.InvokeAsync();
+}

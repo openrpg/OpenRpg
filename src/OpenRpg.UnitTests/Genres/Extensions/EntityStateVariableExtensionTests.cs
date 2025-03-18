@@ -1,7 +1,7 @@
 using System;
 using OpenRpg.Combat.Attacks;
 using OpenRpg.Combat.Processors.Attacks;
-using OpenRpg.Core.State.Variables;
+using OpenRpg.Entities.State.Variables;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Types;
 using Xunit;

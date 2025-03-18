@@ -1,4 +1,5 @@
 using OpenRpg.Core.Requirements;
+using OpenRpg.Entities.Requirements;
 
 namespace OpenRpg.AdviceEngine.Applicators
 {

@@ -2,6 +2,7 @@ using Moq;
 using OpenRpg.Core.Utils;
 using OpenRpg.Genres.Fantasy.Builders;
 using OpenRpg.Genres.Fantasy.Types;
+using OpenRpg.Genres.Populators.Entity;
 using OpenRpg.Items.Extensions;
 using Xunit;
 
@@ -13,7 +14,8 @@ namespace OpenRpg.UnitTests.Genres.Fantasy
         public void should_correctly_setup_slots_for_mapping_when_has_equipment()
         {
             var mockRandomizer = new Mock<IRandomizer>();
-            var characterBuilder = new FantasyCharacterBuilder(mockRandomizer.Object);
+            var mockCharacterPopulator = new Mock<ICharacterPopulator>();
+            var characterBuilder = new FantasyCharacterBuilder(mockRandomizer.Object, mockCharacterPopulator.Object);
 
             var character = characterBuilder.CreateNew().Build();
             

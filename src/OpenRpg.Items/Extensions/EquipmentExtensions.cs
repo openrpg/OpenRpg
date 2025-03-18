@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using OpenRpg.Core.Effects;
 using OpenRpg.Core.Templates;
+using OpenRpg.Entities.Effects;
 using OpenRpg.Items.Equippables;
 using OpenRpg.Items.Equippables.Slots;
 using OpenRpg.Items.Templates;
@@ -42,13 +42,6 @@ namespace OpenRpg.Items.Extensions
             if(slotValidator.CanEquipItemType(slotType, template.ItemType)) { return false; }
             equipment.Slots[slotType] = itemData;
             return true;
-        }
-        
-        public static IEnumerable<Effect> GetEffects(this Equipment equipment, ITemplateAccessor templateAccessor)
-        {
-            return equipment.Slots.Values
-                .Where(x => x != null)
-                .SelectMany(x => x.GetItemEffects(templateAccessor.GetItemTemplate(x.TemplateId)));
         }
     }
 }

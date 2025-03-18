@@ -1,4 +1,4 @@
-@using OpenRpg.Core.Stats.Variables
+@using OpenRpg.Entities.Stats.Variables
 @using OpenRpg.Genres.Extensions
 @using OpenRpg.Genres.Fantasy.Extensions
 
@@ -7,34 +7,34 @@
     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Core Stats</h4>
     <div class="columns">
         <div class="column">
-            <TagLabel Label="Str" Content="@Stats.Strength().ToString()" ContentTagType="is-success"></TagLabel>
+            <TagLabel Label="Str" Content="@Stats.Strength().ToString("0")" ContentTagType="is-success"></TagLabel>
         </div>
         <div class="column">
-            <TagLabel Label="Dex" Content="@Stats.Dexterity().ToString()" ContentTagType="is-success"></TagLabel>
+            <TagLabel Label="Dex" Content="@Stats.Dexterity().ToString("0")" ContentTagType="is-success"></TagLabel>
         </div>
         <div class="column">
-            <TagLabel Label="Int" Content="@Stats.Intelligence().ToString()" ContentTagType="is-success"></TagLabel>
+            <TagLabel Label="Int" Content="@Stats.Intelligence().ToString("0")" ContentTagType="is-success"></TagLabel>
         </div>
         <div class="column">
-            <TagLabel Label="Wis" Content="@Stats.Wisdom().ToString()" ContentTagType="is-success"></TagLabel>
+            <TagLabel Label="Wis" Content="@Stats.Wisdom().ToString("0")" ContentTagType="is-success"></TagLabel>
         </div>
         <div class="column">
-            <TagLabel Label="Cha" Content="@Stats.Charisma().ToString()" ContentTagType="is-success"></TagLabel>
+            <TagLabel Label="Cha" Content="@Stats.Charisma().ToString("0")" ContentTagType="is-success"></TagLabel>
         </div>
     </div>
     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Combat Stats</h4>
     <div class="columns">
         <div class="column">
-            <TagLabel Label="P.Dmg" Content="@Stats.Damage().ToString()" ContentTagType="is-danger"></TagLabel>
+            <TagLabel Label="P.Dmg" Content="@Stats.Damage().ToString("0")" ContentTagType="is-danger"></TagLabel>
         </div>
         <div class="column">
-            <TagLabel Label="P.Def" Content="@Stats.Damage().ToString()" ContentTagType="is-link"></TagLabel>
+            <TagLabel Label="P.Def" Content="@Stats.Damage().ToString("0")" ContentTagType="is-link"></TagLabel>
         </div>
         <div class="column">
-            <TagLabel Label="M.Dmg" Content="@Stats.DarkDamage().ToString()" ContentTagType="is-danger"></TagLabel>
+            <TagLabel Label="M.Dmg" Content="@Stats.DarkDamage().ToString("0")" ContentTagType="is-danger"></TagLabel>
         </div>
         <div class="column">
-            <TagLabel Label="M.Def" Content="@Stats.DarkDefense().ToString()" ContentTagType="is-link"></TagLabel>
+            <TagLabel Label="M.Def" Content="@Stats.DarkDefense().ToString("0")" ContentTagType="is-link"></TagLabel>
         </div>
     </div>
 }

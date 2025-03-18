@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using OpenRpg.Core.Variables;
-using OpenRpg.Core.Variables.General;
 
 namespace OpenRpg.Core.Extensions
 {

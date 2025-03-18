@@ -13,7 +13,7 @@ public class ActiveEffectExtensionsTests
     [InlineData(-1, false)]
     public void should_correctly_indicate_if_effect_is_passive(int effectFrequency, bool shouldBePassive)
     {
-        var dummyTimedEffect = new TimedEffect() { Frequency = effectFrequency };
+        var dummyTimedEffect = new TimedStaticEffect() { Frequency = effectFrequency };
         var dummyActiveEffect = new ActiveEffect(dummyTimedEffect);
         
         Assert.Equal(shouldBePassive, dummyActiveEffect.IsPassiveEffect());
@@ -26,7 +26,7 @@ public class ActiveEffectExtensionsTests
     [InlineData(10, 5, 50)]
     public void should_correctly_get_stacked_potency(int potency, int stacks, int expectedPotency)
     {
-        var dummyTimedEffect = new TimedEffect() { Potency = potency, MaxStack = stacks };
+        var dummyTimedEffect = new TimedStaticEffect() { Potency = potency, MaxStack = stacks };
         var dummyActiveEffect = new ActiveEffect(dummyTimedEffect) { Stacks = stacks };
         var actualPotency = dummyActiveEffect.GetStackedPotency();
         Assert.Equal(expectedPotency, actualPotency);
@@ -39,7 +39,7 @@ public class ActiveEffectExtensionsTests
     [InlineData(1.5, 4, 2)]
     public void should_correctly_get_total_ticks(float frequency, float activeTime, int expectedTicks)
     {
-        var dummyTimedEffect = new TimedEffect() { Frequency = frequency};
+        var dummyTimedEffect = new TimedStaticEffect() { Frequency = frequency};
         var dummyActiveEffect = new ActiveEffect(dummyTimedEffect) { ActiveTime = activeTime };
         var actualTicks = dummyActiveEffect.TicksSoFar();
         Assert.Equal(expectedTicks, actualTicks);

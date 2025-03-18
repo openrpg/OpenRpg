@@ -62,35 +62,13 @@
 <br/>
 
 <Markdown>
-   ## General Data Persistence
-   So while we are discussing persistence its worth saying that in most cases you want to create an object which encapsulates
-   the key aspects of a character. In the above example where we dumped everything its a massive waste as we are saving race,
-   class, effect, stat data as well as potentially other guff in real world scenarios.
-   
-   So it is best to create a separate model which would contain the key bits we care about:
-   
-   ```csharp
-   public class PersistedCharacter
-   {
-      public string NameLocaleId { get; set; }        // These may not ACTUALLY be locale ids if you let players name the character
-      public string DescriptionLocaleId { get; set; }
-      public int RaceId { get; set; }
-      public int ClassLevels { get; set; }
-      public int ClassId { get; set; }
-      public int Health { get; set; }  
-      public int Magic { get; set; }
-      // Maybe custom effects if you do not generate them each time on char creation 
-   }
-   ```
-   
-   The main thing to look at above is that the Race, Class are stored as Ids so they can be used to lookup the race/class
-   data when the save is loaded, this way your save files are lightweight and do not contain any data that can be regenerated.
-   
-   Also with this approach we solve the previous v1.0 -> v1.1 problem, as we would load up the `PersistedCharacter` then
-   use those details to build back up the `AutoStatsCharacter` and we can regenerate the stats, which would give us our
-   new improved MaxHp then we just manually overwrite the `character.Stats.Health(persistedCharacter.Health)` etc.
-   
-   > We will touch more on persistence in a later section as there are some existing models to help with this scenario
+   ## Separating Template / Instance data for persistence
+   While we are on this subject we have two high level types which encapsulate static and runtime/dynamic data, these are
+   the `ITemplate` and `ITemplateData` interfaces. The `ITemplate` data is often part of the game and describes all the things
+   that can be in the game. Then the `ITemplateData` tracks the runtime instances of the templates, for example you would only
+   have 1 `Longsword` template, but you may have 100 instances of Longswords in your game.
+
+   > There is a much larger blurb about `Template` data in the docs which is well worth a read for a deeper dive on the topic.
 </Markdown>
 
 @code {
