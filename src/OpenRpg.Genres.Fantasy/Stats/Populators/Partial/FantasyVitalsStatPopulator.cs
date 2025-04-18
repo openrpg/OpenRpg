@@ -23,6 +23,9 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators.Partial
             var intelligenceBonus = stats.Intelligence() * 5;
             var maxMagic = (int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.MagicBonusAmount, FantasyEffectTypes.MagicBonusPercentage, intelligenceBonus);
             stats.MaxMagic(maxMagic);
+            
+            stats.HealthRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.HealthRegenBonusAmount, FantasyEffectTypes.HealthRegenBonusPercentage));
+            stats.MagicRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.MagicRegenBonusAmount, FantasyEffectTypes.MagicRegenBonusPercentage));
         }
     }
 }

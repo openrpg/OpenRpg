@@ -21,6 +21,9 @@ namespace OpenRpg.Genres.Fantasy.Extensions
         public static void MaxMagic(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.MaxMagic] = value;
         public static int MaxMagic(this EntityStatsVariables stats) => (int)stats.Get(FantasyEntityStatsVariableTypes.MaxMagic);
         
+        public static void MagicRegen(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.MagicRegen] = value;
+        public static float MagicRegen(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.MagicRegen);
+        
         public static float IceDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.IceDamage);
         public static float FireDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.FireDamage);
         public static float WindDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.WindDamage);

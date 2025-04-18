@@ -3,6 +3,7 @@ using OpenRpg.Entities.Entity.Populators.Stats;
 using OpenRpg.Entities.Stats.Populators;
 using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Fantasy.Stats.Populators.Partial;
+using OpenRpg.Genres.Populators.Entity.Stats;
 
 namespace OpenRpg.Genres.Fantasy.Stats.Populators
 {
@@ -16,6 +17,7 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators
                 new FantasyVitalsStatPopulator(),
                 new FantasyMeleeStatPopulator(),
                 new FantasyElementalStatPopulator(),
+                new AbilityStatPopulator(),
             };
 
             if (additionalStatPopulators != null)
