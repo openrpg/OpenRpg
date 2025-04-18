@@ -2,6 +2,7 @@ using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Templates.Variables;
 using OpenRpg.Entities.Procedural;
 using OpenRpg.Entities.Types;
+using OpenRpg.Tags;
 
 namespace OpenRpg.Entities.Extensions
 {
@@ -24,5 +25,9 @@ namespace OpenRpg.Entities.Extensions
         
         public static void AssetCode(this ITemplateVariables vars, string assetCode) 
             => vars[CoreTemplateVariableTypes.AssetCode] = assetCode;
+        
+        public static string Tags(this ITemplateVariables variables) => (string)variables[CoreTemplateVariableTypes.Tags];
+        public static void Tags(this ITemplateVariables variables, TagList tags) => variables[CoreTemplateVariableTypes.Tags] = tags;
+
     }
 }

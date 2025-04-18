@@ -10,5 +10,8 @@ namespace OpenRpg.Entities.Types
         
         // For adding the notion of procedural effects 
         public static int ProceduralEffects = 5001;
+        
+        // For adding the notion of tags
+        public static int Tags = 5002;
     }
 }

@@ -1,6 +1,6 @@
-@using OpenRpg.Core.Variables
-@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Core.Templates.Variables
 @using OpenRpg.Editor.Infrastructure.Variables
+@using OpenRpg.Entities.Extensions
 
 <div class="field is-horizontal">
     <div class="field-label">
@@ -18,7 +18,7 @@
 
 @code {
     [Parameter] 
-    public IVariables<object> Variables { get; set; }
+    public ITemplateVariables Variables { get; set; }
 
     [Parameter]
     public string DefaultAssetCode { get; set; } = string.Empty;
