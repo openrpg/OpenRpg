@@ -19,9 +19,9 @@ namespace OpenRpg.Genres.Fantasy.Types
         public static readonly int StrengthBonusAmount = 73;
         public static readonly int ConstitutionBonusAmount = 74;
         public static readonly int CharismaBonusAmount = 75;
-        public static readonly int HealthBonusAmount = 76;
+        public static readonly int MagicRegenBonusAmount = 76;
+        public static readonly int MagicRegenBonusPercentage = 78;
         public static readonly int MagicBonusAmount = 77;
-        public static readonly int HealthRestoreAmount = 78;
         public static readonly int MagicRestoreAmount = 79;
         public static readonly int ExperienceRestoreAmount = 80;
         

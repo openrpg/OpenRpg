@@ -8,12 +8,12 @@ using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Cards.Genres
 {
-    public class AbilityCard : GenericDataCard<Ability>
+    public class AbilityCard : GenericDataCard<AbilityTemplate>
     {
         public override int CardType => CardTypes.AbilityCard;
         public override IReadOnlyCollection<IEffect> Effects { get; } = Array.Empty<IEffect>();
 
-        public AbilityCard(Ability ability) : base(ability)
+        public AbilityCard(AbilityTemplate ability) : base(ability)
         {}
     }
 }
