@@ -1,15 +1,18 @@
+using System;
 using System.Collections.Generic;
 
 namespace OpenRpg.Combat.Attacks
 {
     public class Attack
     {
-        public ICollection<Damage> Damages { get; set; } = new List<Damage>(); 
+        public bool IsCritical { get; set; }
+        public IReadOnlyList<Damage> Damages { get; set; } = Array.Empty<Damage>(); 
 
         public Attack(){}
-        public Attack(ICollection<Damage> damages)
+        public Attack(IReadOnlyList<Damage> damages, bool isCritical = false)
         {
             Damages = damages;
+            IsCritical = isCritical;
         }
     }
 }

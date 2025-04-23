@@ -42,7 +42,7 @@ namespace OpenRpg.Genres.Scifi.Extensions
             return 0;
         }
         
-        public static float GetDefenseFromDamageType(this EntityStatsVariables stats, int damageType)
+        public static float GetDefenseFromDamageType(this ShipStatsVariables stats, int damageType)
         {
             if (damageType == ScifiDamageTypes.Ballistic) { return stats.BallisticDamage(); }
             if (damageType == ScifiDamageTypes.Explosive) { return stats.ExplosiveDamage(); }
@@ -52,7 +52,7 @@ namespace OpenRpg.Genres.Scifi.Extensions
             return 0;
         }
 
-        public static float GetDamageFor(this EntityStatsVariables stats, int effectType)
+        public static float GetDamageFor(this ShipStatsVariables stats, int effectType)
         {
             if (effectType == ScifiEffectTypes.BallisticDamageAmount) { return stats.BallisticDamage(); }
             if (effectType == ScifiEffectTypes.ExplosiveDamageAmount) { return stats.ExplosiveDamage(); }
