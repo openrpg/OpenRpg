@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Fantasy.Types;
 
@@ -23,7 +24,9 @@ namespace OpenRpg.Genres.Fantasy.Extensions
         
         public static void ManaRegen(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.ManaRegen] = value;
         public static float ManaRegen(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.ManaRegen);
-        
+        public static float ManaRegenRate(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.ManaRegenRate);
+        public static void ManaRegenRate(this EntityStatsVariables stats, float regenRate) => stats[FantasyEntityStatsVariableTypes.ManaRegenRate] = regenRate;
+
         public static float IceDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.IceDamage);
         public static float FireDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.FireDamage);
         public static float WindDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.WindDamage);

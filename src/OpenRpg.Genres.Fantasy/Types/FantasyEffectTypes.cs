@@ -31,7 +31,8 @@ namespace OpenRpg.Genres.Fantasy.Types
         public static readonly int ManaBonusPercentage = 235;
         public static readonly int ManaRestoreAmount = 236;
         public static readonly int ManaRestorePercentage = 237;
-        
+        public static readonly int ManaRegenRateBonusAmount = 238;
+        public static readonly int ManaRegenRateBonusPercentage = 239;
 
         // Melee Damage (Damage Types)
         public static readonly int SlashingDamageAmount = 260;

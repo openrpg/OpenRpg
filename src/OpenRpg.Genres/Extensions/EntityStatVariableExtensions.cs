@@ -33,10 +33,14 @@ namespace OpenRpg.Genres.Extensions
         
         public static float HealthRegen(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.HealthRegen, 0);
         public static void HealthRegen(this EntityStatsVariables stats, float staminaRegen) => stats[GenreEntityStatsVariableTypes.HealthRegen] = staminaRegen;
-        
         public static float StaminaRegen(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.StaminaRegen, 0);
         public static void StaminaRegen(this EntityStatsVariables stats, float staminaRegen) => stats[GenreEntityStatsVariableTypes.StaminaRegen] = staminaRegen;
         
+        public static float HealthRegenRate(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.HealthRegenRate, 0);
+        public static void HealthRegenRate(this EntityStatsVariables stats, float regenRate) => stats[GenreEntityStatsVariableTypes.HealthRegenRate] = regenRate;
+        public static float StaminaRegenRate(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.StaminaRegenRate, 0);
+        public static void StaminaRegenRate(this EntityStatsVariables stats, float regenRate) => stats[GenreEntityStatsVariableTypes.StaminaRegenRate] = regenRate;
+
         public static float MovementSpeed(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.MovementSpeed, 0);
         public static void MovementSpeed(this EntityStatsVariables stats, float movementSpeed) => stats[GenreEntityStatsVariableTypes.MovementSpeed] = movementSpeed;
     }
