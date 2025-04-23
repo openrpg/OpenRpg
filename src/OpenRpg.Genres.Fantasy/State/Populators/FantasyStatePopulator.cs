@@ -20,6 +20,7 @@ namespace OpenRpg.Genres.Fantasy.State.Populators
 
             var entityStats = statsVars as EntityStatsVariables;
             state.Health(entityStats.MaxHealth());
+            state.Stamina(entityStats.MaxStamina());
             state.Mana(entityStats.MaxMana());
         }
     }

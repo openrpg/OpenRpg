@@ -85,6 +85,9 @@ namespace OpenRpg.Genres.Requirements
             if(requirement.RequirementType == GenreRequirementTypes.MaxHealthRequirement)
             { return character.Stats.MaxHealth() >= requirement.Association.AssociatedValue; }
             
+            if(requirement.RequirementType == GenreRequirementTypes.MaxStaminaRequirement)
+            { return character.Stats.MaxStamina() >= requirement.Association.AssociatedValue; }
+            
             return true;
         }
 

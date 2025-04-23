@@ -20,12 +20,16 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators.Partial
             var maxHealth = (int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.HealthBonusAmount, FantasyEffectTypes.HealthBonusPercentage, constitutionBonus);
             stats.MaxHealth(maxHealth);
             
+            var maxStamina = (int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.StaminaBonusAmount, FantasyEffectTypes.StaminaBonusPercentage, constitutionBonus);
+            stats.MaxStamina(maxStamina);
+            
             var intelligenceBonus = stats.Intelligence() * 5;
             var maxMana = (int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.ManaBonusAmount, FantasyEffectTypes.ManaBonusPercentage, intelligenceBonus);
             stats.MaxMana(maxMana);
             
             stats.HealthRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.HealthRegenBonusAmount, FantasyEffectTypes.HealthRegenBonusPercentage));
             stats.ManaRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.ManaRegenBonusAmount, FantasyEffectTypes.ManaRegenBonusPercentage));
+            stats.StaminaRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.StaminaRegenBonusAmount, FantasyEffectTypes.StaminaRegenBonusPercentage));
         }
     }
 }

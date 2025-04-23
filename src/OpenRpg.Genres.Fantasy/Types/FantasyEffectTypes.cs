@@ -37,6 +37,8 @@ namespace OpenRpg.Genres.Fantasy.Types
         public static readonly int ManaBonusPercentage = 98;
         public static readonly int ManaRestorePercentage = 99;
         public static readonly int ExperienceRestorePercentage = 100;
+        public static readonly int StaminaBonusPercentage = 101;
+        public static readonly int StaminaRestorePercentage = 102;
 
         // Melee Damage (Damage Types)
         public static readonly int SlashingDamageAmount = 110;
