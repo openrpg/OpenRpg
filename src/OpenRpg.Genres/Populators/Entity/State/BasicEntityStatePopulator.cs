@@ -19,6 +19,7 @@ namespace OpenRpg.Genres.Populators.Entity.State
 
             var entityStats = statsVars as EntityStatsVariables;
             varsToPopulate.Health(entityStats.MaxHealth());
+            varsToPopulate.Stamina(entityStats.MaxStamina());
         }
     }
 }

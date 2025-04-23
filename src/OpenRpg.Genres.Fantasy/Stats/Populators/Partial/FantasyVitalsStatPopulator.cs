@@ -30,6 +30,8 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators.Partial
             stats.HealthRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.HealthRegenBonusAmount, FantasyEffectTypes.HealthRegenBonusPercentage));
             stats.ManaRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.ManaRegenBonusAmount, FantasyEffectTypes.ManaRegenBonusPercentage));
             stats.StaminaRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.StaminaRegenBonusAmount, FantasyEffectTypes.StaminaRegenBonusPercentage));
+            
+            stats.MovementSpeed(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.MovementSpeedBonusAmount, FantasyEffectTypes.MovementSpeedBonusPercentage));
         }
     }
 }

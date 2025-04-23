@@ -36,5 +36,8 @@ namespace OpenRpg.Genres.Extensions
         
         public static float StaminaRegen(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.StaminaRegen, 0);
         public static void StaminaRegen(this EntityStatsVariables stats, float staminaRegen) => stats[GenreEntityStatsVariableTypes.StaminaRegen] = staminaRegen;
+        
+        public static float MovementSpeed(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.MovementSpeed, 0);
+        public static void MovementSpeed(this EntityStatsVariables stats, float movementSpeed) => stats[GenreEntityStatsVariableTypes.MovementSpeed] = movementSpeed;
     }
 }

@@ -9,6 +9,7 @@ namespace OpenRpg.Genres.Types
         public static readonly int HealthRegen = 2;
         public static readonly int MaxStamina = 3;
         public static readonly int StaminaRegen = 4;
+        public static readonly int MovementSpeed = 5;
         
         // Attack stats
         public static readonly int Damage = 10;

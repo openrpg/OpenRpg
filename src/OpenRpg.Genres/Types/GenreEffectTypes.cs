@@ -16,11 +16,13 @@ namespace OpenRpg.Genres.Types
         public static readonly int DefenseBonusAmount = 21;
         public static readonly int DefenseBonusPercentage = 22;
         
-        // Attributes / Experience
+        // Attributes / Other
         public static readonly int AllAttributeBonusAmount = 40;
         public static readonly int AllAttributeBonusPercentage = 41;
-        public static readonly int ExperienceRestorePercentage = 42;
-        public static readonly int ExperienceRestoreAmount = 43;
+        public static readonly int ExperienceRestoreAmount = 42;
+        public static readonly int ExperienceRestorePercentage = 43;
+        public static readonly int MovementSpeedBonusAmount = 44;
+        public static readonly int MovementSpeedBonusPercentage = 45;
         
         // Vitals
         public static readonly int HealthBonusAmount = 60;

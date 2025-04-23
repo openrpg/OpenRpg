@@ -18,5 +18,11 @@ namespace OpenRpg.Genres.Extensions
             if (entity.Variables.HasEquipment()) { effects.AddRange(entity.Variables.Equipment().GetEffects(templateAccessor)); }
             return effects;
         }
+        
+        public static float GetHealthPercentage(this Entity entity)
+        { return (float)entity.State.Health() / entity.Stats.MaxHealth(); }
+        
+        public static float GetStaminaPercentage(this Entity entity)
+        { return (float)entity.State.Stamina() / entity.Stats.MaxStamina(); }
     }
 }

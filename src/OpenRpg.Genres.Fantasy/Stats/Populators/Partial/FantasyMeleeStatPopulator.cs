@@ -5,9 +5,11 @@ using OpenRpg.Core.Variables;
 using OpenRpg.Entities.Effects.Processors;
 using OpenRpg.Entities.Entity.Populators.Stats;
 using OpenRpg.Entities.Stats.Variables;
+using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Effects;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
+using OpenRpg.Genres.Types;
 
 namespace OpenRpg.Genres.Fantasy.Stats.Populators.Partial
 {
@@ -37,7 +39,6 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators.Partial
             stats.PiercingDefense(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.PiercingDefenseRelationship, piercingModifier));
             stats.SlashingDefense(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.SlashingDefenseRelationship, slashingOrUnarmedModifier));
             stats.UnarmedDefense(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.UnarmedDefenseRelationship, slashingOrUnarmedModifier));
-
         }
     }
 }

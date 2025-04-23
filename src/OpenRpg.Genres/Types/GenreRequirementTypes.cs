@@ -15,6 +15,7 @@ namespace OpenRpg.Genres.Types
         public static readonly int MaxHealthRequirement = 10;
         public static readonly int TradeSkillRequirement = 11;
         public static readonly int MaxStaminaRequirement = 12;
+        public static readonly int MovementSpeedRequirement = 13;
 
     }
 }
