@@ -16,5 +16,15 @@ namespace OpenRpg.Core.Utils
         
         public static implicit operator RangeF(Range range)
         { return new RangeF(range.Min, range.Max); }
+        
+        public static RangeF operator +(RangeF a, RangeF b) => new RangeF(a.Min + b.Min, a.Max + b.Max);
+        public static RangeF operator -(RangeF a, RangeF b) => new RangeF(a.Min - b.Min, a.Max - b.Max);
+        public static RangeF operator *(RangeF a, RangeF b) => new RangeF(a.Min * b.Min, a.Max * b.Max);
+        public static RangeF operator /(RangeF a, RangeF b) => new RangeF(a.Min / b.Min, a.Max / b.Max);
+        
+        public static RangeF operator +(RangeF a, float b) => new RangeF(a.Min + b, a.Max + b);
+        public static RangeF operator -(RangeF a, float b) => new RangeF(a.Min - b, a.Max - b);
+        public static RangeF operator *(RangeF a, float b) => new RangeF(a.Min * b, a.Max * b);
+        public static RangeF operator /(RangeF a, float b) => new RangeF(a.Min / b, a.Max / b);
     }
 }
