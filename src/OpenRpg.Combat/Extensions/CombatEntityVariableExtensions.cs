@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Effects;
 using OpenRpg.Combat.Types;
 using OpenRpg.Entities.Entity.Variables;

@@ -30,7 +30,7 @@ namespace OpenRpg.Demos.Infrastructure.DI
             services.AddSingleton<IEntityStatPopulator>(new FantasyStatsPopulator([new DamageStatPopulator(), new DefenseStatPopulator()]));
             services.AddSingleton<IEntityStatePopulator, FantasyStatePopulator>();
             services.AddSingleton<IRandomizer>(x => new DefaultRandomizer(new Random()));
-            services.AddSingleton<IEntityAttackGenerator, BasicAttackGenerator>();
+            services.AddSingleton<IEntityAttackGenerator, FantasyAttackGenerator>();
             services.AddSingleton<IAttackProcessor<EntityStatsVariables>, DefaultAttackProcessor>();
             services.AddSingleton<ICharacterRequirementChecker, DefaultFantasyCharacterRequirementChecker>();
             services.AddSingleton<ICharacterEffectProcessor, CharacterEffectProcessor>();
