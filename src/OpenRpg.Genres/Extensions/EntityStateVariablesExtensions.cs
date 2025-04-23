@@ -12,6 +12,9 @@ namespace OpenRpg.Genres.Extensions
         public static int Health(this EntityStateVariables state) => (int)state.Get(GenreEntityStateVariableTypes.Health);
         public static void Health(this EntityStateVariables state, int value) => state[GenreEntityStateVariableTypes.Health] = value;
         
+        public static int Stamina(this EntityStateVariables state) => (int)state.Get(GenreEntityStateVariableTypes.Stamina);
+        public static void Stamina(this EntityStateVariables state, int value) => state[GenreEntityStateVariableTypes.Stamina] = value;
+        
         public static void AddHealth(this EntityStateVariables state, int change, int? maxHealth = null)
         {
             var newValue = state.Health() + change;
@@ -32,6 +35,28 @@ namespace OpenRpg.Genres.Extensions
             { state.Health(newValue); }
             else
             { state.AddValue(GenreEntityStateVariableTypes.Health, newValue, 0, maxHealth.Value); }
+        }
+        
+        public static void AddStamina(this EntityStateVariables state, int change, int? maxStamina = null)
+        {
+            var newValue = state.Health() + change;
+            if(newValue <= 0) { newValue = 0; }
+            
+            if(maxStamina == null) 
+            { state.Stamina(newValue); }
+            else 
+            { state.AddValue(GenreEntityStateVariableTypes.Stamina, newValue, 0, maxStamina.Value); }
+        }
+
+        public static void DeductStamina(this EntityStateVariables state, int change, int? maxStamina = null)
+        {
+            var newValue = state.Health() - change;
+            if(newValue <= 0) { newValue = 0; }
+
+            if (maxStamina == null)
+            { state.Stamina(newValue); }
+            else
+            { state.AddValue(GenreEntityStateVariableTypes.Health, newValue, 0, maxStamina.Value); }
         }
         
         public static void ApplyDamageToTarget(this EntityStateVariables state, ProcessedAttack attack)

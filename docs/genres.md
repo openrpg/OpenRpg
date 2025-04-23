@@ -9,7 +9,7 @@ The `Genres` project is a layering/contractual approach that allows you to expre
 You maybe don't, but if we take a step back and think about more RPG games, there are some common themes/settings/mechanics at play, for example if is list some common `Fantasy` themes:
 - They often have some form of *Human*, *Dwarf*, *Elf* `Races`
 - They often have some form of *Fighter*, *Rogue*, *Mage* `Classes`
-- They often have the notion of `Health` and `Magic`
+- They often have the notion of `Health` and `Mana`
 - They often have different kinds of `Damage` like *Blunt*, *Fire*, *Wind*, *Piercing*
 - You can often equip *weapons*, *chest/leg/shoulder/hand* items
 - You can often modify your equipment with *runes/gems/enchantments*
@@ -31,9 +31,9 @@ The other **REALLY IMPORTANT** thing it provides is a contract so everyone using
 
 As mentioned above this provides some out the box functionality and type data for common Fantasy themes, so at a high level things like:
 - Fantasy Stat Types (Strength, Dexterity etc)
-- Fantasy State Types (Health, Magic)
+- Fantasy State Types (Health, Mana)
 - Fantasy Damage/Defense Types (Fire, Ice, Wind, Slash, Blunt etc)
-- Fantasy Effect Types (Strength Bonus Amount/Percentage, Magic Restore Speed etc)
+- Fantasy Effect Types (Strength Bonus Amount/Percentage, Mana Restore Speed etc)
 
 > There is so much more and its recommended you check over the classes in the `Types`, `Extensions` namespaces for exact additions this library provides.
 

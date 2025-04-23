@@ -8,6 +8,6 @@ namespace OpenRpg.Genres.Fantasy.Types
         public static readonly int IntelligenceRequirement = 53;
         public static readonly int WisdomRequirement = 54;
         public static readonly int CharismaRequirement = 55;
-        public static readonly int MaxMagicRequirement = 56;
+        public static readonly int MaxManaRequirement = 56;
     }
 }

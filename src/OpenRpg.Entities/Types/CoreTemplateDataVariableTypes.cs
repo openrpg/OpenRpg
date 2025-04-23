@@ -9,6 +9,6 @@ namespace OpenRpg.Entities.Types
         public static int Level = 5001;
         
         // For adding the procedural associations
-        public static int ProceduralAssociations = 5001;
+        public static int ProceduralAssociations = 5002;
     }
 }

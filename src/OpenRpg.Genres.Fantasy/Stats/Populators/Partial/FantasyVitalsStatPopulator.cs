@@ -20,12 +20,18 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators.Partial
             var maxHealth = (int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.HealthBonusAmount, FantasyEffectTypes.HealthBonusPercentage, constitutionBonus);
             stats.MaxHealth(maxHealth);
             
+            var maxStamina = (int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.StaminaBonusAmount, FantasyEffectTypes.StaminaBonusPercentage, constitutionBonus);
+            stats.MaxStamina(maxStamina);
+            
             var intelligenceBonus = stats.Intelligence() * 5;
-            var maxMagic = (int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.MagicBonusAmount, FantasyEffectTypes.MagicBonusPercentage, intelligenceBonus);
-            stats.MaxMagic(maxMagic);
+            var maxMana = (int)computedEffects.CalculateTotalValueFor(FantasyEffectTypes.ManaBonusAmount, FantasyEffectTypes.ManaBonusPercentage, intelligenceBonus);
+            stats.MaxMana(maxMana);
             
             stats.HealthRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.HealthRegenBonusAmount, FantasyEffectTypes.HealthRegenBonusPercentage));
-            stats.MagicRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.MagicRegenBonusAmount, FantasyEffectTypes.MagicRegenBonusPercentage));
+            stats.ManaRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.ManaRegenBonusAmount, FantasyEffectTypes.ManaRegenBonusPercentage));
+            stats.StaminaRegen(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.StaminaRegenBonusAmount, FantasyEffectTypes.StaminaRegenBonusPercentage));
+            
+            stats.MovementSpeed(computedEffects.CalculateTotalValueFor(FantasyEffectTypes.MovementSpeedBonusAmount, FantasyEffectTypes.MovementSpeedBonusPercentage));
         }
     }
 }

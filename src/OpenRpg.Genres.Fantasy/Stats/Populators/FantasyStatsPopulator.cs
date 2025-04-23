@@ -18,6 +18,7 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators
                 new FantasyMeleeStatPopulator(),
                 new FantasyElementalStatPopulator(),
                 new AbilityStatPopulator(),
+                new CriticalStatPopulator()
             };
 
             if (additionalStatPopulators != null)

@@ -31,7 +31,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 new StaticEffect {Potency = 1, EffectType = FantasyEffectTypes.DarkDamageAmount},
                 new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DarkDefenseAmount},
                 new StaticEffect {Potency = 80, EffectType = FantasyEffectTypes.HealthBonusAmount},
-                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.MagicBonusAmount}
+                new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.ManaBonusAmount}
             };
 
             var raceTemplate = new RaceTemplate
@@ -60,7 +60,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DarkDamageAmount},
                 new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.DarkDefenseAmount},
                 new StaticEffect {Potency = 70, EffectType = FantasyEffectTypes.HealthBonusAmount},
-                new StaticEffect {Potency = 30, EffectType = FantasyEffectTypes.MagicBonusAmount}
+                new StaticEffect {Potency = 30, EffectType = FantasyEffectTypes.ManaBonusAmount}
             };
 
             var raceTemplate = new RaceTemplate

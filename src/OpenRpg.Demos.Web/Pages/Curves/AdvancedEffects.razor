@@ -36,7 +36,7 @@
    So far everything you have been touching on uses the `StaticEffect` behind the scenes which expresses an `EffectType`
    and a `Potency`, however the potency is a fixed value, so if its 10, its always going to be 10. For most use cases
    this is perfectly fine, however imagine if you were making a Souls-like game and you wanted to make a weapon whos
-   `Damage` stat scaled with your `Strength` stat, or if your `Necromancer` class got a `MaxMagic` boost at night time.
+   `Damage` stat scaled with your `Strength` stat, or if your `Necromancer` class got a `MaxMana` boost at night time.
    
    `ScaledEffects` let you achieve these sorts of use cases by replacing the static `Potency` with a `PotencyFunction` 
    that allows us to *compute* the effects potency based off other factors and plot it on a curve.

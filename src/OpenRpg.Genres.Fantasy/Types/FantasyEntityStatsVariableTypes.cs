@@ -2,8 +2,8 @@ namespace OpenRpg.Genres.Fantasy.Types
 {
     public interface FantasyEntityStatsVariableTypes : Genres.Types.GenreEntityStatsVariableTypes
     {
-        public static readonly int MaxMagic = 50;
-        public static readonly int MagicRegen = 51;
+        public static readonly int MaxMana = 50;
+        public static readonly int ManaRegen = 51;
         
         // Base stats
         public static readonly int Strength = 60;

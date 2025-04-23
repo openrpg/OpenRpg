@@ -49,7 +49,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 new StaticEffect {Potency = 4, EffectType = FantasyEffectTypes.IntelligenceBonusAmount},
                 new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.DarkDamageAmount},
                 new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.DarkDefenseAmount},
-                new StaticEffect {Potency = 30, EffectType = FantasyEffectTypes.MagicBonusAmount}
+                new StaticEffect {Potency = 30, EffectType = FantasyEffectTypes.ManaBonusAmount}
             };
 
             var classTemplate = new ClassTemplate

@@ -1,4 +1,5 @@
 using System.Linq;
+using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Requirements;
@@ -84,6 +85,18 @@ namespace OpenRpg.Genres.Requirements
 
             if(requirement.RequirementType == GenreRequirementTypes.MaxHealthRequirement)
             { return character.Stats.MaxHealth() >= requirement.Association.AssociatedValue; }
+            
+            if(requirement.RequirementType == GenreRequirementTypes.MaxStaminaRequirement)
+            { return character.Stats.MaxStamina() >= requirement.Association.AssociatedValue; }
+            
+            if(requirement.RequirementType == GenreRequirementTypes.MovementSpeedRequirement)
+            { return character.Stats.MovementSpeed() >= requirement.Association.AssociatedValue; }
+
+            if (requirement.RequirementType == GenreRequirementTypes.ActiveEffectRequirement)
+            {
+                if(!character.Variables.HasActiveEffects()) { return false; }
+                return character.Variables.ActiveEffects().HasEffect(requirement.Association.AssociatedId);
+            }
             
             return true;
         }
