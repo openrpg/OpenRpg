@@ -29,8 +29,8 @@ namespace OpenRpg.Genres.Fantasy.Requirements
             if(requirement.RequirementType == FantasyRequirementTypes.CharismaRequirement)
             { return character.Stats.Charisma() >= requirement.Association.AssociatedValue; }
             
-            if(requirement.RequirementType == FantasyRequirementTypes.MaxMagicRequirement)
-            { return character.Stats.MaxMagic() >= requirement.Association.AssociatedValue; }
+            if(requirement.RequirementType == FantasyRequirementTypes.MaxManaRequirement)
+            { return character.Stats.MaxMana() >= requirement.Association.AssociatedValue; }
 
             return base.IsRequirementMet(character, requirement);
         }

@@ -6,25 +6,25 @@ namespace OpenRpg.Genres.Fantasy.Extensions
 {
     public static class EntityStateVariableExtensions
     {
-        public static int Magic(this EntityStateVariables state) => (int)state.Get(FantasyEntityStateVariableTypes.Magic);
-        public static void Magic(this EntityStateVariables state, int value) => state[FantasyEntityStateVariableTypes.Magic] = value;
+        public static int Mana(this EntityStateVariables state) => (int)state.Get(FantasyEntityStateVariableTypes.Mana);
+        public static void Mana(this EntityStateVariables state, int value) => state[FantasyEntityStateVariableTypes.Mana] = value;
         
-        public static void AddMagic(this EntityStateVariables state, int change, int? maxMagic = null)
+        public static void AddMana(this EntityStateVariables state, int change, int? maxMana = null)
         {
-            var newValue = state.Magic() + change;
-            if (maxMagic.HasValue)
-            { state.AddValue(FantasyEntityStateVariableTypes.Magic, newValue, 0, maxMagic.Value); }
+            var newValue = state.Mana() + change;
+            if (maxMana.HasValue)
+            { state.AddValue(FantasyEntityStateVariableTypes.Mana, newValue, 0, maxMana.Value); }
             else
-            { state.Magic(newValue); }
+            { state.Mana(newValue); }
         }
 
-        public static void DeductMagic(this EntityStateVariables state, int change, int? maxMagic = null)
+        public static void DeductMana(this EntityStateVariables state, int change, int? maxMana = null)
         {
-            var newValue = state.Magic() - change;
-            if (maxMagic.HasValue)
-            { state.AddValue(FantasyEntityStateVariableTypes.Magic, newValue, 0, maxMagic.Value); }
+            var newValue = state.Mana() - change;
+            if (maxMana.HasValue)
+            { state.AddValue(FantasyEntityStateVariableTypes.Mana, newValue, 0, maxMana.Value); }
             else
-            { state.Magic(newValue); }
+            { state.Mana(newValue); }
         }
     }
 }

@@ -44,7 +44,7 @@
             var character = new DefaultEntity();
             
             character.Stats.MaxHealth(100);
-            character.Stats.MaxMagic(10);
+            character.Stats.MaxMana(10);
             character.Stats.Strength(11);
             character.Stats.Dexterity(12);
             character.Stats.Intelligence(12);
@@ -101,7 +101,7 @@
         new Effect {Potency = 1, EffectType = FantasyEffectTypes.DarkDamageAmount},
         new Effect {Potency = 5, EffectType = FantasyEffectTypes.DarkDefenseAmount},
         new Effect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount},
-        new Effect {Potency = 10, EffectType = FantasyEffectTypes.MagicBonusAmount}
+        new Effect {Potency = 10, EffectType = FantasyEffectTypes.ManaBonusAmount}
     };
 
     var classEffects = new[]
@@ -228,8 +228,8 @@
         ManualStatsExample.Stats = new EntityStatsVariables();
         ManualStatsExample.Stats.MaxHealth(100);
         ManualStatsExample.State.Health(50);
-        ManualStatsExample.Stats.MaxMagic(10);
-        ManualStatsExample.State.Magic(7);
+        ManualStatsExample.Stats.MaxMana(10);
+        ManualStatsExample.State.Mana(7);
 
         ManualStatsExample.Stats.Strength(11);
         ManualStatsExample.Stats.Dexterity(12);
@@ -259,7 +259,7 @@
           new StaticEffect {Potency = 1, EffectType = FantasyEffectTypes.DarkDamageAmount},
           new StaticEffect {Potency = 5, EffectType = FantasyEffectTypes.DarkDefenseAmount},
           new StaticEffect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount},
-          new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.MagicBonusAmount}
+          new StaticEffect {Potency = 10, EffectType = FantasyEffectTypes.ManaBonusAmount}
         };
 
         var classEffects = new[]

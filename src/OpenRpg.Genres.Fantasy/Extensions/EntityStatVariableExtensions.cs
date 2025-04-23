@@ -18,11 +18,11 @@ namespace OpenRpg.Genres.Fantasy.Extensions
         public static void Wisdom(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.Wisdom] = value;
         public static void Charisma(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.Charisma] = value;
 
-        public static void MaxMagic(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.MaxMagic] = value;
-        public static int MaxMagic(this EntityStatsVariables stats) => (int)stats.Get(FantasyEntityStatsVariableTypes.MaxMagic);
+        public static void MaxMana(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.MaxMana] = value;
+        public static int MaxMana(this EntityStatsVariables stats) => (int)stats.Get(FantasyEntityStatsVariableTypes.MaxMana);
         
-        public static void MagicRegen(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.MagicRegen] = value;
-        public static float MagicRegen(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.MagicRegen);
+        public static void ManaRegen(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.ManaRegen] = value;
+        public static float ManaRegen(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.ManaRegen);
         
         public static float IceDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.IceDamage);
         public static float FireDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.FireDamage);

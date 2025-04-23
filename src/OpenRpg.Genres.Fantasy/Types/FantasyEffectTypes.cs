@@ -19,10 +19,10 @@ namespace OpenRpg.Genres.Fantasy.Types
         public static readonly int StrengthBonusAmount = 73;
         public static readonly int ConstitutionBonusAmount = 74;
         public static readonly int CharismaBonusAmount = 75;
-        public static readonly int MagicRegenBonusAmount = 76;
-        public static readonly int MagicRegenBonusPercentage = 78;
-        public static readonly int MagicBonusAmount = 77;
-        public static readonly int MagicRestoreAmount = 79;
+        public static readonly int ManaRegenBonusAmount = 76;
+        public static readonly int ManaRegenBonusPercentage = 78;
+        public static readonly int ManaBonusAmount = 77;
+        public static readonly int ManaRestoreAmount = 79;
         public static readonly int ExperienceRestoreAmount = 80;
         
         // General Attribute Percentage
@@ -34,8 +34,8 @@ namespace OpenRpg.Genres.Fantasy.Types
         public static readonly int CharismaBonusPercentage = 95;
         public static readonly int HealthBonusPercentage = 96;
         public static readonly int HealthRestorePercentage = 97;
-        public static readonly int MagicBonusPercentage = 98;
-        public static readonly int MagicRestorePercentage = 99;
+        public static readonly int ManaBonusPercentage = 98;
+        public static readonly int ManaRestorePercentage = 99;
         public static readonly int ExperienceRestorePercentage = 100;
 
         // Melee Damage (Damage Types)
