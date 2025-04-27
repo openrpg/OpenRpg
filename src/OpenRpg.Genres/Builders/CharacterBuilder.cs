@@ -151,6 +151,14 @@ namespace OpenRpg.Genres.Builders
         
         protected virtual void PreProcessCharacter() {}
         protected virtual void PostProcessCharacter(Character character) {}
+
+        /// <summary>
+        /// Allows you to override the creation of the character instance
+        /// </summary>
+        /// <remarks>This is useful for creating a character with a custom inherited type</remarks>
+        /// <returns></returns>
+        protected virtual Character CreateCharacterInstance()
+        { return new Character() { }; }
         
         public virtual Character CreateCharacter()
         {
@@ -160,14 +168,12 @@ namespace OpenRpg.Genres.Builders
             _variables.Inventory(ProcessInventory());
             _variables.Gender(_genderId);
 
-            var character = new Character()
-            {
-                UniqueId = Guid.NewGuid(),
-                NameLocaleId = _name,
-                DescriptionLocaleId = _description,
-                Variables = _variables,
-                State = new EntityStateVariables(_state)
-            };
+            var character = CreateCharacterInstance();
+            character.UniqueId = Guid.NewGuid();
+            character.NameLocaleId = _name;
+            character.DescriptionLocaleId = _description;
+            character.Variables = _variables;
+            character.State = new EntityStateVariables(_state);
 
             var needsStateRefresh = _state.Count == 0;
             CharacterPopulator.Populate(character, needsStateRefresh);
