@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using OpenRpg.Core.Templates;
-using OpenRpg.Entities.Effects;
 using OpenRpg.Items.Equippables;
 using OpenRpg.Items.Equippables.Slots;
 using OpenRpg.Items.Templates;
@@ -38,8 +34,8 @@ namespace OpenRpg.Items.Extensions
         public static bool AttemptEquipSlot(this Equipment equipment, IEquipmentSlotValidator slotValidator, int slotType, ItemData itemData, ItemTemplate template)
         {
             if(!equipment.HasSlot(slotType)) { return false; }
-            if(!equipment.HasItemEquipped(slotType)) { return false; }
-            if(slotValidator.CanEquipItemType(slotType, template.ItemType)) { return false; }
+            if(equipment.HasItemEquipped(slotType)) { return false; }
+            if(!slotValidator.CanEquipItemType(slotType, template.ItemType)) { return false; }
             equipment.Slots[slotType] = itemData;
             return true;
         }
