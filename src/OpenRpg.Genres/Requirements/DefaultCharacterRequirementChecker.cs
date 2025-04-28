@@ -27,7 +27,7 @@ namespace OpenRpg.Genres.Requirements
 
             if (requirement.RequirementType == GenreRequirementTypes.ClassRequirement)
             {
-                if (character.Variables.HasRace())
+                if (character.Variables.HasClass())
                 {
                     var classDetails = character.Variables.Class();
                     if (classDetails.TemplateId == requirement.Association.AssociatedId)
