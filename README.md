@@ -37,15 +37,15 @@ Effects can be applied to almost everything and are used to derive variables for
 ```csharp
 var raceEffects = new[]
 {
-    new Effect {Potency = 8, EffectType = EffectTypes.StrengthBonusAmount},
-    new Effect {Potency = 100, EffectType = EffectTypes.HealthBonusAmount},
+    new StaticEffect {Potency = 8, EffectType = EffectTypes.StrengthBonusAmount},
+    new StaticEffect {Potency = 100, EffectType = EffectTypes.HealthBonusAmount},
 };
 
 var classEffects = new[]
 {
-    new Effect {Potency = 3, EffectType = EffectTypes.StrengthBonusAmount},
-    new Effect {Potency = 1, EffectType = EffectTypes.DexterityBonusAmount},
-    new Effect {Potency = 50, EffectType = EffectTypes.HealthBonusAmount}
+    new StaticEffect {Potency = 3, EffectType = EffectTypes.StrengthBonusAmount},
+    new StaticEffect {Potency = 1, EffectType = EffectTypes.DexterityBonusAmount},
+    new StaticEffect {Potency = 50, EffectType = EffectTypes.HealthBonusAmount}
 };
 
 var stats = new DefaultStats();
