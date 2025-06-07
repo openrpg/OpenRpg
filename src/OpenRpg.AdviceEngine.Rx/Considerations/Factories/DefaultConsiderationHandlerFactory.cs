@@ -1,7 +1,9 @@
+using OpenRpg.AdviceEngine.Handlers;
+using OpenRpg.AdviceEngine.Handlers.Considerations;
+using OpenRpg.AdviceEngine.Handlers.Considerations.Factories;
 using OpenRpg.AdviceEngine.Variables;
-using OpenRpg.Core.Common;
 
-namespace OpenRpg.AdviceEngine.Handlers.Considerations.Factories
+namespace OpenRpg.AdviceEngine.Rx.Considerations.Factories
 {
     public class DefaultConsiderationHandlerFactory : IConsiderationHandlerFactory
     {

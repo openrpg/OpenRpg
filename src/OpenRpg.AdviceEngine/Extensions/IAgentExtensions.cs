@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
 using OpenRpg.AdviceEngine.Advisors;
 using OpenRpg.AdviceEngine.Considerations;
 using OpenRpg.AdviceEngine.Keys;
@@ -10,7 +9,7 @@ namespace OpenRpg.AdviceEngine.Extensions
 {
     public static class IAgentExtensions
     {
-        public static void AddConsideration(this IAgent agent, IConsideration consideration, IObservable<Unit> explicitUpdateTrigger = null)
+        public static void AddConsideration(this IAgent agent, IConsideration consideration, IObservable<bool> explicitUpdateTrigger = null)
         { agent.ConsiderationHandler.AddConsideration(consideration, explicitUpdateTrigger); }
  
         public static void RemoveConsideration(this IAgent agent, int utilityId)
