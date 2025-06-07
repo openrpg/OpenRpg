@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Version>0.0.0</Version>
+        <Title>OpenRpg.AdviceEngine.Rx</Title>
+        <Authors>Grofit (LP)</Authors>
+        <PackageLicenseUrl>https://github.com/openrpg/OpenRpg/blob/master/LICENSE</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/openrpg/OpenRpg</PackageProjectUrl>
+        <Description>A Utility AI flavoured framework to provide advice about what entities should do</Description>
+        <PackageTags>rpg game-development xna monogame unity godot rx</PackageTags>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>8</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OpenRpg.AdviceEngine\OpenRpg.AdviceEngine.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Reactive" Version="6.0.1" />
+    </ItemGroup>
+
+</Project>

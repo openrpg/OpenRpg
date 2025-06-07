@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using OpenRpg.AdviceEngine.Considerations;
 using OpenRpg.AdviceEngine.Extensions;
+using OpenRpg.AdviceEngine.Handlers;
+using OpenRpg.AdviceEngine.Handlers.Considerations;
 using OpenRpg.AdviceEngine.Keys;
 using OpenRpg.AdviceEngine.Variables;
 using OpenRpg.Core.Variables;
 
-namespace OpenRpg.AdviceEngine.Handlers.Considerations
+namespace OpenRpg.AdviceEngine.Rx.Considerations
 {
     public class ConsiderationHandler : IConsiderationHandler
     {
@@ -34,7 +35,7 @@ namespace OpenRpg.AdviceEngine.Handlers.Considerations
         public void StartHandler() => _isRunning = true;
         public void StopHandler() => _isRunning = false;
         
-        public void AddConsideration(IConsideration consideration, IObservable<Unit> explicitUpdateTrigger = null)
+        public void AddConsideration(IConsideration consideration, IObservable<bool> explicitUpdateTrigger = null)
         {
             _considerations.Add(consideration.UtilityId, consideration);
             UtilityVariables[consideration.UtilityId] = 0;
@@ -66,7 +67,7 @@ namespace OpenRpg.AdviceEngine.Handlers.Considerations
             { RemoveConsideration(key); }
         }
 
-        private void HandleSchedulingForConsideration(IConsideration consideration, IObservable<Unit> explicitUpdateTrigger = null)
+        private void HandleSchedulingForConsideration(IConsideration consideration, IObservable<bool> explicitUpdateTrigger = null)
         {
             if (explicitUpdateTrigger != null)
             {

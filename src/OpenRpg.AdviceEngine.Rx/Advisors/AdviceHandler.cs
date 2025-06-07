@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.AdviceEngine.Advisors;
 using OpenRpg.AdviceEngine.Extensions;
+using OpenRpg.AdviceEngine.Handlers;
+using OpenRpg.AdviceEngine.Handlers.Advisors;
 using OpenRpg.AdviceEngine.Variables;
-using OpenRpg.Core.Common;
 
-namespace OpenRpg.AdviceEngine.Handlers.Advisors
+namespace OpenRpg.AdviceEngine.Rx.Advisors
 {
     public class AdviceHandler : IAdviceHandler
     {
