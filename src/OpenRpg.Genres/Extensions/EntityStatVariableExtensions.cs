@@ -6,42 +6,91 @@ namespace OpenRpg.Genres.Extensions
 {
     public static class EntityStatVariableExtensions
     {
-        public static int MaxHealth(this EntityStatsVariables stats) => (int)stats.Get(GenreEntityStatsVariableTypes.MaxHealth);
-        public static void MaxHealth(this EntityStatsVariables stats, int value) => stats[GenreEntityStatsVariableTypes.MaxHealth] = value;
-        
-        public static int MaxStamina(this EntityStatsVariables stats) => (int)stats.Get(GenreEntityStatsVariableTypes.MaxStamina);
-        public static void MaxStamina(this EntityStatsVariables stats, int value) => stats[GenreEntityStatsVariableTypes.MaxStamina] = value;
-        
-        public static float Damage(this EntityStatsVariables stats) => stats.Get(GenreEntityStatsVariableTypes.Damage);
-        public static void Damage(this EntityStatsVariables stats, float value) => stats[GenreEntityStatsVariableTypes.Damage] = value;
-        public static float Defense(this EntityStatsVariables stats) => stats.Get(GenreEntityStatsVariableTypes.Defense);
-        public static void Defense(this EntityStatsVariables stats, float value) => stats[GenreEntityStatsVariableTypes.Defense] = value;
-        
-        public static float CriticalDamageChance(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.CriticalDamageChance, 0);
-        public static void CriticalDamageChance(this EntityStatsVariables stats, float criticalDamageChance) => stats[GenreEntityStatsVariableTypes.CriticalDamageChance] = criticalDamageChance;
-        public static float CriticalDamageMultiplier(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.CriticalDamageMultiplier, 0);
-        public static void CriticalDamageMultiplier(this EntityStatsVariables stats, float criticalDamageMultiplier) => stats[GenreEntityStatsVariableTypes.CriticalDamageMultiplier] = criticalDamageMultiplier;
-
-        public static float CooldownReduction(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.CooldownReduction, 0);
-        public static void CooldownReduction(this EntityStatsVariables stats, float cooldownReduction) => stats[GenreEntityStatsVariableTypes.CooldownReduction] = cooldownReduction;
-        
-        public static float AttackSize(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.AttackSize, 0);
-        public static void AttackSize(this EntityStatsVariables stats, float attackSize) => stats[GenreEntityStatsVariableTypes.AttackSize] = attackSize;
-        
-        public static float AttackRange(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.AttackRange, 0);
-        public static void AttackRange(this EntityStatsVariables stats, float attackSpeed) => stats[GenreEntityStatsVariableTypes.AttackRange] = attackSpeed;
-        
-        public static float HealthRegen(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.HealthRegen, 0);
-        public static void HealthRegen(this EntityStatsVariables stats, float staminaRegen) => stats[GenreEntityStatsVariableTypes.HealthRegen] = staminaRegen;
-        public static float StaminaRegen(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.StaminaRegen, 0);
-        public static void StaminaRegen(this EntityStatsVariables stats, float staminaRegen) => stats[GenreEntityStatsVariableTypes.StaminaRegen] = staminaRegen;
-        
-        public static float HealthRegenRate(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.HealthRegenRate, 0);
-        public static void HealthRegenRate(this EntityStatsVariables stats, float regenRate) => stats[GenreEntityStatsVariableTypes.HealthRegenRate] = regenRate;
-        public static float StaminaRegenRate(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.StaminaRegenRate, 0);
-        public static void StaminaRegenRate(this EntityStatsVariables stats, float regenRate) => stats[GenreEntityStatsVariableTypes.StaminaRegenRate] = regenRate;
-
-        public static float MovementSpeed(this EntityStatsVariables stats) => stats.GetValueOrDefault(GenreEntityStatsVariableTypes.MovementSpeed, 0);
-        public static void MovementSpeed(this EntityStatsVariables stats, float movementSpeed) => stats[GenreEntityStatsVariableTypes.MovementSpeed] = movementSpeed;
+        extension(EntityStatsVariables state)
+        {
+            public int MaxHealth
+            {
+                get => (int)state.Get(GenreEntityStatsVariableTypes.MaxHealth);
+                set => state[GenreEntityStatsVariableTypes.MaxHealth] = value;
+            }
+            
+            public int MaxStamina
+            {
+                get => (int)state.Get(GenreEntityStatsVariableTypes.MaxStamina);
+                set => state[GenreEntityStatsVariableTypes.MaxStamina] = value;
+            }
+            
+            public float HealthRegen
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.HealthRegen);
+                set => state[GenreEntityStatsVariableTypes.HealthRegen] = value;
+            }
+            
+            public float StaminaRegen
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.StaminaRegen);
+                set => state[GenreEntityStatsVariableTypes.StaminaRegen] = value;
+            }
+            
+            public float HealthRegenRate
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.HealthRegenRate);
+                set => state[GenreEntityStatsVariableTypes.HealthRegenRate] = value;
+            }
+            
+            public float StaminaRegenRate
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.StaminaRegenRate);
+                set => state[GenreEntityStatsVariableTypes.StaminaRegenRate] = value;
+            }
+            
+            public float Damage
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.Damage);
+                set => state[GenreEntityStatsVariableTypes.Damage] = value;
+            }
+            
+            public float Defense
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.Defense);
+                set => state[GenreEntityStatsVariableTypes.Defense] = value;
+            }
+            
+            public float CriticalDamageChance
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.CriticalDamageChance);
+                set => state[GenreEntityStatsVariableTypes.CriticalDamageChance] = value;
+            }
+            
+            public float CriticalDamageMultiplier
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.CriticalDamageMultiplier);
+                set => state[GenreEntityStatsVariableTypes.CriticalDamageMultiplier] = value;
+            }
+            
+            public float CooldownReduction
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.CooldownReduction);
+                set => state[GenreEntityStatsVariableTypes.CooldownReduction] = value;
+            }
+            
+            public float AttackSize
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.AttackSize);
+                set => state[GenreEntityStatsVariableTypes.AttackSize] = value;
+            }
+            
+            public float AttackRange
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.AttackRange);
+                set => state[GenreEntityStatsVariableTypes.AttackRange] = value;
+            }
+            
+            public float MovementSpeed
+            {
+                get => state.Get(GenreEntityStatsVariableTypes.MovementSpeed);
+                set => state[GenreEntityStatsVariableTypes.MovementSpeed] = value;
+            }
+        }
     }
 }

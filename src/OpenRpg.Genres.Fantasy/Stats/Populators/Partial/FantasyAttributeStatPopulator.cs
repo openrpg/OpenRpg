@@ -22,12 +22,12 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators.Partial
         
         public void Populate(EntityStatsVariables stats, ComputedEffects computedEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
-            stats.Strength(CalculateStateFor(computedEffects, FantasyEffectTypes.StrengthBonusAmount, FantasyEffectTypes.StrengthBonusPercentage));
-            stats.Dexterity(CalculateStateFor(computedEffects, FantasyEffectTypes.DexterityBonusAmount, FantasyEffectTypes.DexterityBonusPercentage));
-            stats.Constitution(CalculateStateFor(computedEffects, FantasyEffectTypes.ConstitutionBonusAmount, FantasyEffectTypes.ConstitutionBonusPercentage));
-            stats.Intelligence(CalculateStateFor(computedEffects, FantasyEffectTypes.IntelligenceBonusAmount, FantasyEffectTypes.IntelligenceBonusPercentage));
-            stats.Wisdom(CalculateStateFor(computedEffects, FantasyEffectTypes.WisdomBonusAmount, FantasyEffectTypes.WisdomBonusPercentage));
-            stats.Charisma(CalculateStateFor(computedEffects, FantasyEffectTypes.CharismaBonusAmount, FantasyEffectTypes.CharismaBonusPercentage));
+            stats.Strength = CalculateStateFor(computedEffects, FantasyEffectTypes.StrengthBonusAmount, FantasyEffectTypes.StrengthBonusPercentage);
+            stats.Dexterity = CalculateStateFor(computedEffects, FantasyEffectTypes.DexterityBonusAmount, FantasyEffectTypes.DexterityBonusPercentage);
+            stats.Constitution = CalculateStateFor(computedEffects, FantasyEffectTypes.ConstitutionBonusAmount, FantasyEffectTypes.ConstitutionBonusPercentage);
+            stats.Intelligence = CalculateStateFor(computedEffects, FantasyEffectTypes.IntelligenceBonusAmount, FantasyEffectTypes.IntelligenceBonusPercentage);
+            stats.Wisdom = CalculateStateFor(computedEffects, FantasyEffectTypes.WisdomBonusAmount, FantasyEffectTypes.WisdomBonusPercentage);
+            stats.Charisma = CalculateStateFor(computedEffects, FantasyEffectTypes.CharismaBonusAmount, FantasyEffectTypes.CharismaBonusPercentage);
         }
     }
 }

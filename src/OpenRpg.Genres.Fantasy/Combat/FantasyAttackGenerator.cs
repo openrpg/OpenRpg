@@ -33,7 +33,7 @@ namespace OpenRpg.Genres.Fantasy.Combat
         public virtual (float scaledCritRate, float scaledCritMultiplier) GetScaledCriticalRateAndMultiplier(
             EntityStatsVariables stats)
         {
-            return (stats.CriticalDamageChance(), stats.CriticalDamageMultiplier());
+            return (stats.CriticalDamageChance, stats.CriticalDamageMultiplier);
         }
 
         public (bool DidCrit, Damage[] Damages) AttemptToCritical(Damage[] damages, EntityStatsVariables stats)

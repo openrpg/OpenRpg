@@ -4,7 +4,9 @@ namespace OpenRpg.Genres.Fantasy.Extensions
 {
     public static class FantasyEntityExtensions
     {
-        public static float GetManaPercentage(this Entity entity)
-        { return (float)entity.State.Mana() / entity.Stats.MaxMana(); }
+        extension(Entity entity)
+        {
+            public float ManaPercentage => entity.State.Mana / entity.Stats.MaxMana;
+        }
     }
 }

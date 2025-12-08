@@ -21,8 +21,8 @@ namespace OpenRpg.Genres.Extensions
         
         extension(Entity entity)
         {
-            public float HealthPercentage => (float)entity.State.Health() / entity.Stats.MaxHealth();
-            public float StaminaPercentage => (float)entity.State.Stamina() / entity.Stats.MaxStamina();
+            public float HealthPercentage => (float)entity.State.Health / entity.Stats.MaxHealth;
+            public float StaminaPercentage => (float)entity.State.Stamina / entity.Stats.MaxStamina;
         }
     }
 }

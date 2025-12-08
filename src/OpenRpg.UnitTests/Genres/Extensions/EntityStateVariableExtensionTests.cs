@@ -15,9 +15,9 @@ namespace OpenRpg.UnitTests.Genres.Extensions
         {
             var expectedHealth = 123;
             var entityState = new EntityStateVariables();
-            entityState.Health(expectedHealth);
+            entityState.Health = expectedHealth;
 
-            var actualHealth = entityState.Health();
+            var actualHealth = entityState.Health;
             Assert.Equal(expectedHealth, actualHealth);
         }
         
@@ -26,10 +26,10 @@ namespace OpenRpg.UnitTests.Genres.Extensions
         {
             var expectedHealth = 123;
             var entityState = new EntityStateVariables();
-            entityState.Health(100);
+            entityState.Health = 100;
             entityState.AddHealth(23);
 
-            var actualHealth = entityState.Health();
+            var actualHealth = entityState.Health;
             Assert.Equal(expectedHealth, actualHealth);
         }
         
@@ -38,10 +38,10 @@ namespace OpenRpg.UnitTests.Genres.Extensions
         {
             var expectedHealth = 100;
             var entityState = new EntityStateVariables();
-            entityState.Health(123);
+            entityState.Health = 123;
             entityState.DeductHealth(23);
 
-            var actualHealth = entityState.Health();
+            var actualHealth = entityState.Health;
             Assert.Equal(expectedHealth, actualHealth);
         }
         
@@ -50,12 +50,12 @@ namespace OpenRpg.UnitTests.Genres.Extensions
         {
             var expectedHealth = 50;
             var entityState = new EntityStateVariables();
-            entityState.Health(100);
+            entityState.Health = 100;
 
             var processedAttack = new ProcessedAttack(new[] { new Damage(GenreDamageTypes.Damage, 50) }, Array.Empty<Damage>());
             entityState.ApplyDamageToTarget(processedAttack);
             
-            var actualHealth = entityState.Health();
+            var actualHealth = entityState.Health;
             Assert.Equal(expectedHealth, actualHealth);
         }
     }

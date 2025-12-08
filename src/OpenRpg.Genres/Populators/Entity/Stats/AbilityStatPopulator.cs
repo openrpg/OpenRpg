@@ -15,14 +15,17 @@ namespace OpenRpg.Genres.Populators.Entity.Stats
 
         public void Populate(EntityStatsVariables stats, ComputedEffects computedEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
-            stats.AttackRange(computedEffects.CalculateTotalValueFor(GenreEffectTypes.AttackRangeBonusAmount,
-                GenreEffectTypes.AttackRangeBonusPercentage));
+            stats.AttackRange = computedEffects.CalculateTotalValueFor(
+                GenreEffectTypes.AttackRangeBonusAmount,
+                GenreEffectTypes.AttackRangeBonusPercentage);
             
-            stats.AttackSize(computedEffects.CalculateTotalValueFor(GenreEffectTypes.AttackRangeBonusAmount,
-                GenreEffectTypes.AttackRangeBonusPercentage));
+            stats.AttackSize = computedEffects.CalculateTotalValueFor(
+                GenreEffectTypes.AttackRangeBonusAmount,
+                GenreEffectTypes.AttackRangeBonusPercentage);
             
-            stats.CooldownReduction(computedEffects.CalculateTotalValueFor(GenreEffectTypes.AttackRangeBonusAmount,
-                GenreEffectTypes.AttackRangeBonusPercentage));
+            stats.CooldownReduction = computedEffects.CalculateTotalValueFor(
+                GenreEffectTypes.AttackRangeBonusAmount,
+                GenreEffectTypes.AttackRangeBonusPercentage);
         }
     }
 }

@@ -9,54 +9,37 @@ namespace OpenRpg.Genres.Extensions
 {
     public static class EntityStateVariablesExtensions
     {
-        public static int Health(this EntityStateVariables state) => (int)state.Get(GenreEntityStateVariableTypes.Health);
-        public static void Health(this EntityStateVariables state, int value) => state[GenreEntityStateVariableTypes.Health] = value;
-        
-        public static int Stamina(this EntityStateVariables state) => (int)state.Get(GenreEntityStateVariableTypes.Stamina);
-        public static void Stamina(this EntityStateVariables state, int value) => state[GenreEntityStateVariableTypes.Stamina] = value;
+        extension(EntityStateVariables state)
+        {
+            public int Health
+            {
+                get => (int)state.Get(GenreEntityStateVariableTypes.Health);
+                set => state[GenreEntityStateVariableTypes.Health] = value;
+            }
+            
+            public bool IsDead => state.Health <= 0;
+        }
         
         public static void AddHealth(this EntityStateVariables state, int change, int? maxHealth = null)
         {
-            var newValue = state.Health() + change;
+            var newValue = state.Health + change;
             if(newValue <= 0) { newValue = 0; }
             
             if(maxHealth == null) 
-            { state.Health(newValue); }
+            { state.Health = newValue; }
             else 
             { state.AddValue(GenreEntityStateVariableTypes.Health, newValue, 0, maxHealth.Value); }
         }
 
         public static void DeductHealth(this EntityStateVariables state, int change, int? maxHealth = null)
         {
-            var newValue = state.Health() - change;
+            var newValue = state.Health - change;
             if(newValue <= 0) { newValue = 0; }
 
             if (maxHealth == null)
-            { state.Health(newValue); }
+            { state.Health = newValue; }
             else
             { state.AddValue(GenreEntityStateVariableTypes.Health, newValue, 0, maxHealth.Value); }
-        }
-        
-        public static void AddStamina(this EntityStateVariables state, int change, int? maxStamina = null)
-        {
-            var newValue = state.Health() + change;
-            if(newValue <= 0) { newValue = 0; }
-            
-            if(maxStamina == null) 
-            { state.Stamina(newValue); }
-            else 
-            { state.AddValue(GenreEntityStateVariableTypes.Stamina, newValue, 0, maxStamina.Value); }
-        }
-
-        public static void DeductStamina(this EntityStateVariables state, int change, int? maxStamina = null)
-        {
-            var newValue = state.Health() - change;
-            if(newValue <= 0) { newValue = 0; }
-
-            if (maxStamina == null)
-            { state.Stamina(newValue); }
-            else
-            { state.AddValue(GenreEntityStateVariableTypes.Health, newValue, 0, maxStamina.Value); }
         }
         
         public static void ApplyDamageToTarget(this EntityStateVariables state, ProcessedAttack attack)
@@ -67,7 +50,35 @@ namespace OpenRpg.Genres.Extensions
             state.DeductHealth(totalDamage);
         }
         
-        public static bool IsDead(this EntityStateVariables state)
-        { return state.Health() <= 0; }
+        extension(EntityStateVariables state)
+        {
+            public int Stamina
+            {
+                get => (int)state.Get(GenreEntityStateVariableTypes.Stamina);
+                set => state[GenreEntityStateVariableTypes.Stamina] = value;
+            }
+        }
+        
+        public static void AddStamina(this EntityStateVariables state, int change, int? maxStamina = null)
+        {
+            var newValue = state.Stamina + change;
+            if(newValue <= 0) { newValue = 0; }
+            
+            if(maxStamina == null) 
+            { state.Stamina = newValue; }
+            else 
+            { state.AddValue(GenreEntityStateVariableTypes.Stamina, newValue, 0, maxStamina.Value); }
+        }
+
+        public static void DeductStamina(this EntityStateVariables state, int change, int? maxStamina = null)
+        {
+            var newValue = state.Stamina - change;
+            if(newValue <= 0) { newValue = 0; }
+
+            if (maxStamina == null)
+            { state.Stamina = newValue; }
+            else
+            { state.AddValue(GenreEntityStateVariableTypes.Stamina, newValue, 0, maxStamina.Value); }
+        }
     }
 }
