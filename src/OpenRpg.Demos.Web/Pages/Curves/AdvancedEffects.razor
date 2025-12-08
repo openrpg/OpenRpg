@@ -188,8 +188,8 @@
         <CardSection>
             <br />
             <CharacterDetails Name="@ExampleCharacter.NameLocaleId"
-                              Race="@TemplateAccessor.ToInstance(ExampleCharacter.Variables.Race())"
-                              Class="@TemplateAccessor.ToInstance(ExampleCharacter.Variables.Class())"/>
+                              Race="@TemplateAccessor.ToInstance(ExampleCharacter.Variables.Race)"
+                              Class="@TemplateAccessor.ToInstance(ExampleCharacter.Variables.Class)"/>
             <CharacterStats Stats="@ExampleCharacter.Stats"/>
             <br />
             <CharacterVitals Stats="@ExampleCharacter.Stats" State="ExampleCharacter.State"/>
@@ -211,8 +211,8 @@
 
     public int CharacterLevel
     {
-        get => ExampleCharacter.Variables.Class().Variables.Level();
-        set => ExampleCharacter.Variables.Class().Variables.Level(value);
+        get => ExampleCharacter.Variables.Class.Variables.Level();
+        set => ExampleCharacter.Variables.Class.Variables.Level(value);
     }
     
     protected override void OnInitialized()
@@ -285,8 +285,8 @@
         var equipment = new Equipment();
         equipment.MainHandSlot(new ItemData() { TemplateId = pretendWeapon.Id });
 
-        ExampleCharacter.Variables.Race(new RaceData() { TemplateId = pretendHumanRace.Id });
-        ExampleCharacter.Variables.Class(new ClassData() { TemplateId = pretendFighterClassTemplate.Id });
+        ExampleCharacter.Variables.Race = new RaceData() { TemplateId = pretendHumanRace.Id };
+        ExampleCharacter.Variables.Class = new ClassData() { TemplateId = pretendFighterClassTemplate.Id };
         ExampleCharacter.Variables.Equipment(equipment);
 
         TemplateAccessor.AddTemplate(pretendHumanRace);

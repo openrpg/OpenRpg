@@ -21,7 +21,7 @@ namespace OpenRpg.Genres.Requirements
                 if (!character.Variables.HasRace())
                 { return false; }
 
-                var race = character.Variables.Race();
+                var race = character.Variables.Race;
                 return race.TemplateId == requirement.Association.AssociatedId;
             }
 
@@ -29,14 +29,14 @@ namespace OpenRpg.Genres.Requirements
             {
                 if (character.Variables.HasClass())
                 {
-                    var classDetails = character.Variables.Class();
+                    var classDetails = character.Variables.Class;
                     if (classDetails.TemplateId == requirement.Association.AssociatedId)
                     { return classDetails.Variables.Level() >= requirement.Association.AssociatedValue; }
                 }
 
                 if (character.Variables.HasMultiClass())
                 {
-                    var multiClass = character.Variables.MultiClass();
+                    var multiClass = character.Variables.MultiClass;
                     var possibleClass = multiClass.GetClass(requirement.Association.AssociatedId);
                     if (possibleClass != null)
                     { return possibleClass.Variables.Level() >= requirement.Association.AssociatedValue; }
@@ -50,7 +50,7 @@ namespace OpenRpg.Genres.Requirements
                 if (!character.Variables.HasGender())
                 { return false; }
                 
-                return character.Variables.Gender() == requirement.Association.AssociatedId;
+                return character.Variables.Gender == requirement.Association.AssociatedId;
             }
             
             if (requirement.RequirementType == GenreRequirementTypes.EquipmentItemRequirement)

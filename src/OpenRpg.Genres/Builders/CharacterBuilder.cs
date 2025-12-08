@@ -162,11 +162,11 @@ namespace OpenRpg.Genres.Builders
         
         public virtual Character CreateCharacter()
         {
-            _variables.Class(ProcessClass());
-            _variables.Race(ProcessRace());
+            _variables.Class = ProcessClass();
+            _variables.Race = ProcessRace();
             _variables.Equipment(ProcessEquipment());
             _variables.Inventory(ProcessInventory());
-            _variables.Gender(_genderId);
+            _variables.Gender = _genderId;
 
             var character = CreateCharacterInstance();
             character.UniqueId = Guid.NewGuid();

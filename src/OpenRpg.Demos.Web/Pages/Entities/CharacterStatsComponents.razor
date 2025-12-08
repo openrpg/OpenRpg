@@ -61,8 +61,8 @@
     <div class="column is-half">
         <CardSection>
             <CharacterDetails Name="@ManualStatsExample.NameLocaleId"
-                              Race="@ManualStatTemplateAccessor.ToInstance(ManualStatsExample.Variables.Race())" 
-                              Class="@ManualStatTemplateAccessor.ToInstance(ManualStatsExample.Variables.Class())" />
+                              Race="@ManualStatTemplateAccessor.ToInstance(ManualStatsExample.Variables.Race)" 
+                              Class="@ManualStatTemplateAccessor.ToInstance(ManualStatsExample.Variables.Class)" />
             <br />
             <CharacterVitals Stats="@ManualStatsExample.Stats" />
             <br />
@@ -158,8 +158,8 @@
     <div class="column is-half">
         <CardSection>
             <CharacterDetails Name="@AutoStatsExample.NameLocaleId"
-                              Race="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample.Variables.Race())" 
-                              Class="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample.Variables.Class())" />
+                              Race="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample.Variables.Race)" 
+                              Class="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample.Variables.Class)" />
             <br />
             <CharacterVitals Stats="@AutoStatsExample.Stats" />
             <br />
@@ -168,19 +168,19 @@
             <div class="columns">
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
-                    <EffectList Effects="GetEffectsFor(AutoStatsExample.Variables.Race())" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample.Variables.Race)" />
                 </div>
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
-                    <EffectList Effects="GetEffectsFor(AutoStatsExample.Variables.Class())" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample.Variables.Class)" />
                 </div>
             </div>
         </CardSection>
         <br />
         <CardSection>
             <CharacterDetails Name="@AutoStatsExample2.NameLocaleId"
-                              Race="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample2.Variables.Race())" 
-                              Class="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample2.Variables.Class())" />
+                              Race="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample2.Variables.Race)" 
+                              Class="@AutoStatTemplateAccessor.ToInstance(AutoStatsExample2.Variables.Class)" />
             <br />
             <CharacterVitals Stats="@AutoStatsExample2.Stats" />
             <br />
@@ -189,11 +189,11 @@
             <div class="columns">
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Race Effects</h4>
-                    <EffectList Effects="GetEffectsFor(AutoStatsExample2.Variables.Race())" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample2.Variables.Race)" />
                 </div>
                 <div class="column has-text-centered">
                     <h4 class="subtitle mb-2 has-text-dark">Class Effects</h4>
-                    <EffectList Effects="GetEffectsFor(AutoStatsExample2.Variables.Class())" />
+                    <EffectList Effects="GetEffectsFor(AutoStatsExample2.Variables.Class)" />
                 </div>
             </div>
         </CardSection>
@@ -222,8 +222,8 @@
         
         ManualStatsExample.NameLocaleId = "Frodo Baggins";
         
-        ManualStatsExample.Variables.Race(new RaceData { TemplateId = hobbitRace.Id });
-        ManualStatsExample.Variables.Class(new ClassData { TemplateId = fighterClass.Id });
+        ManualStatsExample.Variables.Race = new RaceData { TemplateId = hobbitRace.Id };
+        ManualStatsExample.Variables.Class = new ClassData { TemplateId = fighterClass.Id };
         
         ManualStatsExample.Stats = new EntityStatsVariables();
         ManualStatsExample.Stats.MaxHealth(100);
@@ -278,12 +278,12 @@
         AutoStatTemplateAccessor.AddTemplate(fighterClass);
         
         AutoStatsExample.NameLocaleId = "Frodo Baggins";
-        AutoStatsExample.Variables.Race(new RaceData { TemplateId = hobbitRace.Id });
-        AutoStatsExample.Variables.Class(new ClassData{ TemplateId = fighterClass.Id });
+        AutoStatsExample.Variables.Race = new RaceData { TemplateId = hobbitRace.Id };
+        AutoStatsExample.Variables.Class = new ClassData{ TemplateId = fighterClass.Id };
 
         AutoStatsExample2.NameLocaleId = "Peregrin Took";
-        AutoStatsExample2.Variables.Race(new RaceData { TemplateId = hobbitRace.Id });
-        AutoStatsExample2.Variables.Class(new ClassData { TemplateId = fighterClass.Id });
+        AutoStatsExample2.Variables.Race = new RaceData { TemplateId = hobbitRace.Id };
+        AutoStatsExample2.Variables.Class = new ClassData { TemplateId = fighterClass.Id };
         
         var statsCalculator = new FantasyStatsPopulator();
         var computedEffects1 = EffectProcessor.ComputeEffects(AutoStatsExample);

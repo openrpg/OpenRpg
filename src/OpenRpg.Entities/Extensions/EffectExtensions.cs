@@ -3,8 +3,6 @@ using System.Linq;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Classes;
-using OpenRpg.Entities.Effects;
-using OpenRpg.Entities.Modifications;
 using OpenRpg.Entities.Races;
 
 namespace OpenRpg.Entities.Extensions

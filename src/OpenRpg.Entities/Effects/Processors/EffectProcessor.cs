@@ -51,13 +51,13 @@ namespace OpenRpg.Entities.Effects.Processors
             
             if (entity.Variables.HasRace())
             {
-                var template = TemplateAccessor.GetRaceTemplate(entity.Variables.Race().TemplateId);
+                var template = TemplateAccessor.GetRaceTemplate(entity.Variables.Race.TemplateId);
                 ComputeEffects(template, entity, computedEffects);
             }
             
             if (entity.Variables.HasClass())
             {
-                var template = TemplateAccessor.GetClassTemplate(entity.Variables.Class().TemplateId);
+                var template = TemplateAccessor.GetClassTemplate(entity.Variables.Class.TemplateId);
                 ComputeEffects(template, entity, computedEffects);
             }
 
@@ -83,7 +83,7 @@ namespace OpenRpg.Entities.Effects.Processors
         {
             if (effect.ScalingType == CoreEffectScalingTypes.Level)
             {
-                var level = relatedEntity?.Variables.Class()?.Variables.Level() ?? 1;
+                var level = relatedEntity?.Variables.Class?.Variables.Level() ?? 1;
                 computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(level));
                 return;
             }

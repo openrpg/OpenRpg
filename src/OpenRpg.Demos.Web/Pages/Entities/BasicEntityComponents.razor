@@ -83,8 +83,8 @@
   <div class="column is-half">
       <CardSection>
           <CharacterDetails Name="@SimpleEntity.NameLocaleId"
-                            Race="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.Race())"
-                            Class="@TemplateAccessor.ToInstance(SimpleEntity.Variables.Class())">
+                            Race="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.Race)"
+                            Class="@TemplateAccessor.ToInstance(SimpleEntity.Variables.Class)">
           </CharacterDetails>
       </CardSection>
   </div>
@@ -130,8 +130,8 @@
     <div class="column is-half">
         <CardSection>
             <CharacterDetails Name="@MultiClassEntity.NameLocaleId"
-                              Race="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.Race())"
-                              Classes="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.MultiClass().Classes)">
+                              Race="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.Race)"
+                              Classes="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.MultiClass.Classes)">
             </CharacterDetails>
         </CardSection>
     </div>
@@ -157,11 +157,11 @@
         TemplateAccessor.AddTemplate(RingBearerClass);
         
         SimpleEntity.NameLocaleId = "Frodo Baggins";
-        SimpleEntity.Variables.Race(new RaceData { TemplateId = HobbitRace.Id });
-        SimpleEntity.Variables.Class(new ClassData { TemplateId = FighterClass.Id });
+        SimpleEntity.Variables.Race = new RaceData { TemplateId = HobbitRace.Id };
+        SimpleEntity.Variables.Class = new ClassData { TemplateId = FighterClass.Id };
         
         MultiClassEntity.NameLocaleId = "Frodo Baggins";
-        MultiClassEntity.Variables.Race(new RaceData { TemplateId = HobbitRace.Id });
+        MultiClassEntity.Variables.Race = new RaceData { TemplateId = HobbitRace.Id };
 
         var multiClass = new MultiClasses();
         var level2Fighter =new ClassData { TemplateId = FighterClass.Id };
@@ -175,7 +175,7 @@
         level3RingBearer.Variables.Level(3);
         multiClass.AddClass(level3RingBearer);
 
-        MultiClassEntity.Variables.MultiClass(multiClass);
+        MultiClassEntity.Variables.MultiClass = multiClass;
         base.OnInitialized();
     }
 }

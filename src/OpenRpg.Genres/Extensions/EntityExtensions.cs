@@ -13,16 +13,16 @@ namespace OpenRpg.Genres.Extensions
         {
             var effects = new List<IEffect>();
 
-            if (entity.Variables.HasRace()) { effects.AddRange(entity.Variables.Race().GetEffects(templateAccessor)); }
-            if (entity.Variables.HasClass()) { effects.AddRange(entity.Variables.Class().GetEffects(templateAccessor)); }
+            if (entity.Variables.HasRace()) { effects.AddRange(entity.Variables.Race.GetEffects(templateAccessor)); }
+            if (entity.Variables.HasClass()) { effects.AddRange(entity.Variables.Class.GetEffects(templateAccessor)); }
             if (entity.Variables.HasEquipment()) { effects.AddRange(entity.Variables.Equipment().GetEffects(templateAccessor)); }
             return effects;
         }
         
-        public static float GetHealthPercentage(this Entity entity)
-        { return (float)entity.State.Health() / entity.Stats.MaxHealth(); }
-        
-        public static float GetStaminaPercentage(this Entity entity)
-        { return (float)entity.State.Stamina() / entity.Stats.MaxStamina(); }
+        extension(Entity entity)
+        {
+            public float HealthPercentage => (float)entity.State.Health() / entity.Stats.MaxHealth();
+            public float StaminaPercentage => (float)entity.State.Stamina() / entity.Stats.MaxStamina();
+        }
     }
 }
