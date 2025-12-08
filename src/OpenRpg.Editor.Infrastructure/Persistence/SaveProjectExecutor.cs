@@ -36,7 +36,7 @@ public class SaveProjectExecutor
         if(string.IsNullOrEmpty(EditorState.CurrentProject?.ProjectPath))
         { throw new Exception("Folder path is empty"); }
         
-        if(!Directory.Exists(EditorState.CurrentProject.GetTemplatePath()))
+        if(!Directory.Exists(EditorState.CurrentProject.TemplatePath))
         { throw new Exception("Data path does not exist on file system"); }
 
         await SaveTemplateData<ItemTemplate>();
@@ -58,11 +58,11 @@ public class SaveProjectExecutor
         if(string.IsNullOrEmpty(EditorState.CurrentProject?.ProjectPath))
         { throw new Exception("Folder path is empty"); }
         
-        if(!Directory.Exists(EditorState.CurrentProject.GetTemplatePath()))
+        if(!Directory.Exists(EditorState.CurrentProject.TemplatePath))
         { throw new Exception("Data path does not exist on file system"); }
 
         var data = EditorDatasource.SerializeData<T>();
-        var dataFile = $"{EditorState.CurrentProject.GetTemplatePath()}/{typeof(T).Name}.json";
+        var dataFile = $"{EditorState.CurrentProject.TemplatePath}/{typeof(T).Name}.json";
         await File.WriteAllTextAsync(dataFile, data);
     }
 
@@ -74,13 +74,13 @@ public class SaveProjectExecutor
         if(string.IsNullOrEmpty(EditorState.CurrentProject?.ProjectPath))
         { throw new Exception("Folder path is empty"); }
         
-        if(!Directory.Exists(EditorState.CurrentProject.GetLocalePath()))
+        if(!Directory.Exists(EditorState.CurrentProject.LocalePath))
         { throw new Exception("Locale path does not exist on file system"); }
 
         foreach (var localeData in EditorLocaleDatasource.LocaleDatasets)
         {
             var data = localeData.Value.SerializeData();
-            var dataFile = $"{EditorState.CurrentProject.GetLocalePath()}/{localeData.Key}.json";
+            var dataFile = $"{EditorState.CurrentProject.LocalePath}/{localeData.Key}.json";
             await File.WriteAllTextAsync(dataFile, data);
         }
     }

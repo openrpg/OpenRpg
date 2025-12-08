@@ -65,10 +65,10 @@ public class LoadProjectExecutor
         if(string.IsNullOrEmpty(EditorState.CurrentProject?.ProjectPath))
         { throw new Exception("Folder path is empty"); }
         
-        if(!Directory.Exists(EditorState.CurrentProject.GetTemplatePath()))
+        if(!Directory.Exists(EditorState.CurrentProject.TemplatePath))
         { throw new Exception("Template path does not exist on file system"); }
 
-        var dataFile = $"{EditorState.CurrentProject.GetTemplatePath()}/{typeof(T).Name}.json";
+        var dataFile = $"{EditorState.CurrentProject.TemplatePath}/{typeof(T).Name}.json";
         if(!File.Exists(dataFile)) { await File.WriteAllTextAsync(dataFile, "[]"); }
         
         var fileContent = await File.ReadAllTextAsync(dataFile);
@@ -95,10 +95,10 @@ public class LoadProjectExecutor
         if(string.IsNullOrEmpty(EditorState.CurrentProject?.ProjectPath))
         { throw new Exception("Folder path is empty"); }
         
-        if(!Directory.Exists(EditorState.CurrentProject.GetLocalePath()))
+        if(!Directory.Exists(EditorState.CurrentProject.LocalePath))
         { throw new Exception("Locale path does not exist on file system"); }
         
-        var localeFiles = Directory.GetFiles(EditorState.CurrentProject.GetLocalePath(), "*.json");
+        var localeFiles = Directory.GetFiles(EditorState.CurrentProject.LocalePath, "*.json");
         foreach (var localeFile in localeFiles)
         {
             var localeData = await File.ReadAllTextAsync(localeFile);

@@ -19,9 +19,9 @@ public class CreateProjectExecutor(EditorState EditorState)
         var projectContent = JsonConvert.SerializeObject(newProject.Project, Formatting.Indented);
 
         await File.WriteAllTextAsync(projectFile, projectContent);
-        Directory.CreateDirectory(newProject.GetTemplatePath());
-        Directory.CreateDirectory(newProject.GetAssetPath());
-        Directory.CreateDirectory(newProject.GetLocalePath());
+        Directory.CreateDirectory(newProject.TemplatePath);
+        Directory.CreateDirectory(newProject.AssetPath);
+        Directory.CreateDirectory(newProject.LocalePath);
         Directory.CreateDirectory(newProject.GetAssetPath("items"));
         
         return newProject;
