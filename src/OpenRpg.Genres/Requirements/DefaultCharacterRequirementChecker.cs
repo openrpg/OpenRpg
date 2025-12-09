@@ -58,7 +58,7 @@ namespace OpenRpg.Genres.Requirements
                 if (!character.Variables.HasEquipment())
                 { return false; }
 
-                return character.Variables.Equipment().Slots.Values
+                return character.Variables.Equipment.Slots.Values
                     .Any(x => x?.TemplateId == requirement.Association.AssociatedId);
             }
             
@@ -79,7 +79,7 @@ namespace OpenRpg.Genres.Requirements
                 if (!character.Variables.HasInventory())
                 { return false; }
 
-                return character.Variables.Inventory()
+                return character.Variables.Inventory
                     .HasItem(requirement.Association.AssociatedId, requirement.Association.AssociatedValue);
             }
 
@@ -112,7 +112,7 @@ namespace OpenRpg.Genres.Requirements
             return true;
         }
     
-        public virtual bool IsRequirementMet(ITriggerStateVariables state, Requirement requirement)
+        public virtual bool IsRequirementMet(ITriggerState state, Requirement requirement)
         {
             if (requirement.RequirementType == GenreRequirementTypes.TriggerRequirement)
             {

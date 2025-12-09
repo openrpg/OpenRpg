@@ -14,29 +14,38 @@ namespace OpenRpg.Items.Extensions
     {
         public static bool HasEquipment(this EntityVariables vars) 
         { return vars.ContainsKey(ItemEntityVariableTypes.Equipment); }
-        
-        public static Equipment Equipment(this EntityVariables vars)
-        { return vars.GetAs<Equipment>(ItemEntityVariableTypes.Equipment); }
 
-        public static void Equipment(this EntityVariables vars, Equipment equipment)
-        { vars[ItemEntityVariableTypes.Equipment] = equipment; }
+        extension(EntityVariables vars)
+        {
+            public Equipment Equipment
+            {
+                get => vars.GetAsOrDefault(ItemEntityVariableTypes.Equipment, () => new Equipment());
+                set => vars[ItemEntityVariableTypes.Equipment] = value;
+            }
+        }
         
         public static bool HasInventory(this EntityVariables vars) 
         { return vars.ContainsKey(ItemEntityVariableTypes.Inventory); }
         
-        public static Inventory Inventory(this EntityVariables vars)
-        { return vars.GetAs<Inventory>(ItemEntityVariableTypes.Inventory); }
-
-        public static void Inventory(this EntityVariables vars, Inventory inventory)
-        { vars[ItemEntityVariableTypes.Inventory] = inventory; }
-        
+        extension(EntityVariables vars)
+        {
+            public Inventory Inventory
+            {
+                get => vars.GetAsOrDefault(ItemEntityVariableTypes.Inventory, () => new Inventory());
+                set => vars[ItemEntityVariableTypes.Inventory] = value;
+            }
+        }
+       
         public static bool HasLootTable(this EntityVariables vars) 
         { return vars.ContainsKey(ItemEntityVariableTypes.LootTable); }
         
-        public static ILootTable LootTable(this EntityVariables vars)
-        { return vars.GetAs<ILootTable>(ItemEntityVariableTypes.LootTable); }
-
-        public static void LootTable(this EntityVariables vars, ILootTable lootTable)
-        { vars[ItemEntityVariableTypes.LootTable] = lootTable; }
+        extension(EntityVariables vars)
+        {
+            public ILootTable LootTable
+            {
+                get => vars.GetAsOrDefault(ItemEntityVariableTypes.LootTable, () => new DefaultLootTable());
+                set => vars[ItemEntityVariableTypes.LootTable] = value;
+            }
+        }
     }
 }

@@ -87,7 +87,7 @@ namespace OpenRpg.Items.Extensions
             if (!inventory.Variables.HasMaxSlots())
             { return true; }
 
-            return inventory.Items.Count + slotsRequired < inventory.Variables.MaxSlots();
+            return inventory.Items.Count + slotsRequired < inventory.Variables.MaxSlots;
         }
         
         public static bool HasWeightCapacity(this Inventory inventory, float weightToAdd)
@@ -96,7 +96,7 @@ namespace OpenRpg.Items.Extensions
             { return true; }
 
             var proposedWeight = inventory.Items.Sum(x => x.Variables.Weight) + weightToAdd;
-            return proposedWeight < inventory.Variables.MaxWeight();
+            return proposedWeight < inventory.Variables.MaxWeight;
         }
         
         /// <summary>
@@ -148,7 +148,7 @@ namespace OpenRpg.Items.Extensions
                 .OrderByDescending(x => x.Variables.Amount)
                 .ToArray();
 
-            var maxSlots = inventory.Variables.MaxSlots();
+            var maxSlots = inventory.Variables.MaxSlots;
             if (maxSlots > 0)
             {
                 var currentSlots = inventory.Items.Count;
@@ -204,7 +204,6 @@ namespace OpenRpg.Items.Extensions
                     itemDataHasWithSpace.Variables.Amount = existingAmount + amountLeft;
                     amountLeft = 0;
                 }
-                
 
                 index++;
             }

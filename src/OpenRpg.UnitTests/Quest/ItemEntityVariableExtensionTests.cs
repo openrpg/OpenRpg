@@ -15,9 +15,9 @@ public class QuestEntityVariableExtensionTests
         Assert.False(entityVars.HasFactionReputation());
         
         var dummyFactionRep = new FactionReputation();
-        entityVars.FactionReputation(dummyFactionRep);
+        entityVars.FactionReputation = dummyFactionRep;
         Assert.True(entityVars.HasFactionReputation());
-        Assert.Equal(entityVars.FactionReputation(), dummyFactionRep);
+        Assert.Equal(entityVars.FactionReputation, dummyFactionRep);
     }
     
     [Fact]
@@ -27,9 +27,9 @@ public class QuestEntityVariableExtensionTests
         Assert.False(entityVars.HasQuestState());
         
         var dummyQuestState = new QuestState();
-        entityVars.QuestState(dummyQuestState);
+        entityVars.QuestState = dummyQuestState;
         Assert.True(entityVars.HasQuestState());
-        Assert.Equal(entityVars.QuestState(), dummyQuestState);
+        Assert.Equal(entityVars.QuestState, dummyQuestState);
     }
     
     [Fact]
@@ -39,8 +39,8 @@ public class QuestEntityVariableExtensionTests
         Assert.False(entityVars.HasTriggerState());
         
         var dummyQuestState = new TriggerState();
-        entityVars.TriggerState(dummyQuestState);
+        entityVars.TriggerState = dummyQuestState;
         Assert.True(entityVars.HasTriggerState());
-        Assert.Equal(entityVars.TriggerState(), dummyQuestState);
+        Assert.Equal(entityVars.TriggerState, dummyQuestState);
     }
 }

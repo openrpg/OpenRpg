@@ -16,9 +16,9 @@ public class ItemEntityVariableExtensionTests
         Assert.False(entityVars.HasInventory());
         
         var dummyInventory = new Inventory();
-        entityVars.Inventory(dummyInventory);
+        entityVars.Inventory = dummyInventory;
         Assert.True(entityVars.HasInventory());
-        Assert.Equal(entityVars.Inventory(), dummyInventory);
+        Assert.Equal(entityVars.Inventory, dummyInventory);
     }
     
     [Fact]
@@ -28,9 +28,9 @@ public class ItemEntityVariableExtensionTests
         Assert.False(entityVars.HasEquipment());
         
         var dummyEquipment = new Equipment();
-        entityVars.Equipment(dummyEquipment);
+        entityVars.Equipment = dummyEquipment;
         Assert.True(entityVars.HasEquipment());
-        Assert.Equal(entityVars.Equipment(), dummyEquipment);
+        Assert.Equal(entityVars.Equipment, dummyEquipment);
     }
     
     [Fact]
@@ -40,8 +40,8 @@ public class ItemEntityVariableExtensionTests
         Assert.False(entityVars.HasLootTable());
         
         var dummyLootTable = new DefaultLootTable();
-        entityVars.LootTable(dummyLootTable);
+        entityVars.LootTable = dummyLootTable;
         Assert.True(entityVars.HasLootTable());
-        Assert.Equal(entityVars.LootTable(), dummyLootTable);
+        Assert.Equal(entityVars.LootTable, dummyLootTable);
     }
 }

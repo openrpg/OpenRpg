@@ -164,8 +164,8 @@ namespace OpenRpg.Genres.Builders
         {
             _variables.Class = ProcessClass();
             _variables.Race = ProcessRace();
-            _variables.Equipment(ProcessEquipment());
-            _variables.Inventory(ProcessInventory());
+            _variables.Equipment = ProcessEquipment();
+            _variables.Inventory = ProcessInventory();
             _variables.Gender = _genderId;
 
             var character = CreateCharacterInstance();

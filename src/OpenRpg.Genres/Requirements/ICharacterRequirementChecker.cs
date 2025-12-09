@@ -8,6 +8,6 @@ namespace OpenRpg.Genres.Requirements
     public interface ICharacterRequirementChecker : IEntityRequirementChecker<Character>
     {
         bool IsRequirementMet(IQuestState state, Requirement requirement);
-        bool IsRequirementMet(ITriggerStateVariables state, Requirement requirement);
+        bool IsRequirementMet(ITriggerState state, Requirement requirement);
     }
 }

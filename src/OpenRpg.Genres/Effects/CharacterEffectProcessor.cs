@@ -50,7 +50,7 @@ namespace OpenRpg.Genres.Effects
             
             if (entity.Variables.HasEquipment())
             {
-                var equipment = entity.Variables.Equipment();
+                var equipment = entity.Variables.Equipment;
                 var equippedItems = equipment.Slots.Values
                     .Where(x => x != null);
 

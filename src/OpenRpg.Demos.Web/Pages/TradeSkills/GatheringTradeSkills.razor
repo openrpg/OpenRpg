@@ -201,8 +201,8 @@
     {
         TradeSkillCalculator = new TradeSkillCalculator(Randomizer) { RandomnessVariance = 0.2f };
         
-        Example1Inventory.Variables.MaxSlots(10);
-        Example2Inventory.Variables.MaxSlots(10);
+        Example1Inventory.Variables.MaxSlots = 10;
+        Example2Inventory.Variables.MaxSlots = 10;
         CopperOreGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.CopperOre);
         OakLogGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.OakLog);
         IronOreGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.IronOre);

@@ -118,7 +118,7 @@ public class DefaultInventoryAmountTests
         existingItem2.Variables.Amount = 8;
         
         var inventory = new Inventory();
-        inventory.Variables.MaxSlots(2);
+        inventory.Variables.MaxSlots = 2;
         inventory.Items.Add(existingItem1);
         inventory.Items.Add(existingItem2);
         

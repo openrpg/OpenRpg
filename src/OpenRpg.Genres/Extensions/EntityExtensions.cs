@@ -15,7 +15,7 @@ namespace OpenRpg.Genres.Extensions
 
             if (entity.Variables.HasRace()) { effects.AddRange(entity.Variables.Race.GetEffects(templateAccessor)); }
             if (entity.Variables.HasClass()) { effects.AddRange(entity.Variables.Class.GetEffects(templateAccessor)); }
-            if (entity.Variables.HasEquipment()) { effects.AddRange(entity.Variables.Equipment().GetEffects(templateAccessor)); }
+            if (entity.Variables.HasEquipment()) { effects.AddRange(entity.Variables.Equipment.GetEffects(templateAccessor)); }
             return effects;
         }
         

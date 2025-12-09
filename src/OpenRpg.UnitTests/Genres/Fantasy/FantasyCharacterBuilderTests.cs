@@ -22,7 +22,7 @@ namespace OpenRpg.UnitTests.Genres.Fantasy
             Assert.NotNull(character);
             Assert.NotNull(character.Variables);
 
-            var equipment = character.Variables.Equipment();
+            var equipment = character.Variables.Equipment;
             Assert.NotNull(equipment);
 
             var slots = equipment.Slots;
