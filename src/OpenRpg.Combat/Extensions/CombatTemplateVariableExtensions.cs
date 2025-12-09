@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Types;
@@ -16,7 +15,7 @@ namespace OpenRpg.Combat.Extensions
         {
             public IReadOnlyCollection<AbilityData> Abilities
             {
-                get => vars.GetAsOrDefault(CombatTemplateVariableTypes.Abilities, Array.Empty<AbilityData>);
+                get => vars.GetAsOrDefault(CombatTemplateVariableTypes.Abilities, IReadOnlyCollection<AbilityData>.Empty);
                 set => vars[CombatTemplateVariableTypes.Abilities] = value;
                 
             }

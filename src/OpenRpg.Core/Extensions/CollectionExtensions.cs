@@ -5,6 +5,11 @@ namespace OpenRpg.Core.Extensions
 {
     public static class CollectionExtensions
     {
+        extension<T>(IReadOnlyCollection<T>)
+        {
+            public static IReadOnlyCollection<T> Empty() => Array.Empty<T>();
+        }
+        
         public static void ForEach<TK, TV>(this IDictionary<TK, TV> dictionary, Action<TK, TV> action)
         {
             foreach(var pair in dictionary)

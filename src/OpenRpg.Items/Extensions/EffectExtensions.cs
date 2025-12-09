@@ -19,7 +19,8 @@ namespace OpenRpg.Items.Extensions
             if (itemData.Variables.HasProceduralAssociation())
             {
                 var proceduralEffects = template.Variables.ProceduralEffects;
-                foreach (var proceduralEffect in itemData.Variables.ProceduralAssociation)
+                var proceduralAssociations = itemData.Variables.ProceduralAssociation;
+                foreach (var proceduralEffect in proceduralAssociations)
                 {
                     var effect = proceduralEffects.Effects[proceduralEffect.AssociatedId];
                     if (effect.ScalingType == CoreEffectScalingTypes.Value)
