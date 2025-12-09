@@ -61,7 +61,7 @@ namespace OpenRpg.Genres.Effects
             if (entity.Variables.HasActiveEffects())
             {
                 var activeEffects = entity.Variables.ActiveEffects().ActiveEffects
-                    .Where(x => x.IsPassiveEffect())
+                    .Where(x => x.IsPassiveEffect)
                     .Select(x => x.ToEffect());
                 
                 foreach(var effect in activeEffects)

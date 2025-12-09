@@ -1,32 +1,34 @@
 using OpenRpg.Combat.Effects;
 using OpenRpg.Core.Effects;
-using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Combat.Extensions
 {
     public static class ActiveEffectsExtensions
     {
-        public static bool IsPassiveEffect(this ActiveEffect activeEffect)
-        { return IsPassiveEffect(activeEffect.StaticEffect); }
+        extension(ActiveEffect effect)
+        {
+            public bool IsPassiveEffect => effect.StaticEffect.IsPassiveEffect;
+            public float StackedPotency => GetStackedPotency(effect);
+            public int TicksSoFar => (int)(effect.ActiveTime / effect.StaticEffect.Frequency);
+        }
+
+        extension(TimedStaticEffect effect)
+        {
+            public bool IsPassiveEffect => effect.Frequency == 0;
+        }
         
-        public static bool IsPassiveEffect(this TimedStaticEffect staticEffect)
-        { return staticEffect.Frequency == 0; }
-        
-        public static float GetStackedPotency(this ActiveEffect activeEffect)
+        public static float GetStackedPotency(ActiveEffect activeEffect)
         {
             var stacks = activeEffect.Stacks > 0 ? activeEffect.Stacks : 1;
             return activeEffect.StaticEffect.Potency * stacks;
         }
-        
-        public static int TicksSoFar(this ActiveEffect activeEffect)
-        { return (int)(activeEffect.ActiveTime / activeEffect.StaticEffect.Frequency); }
         
         public static StaticEffect ToEffect(this ActiveEffect activeEffect)
         { 
             return new StaticEffect()
             {
                 EffectType = activeEffect.StaticEffect.EffectType,
-                Potency = activeEffect.GetStackedPotency(),
+                Potency = activeEffect.StackedPotency,
                 Requirements = activeEffect.StaticEffect.Requirements
             }; 
         }

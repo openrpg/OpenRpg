@@ -67,7 +67,7 @@ namespace OpenRpg.Genres.Requirements
                 if (!character.Variables.HasTradeSkillState())
                 { return false; }
 
-                var tradeSkills = character.Variables.TradeSkillState();
+                var tradeSkills = character.Variables.TradeSkillState;
                 if (!tradeSkills.ContainsKey(requirement.Association.AssociatedId))
                 { return false; }
 

@@ -12,11 +12,14 @@ namespace OpenRpg.Items.TradeSkills.Extensions
     {
         public static bool HasTradeSkillState(this EntityVariables vars) 
         { return vars.ContainsKey(TradeSkillEntityVariableTypes.TradeSkillState); }
-        
-        public static TradeSkillState TradeSkillState(this EntityVariables vars)
-        { return vars.GetAs<TradeSkillState>(TradeSkillEntityVariableTypes.TradeSkillState); }
 
-        public static void TradeSkillState(this EntityVariables vars, TradeSkillState tradeSkillState)
-        { vars[TradeSkillEntityVariableTypes.TradeSkillState] = tradeSkillState; }
+        extension(EntityVariables vars)
+        {
+            public TradeSkillState TradeSkillState
+            {
+                get => vars.GetAsOrDefault(TradeSkillEntityVariableTypes.TradeSkillState, () => new TradeSkillState());
+                set => vars[TradeSkillEntityVariableTypes.TradeSkillState] = value;
+            }
+        }
     }
 }

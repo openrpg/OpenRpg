@@ -168,7 +168,7 @@
     public bool HasMatsForCopperSword => CraftingInventory.HasItemsRequiredFor(CopperSwordCraftingTemplate);
     public bool HasSkillsForCopperSword => RequirementsChecker.AreRequirementsMet(DummyCharacter, CopperSwordCraftingTemplate);
 
-    public TradeSkillState TradeSkillState => DummyCharacter.Variables.TradeSkillState();
+    public TradeSkillState TradeSkillState => DummyCharacter.Variables.TradeSkillState;
     
     protected override void OnInitialized()
     {
@@ -180,7 +180,7 @@
         CraftingInventory.Variables.MaxSlots = 50;
         GiveCopperOre(10);
         
-        DummyCharacter.Variables.TradeSkillState(new TradeSkillState());
+        DummyCharacter.Variables.TradeSkillState = new TradeSkillState();
         TradeSkillState.Smithing(1);
         
         base.OnInitialized();

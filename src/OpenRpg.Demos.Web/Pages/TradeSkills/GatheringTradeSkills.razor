@@ -195,7 +195,7 @@
     public TradeSkillItemEntry CopperOreTradeSkillItemEntry => CopperOreGatheringTemplate.OutputItems.First();
     public TradeSkillItemEntry OakLogTradeSkillItemEntry => OakLogGatheringTemplate.OutputItems.First();
     public TradeSkillItemEntry IronOreTradeSkillItemEntry => IronOreGatheringTemplate.OutputItems.First();
-    public TradeSkillState TradeSkillState => DummyCharacter.Variables.TradeSkillState();
+    public TradeSkillState TradeSkillState => DummyCharacter.Variables.TradeSkillState;
     
     protected override void OnInitialized()
     {
@@ -207,7 +207,7 @@
         OakLogGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.OakLog);
         IronOreGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.IronOre);
 
-        DummyCharacter.Variables.TradeSkillState(new TradeSkillState());
+        DummyCharacter.Variables.TradeSkillState = new TradeSkillState();
         TradeSkillState.Mining(1);
         
         base.OnInitialized();
