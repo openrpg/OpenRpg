@@ -6,20 +6,36 @@ namespace OpenRpg.Genres.Fantasy.Extensions
 {
     public static class TradeSkillStateExtensions
     {
-        public static int Logging(this TradeSkillState state) => state.Get(FantasyGatheringTradeSkillTypes.Logging);
-        public static void Logging(this TradeSkillState state, int value) => state[FantasyGatheringTradeSkillTypes.Logging] = value;
+        extension(TradeSkillState state)
+        {
+            public int Logging
+            {
+                get => state.Get(FantasyGatheringTradeSkillTypes.Logging);
+                set => state[FantasyGatheringTradeSkillTypes.Logging] = value;
+            }
+            
+            public int Mining
+            {
+                get => state.Get(FantasyGatheringTradeSkillTypes.Mining);
+                set => state[FantasyGatheringTradeSkillTypes.Mining] = value;
+            }
+            
+            public int Smelting
+            {
+                get => state.Get(FantasyCraftingTradeSkillTypes.Smelting);
+                set => state[FantasyCraftingTradeSkillTypes.Smelting] = value;
+            }
+            
+            public int Smithing
+            {
+                get => state.Get(FantasyCraftingTradeSkillTypes.Smithing);
+                set => state[FantasyCraftingTradeSkillTypes.Smithing] = value;
+            }
+        }
+
         public static void AddLogging(this TradeSkillState state, int addition) => state.AddValue(FantasyGatheringTradeSkillTypes.Logging, addition);
-        
-        public static int Mining(this TradeSkillState state) => state.Get(FantasyGatheringTradeSkillTypes.Mining);
-        public static void Mining(this TradeSkillState state, int value) => state[FantasyGatheringTradeSkillTypes.Mining] = value;
         public static void AddMining(this TradeSkillState state, int addition) => state.AddValue(FantasyGatheringTradeSkillTypes.Mining, addition);
-        
-        public static int Smelting(this TradeSkillState state) => state.Get(FantasyCraftingTradeSkillTypes.Smelting);
-        public static void Smelting(this TradeSkillState state, int value) => state[FantasyCraftingTradeSkillTypes.Smelting] = value;
         public static void AddSmelting(this TradeSkillState state, int addition) => state.AddValue(FantasyCraftingTradeSkillTypes.Smelting, addition);
-        
-        public static int Smithing(this TradeSkillState state) => state.Get(FantasyCraftingTradeSkillTypes.Smithing);
-        public static void Smithing(this TradeSkillState state, int value) => state[FantasyCraftingTradeSkillTypes.Smithing] = value;
         public static void AddSmithing(this TradeSkillState state, int addition) => state.AddValue(FantasyCraftingTradeSkillTypes.Smithing, addition);
     }
 }

@@ -1,5 +1,4 @@
 using OpenRpg.Core.Extensions;
-using OpenRpg.Entities.Entity;
 using OpenRpg.Entities.State.Variables;
 using OpenRpg.Genres.Fantasy.Types;
 

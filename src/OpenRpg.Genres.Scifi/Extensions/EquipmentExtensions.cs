@@ -6,10 +6,19 @@ namespace OpenRpg.Genres.Scifi.Extensions
 {
     public static class EquipmentExtensions
     {
-        public static ItemData WeaponSlot(this Equipment equipment) => equipment.Slots.Get(ScifiEntityEquipmentSlotTypes.WeaponSlot);
-        public static ItemData ArmourSlot(this Equipment equipment) => equipment.Slots.Get(ScifiEntityEquipmentSlotTypes.ArmourSlot);
-        
-        public static void WeaponSlot(this Equipment equipment, ItemData itemData) => equipment.Slots[ScifiEntityEquipmentSlotTypes.WeaponSlot] = itemData;
-        public static void ArmourSlot(this Equipment equipment, ItemData itemData) => equipment.Slots[ScifiEntityEquipmentSlotTypes.ArmourSlot] = itemData;
+        extension(Equipment equipment)
+        {
+            public ItemData WeaponSlot
+            {
+                get => equipment.Slots.Get(ScifiEntityEquipmentSlotTypes.WeaponSlot);
+                set => equipment.Slots[ScifiEntityEquipmentSlotTypes.WeaponSlot] = value;
+            }
+            
+            public ItemData ArmourSlot
+            {
+                get => equipment.Slots.Get(ScifiEntityEquipmentSlotTypes.ArmourSlot);
+                set => equipment.Slots[ScifiEntityEquipmentSlotTypes.ArmourSlot] = value;
+            }
+        }
     }
 }

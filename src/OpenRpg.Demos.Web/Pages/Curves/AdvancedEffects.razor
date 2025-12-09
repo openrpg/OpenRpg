@@ -283,7 +283,7 @@
         };
         
         var equipment = new Equipment();
-        equipment.MainHandSlot(new ItemData() { TemplateId = pretendWeapon.Id });
+        equipment.MainHandSlot = new ItemData() { TemplateId = pretendWeapon.Id };
 
         ExampleCharacter.Variables.Race = new RaceData() { TemplateId = pretendHumanRace.Id };
         ExampleCharacter.Variables.Class = new ClassData() { TemplateId = pretendFighterClassTemplate.Id };

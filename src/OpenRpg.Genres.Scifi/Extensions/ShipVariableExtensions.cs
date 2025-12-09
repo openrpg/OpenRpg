@@ -1,3 +1,4 @@
+using OpenRpg.Core.Extensions;
 using OpenRpg.Genres.Scifi.Equippables.ShipSlots;
 using OpenRpg.Genres.Scifi.Types;
 using OpenRpg.Genres.Scifi.Variables;
@@ -10,22 +11,25 @@ namespace OpenRpg.Genres.Scifi.Extensions
     /// </summary>
     public static class ShipVariableExtensions
     {
+        extension(ShipVariables vars)
+        {
+            public ShipEquipment Equipment
+            {
+                get => vars.GetAsOrDefault(ShipVariableTypes.Equipment, () => new ShipEquipment());
+                set => vars[ShipVariableTypes.Equipment] = value;
+            }
+            
+            public Inventory Inventory
+            {
+                get => vars.GetAsOrDefault(ShipVariableTypes.Inventory, () => new Inventory());
+                set => vars[ShipVariableTypes.Inventory] = value;
+            }
+        }
+        
         public static bool HasEquipment(this ShipVariables vars) 
         { return vars.ContainsKey(ShipVariableTypes.Equipment); }
         
-        public static ShipEquipment Equipment(this ShipVariables vars)
-        { return vars[ShipVariableTypes.Equipment] as ShipEquipment; }
-
-        public static void Equipment(this ShipVariables vars, ShipEquipment equipment)
-        { vars[ShipVariableTypes.Equipment] = equipment; }
-        
         public static bool HasInventory(this ShipVariables vars) 
         { return vars.ContainsKey(ShipVariableTypes.Inventory); }
-        
-        public static Inventory Inventory(this ShipVariables vars)
-        { return vars[ShipVariableTypes.Inventory] as Inventory; }
-
-        public static void Inventory(this ShipVariables vars, Inventory inventory)
-        { vars[ShipVariableTypes.Inventory] = inventory; }
     }
 }

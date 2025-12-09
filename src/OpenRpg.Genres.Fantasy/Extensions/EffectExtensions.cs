@@ -1,7 +1,6 @@
 using System.Linq;
 using OpenRpg.Combat.Effects;
 using OpenRpg.Core.Effects;
-using OpenRpg.Entities.Effects;
 using OpenRpg.Genres.Fantasy.Effects;
 using OpenRpg.Genres.Fantasy.Types;
 
@@ -60,20 +59,25 @@ namespace OpenRpg.Genres.Fantasy.Extensions
             return FantasyDamageTypes.UnknownDamage;
         }
 
-        public static bool IsDamagingEffect(this StaticEffect staticEffect)
-        {  return EffectTypeGroups.DamageEffectTypes.Contains(staticEffect.EffectType); }
+        extension(StaticEffect effect)
+        {
+            public bool IsDamagingEffect => EffectTypeGroups.DamageEffectTypes.Contains(effect.EffectType);
+            public bool IsDefensiveEffect => EffectTypeGroups.DefenseEffectTypes.Contains(effect.EffectType);
+            public bool IsBeneficialEffect => IsBeneficialEffect(effect);
+        }
         
-        public static bool IsDefensiveEffect(this StaticEffect staticEffect)
-        {  return EffectTypeGroups.DefenseEffectTypes.Contains(staticEffect.EffectType); }
+        extension(ActiveEffect effect)
+        {
+            public bool IsDamagingEffect => effect.StaticEffect.IsDamagingEffect;
+            public bool IsDefensiveEffect => effect.StaticEffect.IsDefensiveEffect;
+            public bool IsBeneficialEffect => effect.StaticEffect.IsBeneficialEffect;
+        }
 
-        public static bool IsBeneficialEffect(this ActiveEffect effect)
-        { return IsBeneficialEffect(effect.StaticEffect); }
-        
-        public static bool IsBeneficialEffect(this StaticEffect staticEffect)
+        public static bool IsBeneficialEffect(StaticEffect staticEffect)
         {
             if(staticEffect.EffectType != FantasyEffectTypes.LightBonusAmount)
             {
-                if (staticEffect.IsDamagingEffect())
+                if (staticEffect.IsDamagingEffect)
                 { return false; }
             }
 

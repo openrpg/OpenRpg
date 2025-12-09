@@ -123,7 +123,7 @@
         <CardSection>
             <div class="field">
                 <div class="control">
-                    <TagLabel Label="Smithing Skill" Content="@TradeSkillState.Smithing().ToString()"></TagLabel>
+                    <TagLabel Label="Smithing Skill" Content="@TradeSkillState.Smithing.ToString()"></TagLabel>
                 </div>
             </div>
             @if (IsCrafting)
@@ -181,7 +181,7 @@
         GiveCopperOre(10);
         
         DummyCharacter.Variables.TradeSkillState = new TradeSkillState();
-        TradeSkillState.Smithing(1);
+        TradeSkillState.Smithing = 1;
         
         base.OnInitialized();
     }
@@ -226,7 +226,7 @@
         CurrentTemplate.CraftFrom(CraftingInventory, TemplateAccessor);
         ActionBarRef?.Reset();
         
-        var currentSkill = TradeSkillState.Smithing();
+        var currentSkill = TradeSkillState.Smithing;
         var tradeSkillPoints = TradeSkillCalculator.CalculateSkillUpPointsFor(currentSkill, CurrentTemplate.SkillDifficulty);
         TradeSkillState.AddSmithing(tradeSkillPoints);
         

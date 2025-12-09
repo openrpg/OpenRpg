@@ -97,11 +97,11 @@
     }
 
     public float TotalDamage => Effects.GetStaticEffects()
-        .Where(x => x.IsDamagingEffect() || x.EffectType == FantasyEffectTypes.DamageBonusAmount)
+        .Where(x => x.IsDamagingEffect || x.EffectType == FantasyEffectTypes.DamageBonusAmount)
         .Sum(x => x.Potency);
 
     public float TotalDefense => Effects.GetStaticEffects()
-        .Where(x => x.IsDefensiveEffect() || x.EffectType == FantasyEffectTypes.DefenseBonusAmount)
+        .Where(x => x.IsDefensiveEffect || x.EffectType == FantasyEffectTypes.DefenseBonusAmount)
         .Sum(x => x.Potency);
 
     

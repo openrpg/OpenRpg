@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Fantasy.Types;
 

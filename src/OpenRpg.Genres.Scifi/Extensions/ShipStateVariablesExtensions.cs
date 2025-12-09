@@ -8,27 +8,47 @@ namespace OpenRpg.Genres.Scifi.Extensions
 {
     public static class ShipStateVariablesExtensions
     {
-        public static int Armour(this ShipStateVariables state) => (int)state.Get(ScifiShipStateVariableTypes.Armour);
-        public static void Armour(this ShipStateVariables state, int value) => state[ScifiShipStateVariableTypes.Armour] = value;
+        extension(ShipStateVariables state)
+        {
+            public int Armour
+            {
+                get => (int)state.Get(ScifiShipStateVariableTypes.Armour);
+                set => state[ScifiShipStateVariableTypes.Armour] = value;
+            }
+            
+            public int Shield
+            {
+                get => (int)state.Get(ScifiShipStateVariableTypes.Shield);
+                set => state[ScifiShipStateVariableTypes.Shield] = value;
+            }
+            
+            public int Energy
+            {
+                get => (int)state.Get(ScifiShipStateVariableTypes.Energy);
+                set => state[ScifiShipStateVariableTypes.Energy] = value;
+            }
+
+            public bool IsDead => state.Armour <= 0;
+        }
         
         public static void AddArmour(this ShipStateVariables state, int change, int? max = null)
         {
-            var newValue = state.Armour() + change;
+            var newValue = state.Armour + change;
             if(newValue <= 0) { newValue = 0; }
             
             if(max == null) 
-            { state.Armour(newValue); }
+            { state.Armour = newValue; }
             else 
             {state.EnsureArmourInBounds(newValue, max.Value); }
         }
 
         public static void DeductArmour(this ShipStateVariables state, int change, int? max = null)
         {
-            var newValue = state.Armour() - change;
+            var newValue = state.Armour - change;
             if(newValue <= 0) { newValue = 0; }
             
             if(max == null) 
-            { state.Armour(newValue); }
+            { state.Armour = newValue; }
             else 
             {state.EnsureArmourInBounds(newValue, max.Value); }
         }
@@ -43,27 +63,24 @@ namespace OpenRpg.Genres.Scifi.Extensions
             { state[ScifiShipStateVariableTypes.Armour] = value; }
         }
         
-        public static int Shield(this ShipStateVariables state) => (int)state.Get(ScifiShipStateVariableTypes.Shield);
-        public static void Shield(this ShipStateVariables state, int value) => state[ScifiShipStateVariableTypes.Shield] = value;
-        
         public static void AddShield(this ShipStateVariables state, int change, int? max = null)
         {
-            var newValue = state.Shield() + change;
+            var newValue = state.Shield + change;
             if(newValue <= 0) { newValue = 0; }
             
             if(max == null) 
-            { state.Shield(newValue); }
+            { state.Shield = newValue; }
             else 
             {state.EnsureShieldInBounds(newValue, max.Value); }
         }
 
         public static void DeductShield(this ShipStateVariables state, int change, int? max = null)
         {
-            var newValue = state.Shield() - change;
+            var newValue = state.Shield - change;
             if(newValue <= 0) { newValue = 0; }
             
             if(max == null) 
-            { state.Shield(newValue); }
+            { state.Shield = newValue; }
             else 
             {state.EnsureShieldInBounds(newValue, max.Value); }
         }
@@ -78,27 +95,24 @@ namespace OpenRpg.Genres.Scifi.Extensions
             { state[ScifiShipStateVariableTypes.Shield] = value; }
         }
         
-        public static int Energy(this ShipStateVariables state) => (int)state.Get(ScifiShipStateVariableTypes.Shield);
-        public static void Energy(this ShipStateVariables state, int value) => state[ScifiShipStateVariableTypes.Shield] = value;
-        
         public static void AddEnergy(this ShipStateVariables state, int change, int? max = null)
         {
-            var newValue = state.Energy() + change;
+            var newValue = state.Energy + change;
             if(newValue <= 0) { newValue = 0; }
             
             if(max == null) 
-            { state.Energy(newValue); }
+            { state.Energy = newValue; }
             else 
             {state.EnsureEnergyInBounds(newValue, max.Value); }
         }
 
         public static void DeductEnergy(this ShipStateVariables state, int change, int? max = null)
         {
-            var newValue = state.Energy() - change;
+            var newValue = state.Energy - change;
             if(newValue <= 0) { newValue = 0; }
             
             if(max == null) 
-            { state.Energy(newValue); }
+            { state.Energy = newValue; }
             else 
             {state.EnsureEnergyInBounds(newValue, max.Value); }
         }
@@ -120,8 +134,5 @@ namespace OpenRpg.Genres.Scifi.Extensions
             if (totalDamage < 0) { totalDamage = 0; }
             state.DeductArmour(totalDamage);
         }
-        
-        public static bool IsDead(this ShipStateVariables state)
-        { return state.Armour() <= 0; }
     }
 }
