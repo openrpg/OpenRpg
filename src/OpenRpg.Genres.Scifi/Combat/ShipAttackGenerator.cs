@@ -22,7 +22,7 @@ namespace OpenRpg.Genres.Scifi.Combat
 
         public Attack GenerateAttack(Ability ability, ShipStatsVariables stats)
         {
-            var baseDamage = ability.Template.Variables.Damage();
+            var baseDamage = ability.Template.Variables.Damage;
             return GenerateAttack(baseDamage, stats);
         }
 

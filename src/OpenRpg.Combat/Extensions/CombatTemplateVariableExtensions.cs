@@ -11,11 +11,17 @@ namespace OpenRpg.Combat.Extensions
     {
         public static bool HasAbilities(this ITemplateVariables vars) =>
             vars.ContainsKey(CombatTemplateVariableTypes.Abilities);
+
+        extension(ITemplateVariables vars)
+        {
+            public IReadOnlyCollection<AbilityData> Abilities
+            {
+                get => vars.GetAsOrDefault(CombatTemplateVariableTypes.Abilities, Array.Empty<AbilityData>);
+                set => vars[CombatTemplateVariableTypes.Abilities] = value;
+                
+            }
+        }
         
-        public static IReadOnlyCollection<AbilityData> Abilities(this ITemplateVariables vars) =>
-            vars.GetAsOrDefault(CombatTemplateVariableTypes.Abilities, Array.Empty<AbilityData>);
-        
-        public static void Abilities(this ITemplateVariables vars, IReadOnlyCollection<AbilityData> abilities) =>
-            vars[CombatTemplateVariableTypes.Abilities] = abilities;
+
     }
 }

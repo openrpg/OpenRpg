@@ -95,7 +95,7 @@ namespace OpenRpg.Genres.Requirements
             if (requirement.RequirementType == GenreRequirementTypes.ActiveEffectRequirement)
             {
                 if(!character.Variables.HasActiveEffects()) { return false; }
-                return character.Variables.ActiveEffects().HasEffect(requirement.Association.AssociatedId);
+                return character.Variables.ActiveEffects.HasEffect(requirement.Association.AssociatedId);
             }
             
             return true;

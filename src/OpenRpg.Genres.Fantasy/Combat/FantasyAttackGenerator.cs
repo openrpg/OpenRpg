@@ -61,7 +61,7 @@ namespace OpenRpg.Genres.Fantasy.Combat
         
         public virtual Attack GenerateAttack(Ability ability, EntityStatsVariables stats)
         {
-            var baseDamage = ability.Template.Variables.Damage();
+            var baseDamage = ability.Template.Variables.Damage;
             return GenerateAttack(baseDamage, stats);
         }
         

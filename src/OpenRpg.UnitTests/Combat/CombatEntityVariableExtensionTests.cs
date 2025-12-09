@@ -14,8 +14,8 @@ public class CombatEntityVariableExtensionTests
         Assert.False(entityVars.HasActiveEffects());
         
         var dummyActiveEffects = new DefaultActiveEffects();
-        entityVars.ActiveEffects(dummyActiveEffects);
+        entityVars.ActiveEffects = dummyActiveEffects;
         Assert.True(entityVars.HasActiveEffects());
-        Assert.Equal(entityVars.ActiveEffects(), dummyActiveEffects);
+        Assert.Equal(entityVars.ActiveEffects, dummyActiveEffects);
     }
 }
