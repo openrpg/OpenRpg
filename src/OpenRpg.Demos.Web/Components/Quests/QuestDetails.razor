@@ -91,7 +91,7 @@
             TemplateId = itemTemplateId,
             Variables = new ItemVariables()
         };
-        item.Variables.Amount(itemAmount);
+        item.Variables.Amount = itemAmount;
         return TemplateAccessor.ToInstance(item);
     }
 }

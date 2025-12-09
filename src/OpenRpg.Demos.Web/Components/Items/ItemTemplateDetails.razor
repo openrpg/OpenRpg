@@ -26,7 +26,7 @@
     <div class="columns">
         <div class="column">
             <figure class="image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
-                <img src="images/items/@(ItemTemplate.Variables.AssetCode()).png">
+                <img src="images/items/@(ItemTemplate.Variables.AssetCode).png">
             </figure>
         </div>
         <div class="column">
@@ -115,7 +115,7 @@
     protected override void OnInitialized()
     {
         if (ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
-        { _itemQualityTypeId = ItemTemplate.Variables.QualityType(); }
+        { _itemQualityTypeId = ItemTemplate.Variables.QualityType; }
 
     }
 

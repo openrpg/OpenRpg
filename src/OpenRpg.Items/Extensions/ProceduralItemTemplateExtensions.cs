@@ -11,9 +11,9 @@ namespace OpenRpg.Items.Extensions
             if (!template.Variables.HasProceduralEffects())
             { return new ItemData() { TemplateId = template.Id }; }
 
-            var takenEffects = template.Variables.ProceduralEffects().GenerateProceduralEffectAssociations(randomizer);
+            var takenEffects = template.Variables.ProceduralEffects.GenerateProceduralEffectAssociations(randomizer);
             var itemData = new ItemData { TemplateId = template.Id };
-            itemData.Variables.ProceduralAssociation(takenEffects);
+            itemData.Variables.ProceduralAssociation = takenEffects;
             return itemData;
         }
     }

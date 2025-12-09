@@ -25,10 +25,10 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
     public ItemCraftingTemplate MakeCopperIngotCraftingTemplate()
     {
         var inputItemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperOre };
-        inputItemEntry.Variables.Amount(5);
+        inputItemEntry.Variables.Amount = 5;
 
         var outputItemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperIngot };
-        outputItemEntry.Variables.Amount(1);
+        outputItemEntry.Variables.Amount = 1;
         
         return new ItemCraftingTemplate()
         {
@@ -44,12 +44,12 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
     public ItemCraftingTemplate MakeCopperSwordCraftingTemplate()
     {
         var inputItem1Entry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperIngot };
-        inputItem1Entry.Variables.Amount(2);
+        inputItem1Entry.Variables.Amount = 2;
         var inputItem2Entry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.OakLog };
-        inputItem2Entry.Variables.Amount(1);
+        inputItem2Entry.Variables.Amount = 1;
 
         var outputItemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperSword };
-        outputItemEntry.Variables.Amount(1);
+        outputItemEntry.Variables.Amount = 1;
         
         return new ItemCraftingTemplate()
         {

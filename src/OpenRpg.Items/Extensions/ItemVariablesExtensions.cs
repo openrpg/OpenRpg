@@ -20,16 +20,25 @@ namespace OpenRpg.Items.Extensions
         public static bool HasAmount(this ItemVariables variables)
         { return variables.ContainsKey(ItemVariableTypes.Amount); }
         
-        public static int Amount(this ItemVariables variables)
-        { return variables.GetIntOrDefault(ItemVariableTypes.Amount, 1); }
-
-        public static void Amount(this ItemVariables variables, int value)
-        { variables[ItemVariableTypes.Amount] = value; }
-
+        extension(ItemVariables vars)
+        {
+            public int Amount
+            {
+                get => vars.GetIntOrDefault(ItemVariableTypes.Amount, 1);
+                set => vars[ItemVariableTypes.Amount] = value;
+            }
+        }
+        
         public static bool HasWeight(this ItemVariables variables)
         { return variables.ContainsKey(ItemVariableTypes.Weight); }
         
-        public static float Weight(this ItemVariables variables) => variables.GetFloat(ItemVariableTypes.Weight);
-        public static void Weight(this ItemVariables variables, float value) => variables[ItemVariableTypes.Weight] = value;
+        extension(ItemVariables vars)
+        {
+            public float Weight
+            {
+                get => vars.GetFloat(ItemVariableTypes.Weight);
+                set => vars[ItemVariableTypes.Weight] = value;
+            }
+        }
     }
 }

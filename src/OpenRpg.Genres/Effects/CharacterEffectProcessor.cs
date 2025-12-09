@@ -29,8 +29,8 @@ namespace OpenRpg.Genres.Effects
 
             if (itemTemplate.Variables.HasProceduralEffects())
             {
-                var proceduralEffects = itemTemplate.Variables.ProceduralEffects();
-                var associatedEffects = itemData.Variables.ProceduralAssociation();
+                var proceduralEffects = itemTemplate.Variables.ProceduralEffects;
+                var associatedEffects = itemData.Variables.ProceduralAssociation;
                 ComputeProceduralEffects(proceduralEffects, associatedEffects, itemTemplate, computedEffects, relatedEntity);
             }
 

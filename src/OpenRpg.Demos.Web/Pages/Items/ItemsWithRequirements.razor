@@ -136,9 +136,9 @@
                 new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 3.0f }
             }
         };
-        template.Variables.QualityType(FantasyItemQualityTypes.UncommonQuality);
-        template.Variables.Value(150);
-        template.Variables.AssetCode("staff");
+        template.Variables.QualityType = FantasyItemQualityTypes.UncommonQuality;
+        template.Variables.Value = 150;
+        template.Variables.AssetCode = "staff";
 
         return template;
     }
@@ -163,9 +163,9 @@
                 new StaticEffect { EffectType = FantasyEffectTypes.ManaBonusAmount, Potency = 40.0f }
             }
         };
-        template.Variables.QualityType(FantasyItemQualityTypes.RareQuality);
-        template.Variables.Value(300);
-        template.Variables.AssetCode("wand");
+        template.Variables.QualityType = FantasyItemQualityTypes.RareQuality;
+        template.Variables.Value = 300;
+        template.Variables.AssetCode = "wand";
 
         return template;
     }
@@ -203,9 +203,9 @@
                 }},
             }
         };
-        template.Variables.QualityType(FantasyItemQualityTypes.EpicQuality);
-        template.Variables.Value(1000);
-        template.Variables.AssetCode("sword");
+        template.Variables.QualityType = FantasyItemQualityTypes.EpicQuality;
+        template.Variables.Value = 1000;
+        template.Variables.AssetCode = "sword";
 
         return template;
     }

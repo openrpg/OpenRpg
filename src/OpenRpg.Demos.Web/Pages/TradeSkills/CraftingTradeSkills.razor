@@ -189,7 +189,7 @@
     public void GiveCopperOre(int amount = 20)
     {
         var copperOreItem = TemplateAccessor.ToInstance(new ItemData { TemplateId = ItemTemplateLookups.CopperOre });
-        copperOreItem.Data.Variables.Amount(amount);
+        copperOreItem.Data.Variables.Amount = amount;
         CraftingInventory.AttemptAddItem(copperOreItem);
         CraftingInventoryRef?.Refresh();
     }
@@ -197,7 +197,7 @@
     public void GiveOakLog(int amount = 1)
     {
         var oakLog = TemplateAccessor.ToInstance(new ItemData { TemplateId = ItemTemplateLookups.OakLog });
-        oakLog.Data.Variables.Amount(amount);
+        oakLog.Data.Variables.Amount = amount;
         CraftingInventory.AttemptAddItem(oakLog);
         CraftingInventoryRef.Refresh();
     }

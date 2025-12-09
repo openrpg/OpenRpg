@@ -10,10 +10,13 @@ namespace OpenRpg.Entities.Extensions
         public static bool HasProceduralEffects(this ITemplateVariables vars)
             => vars.ContainsKey(CoreTemplateVariableTypes.ProceduralEffects);
 
-        public static ProceduralEffects ProceduralEffects(this ITemplateVariables vars)
-            => vars.GetAsOrDefault(CoreTemplateVariableTypes.ProceduralEffects, () => new ProceduralEffects());
-
-        public static void ProceduralEffects(this ITemplateVariables vars, ProceduralEffects proceduralEffects)
-            => vars[CoreTemplateVariableTypes.ProceduralEffects] = proceduralEffects;
+        extension(ITemplateVariables vars)
+        {
+            public ProceduralEffects ProceduralEffects
+            {
+                get => vars.GetAsOrDefault(CoreTemplateVariableTypes.ProceduralEffects, () => new ProceduralEffects());
+                set => vars[CoreTemplateVariableTypes.ProceduralEffects] = value;
+            }
+        }
     }
 }

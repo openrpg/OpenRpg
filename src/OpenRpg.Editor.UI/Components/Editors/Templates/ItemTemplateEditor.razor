@@ -1,4 +1,3 @@
-@using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Modifications
 @using OpenRpg.Items.Extensions
@@ -6,8 +5,8 @@
 
 <GenericTemplateEditor TTemplate="ItemTemplate" AssetCodePrefix="item" Template="Template">
     <AvatarContent>
-        <AssetImage CustomClasses="@($"item-image quality-type-{context.Variables.QualityType()}")"
-                    AssetType="items" AssetCode="@context.Variables.AssetCode()" />
+        <AssetImage CustomClasses="@($"item-image quality-type-{context.Variables.QualityType}")"
+                    AssetType="items" AssetCode="@context.Variables.AssetCode" />
     </AvatarContent>
     <PrimaryDetailsContent>
         <Accordion Title="Item Details" IsExpanded="true">

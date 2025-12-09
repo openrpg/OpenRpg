@@ -168,9 +168,9 @@
             NameLocaleId = "Magical Random Sword",
             ItemType = FantasyItemTypes.GenericWeapon
         };
-        proceduralItemTemplate.Variables.AssetCode("sword");
-        proceduralItemTemplate.Variables.ProceduralEffects(proceduralEffects);
-        proceduralItemTemplate.Variables.QualityType(FantasyItemQualityTypes.EpicQuality);
+        proceduralItemTemplate.Variables.AssetCode = "sword";
+        proceduralItemTemplate.Variables.ProceduralEffects = proceduralEffects;
+        proceduralItemTemplate.Variables.QualityType = FantasyItemQualityTypes.EpicQuality;
         TemplateAccessor.AddTemplate(proceduralItemTemplate);
 
         RefreshProceduralItem();

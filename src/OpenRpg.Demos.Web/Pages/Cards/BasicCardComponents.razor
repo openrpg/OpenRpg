@@ -115,9 +115,9 @@
                 new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
             }
         };
-        template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
-        template.Variables.Value(10);
-        template.Variables.AssetCode("sword");
+        template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
+        template.Variables.Value = 10;
+        template.Variables.AssetCode = "sword";
 
         var itemData = new ItemData { TemplateId = template.Id };
         var item = TemplateAccessor.ToInstance(itemData);

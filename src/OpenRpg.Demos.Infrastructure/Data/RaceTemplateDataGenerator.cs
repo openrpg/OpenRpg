@@ -41,7 +41,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "Humans are the most common of all races",
                 Effects = effects
             };
-            raceTemplate.Variables.AssetCode("race-human");
+            raceTemplate.Variables.AssetCode = "race-human";
             return raceTemplate;
         }
 
@@ -70,7 +70,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "Elves are pretty common, have pointy ears too",
                 Effects = effects
             };
-            raceTemplate.Variables.AssetCode("race-elf");
+            raceTemplate.Variables.AssetCode = "race-elf";
             return raceTemplate;
         }
 
@@ -98,7 +98,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "Dwarves are strong and hardy",
                 Effects = effects
             };
-            raceTemplate.Variables.AssetCode("race-dwarf");
+            raceTemplate.Variables.AssetCode = "race-dwarf";
             return raceTemplate;
         }
     }

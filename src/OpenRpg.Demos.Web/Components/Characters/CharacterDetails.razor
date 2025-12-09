@@ -6,7 +6,7 @@
     <h2 class="title has-text-dark">@(Name ?? "Unnamed Person")</h2>
     @if(Class != null)
     {
-    <h3 class="subtitle has-text-dark">@($"Level {Class?.Data.Variables.Level().ToString() ?? "1"} {Race.Template?.NameLocaleId ?? "Unknown Race"} {Class?.Template?.NameLocaleId ?? "Unknown Class"}")</h3>
+    <h3 class="subtitle has-text-dark">@($"Level {Class?.Data.Variables.Level.ToString() ?? "1"} {Race.Template?.NameLocaleId ?? "Unknown Race"} {Class?.Template?.NameLocaleId ?? "Unknown Class"}")</h3>
     }
     @if(@Classes != null)
     {
@@ -15,7 +15,7 @@
         @foreach (var _class in @Classes)
          {
              <div class="column">
-                 <TagLabel Label="@($"Level {_class?.Data.Variables.Level().ToString() ?? "1"}")" Content="@($"{_class?.Template?.NameLocaleId ?? "Unknown Class"}")" Centered="true"></TagLabel>
+                 <TagLabel Label="@($"Level {_class?.Data.Variables.Level.ToString() ?? "1"}")" Content="@($"{_class?.Template?.NameLocaleId ?? "Unknown Class"}")" Centered="true"></TagLabel>
              </div>
          }
         </div>

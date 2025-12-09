@@ -147,9 +147,9 @@
                 new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
             }
         };
-        template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
-        template.Variables.Value(10);
-        template.Variables.AssetCode("sword");
+        template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
+        template.Variables.Value = 10;
+        template.Variables.AssetCode = "sword";
 
         return template;
     }
@@ -173,9 +173,9 @@
             ItemType = FantasyItemTypes.GenericWeapon,
             Effects = swordEffects
         };
-        template.Variables.QualityType(FantasyItemQualityTypes.EpicQuality);
-        template.Variables.Value(10000);
-        template.Variables.AssetCode("sword");
+        template.Variables.QualityType = FantasyItemQualityTypes.EpicQuality;
+        template.Variables.Value = 10000;
+        template.Variables.AssetCode = "sword";
 
         return template;
     }

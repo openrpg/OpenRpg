@@ -136,7 +136,7 @@ namespace OpenRpg.Genres.Builders
             if (_classId == 0) { return classData; }
 
             classData.TemplateId = _classId;
-            classData.Variables.Level(_classLevels);
+            classData.Variables.Level = _classLevels;
             return classData;
         }
         

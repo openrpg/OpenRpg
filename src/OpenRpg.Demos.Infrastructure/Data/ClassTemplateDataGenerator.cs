@@ -38,7 +38,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "Super tough, hits things",
                 Effects = effects
             };
-            classTemplate.Variables.AssetCode("class-fighter");
+            classTemplate.Variables.AssetCode = "class-fighter";
             return classTemplate;
         }
 
@@ -59,7 +59,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "Powerful magic users",
                 Effects = effects
             };
-            classTemplate.Variables.AssetCode("class-mage");
+            classTemplate.Variables.AssetCode = "class-mage";
             return classTemplate;
         }
 

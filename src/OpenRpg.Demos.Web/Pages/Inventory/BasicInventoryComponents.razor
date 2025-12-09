@@ -144,14 +144,14 @@
     private Item MakePotion()
     {
         var item = new ItemData { TemplateId = ItemTemplateLookups.HealingPotion };
-        item.Variables.Amount(1);
+        item.Variables.Amount = 1;
         return TemplateAccessor.ToInstance(item);
     }
 
     private Item MakeJunkPotion()
     {
         var item = new ItemData { TemplateId = ItemTemplateLookups.JunkPotion };
-        item.Variables.Amount(3);
+        item.Variables.Amount = 3;
         return TemplateAccessor.ToInstance(item);
     }
 

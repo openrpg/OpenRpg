@@ -72,7 +72,7 @@ namespace OpenRpg.Core.Extensions
         {
             if (vars.ContainsKey(variableKey))
             { return vars.GetAs<T>(variableKey) ?? defaultValueFactory(); }
-            return  defaultValueFactory();
+            return defaultValueFactory();
         }
     }
 }

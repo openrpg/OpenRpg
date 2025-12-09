@@ -211,8 +211,8 @@
 
     public int CharacterLevel
     {
-        get => ExampleCharacter.Variables.Class.Variables.Level();
-        set => ExampleCharacter.Variables.Class.Variables.Level(value);
+        get => ExampleCharacter.Variables.Class.Variables.Level;
+        set => ExampleCharacter.Variables.Class.Variables.Level = value;
     }
     
     protected override void OnInitialized()

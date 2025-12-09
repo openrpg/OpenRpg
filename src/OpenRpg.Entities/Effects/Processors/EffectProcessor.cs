@@ -83,7 +83,7 @@ namespace OpenRpg.Entities.Effects.Processors
         {
             if (effect.ScalingType == CoreEffectScalingTypes.Level)
             {
-                var level = relatedEntity?.Variables.Class?.Variables.Level() ?? 1;
+                var level = relatedEntity?.Variables.Class?.Variables.Level ?? 1;
                 computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(level));
                 return;
             }

@@ -10,8 +10,8 @@
         <div class="field">
             <div class="control">
                 <input class="input" type="text" placeholder="i.e 25"
-                       value="@Template.Variables.MaxStacks()"
-                       @onchange="e => Template.Variables.MaxStacks(int.Parse(e.Value?.ToString()))"/>
+                       value="@Template.Variables.MaxStacks"
+                       @onchange="e => Template.Variables.MaxStacks = int.Parse(e.Value?.ToString())"/>
             </div>
         </div>
     </div>
@@ -24,8 +24,8 @@
         <div class="field">
             <div class="control">
                 <input class="input" type="text" placeholder="i.e 100"
-                       value="@Template.Variables.Value()"
-                       @onchange="e => Template.Variables.Value(int.Parse(e.Value?.ToString()))"/>
+                       value="@Template.Variables.Value"
+                       @onchange="e => Template.Variables.Value = int.Parse(e.Value?.ToString())"/>
             </div>
         </div>
     </div>
@@ -53,8 +53,8 @@
         <div class="field">
             <div class="control">
                 <div class="select is-fullwidth">
-                    <select value="@Template.Variables.QualityType()"
-                            @onchange="e => Template.Variables.QualityType(int.Parse(e.Value?.ToString()))">
+                    <select value="@Template.Variables.QualityType"
+                            @onchange="e => Template.Variables.QualityType = int.Parse(e.Value?.ToString())">
                         @foreach (var itemType in TypesHelper.GetItemQualityTypes)
                         {
                             <option value=@itemType.Id>@itemType.Name</option>

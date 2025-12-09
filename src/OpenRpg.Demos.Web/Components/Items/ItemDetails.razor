@@ -27,7 +27,7 @@
     <div class="columns">
         <div class="column">
             <figure class="image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
-                <img src="images/items/@(Item.Template.Variables.AssetCode()).png">
+                <img src="images/items/@(Item.Template.Variables.AssetCode).png">
             </figure>
         </div>
         <div class="column">
@@ -127,7 +127,7 @@
         Effects = Item.Data.GetEffects(OverriddenTemplateAccessor != null ? OverriddenTemplateAccessor : TemplateAccessor).ToArray();
         
         if (Item.Template.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
-        { _itemQualityTypeId = Item.Template.Variables.QualityType(); }
+        { _itemQualityTypeId = Item.Template.Variables.QualityType; }
         
         base.OnParametersSet();
     }

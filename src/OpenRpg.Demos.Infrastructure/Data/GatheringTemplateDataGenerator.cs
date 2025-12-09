@@ -26,7 +26,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
         public ItemGatheringTemplate MakeCopperOreGatheringTemplate()
         {
             var itemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperOre };
-            itemEntry.Variables.Amount(1);
+            itemEntry.Variables.Amount = 1;
         
             return new ItemGatheringTemplate()
             {
@@ -41,7 +41,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
         public ItemGatheringTemplate MakeIronOreGatheringTemplate()
         {
             var itemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.IronOre };
-            itemEntry.Variables.Amount(1);
+            itemEntry.Variables.Amount = 1;
         
             return new ItemGatheringTemplate()
             {
@@ -60,7 +60,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
         public ItemGatheringTemplate MakeOakLogGatheringTemplate()
         {
             var itemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.OakLog };
-            itemEntry.Variables.Amount(1);
+            itemEntry.Variables.Amount = 1;
         
             return new ItemGatheringTemplate()
             {

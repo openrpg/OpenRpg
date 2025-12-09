@@ -31,7 +31,7 @@ namespace OpenRpg.Genres.Requirements
                 {
                     var classDetails = character.Variables.Class;
                     if (classDetails.TemplateId == requirement.Association.AssociatedId)
-                    { return classDetails.Variables.Level() >= requirement.Association.AssociatedValue; }
+                    { return classDetails.Variables.Level >= requirement.Association.AssociatedValue; }
                 }
 
                 if (character.Variables.HasMultiClass())
@@ -39,7 +39,7 @@ namespace OpenRpg.Genres.Requirements
                     var multiClass = character.Variables.MultiClass;
                     var possibleClass = multiClass.GetClass(requirement.Association.AssociatedId);
                     if (possibleClass != null)
-                    { return possibleClass.Variables.Level() >= requirement.Association.AssociatedValue; }
+                    { return possibleClass.Variables.Level >= requirement.Association.AssociatedValue; }
                 }
 
                 return false;

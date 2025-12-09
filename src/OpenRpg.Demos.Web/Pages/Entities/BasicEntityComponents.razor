@@ -165,14 +165,14 @@
 
         var multiClass = new MultiClasses();
         var level2Fighter =new ClassData { TemplateId = FighterClass.Id };
-        level2Fighter.Variables.Level(2);
+        level2Fighter.Variables.Level = 2;
         multiClass.AddClass(level2Fighter);
         
         var level1Wraith = new ClassData { TemplateId = WraithClass.Id };
         multiClass.AddClass(level1Wraith);
         
         var level3RingBearer = new ClassData { TemplateId = RingBearerClass.Id };
-        level3RingBearer.Variables.Level(3);
+        level3RingBearer.Variables.Level = 3;
         multiClass.AddClass(level3RingBearer);
 
         MultiClassEntity.Variables.MultiClass = multiClass;

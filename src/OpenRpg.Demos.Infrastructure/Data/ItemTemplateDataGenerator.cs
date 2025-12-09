@@ -47,9 +47,9 @@ namespace OpenRpg.Demos.Infrastructure.Data
                     new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
                 }
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
-            template.Variables.Value(10);
-            template.Variables.AssetCode("sword");
+            template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
+            template.Variables.Value = 10;
+            template.Variables.AssetCode = "sword";
 
             return template;
         }
@@ -75,9 +75,9 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Requirements = Array.Empty<Requirement>(),
                 Effects = swordEffects
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.EpicQuality);
-            template.Variables.Value(10000);
-            template.Variables.AssetCode("sword");
+            template.Variables.QualityType = FantasyItemQualityTypes.EpicQuality;
+            template.Variables.Value = 10000;
+            template.Variables.AssetCode = "sword";
             
             return template;
         }
@@ -97,10 +97,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = 30.0f }
             }
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.UncommonQuality);
-            template.Variables.Value(20);
-            template.Variables.MaxStacks(5);
-            template.Variables.AssetCode("potion");
+            template.Variables.QualityType = FantasyItemQualityTypes.UncommonQuality;
+            template.Variables.Value = 20;
+            template.Variables.MaxStacks = 5;
+            template.Variables.AssetCode = "potion";
 
             return template;
         }
@@ -120,10 +120,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = -5.0f }
             }
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
-            template.Variables.Value(0);
-            template.Variables.MaxStacks(5);
-            template.Variables.AssetCode("potion-2");
+            template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
+            template.Variables.Value = 0;
+            template.Variables.MaxStacks = 5;
+            template.Variables.AssetCode = "potion-2";
             
             return template;
         }
@@ -140,10 +140,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Requirements = Array.Empty<Requirement>(),
                 Effects = Array.Empty<StaticEffect>(),
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
-            template.Variables.Value(5);
-            template.Variables.MaxStacks(20);
-            template.Variables.AssetCode("copper-ingot");
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 5;
+            template.Variables.MaxStacks = 20;
+            template.Variables.AssetCode = "copper-ingot";
             
             return template;
         }
@@ -160,10 +160,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Requirements = Array.Empty<Requirement>(),
                 Effects = Array.Empty<StaticEffect>(),
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
-            template.Variables.Value(1);
-            template.Variables.MaxStacks(20);
-            template.Variables.AssetCode("copper-ore");
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 1;
+            template.Variables.MaxStacks = 20;
+            template.Variables.AssetCode = "copper-ore";
             
             return template;
         }
@@ -180,10 +180,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Requirements = Array.Empty<Requirement>(),
                 Effects = Array.Empty<StaticEffect>(),
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
-            template.Variables.Value(1);
-            template.Variables.MaxStacks(20);
-            template.Variables.AssetCode("iron-ore");
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 1;
+            template.Variables.MaxStacks = 20;
+            template.Variables.AssetCode = "iron-ore";
             
             return template;
         }
@@ -200,10 +200,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Requirements = Array.Empty<Requirement>(),
                 Effects = Array.Empty<StaticEffect>(),
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
-            template.Variables.Value(1);
-            template.Variables.MaxStacks(20);
-            template.Variables.AssetCode("oak-log");
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 1;
+            template.Variables.MaxStacks = 20;
+            template.Variables.AssetCode = "oak-log";
             
             return template;
         }
@@ -223,10 +223,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
                     new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 50 }
                 }
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
-            template.Variables.Value(50);
-            template.Variables.MaxStacks(1);
-            template.Variables.AssetCode("copper-sword");
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 50;
+            template.Variables.MaxStacks = 1;
+            template.Variables.AssetCode = "copper-sword";
             
             return template;
         }
