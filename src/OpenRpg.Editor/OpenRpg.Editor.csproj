@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Blazor-ApexCharts" Version="5.1.0" />
+      <PackageReference Include="Blazor-ApexCharts" Version="6.0.2" />
       <PackageReference Include="Photino.Blazor" Version="3.2.0" />
     </ItemGroup>
 
