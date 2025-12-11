@@ -1,14 +1,8 @@
-using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Combat.Extensions;
-using OpenRpg.Core.Associations;
-using OpenRpg.Core.Effects;
 using OpenRpg.Core.Templates;
-using OpenRpg.Core.Templates.Variables;
 using OpenRpg.Entities.Effects.Processors;
 using OpenRpg.Entities.Extensions;
-using OpenRpg.Entities.Procedural;
-using OpenRpg.Entities.Types;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Requirements;
 using OpenRpg.Items.Extensions;
