@@ -204,7 +204,7 @@
     public IRefreshable DamageScalingChart { get; set; }
 
     public ManualTemplateAccessor TemplateAccessor { get; set; } = new();
-    public ICharacterEffectProcessor EffectProcessor { get; set; }
+    public IEntityCharacterEffectProcessor EffectProcessor { get; set; }
     public Character ExampleCharacter { get; set; } = new();
     public CharacterPopulator CharacterPopulator { get; set; }
     public List<IEffect> AllEffects { get; set; } = new();
@@ -217,7 +217,7 @@
     
     protected override void OnInitialized()
     {
-        EffectProcessor = new CharacterEffectProcessor(TemplateAccessor, RequirementsChecker);
+        EffectProcessor = new EntityCharacterEffectProcessor(TemplateAccessor, RequirementsChecker);
         CharacterPopulator = new CharacterPopulator(StatPopulator, StatePopulator, EffectProcessor);
         DamageScaledWithStrengthEffect = new ScaledEffect()
         {

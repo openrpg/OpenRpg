@@ -10,9 +10,9 @@ using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Genres.Effects
 {
-    public class CharacterEffectProcessor : EffectProcessor<Character>, ICharacterEffectProcessor
+    public class EntityCharacterEffectProcessor : EntityEffectProcessor<Character>, IEntityCharacterEffectProcessor
     {
-        public CharacterEffectProcessor(ITemplateAccessor templateAccessor, ICharacterRequirementChecker requirementChecker) : base(templateAccessor, requirementChecker)
+        public EntityCharacterEffectProcessor(ITemplateAccessor templateAccessor, ICharacterRequirementChecker requirementChecker) : base(templateAccessor, requirementChecker)
         {
         }
         

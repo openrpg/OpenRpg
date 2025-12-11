@@ -1,15 +1,18 @@
-﻿@page "/enemies/basic-enemy"
+﻿@page "/enemies/advanced-enemy"
 
 @using OpenRpg.Core.Effects
 @using OpenRpg.Core.Extensions
 @using OpenRpg.Core.Templates
+@using OpenRpg.Demos.Infrastructure.Templates
 @using OpenRpg.Entities.Effects.Processors
 @using OpenRpg.Entities.Entity.Populators.Stats
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Requirements
 @using OpenRpg.Genres.Types
 
+@inject ICharacterRequirementChecker RequirementChecker;
 @inject IEntityStatPopulator StatPopulator
 
 <Markdown>
@@ -117,9 +120,7 @@
                 Bat2.State.Health = Bat2.Stats.MaxHealth/2;
             ```
             
-            Then if we look over to the side we can see the two instances of the Bat enemies, and you could battle them individually etc.
-            
-            > This shows a REALLY simple way of handling enemies, but in reality you will probably want to do more to streamline this, and we can also take some other shortcuts to make more advanced enemy handling scenarios.
+            Then if we look over to the side we can see the two instances of the Bat enemies.
         </Markdown>
     </div>
     <div class="column is-half">
@@ -161,12 +162,32 @@
     {
         public static int Bat = 1;
     }
+
+    public class EnemyEffectProcessor : EntityEffectProcessor<EnemyData>
+    {
+        public EnemyEffectProcessor(ITemplateAccessor templateAccessor, ICharacterRequirementChecker requirementChecker) : base(templateAccessor, requirementChecker)
+        {}
+
+        public override ComputedEffects ComputeEffects(EnemyData entity)
+        {
+            var computedEffects =  base.ComputeEffects(entity);
+
+            var enemyTemplate = TemplateAccessor.Get<EnemyTemplate>(entity.TemplateId);
+            ComputeEffects(enemyTemplate, entity, computedEffects);
+            
+            return computedEffects;
+        }
+    }
     
     private EnemyTemplate BatTemplate;
     private EnemyData Bat1, Bat2;
+    private ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new();
+    private EnemyEffectProcessor EffectProcessor;
     
     protected override void OnInitialized()
     {
+        EffectProcessor = new EnemyEffectProcessor(ManualStatTemplateAccessor, RequirementChecker);
+        
         BatTemplate = new EnemyTemplate
         {
             Id = EnemyTypes.Bat,
@@ -180,6 +201,8 @@
             ]
         };
         
+        ManualStatTemplateAccessor.AddTemplate(BatTemplate);
+
         var computedEffects = new ComputedEffects();
         BatTemplate.Effects
             .Cast<StaticEffect>()

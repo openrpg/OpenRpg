@@ -209,7 +209,7 @@
     
     public ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new();
     public ManualTemplateAccessor AutoStatTemplateAccessor { get; } = new();
-    public ICharacterEffectProcessor EffectProcessor { get; set; }
+    public IEntityCharacterEffectProcessor EffectProcessor { get; set; }
 
     
     protected void SetupManualStats()
@@ -245,7 +245,7 @@
 
     protected void SetupAutoStats1()
     {
-        EffectProcessor = new CharacterEffectProcessor(AutoStatTemplateAccessor, RequirementChecker);
+        EffectProcessor = new EntityCharacterEffectProcessor(AutoStatTemplateAccessor, RequirementChecker);
         
         var raceEffects = new[]
         {

@@ -12,12 +12,12 @@ using BaseEntity = OpenRpg.Entities.Entity.Entity;
 
 namespace OpenRpg.Entities.Effects.Processors
 {
-    public class EffectProcessor<T> : IEffectProcessor<T> where T : BaseEntity
+    public class EntityEffectProcessor<T> : IEntityEffectProcessor<T> where T : BaseEntity
     {
         public ITemplateAccessor TemplateAccessor { get; }
         public IEntityRequirementChecker<T> RequirementChecker { get; }
 
-        public EffectProcessor(ITemplateAccessor templateAccessor, IEntityRequirementChecker<T> requirementChecker)
+        public EntityEffectProcessor(ITemplateAccessor templateAccessor, IEntityRequirementChecker<T> requirementChecker)
         {
             TemplateAccessor = templateAccessor;
             RequirementChecker = requirementChecker;
