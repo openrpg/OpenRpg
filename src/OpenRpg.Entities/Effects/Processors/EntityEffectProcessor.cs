@@ -3,16 +3,15 @@ using OpenRpg.Core.Associations;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Templates;
+using OpenRpg.Entities.Entity;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Procedural;
 using OpenRpg.Entities.Requirements;
 using OpenRpg.Entities.Types;
 
-using BaseEntity = OpenRpg.Entities.Entity.Entity;
-
 namespace OpenRpg.Entities.Effects.Processors
 {
-    public class EntityEffectProcessor<T> : IEntityEffectProcessor<T> where T : BaseEntity
+    public class EntityEffectProcessor<T> : IEntityEffectProcessor<T> where T : EntityData
     {
         public ITemplateAccessor TemplateAccessor { get; }
         public IEntityRequirementChecker<T> RequirementChecker { get; }
@@ -79,11 +78,27 @@ namespace OpenRpg.Entities.Effects.Processors
             }
         }
 
-        public virtual void ComputeScaledEffect(ScaledEffect effect, IHasEffects context, ComputedEffects computedEffects, BaseEntity relatedEntity)
+        public virtual int GetLevelValue(ScaledEffect effect, IHasEffects context, ComputedEffects computedEffects, T relatedEntity)
+        {
+            if (effect.ScalingIndex >= 0)
+            {
+                if (relatedEntity.Variables.HasMultiClass())
+                {
+                    var relatedClass = relatedEntity.Variables.MultiClass.GetClass(effect.ScalingIndex);
+                    if(relatedClass != null) { return relatedClass.Variables.Level; }
+                }
+            }
+            
+            if(relatedEntity.Variables.HasClass()) { return relatedEntity.Variables.Class.Variables.Level; }
+            if(relatedEntity.Variables.HasLevel()) { return relatedEntity.Variables.Level; }
+            return 1;
+        }
+
+        public virtual void ComputeScaledEffect(ScaledEffect effect, IHasEffects context, ComputedEffects computedEffects, T relatedEntity)
         {
             if (effect.ScalingType == CoreEffectScalingTypes.Level)
             {
-                var level = relatedEntity?.Variables.Class?.Variables.Level ?? 1;
+                var level = GetLevelValue(effect, context, computedEffects, relatedEntity);
                 computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(level));
                 return;
             }

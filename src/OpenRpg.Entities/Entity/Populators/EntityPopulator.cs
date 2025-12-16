@@ -5,7 +5,7 @@ using OpenRpg.Entities.Extensions;
 
 namespace OpenRpg.Entities.Entity.Populators
 {
-    public class EntityPopulator<T> : IEntityPopulator<T> where T : Entity
+    public class EntityPopulator<T> : IEntityPopulator<T> where T : EntityData
     {
         public IEntityStatPopulator StatPopulator { get; }
         public IEntityStatePopulator StatePopulator { get; }

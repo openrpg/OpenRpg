@@ -22,11 +22,11 @@ namespace OpenRpg.Entities.Effects
         /// The type of value required for scaling, i.e level, index etc
         /// </summary>
         public int ScalingType { get; set; }
-        
+
         /// <summary>
         /// Used for certain scaling types
         /// </summary>
-        public int ScalingIndex { get; set; }
+        public int ScalingIndex { get; set; } = -1;
 
         /// <summary>
         /// The function that calculates the potency of the effect

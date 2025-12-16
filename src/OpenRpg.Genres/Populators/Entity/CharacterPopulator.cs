@@ -8,7 +8,7 @@ namespace OpenRpg.Genres.Populators.Entity
 {
     public class CharacterPopulator : EntityPopulator<Character>, ICharacterPopulator
     {
-        public CharacterPopulator(IEntityStatPopulator statPopulator, IEntityStatePopulator statePopulator, IEntityCharacterEffectProcessor effectProcessor) : base(statPopulator, statePopulator, effectProcessor)
+        public CharacterPopulator(IEntityStatPopulator statPopulator, IEntityStatePopulator statePopulator, ICharacterEffectProcessor effectProcessor) : base(statPopulator, statePopulator, effectProcessor)
         {
         }
     }

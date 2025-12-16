@@ -13,7 +13,7 @@
 @inject DemoCharacterBuilder CharacterBuilder;
 @inject IEntityStatPopulator StatPopulator;
 @inject ITemplateAccessor TemplateAccessor;
-@inject IEntityCharacterEffectProcessor EffectProcessor;
+@inject ICharacterEffectProcessor EffectProcessor;
 
 <Markdown>
    #### Character Persistence
@@ -87,7 +87,7 @@
         _jsonSettings = new JsonSerializerSettings()
         {
             TypeNameHandling = TypeNameHandling.Auto,
-            ContractResolver = new IgnorePropertiesResolver(new[] { nameof(Entity.Stats) })
+            ContractResolver = new IgnorePropertiesResolver(new[] { nameof(EntityData.Stats) })
         };
         
         RandomizeCharacter();

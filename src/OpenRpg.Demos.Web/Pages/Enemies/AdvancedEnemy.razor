@@ -3,10 +3,19 @@
 @using OpenRpg.Core.Effects
 @using OpenRpg.Core.Extensions
 @using OpenRpg.Core.Templates
+@using OpenRpg.Core.Utils
+@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Scaling
 @using OpenRpg.Demos.Infrastructure.Templates
+@using OpenRpg.Entities.Classes
+@using OpenRpg.Entities.Classes.Templates
+@using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Effects.Processors
+@using OpenRpg.Entities.Entity
 @using OpenRpg.Entities.Entity.Populators.Stats
+@using OpenRpg.Entities.Entity.Templates
 @using OpenRpg.Entities.Extensions
+@using OpenRpg.Entities.Types
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Extensions
 @using OpenRpg.Genres.Requirements
@@ -16,111 +25,106 @@
 @inject IEntityStatPopulator StatPopulator
 
 <Markdown>
-    ## Enemies
-    So far we have discussed characters, quests and combat etc, and thats all great, but almost all RPGs need some notion of enemies right?
+    ## Advanced Enemies
+    Now we have made basic static enemies, what about if we wanted to create some form of scaling enemy?
     
-    Thing is out the box we don't have any formal structures for enemies etc, from a data perspective they are just entities/characters with a template for the most part.
-    
-    So with that being the case why do we even have a chapter on this? well because there is some differences in most common use cases between enemies and characters, for example:
-    - Enemies are often not unique are likely based off templates
-    - Enemies often give rewards when killed, so may have loot tables rather than inventories etc
-    - Enemies often end up being short lived and are often not player controlled
-    
-    There are many other differences, and these may be more/less apparent in different scenarios, but ultimately we can express enemies with the current structures we have.
+    We have already made procedural items and seen how we can make effects that scale with other values, so if we mix this all together we can make enemies that can be scaled.
 </Markdown>
 <br />
 
 <Markdown>
-    ## Expressing Enemy Templates
-    Given what we discuss above lets have a look at a super simple enemy template we could make, again this is mainly up to you to decide what an enemy needs to be.
+    ## Creating Scaling Enemies
+    First of all lets build some scaling effects that can be used as a basis.
     
     ```csharp
-    public class EnemyTemplate : ITemplate, IHasEffects
+    // Lets make a simple level scaling function
+    public class LevelScaledFunction : ScalingFunction
     {
-        public int Id { get; set; }
-        public string NameLocaleId { get; set; }
-        public string DescriptionLocaleId { get; set; }
-         
-        public IReadOnlyCollection&lt;IEffect> Effects { get; set; } = Array.Empty&lt;IEffect>();
+        // We can provide output min/max but always scale the input levels from 1-100
+        public LevelScaledFunction(RangeF minMaxStat) : base(PresetCurves.Linear, minMaxStat, new RangeF(1, 100)){}
     }
+    
+    var healthRange = new RangeF(100, 10000); // Level 1 should have 100, Level 100 should have 10000 HP
+    ScaledEffects.Add(new ScaledEffect()
+    {
+        EffectType = GenreEffectTypes.HealthBonusAmount,
+        ScalingType = CoreEffectScalingTypes.Level,
+        PotencyFunction = new LevelScaledFunction(healthRange)
+    });
+        
+    var damageRange = new RangeF(10, 1000); // 10-1000 damage based on level
+    ScaledEffects.Add(new ScaledEffect()
+    {
+        EffectType = GenreEffectTypes.DamageBonusAmount,
+        ScalingType = CoreEffectScalingTypes.Level,
+        PotencyFunction = new LevelScaledFunction(damageRange)
+    });
+        
+    var experienceRange = new RangeF(10, 1000); // 10-1000 experience based on level
+    ScaledEffects.Add(new ScaledEffect()
+    {
+        EffectType = GenreEffectTypes.ExperienceRestoreAmount,
+        ScalingType = CoreEffectScalingTypes.Level,
+        PotencyFunction = new LevelScaledFunction(experienceRange)
+    });
     ```
     
-    This seems reasonable as a starting point, we give the template the notion of `Effects` which we can just assign directly and as with all `Templates` it has an Id/Name/Description.
+    This allows us to scale the HP/Damage and XP rewards based on the level of the enemy, which is pretty simple to express given out the box functionality.
     
-    So using the above we could create a Bat enemy using this template like so:
+    However before we continue we need to make a better way of processing the effects as our hacky approach in the previous one wont fly with scaled effects, but no need to worry we can just extend the default `EntityEffectProcessor`.
     
     ```csharp
-    var batTemplate = new EnemyTemplate
+    public class EnemyEffectProcessor : EntityEffectProcessor&lt;Enemy>
     {
-        Id = EnemyTypes.Bat,
-        NameLocaleId = "Bat",
-        DescriptionLocaleId = "Its a big bat with leathery wings",
-        Effects = [
-            new StaticEffect() { EffectType = GenreEffectTypes.HealthBonusAmount, Potency = 100 },  // Give it 100 hp
-            new StaticEffect() { EffectType = GenreEffectTypes.DamageBonusAmount, Potency = 10 },   // and 10 damage 
-            new StaticEffect() { EffectType = GenreEffectTypes.ExperienceRestoreAmount, Potency = 5 },  // gives 5 xp when killed 
-        ]
-    }
-    ```
-    
-    > We are keeping things SUPER simple here, but maybe you want your enemies to have races/classes/equipment that can be used to provide effects
-    > there is nothing stopping you adding that, or any other responsibilities an `Enemy` may have, like a loot table or abilities an enemy has etc.
-    
-    Ok so that was simple enough, so now we have expressed the template that drives how the enemies stats will be generated how do we actually make instances from the templates?
-</Markdown>
-<br />
+        public EnemyEffectProcessor(ITemplateAccessor templateAccessor, ICharacterRequirementChecker requirementChecker) : base(templateAccessor, requirementChecker)
+        {}
 
-<Markdown>
-    ## Creating Instances of Enemies
-    
-    So at this point we have a template describing what a Bat is, but we need to have some data container to store the runtime instance of a Bat.
-    
-    ```csharp
-    public class EnemyData : UniqueEntity, IHasTemplateLink
-    {
-        public int TemplateId { get; set; }
+        public override ComputedEffects ComputeEffects(Enemy entity)
+        {
+            // Compute any generic effect providers on the Entity (i.e class/race etc)
+            var computedEffects =  base.ComputeEffects(entity);
+
+            // Get our template for the enemy and compute the effects for that explicitly
+            var enemyTemplate = TemplateAccessor.Get&lt;EnemyTemplate>(entity.TemplateId);
+            ComputeEffects(enemyTemplate, entity, computedEffects);
+                    
+            return computedEffects;
+        }
     }
     ```
     
-    Wow that was hard... as mentioned before an Enemy is just an `Entity` but they are basically instances of templates, so we have interfaces for that already.
-    
-    > We could have used `ITemplateData&lt;T>` but in this example we are not giving the `EnemyTemplate` any `IVariables` of any kind but in the real world you may want to do that.
-    
-    So lets make a couple of bats, what would that look like?
-    
-    ```csharp
-    var bat1 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = "Bat 1" };
-    var bat2 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = "Bat 2" };
-    ```
-    
-    Huzzah! but don't rejoice too quickly as this is just part of the battle, much like with other entities we need to Populate their stats/states.
+    Now we are in a position to use it all to make the enemies, so lets give it a whirl.
 </Markdown>
 <br />
 
 <div class="columns">
     <div class="column is-half">
         <Markdown>
-            ## Populating Enemy Stats/State
-            This can be as complex as you want it to be, but for now lets keep things simple and do the minimum needed to populate the stats/state for `bat1` and `bat2`.
+            ## Creating The Enemies
+            
+            So much like the basic enemy example we will create our enemies but give them the scaled effects and use the effect processor, we also now need to give them a level so it will scale correctly.
             
             ```csharp
-                // Create and populate barebones computed effects
-                var computedEffects = new ComputedEffects();
-                batTemplate.Effects
-                    .Cast&lt;StaticEffect>()
-                    .ForEach(x => computedEffects.Add(x.EffectType, x.Potency));
-
-                // Grab any old IEntityStatPopulator to use to populate stats
-                StatPopulator.Populate(bat1.Stats, computedEffects, []);
-                // Then manually apply the max health to the health state
-                Bat1.State.Health = bat1.Stats.MaxHealth;
-
-                // Same as above but lets start the bat with 50% hp for lols
-                StatPopulator.Populate(Bat2.Stats, computedEffects, []);
-                Bat2.State.Health = Bat2.Stats.MaxHealth/2;
+            var bat1 = new Enemy() { TemplateId = EnemyTypes.Bat };
+            bat1.Variables.Level = 1;
+            bat1.NameLocaleId = $"{BatTemplate.NameLocaleId} - Lv {bat1.Variables.Level}";
+        
+            var computedEffects1 = EffectProcessor.ComputeEffects(bat1);
+            StatPopulator.Populate(bat1.Stats, computedEffects1, []);
+            bat1.State.Health = bat1.Stats.MaxHealth;
+        
+            var bat2 = new Enemy() { TemplateId = EnemyTypes.Bat };
+            bat2.Variables.Level = 100;
+            bat2.NameLocaleId = $"{BatTemplate.NameLocaleId} - Lv {bat2.Variables.Level}";
+        
+            var computedEffects2 = EffectProcessor.ComputeEffects(bat2);
+            StatPopulator.Populate(bat2.Stats, computedEffects2, []);
+            bat2.State.Health = bat2.Stats.MaxHealth;
             ```
             
-            Then if we look over to the side we can see the two instances of the Bat enemies.
+            All done, now when we show it you can see the damage is a LOT higher when level 100, and if you mouse over the HP you can see the Health is higher too.
+            
+            We can use this to scale anything on the enemy, so you can make it as advanced as you want to.
         </Markdown>
     </div>
     <div class="column is-half">
@@ -135,40 +139,47 @@
         <CardSection>
             <CharacterDetails Name="@Bat2.NameLocaleId"/>
             <br />
-            <CharacterVitals Stats="@Bat2.Stats"  State="@Bat2.State"/>
+            <CharacterVitals Stats="@Bat2.Stats" State="@Bat2.State"/>
             <br />
             <CharacterStats Stats="@Bat2.Stats" ShowCoreStats="false"/>
         </CardSection>
     </div>
 </div>
+<br />
+
+<Markdown>
+    ## Optimising Effect Computing
+    
+    There are a few things you can do to reduce overhead in managing effect computation, for example so far we are computing the effects on each individual enemy, but in reality as they are all based off templates, you can just compute it once per level and re-use the stats.
+
+    This way you just pay the price for computing stats for each enemies level once up front, and just manually assign the `Stats` for the given level.
+    
+    > There is some gotchas here, such as if you need to account for buffs at runtime you may need to keep the runtime computed effects separate from the template ones and merge them before processing.
+    
+    It is also worth noting that we are using `Level` on the `Enemy` directly, but the codebase supports class levels or even multi class levels etc, so you can have enemies or npcs based on classes/races like characters too.
+</Markdown>
+<br />
 
 @code {
 
-    public class EnemyTemplate : ITemplate, IHasEffects
+    public class EnemyTemplate : EntityTemplate, IHasEffects
     {
-        public int Id { get; set; }
-        public string NameLocaleId { get; set; }
-        public string DescriptionLocaleId { get; set; }
-         
         public IReadOnlyCollection<IEffect> Effects { get; set; } = Array.Empty<IEffect>();
     }
     
-    public class EnemyData : Character, IHasTemplateLink
-    {
-        public int TemplateId { get; set; }
-    }
+    public class Enemy : Character {}
 
     public static class EnemyTypes
     {
         public static int Bat = 1;
     }
 
-    public class EnemyEffectProcessor : EntityEffectProcessor<EnemyData>
+    public class EnemyEffectProcessor : EntityEffectProcessor<Enemy>
     {
         public EnemyEffectProcessor(ITemplateAccessor templateAccessor, ICharacterRequirementChecker requirementChecker) : base(templateAccessor, requirementChecker)
         {}
 
-        public override ComputedEffects ComputeEffects(EnemyData entity)
+        public override ComputedEffects ComputeEffects(Enemy entity)
         {
             var computedEffects =  base.ComputeEffects(entity);
 
@@ -179,42 +190,73 @@
         }
     }
     
+    public class LevelScaledFunction : ScalingFunction
+    {
+        public LevelScaledFunction(RangeF minMaxStat) : base(PresetCurves.Linear, minMaxStat, new RangeF(1, 100))
+        {
+        }
+    }
+    
     private EnemyTemplate BatTemplate;
-    private EnemyData Bat1, Bat2;
+    private Enemy Bat1, Bat2;
     private ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new();
     private EnemyEffectProcessor EffectProcessor;
+    private List<IEffect> ScaledEffects = new();
     
     protected override void OnInitialized()
     {
         EffectProcessor = new EnemyEffectProcessor(ManualStatTemplateAccessor, RequirementChecker);
+
+        var healthRange = new RangeF(100, 10000);
+        ScaledEffects.Add(new ScaledEffect()
+        {
+            EffectType = GenreEffectTypes.HealthBonusAmount,
+            ScalingType = CoreEffectScalingTypes.Level,
+            PotencyFunction = new LevelScaledFunction(healthRange)
+        });
+        
+        var damageRange = new RangeF(10, 1000);
+        ScaledEffects.Add(new ScaledEffect()
+        {
+            EffectType = GenreEffectTypes.DamageBonusAmount,
+            ScalingType = CoreEffectScalingTypes.Level,
+            PotencyFunction = new LevelScaledFunction(damageRange)
+        });
+        
+        var experienceRange = new RangeF(10, 1000);
+        ScaledEffects.Add(new ScaledEffect()
+        {
+            EffectType = GenreEffectTypes.ExperienceRestoreAmount,
+            ScalingType = CoreEffectScalingTypes.Level,
+            PotencyFunction = new LevelScaledFunction(experienceRange)
+        });
         
         BatTemplate = new EnemyTemplate
         {
             Id = EnemyTypes.Bat,
             NameLocaleId = "Bat",
             DescriptionLocaleId = "Its a big bat with leathery wings",
-            Effects =
-            [
-                new StaticEffect() { EffectType = GenreEffectTypes.HealthBonusAmount, Potency = 100 }, // Give it 100 hp
-                new StaticEffect() { EffectType = GenreEffectTypes.DamageBonusAmount, Potency = 10 }, // and 10 damage 
-                new StaticEffect() { EffectType = GenreEffectTypes.ExperienceRestoreAmount, Potency = 5 }, // gives 5 xp when killed 
-            ]
+            Effects = ScaledEffects
         };
         
         ManualStatTemplateAccessor.AddTemplate(BatTemplate);
-
-        var computedEffects = new ComputedEffects();
-        BatTemplate.Effects
-            .Cast<StaticEffect>()
-            .ForEach(x => computedEffects.Add(x.EffectType, x.Potency));
         
-        Bat1 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = "Bat 1" };
-        StatPopulator.Populate(Bat1.Stats, computedEffects, []);
+        Bat1 = new Enemy() { TemplateId = EnemyTypes.Bat };
+        Bat1.Variables.Level = 1;
+        Bat1.NameLocaleId = $"{BatTemplate.NameLocaleId} - Lv {Bat1.Variables.Level}";
+        
+        var computedEffects1 = EffectProcessor.ComputeEffects(Bat1);
+        StatPopulator.Populate(Bat1.Stats, computedEffects1, []);
         Bat1.State.Health = Bat1.Stats.MaxHealth;
         
-        Bat2 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = "Bat 2" };
-        StatPopulator.Populate(Bat2.Stats, computedEffects, []);
-        Bat2.State.Health = Bat2.Stats.MaxHealth/2;
+
+        Bat2 = new Enemy() { TemplateId = EnemyTypes.Bat };
+        Bat2.Variables.Level = 100;
+        Bat2.NameLocaleId = $"{BatTemplate.NameLocaleId} - Lv {Bat2.Variables.Level}";
+        
+        var computedEffects2 = EffectProcessor.ComputeEffects(Bat2);
+        StatPopulator.Populate(Bat2.Stats, computedEffects2, []);
+        Bat2.State.Health = Bat2.Stats.MaxHealth;
         
         base.OnInitialized();
     }

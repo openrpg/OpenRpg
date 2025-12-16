@@ -82,9 +82,9 @@
   </div>
   <div class="column is-half">
       <CardSection>
-          <CharacterDetails Name="@SimpleEntity.NameLocaleId"
-                            Race="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.Race)"
-                            Class="@TemplateAccessor.ToInstance(SimpleEntity.Variables.Class)">
+          <CharacterDetails Name="@_simpleEntityData.NameLocaleId"
+                            Race="@TemplateAccessor.ToInstance(_multiClassEntityData.Variables.Race)"
+                            Class="@TemplateAccessor.ToInstance(_simpleEntityData.Variables.Class)">
           </CharacterDetails>
       </CardSection>
   </div>
@@ -129,17 +129,17 @@
   </div>
     <div class="column is-half">
         <CardSection>
-            <CharacterDetails Name="@MultiClassEntity.NameLocaleId"
-                              Race="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.Race)"
-                              Classes="@TemplateAccessor.ToInstance(MultiClassEntity.Variables.MultiClass.Classes)">
+            <CharacterDetails Name="@_multiClassEntityData.NameLocaleId"
+                              Race="@TemplateAccessor.ToInstance(_multiClassEntityData.Variables.Race)"
+                              Classes="@TemplateAccessor.ToInstance(_multiClassEntityData.Variables.MultiClass.Classes)">
             </CharacterDetails>
         </CardSection>
     </div>
 </div>
 
 @code {
-    private Entity SimpleEntity = new Entity();
-    private Entity MultiClassEntity = new Entity();
+    private EntityData _simpleEntityData = new EntityData();
+    private EntityData _multiClassEntityData = new EntityData();
     
     private RaceTemplate HobbitRace = new RaceTemplate { Id = 1, NameLocaleId = "Hobbit" };
     
@@ -156,12 +156,12 @@
         TemplateAccessor.AddTemplate(WraithClass);
         TemplateAccessor.AddTemplate(RingBearerClass);
         
-        SimpleEntity.NameLocaleId = "Frodo Baggins";
-        SimpleEntity.Variables.Race = new RaceData { TemplateId = HobbitRace.Id };
-        SimpleEntity.Variables.Class = new ClassData { TemplateId = FighterClass.Id };
+        _simpleEntityData.NameLocaleId = "Frodo Baggins";
+        _simpleEntityData.Variables.Race = new RaceData { TemplateId = HobbitRace.Id };
+        _simpleEntityData.Variables.Class = new ClassData { TemplateId = FighterClass.Id };
         
-        MultiClassEntity.NameLocaleId = "Frodo Baggins";
-        MultiClassEntity.Variables.Race = new RaceData { TemplateId = HobbitRace.Id };
+        _multiClassEntityData.NameLocaleId = "Frodo Baggins";
+        _multiClassEntityData.Variables.Race = new RaceData { TemplateId = HobbitRace.Id };
 
         var multiClass = new MultiClasses();
         var level2Fighter =new ClassData { TemplateId = FighterClass.Id };
@@ -175,7 +175,7 @@
         level3RingBearer.Variables.Level = 3;
         multiClass.AddClass(level3RingBearer);
 
-        MultiClassEntity.Variables.MultiClass = multiClass;
+        _multiClassEntityData.Variables.MultiClass = multiClass;
         base.OnInitialized();
     }
 }

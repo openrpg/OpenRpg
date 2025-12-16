@@ -9,20 +9,20 @@ namespace OpenRpg.Genres.Extensions
 {
     public static class EntityExtensions
     {
-        public static IReadOnlyCollection<IEffect> GetEffects(this Entity entity, ITemplateAccessor templateAccessor)
+        public static IReadOnlyCollection<IEffect> GetEffects(this EntityData entityData, ITemplateAccessor templateAccessor)
         {
             var effects = new List<IEffect>();
 
-            if (entity.Variables.HasRace()) { effects.AddRange(entity.Variables.Race.GetEffects(templateAccessor)); }
-            if (entity.Variables.HasClass()) { effects.AddRange(entity.Variables.Class.GetEffects(templateAccessor)); }
-            if (entity.Variables.HasEquipment()) { effects.AddRange(entity.Variables.Equipment.GetEffects(templateAccessor)); }
+            if (entityData.Variables.HasRace()) { effects.AddRange(entityData.Variables.Race.GetEffects(templateAccessor)); }
+            if (entityData.Variables.HasClass()) { effects.AddRange(entityData.Variables.Class.GetEffects(templateAccessor)); }
+            if (entityData.Variables.HasEquipment()) { effects.AddRange(entityData.Variables.Equipment.GetEffects(templateAccessor)); }
             return effects;
         }
         
-        extension(Entity entity)
+        extension(EntityData entityData)
         {
-            public float HealthPercentage => (float)entity.State.Health / entity.Stats.MaxHealth;
-            public float StaminaPercentage => (float)entity.State.Stamina / entity.Stats.MaxStamina;
+            public float HealthPercentage => (float)entityData.State.Health / entityData.Stats.MaxHealth;
+            public float StaminaPercentage => (float)entityData.State.Stamina / entityData.Stats.MaxStamina;
         }
     }
 }

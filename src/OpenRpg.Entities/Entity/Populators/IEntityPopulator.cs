@@ -1,6 +1,6 @@
 namespace OpenRpg.Entities.Entity.Populators
 {
-    public interface IEntityPopulator<in T> where T : Entity
+    public interface IEntityPopulator<in T> where T : EntityData
     {
         void Populate(T entity, bool refreshState = false);
     }

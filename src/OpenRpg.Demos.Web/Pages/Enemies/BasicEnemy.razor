@@ -2,9 +2,9 @@
 
 @using OpenRpg.Core.Effects
 @using OpenRpg.Core.Extensions
-@using OpenRpg.Core.Templates
 @using OpenRpg.Entities.Effects.Processors
 @using OpenRpg.Entities.Entity.Populators.Stats
+@using OpenRpg.Entities.Entity.Templates
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Extensions
@@ -14,7 +14,7 @@
 
 <Markdown>
     ## Enemies
-    So far we have discussed characters, quests and combat etc, and thats all great, but almost all RPGs need some notion of enemies right?
+    So far we have discussed characters, quests and combat etc, and thats all great, but almost all RPGs need some notion of enemies/monsters/npcs right?
     
     Thing is out the box we don't have any formal structures for enemies etc, from a data perspective they are just entities/characters with a template for the most part.
     
@@ -32,12 +32,8 @@
     Given what we discuss above lets have a look at a super simple enemy template we could make, again this is mainly up to you to decide what an enemy needs to be.
     
     ```csharp
-    public class EnemyTemplate : ITemplate, IHasEffects
+    public class EnemyTemplate : EntityTemplate, IHasEffects
     {
-        public int Id { get; set; }
-        public string NameLocaleId { get; set; }
-        public string DescriptionLocaleId { get; set; }
-         
         public IReadOnlyCollection&lt;IEffect> Effects { get; set; } = Array.Empty&lt;IEffect>();
     }
     ```
@@ -73,21 +69,17 @@
     So at this point we have a template describing what a Bat is, but we need to have some data container to store the runtime instance of a Bat.
     
     ```csharp
-    public class EnemyData : UniqueEntity, IHasTemplateLink
-    {
-        public int TemplateId { get; set; }
-    }
+    public class Enemy : Character
+    {}
     ```
     
-    Wow that was hard... as mentioned before an Enemy is just an `Entity` but they are basically instances of templates, so we have interfaces for that already.
-    
-    > We could have used `ITemplateData&lt;T>` but in this example we are not giving the `EnemyTemplate` any `IVariables` of any kind but in the real world you may want to do that.
-    
+    Wow that was hard... as mentioned before an Enemy is just an `Entity`/`Character` but they are basically instances of templates, so we have interfaces/classes for that already.
+   
     So lets make a couple of bats, what would that look like?
     
     ```csharp
-    var bat1 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = "Bat 1" };
-    var bat2 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = "Bat 2" };
+    var bat1 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 1" };
+    var bat2 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 2" };
     ```
     
     Huzzah! but don't rejoice too quickly as this is just part of the battle, much like with other entities we need to Populate their stats/states.
@@ -143,19 +135,12 @@
 
 @code {
 
-    public class EnemyTemplate : ITemplate, IHasEffects
+    public class EnemyTemplate : EntityTemplate, IHasEffects
     {
-        public int Id { get; set; }
-        public string NameLocaleId { get; set; }
-        public string DescriptionLocaleId { get; set; }
-         
         public IReadOnlyCollection<IEffect> Effects { get; set; } = Array.Empty<IEffect>();
     }
     
-    public class EnemyData : Character, IHasTemplateLink
-    {
-        public int TemplateId { get; set; }
-    }
+    public class Enemy : Character {}
 
     public static class EnemyTypes
     {
@@ -163,8 +148,8 @@
     }
     
     private EnemyTemplate BatTemplate;
-    private EnemyData Bat1, Bat2;
-    
+    private Enemy Bat1, Bat2;
+
     protected override void OnInitialized()
     {
         BatTemplate = new EnemyTemplate
@@ -185,15 +170,14 @@
             .Cast<StaticEffect>()
             .ForEach(x => computedEffects.Add(x.EffectType, x.Potency));
         
-        Bat1 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = "Bat 1" };
+        Bat1 = new Enemy() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 1" };
         StatPopulator.Populate(Bat1.Stats, computedEffects, []);
         Bat1.State.Health = Bat1.Stats.MaxHealth;
         
-        Bat2 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = "Bat 2" };
+        Bat2 = new Enemy() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 2" };
         StatPopulator.Populate(Bat2.Stats, computedEffects, []);
         Bat2.State.Health = Bat2.Stats.MaxHealth/2;
         
         base.OnInitialized();
     }
-
 }

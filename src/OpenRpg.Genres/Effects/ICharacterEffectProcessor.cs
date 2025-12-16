@@ -3,6 +3,6 @@ using OpenRpg.Genres.Characters;
 
 namespace OpenRpg.Genres.Effects
 {
-    public interface IEntityCharacterEffectProcessor : IEntityEffectProcessor<Character>
+    public interface ICharacterEffectProcessor : IEntityEffectProcessor<Character>
     {}
 }
