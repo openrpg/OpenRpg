@@ -129,16 +129,16 @@
             Requirements = new[]
             {
                 new Requirement {RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 10) }
-                },
-            Effects = new[]
-            {
-                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f },
-                new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 3.0f }
-            }
+                }
         };
         template.Variables.QualityType = FantasyItemQualityTypes.UncommonQuality;
         template.Variables.Value = 150;
         template.Variables.AssetCode = "staff";
+        template.Variables.Effects = new[]
+        {
+            new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f },
+            new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 3.0f }
+        };
 
         return template;
     }
@@ -154,18 +154,18 @@
             Requirements = new[]
             {
                 new Requirement { RequirementType = FantasyRequirementTypes.ClassRequirement, Association = new Association(ClassTypeLookups.Mage, 3)},
-            },
-            Effects = new[]
-            {
-                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 15.0f },
-                new StaticEffect { EffectType = FantasyEffectTypes.DarkDamageAmount, Potency = 30.0f },
-                new StaticEffect { EffectType = FantasyEffectTypes.IntelligenceBonusAmount, Potency = 5.0f },
-                new StaticEffect { EffectType = FantasyEffectTypes.ManaBonusAmount, Potency = 40.0f }
             }
         };
         template.Variables.QualityType = FantasyItemQualityTypes.RareQuality;
         template.Variables.Value = 300;
         template.Variables.AssetCode = "wand";
+        template.Variables.Effects = new[]
+        {
+            new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 15.0f },
+            new StaticEffect { EffectType = FantasyEffectTypes.DarkDamageAmount, Potency = 30.0f },
+            new StaticEffect { EffectType = FantasyEffectTypes.IntelligenceBonusAmount, Potency = 5.0f },
+            new StaticEffect { EffectType = FantasyEffectTypes.ManaBonusAmount, Potency = 40.0f }
+        };
 
         return template;
     }
@@ -181,31 +181,43 @@
             Requirements = new[]
             {
                 new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 8) },
-            },
-            Effects = new[]
-            {
-                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 20 },
-                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 5.0f, Requirements = new []
-            {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement,  Association = new Association(0, 9)  }
-                }},
-                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 7.5f, Requirements = new []
-            {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 10)  }
-                }},
-                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f, Requirements = new []
-            {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 11)  }
-                }},
-                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 12.5f, Requirements = new []
-            {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 12)  }
-                }},
             }
         };
         template.Variables.QualityType = FantasyItemQualityTypes.EpicQuality;
         template.Variables.Value = 1000;
         template.Variables.AssetCode = "sword";
+        template.Variables.Effects = new[]
+        {
+            new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 20 },
+            new StaticEffect
+            {
+                EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 5.0f, Requirements = new[]
+                {
+                    new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 9) }
+                }
+            },
+            new StaticEffect
+            {
+                EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 7.5f, Requirements = new[]
+                {
+                    new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 10) }
+                }
+            },
+            new StaticEffect
+            {
+                EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f, Requirements = new[]
+                {
+                    new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 11) }
+                }
+            },
+            new StaticEffect
+            {
+                EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 12.5f, Requirements = new[]
+                {
+                    new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 12) }
+                }
+            },
+        };
 
         return template;
     }

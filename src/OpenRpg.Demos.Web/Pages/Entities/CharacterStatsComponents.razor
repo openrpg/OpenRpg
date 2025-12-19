@@ -271,8 +271,10 @@
           new StaticEffect {Potency = 50, EffectType = FantasyEffectTypes.HealthBonusAmount}
         };
 
-        var hobbitRace = new RaceTemplate { NameLocaleId = "Hobbit", Effects = raceEffects };
-        var fighterClass = new ClassTemplate { NameLocaleId = "Fighter", Effects = classEffects };
+        var hobbitRace = new RaceTemplate { NameLocaleId = "Hobbit" };
+        hobbitRace.Variables.Effects = raceEffects;
+        var fighterClass = new ClassTemplate { NameLocaleId = "Fighter" };
+        fighterClass.Variables.Effects = classEffects;
 
         AutoStatTemplateAccessor.AddTemplate(hobbitRace);
         AutoStatTemplateAccessor.AddTemplate(fighterClass);
@@ -296,13 +298,13 @@
     public IReadOnlyCollection<StaticEffect> GetEffectsFor(RaceData race)
     {
         var template = AutoStatTemplateAccessor.GetRaceTemplate(race.TemplateId);
-        return template.Effects.GetStaticEffects();
+        return template.Variables.Effects.GetStaticEffects();
     }
     
     public IReadOnlyCollection<StaticEffect> GetEffectsFor(ClassData @class)
     {
         var template = AutoStatTemplateAccessor.GetClassTemplate(@class.TemplateId);
-        return template.Effects.GetStaticEffects();
+        return template.Variables.Effects.GetStaticEffects();
     }
 
     protected override void OnInitialized()

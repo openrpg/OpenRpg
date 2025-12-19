@@ -16,7 +16,7 @@
     ## Enemies
     So far we have discussed characters, quests and combat etc, and thats all great, but almost all RPGs need some notion of enemies/monsters/npcs right?
     
-    Thing is out the box we don't have any formal structures for enemies etc, from a data perspective they are just entities/characters with a template for the most part.
+    Thing is out the box we don't have any formal structures explicitly for enemies etc, from a data perspective they are just entities/characters with a template for the most part.
     
     So with that being the case why do we even have a chapter on this? well because there is some differences in most common use cases between enemies and characters, for example:
     - Enemies are often not unique are likely based off templates
@@ -31,29 +31,22 @@
     ## Expressing Enemy Templates
     Given what we discuss above lets have a look at a super simple enemy template we could make, again this is mainly up to you to decide what an enemy needs to be.
     
-    ```csharp
-    public class EnemyTemplate : EntityTemplate, IHasEffects
-    {
-        public IReadOnlyCollection&lt;IEffect> Effects { get; set; } = Array.Empty&lt;IEffect>();
-    }
-    ```
+    Any template has the notion of `Effects` available on its `Variables` which we can just assign directly and as with all `Templates` it has an Id/Name/Description.
     
-    This seems reasonable as a starting point, we give the template the notion of `Effects` which we can just assign directly and as with all `Templates` it has an Id/Name/Description.
-    
-    So using the above we could create a Bat enemy using this template like so:
+    So we could create a Bat enemy using this template like so:
     
     ```csharp
-    var batTemplate = new EnemyTemplate
+    var batTemplate = new EntityTemplate
     {
         Id = EnemyTypes.Bat,
         NameLocaleId = "Bat",
-        DescriptionLocaleId = "Its a big bat with leathery wings",
-        Effects = [
-            new StaticEffect() { EffectType = GenreEffectTypes.HealthBonusAmount, Potency = 100 },  // Give it 100 hp
-            new StaticEffect() { EffectType = GenreEffectTypes.DamageBonusAmount, Potency = 10 },   // and 10 damage 
-            new StaticEffect() { EffectType = GenreEffectTypes.ExperienceRestoreAmount, Potency = 5 },  // gives 5 xp when killed 
-        ]
+        DescriptionLocaleId = "Its a big bat with leathery wings"
     }
+    batTemplate.Variables.Effects = [
+        new StaticEffect() { EffectType = GenreEffectTypes.HealthBonusAmount, Potency = 100 }, // Give it 100 hp
+        new StaticEffect() { EffectType = GenreEffectTypes.DamageBonusAmount, Potency = 10 }, // and 10 damage 
+        new StaticEffect() { EffectType = GenreEffectTypes.ExperienceRestoreAmount, Potency = 5 }, // gives 5 xp when killed 
+    ];
     ```
     
     > We are keeping things SUPER simple here, but maybe you want your enemies to have races/classes/equipment that can be used to provide effects
@@ -68,18 +61,13 @@
     
     So at this point we have a template describing what a Bat is, but we need to have some data container to store the runtime instance of a Bat.
     
-    ```csharp
-    public class Enemy : Character
-    {}
-    ```
-    
-    Wow that was hard... as mentioned before an Enemy is just an `Entity`/`Character` but they are basically instances of templates, so we have interfaces/classes for that already.
+    As mentioned before an Enemy is just an `Entity`/`Character` but they are basically instances of templates, so we have interfaces/classes for that already.
    
     So lets make a couple of bats, what would that look like?
     
     ```csharp
-    var bat1 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 1" };
-    var bat2 = new EnemyData() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 2" };
+    var bat1 = new Character() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 1" };
+    var bat2 = new Character() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 2" };
     ```
     
     Huzzah! but don't rejoice too quickly as this is just part of the battle, much like with other entities we need to Populate their stats/states.
@@ -135,46 +123,38 @@
 
 @code {
 
-    public class EnemyTemplate : EntityTemplate, IHasEffects
-    {
-        public IReadOnlyCollection<IEffect> Effects { get; set; } = Array.Empty<IEffect>();
-    }
-    
-    public class Enemy : Character {}
-
     public static class EnemyTypes
     {
         public static int Bat = 1;
     }
     
-    private EnemyTemplate BatTemplate;
-    private Enemy Bat1, Bat2;
+    private EntityTemplate BatTemplate;
+    private Character Bat1, Bat2;
 
     protected override void OnInitialized()
     {
-        BatTemplate = new EnemyTemplate
+        BatTemplate = new EntityTemplate
         {
             Id = EnemyTypes.Bat,
             NameLocaleId = "Bat",
-            DescriptionLocaleId = "Its a big bat with leathery wings",
-            Effects =
-            [
-                new StaticEffect() { EffectType = GenreEffectTypes.HealthBonusAmount, Potency = 100 }, // Give it 100 hp
-                new StaticEffect() { EffectType = GenreEffectTypes.DamageBonusAmount, Potency = 10 }, // and 10 damage 
-                new StaticEffect() { EffectType = GenreEffectTypes.ExperienceRestoreAmount, Potency = 5 }, // gives 5 xp when killed 
-            ]
+            DescriptionLocaleId = "Its a big bat with leathery wings"
         };
+        BatTemplate.Variables.Effects = [
+            new StaticEffect() { EffectType = GenreEffectTypes.HealthBonusAmount, Potency = 100 }, // Give it 100 hp
+            new StaticEffect() { EffectType = GenreEffectTypes.DamageBonusAmount, Potency = 10 }, // and 10 damage 
+            new StaticEffect() { EffectType = GenreEffectTypes.ExperienceRestoreAmount, Potency = 5 }, // gives 5 xp when killed 
+        ];
         
         var computedEffects = new ComputedEffects();
-        BatTemplate.Effects
+        BatTemplate.Variables.Effects
             .Cast<StaticEffect>()
             .ForEach(x => computedEffects.Add(x.EffectType, x.Potency));
         
-        Bat1 = new Enemy() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 1" };
+        Bat1 = new Character() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 1" };
         StatPopulator.Populate(Bat1.Stats, computedEffects, []);
         Bat1.State.Health = Bat1.Stats.MaxHealth;
         
-        Bat2 = new Enemy() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 2" };
+        Bat2 = new Character() { TemplateId = EnemyTypes.Bat, NameLocaleId = $"{BatTemplate.NameLocaleId} 2" };
         StatPopulator.Populate(Bat2.Stats, computedEffects, []);
         Bat2.State.Health = Bat2.Stats.MaxHealth/2;
         

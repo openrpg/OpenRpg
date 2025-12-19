@@ -9,12 +9,11 @@ using OpenRpg.Entities.Requirements;
 
 namespace OpenRpg.Entities.Races.Templates
 {
-    public class RaceTemplate : ITemplate<RaceTemplateVariables>, IHasEffects, IHasRequirements
+    public class RaceTemplate : ITemplate<RaceTemplateVariables>, IHasRequirements
     {
         public int Id { get; set; }
         public string NameLocaleId { get; set; }
         public string DescriptionLocaleId { get; set; }
-        public IReadOnlyCollection<IEffect> Effects { get; set; } = Array.Empty<IEffect>();
         public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
         public RaceTemplateVariables Variables { get; set; } = new RaceTemplateVariables();
     }

@@ -4,6 +4,7 @@ using OpenRpg.Core.Effects;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Entity;
+using OpenRpg.Entities.Entity.Templates;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Procedural;
 using OpenRpg.Entities.Requirements;
@@ -22,16 +23,16 @@ namespace OpenRpg.Entities.Effects.Processors
             RequirementChecker = requirementChecker;
         }
 
-        public virtual ComputedEffects ComputeEffects(IHasEffects context, T relatedEntity)
+        public virtual ComputedEffects ComputeEffects(IReadOnlyCollection<IEffect> context, T relatedEntity)
         {
             var computedEffects = new ComputedEffects();
             ComputeEffects(context, relatedEntity, computedEffects);
             return computedEffects;
         }
         
-        public virtual void ComputeEffects(IHasEffects context, T relatedEntity, ComputedEffects computedEffects)
+        public virtual void ComputeEffects(IReadOnlyCollection<IEffect> context, T relatedEntity, ComputedEffects computedEffects)
         {
-            foreach (var effect in context.Effects)
+            foreach (var effect in context)
             {
                 if(!RequirementChecker.AreRequirementsMet(relatedEntity, effect.Requirements))
                 { continue; }
@@ -51,19 +52,26 @@ namespace OpenRpg.Entities.Effects.Processors
             if (entity.Variables.HasRace())
             {
                 var template = TemplateAccessor.GetRaceTemplate(entity.Variables.Race.TemplateId);
-                ComputeEffects(template, entity, computedEffects);
+                ComputeEffects(template.Variables.Effects, entity, computedEffects);
             }
             
             if (entity.Variables.HasClass())
             {
                 var template = TemplateAccessor.GetClassTemplate(entity.Variables.Class.TemplateId);
-                ComputeEffects(template, entity, computedEffects);
+                ComputeEffects(template.Variables.Effects, entity, computedEffects);
             }
 
+            if (entity.TemplateId != -1)
+            {
+                var entityTemplate = TemplateAccessor.Get<EntityTemplate>(entity.TemplateId);
+                if(entityTemplate.Variables.HasEffects())
+                { ComputeEffects(entityTemplate.Variables.Effects, entity, computedEffects); }
+            }
+            
             return computedEffects;
         }
         
-        public virtual void ComputeProceduralEffects(ProceduralEffects proceduralEffects, IReadOnlyCollection<Association> effectAssociations, IHasEffects context, ComputedEffects computedEffects, T relatedEntity)
+        public virtual void ComputeProceduralEffects(ProceduralEffects proceduralEffects, IReadOnlyCollection<Association> effectAssociations, IReadOnlyCollection<IEffect> context, ComputedEffects computedEffects, T relatedEntity)
         {
             foreach (var effectAssociation in effectAssociations)
             {
@@ -78,7 +86,7 @@ namespace OpenRpg.Entities.Effects.Processors
             }
         }
 
-        public virtual int GetLevelValue(ScaledEffect effect, IHasEffects context, ComputedEffects computedEffects, T relatedEntity)
+        public virtual int GetLevelValue(ScaledEffect effect, IReadOnlyCollection<IEffect> context, ComputedEffects computedEffects, T relatedEntity)
         {
             if (effect.ScalingIndex >= 0)
             {
@@ -94,7 +102,7 @@ namespace OpenRpg.Entities.Effects.Processors
             return 1;
         }
 
-        public virtual void ComputeScaledEffect(ScaledEffect effect, IHasEffects context, ComputedEffects computedEffects, T relatedEntity)
+        public virtual void ComputeScaledEffect(ScaledEffect effect, IReadOnlyCollection<IEffect> context, ComputedEffects computedEffects, T relatedEntity)
         {
             if (effect.ScalingType == CoreEffectScalingTypes.Level)
             {

@@ -229,56 +229,56 @@
         var pretendFighterClassTemplate = new ClassTemplate
         {
             Id = 5,
-            NameLocaleId = "Fighter",
-            Effects = new IEffect[]
+            NameLocaleId = "Fighter"
+        };
+        pretendFighterClassTemplate.Variables.Effects = new IEffect[]
+        {
+            new ScaledEffect()
             {
-                new ScaledEffect()
-                {
-                    EffectType = FantasyEffectTypes.StrengthBonusAmount,
-                    ScalingType = CoreEffectScalingTypes.Level,
-                    PotencyFunction = new ScalingFunction(PresetCurves.Linear, 2, 5, 1, 10)
-                },
-                new StaticEffect()
-                {
-                    EffectType = FantasyEffectTypes.StrengthBonusPercentage,
-                    Potency = 0.2f
-                }
+                EffectType = FantasyEffectTypes.StrengthBonusAmount,
+                ScalingType = CoreEffectScalingTypes.Level,
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, 2, 5, 1, 10)
+            },
+            new StaticEffect()
+            {
+                EffectType = FantasyEffectTypes.StrengthBonusPercentage,
+                Potency = 0.2f
             }
         };
 
         var pretendHumanRace = new RaceTemplate
         {
             Id = 2,
-            NameLocaleId = "Human",
-            Effects = new[]
+            NameLocaleId = "Human"
+        };
+        pretendHumanRace.Variables.Effects = new[]
+        {
+            new ScaledEffect()
             {
-                new ScaledEffect()
-                {
-                    EffectType = FantasyEffectTypes.AllAttributeBonusAmount,
-                    ScalingType = CoreEffectScalingTypes.Level,
-                    PotencyFunction = new ScalingFunction(PresetCurves.Linear, 7, 10, 1, 10)
-                }
+                EffectType = FantasyEffectTypes.AllAttributeBonusAmount,
+                ScalingType = CoreEffectScalingTypes.Level,
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, 7, 10, 1, 10)
             }
         };
 
         var pretendWeapon = new ItemTemplate
         {
             Id = 23,
-            NameLocaleId = "Super Fighter Sword",
-            Effects = new IEffect[]
+            NameLocaleId = "Super Fighter Sword"
+        };
+        pretendWeapon.Variables.Effects = new IEffect[]
+        {
+            new StaticEffect()
             {
-                new StaticEffect()
-                {
-                    EffectType = FantasyEffectTypes.StrengthBonusAmount,
-                    Potency = 2
-                },
-                new ScaledEffect()
-                {
-                    EffectType = FantasyEffectTypes.DamageBonusAmount,
-                    ScalingType = CoreEffectScalingTypes.StatIndex,
-                    ScalingIndex = FantasyEntityStatsVariableTypes.Strength,
-                    PotencyFunction = new ScalingFunction(PresetCurves.Linear, 10, 30, 10, 20)
-                }
+                EffectType = FantasyEffectTypes.StrengthBonusAmount,
+                Potency = 2
+            },
+            new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.DamageBonusAmount,
+                ScalingType = CoreEffectScalingTypes.StatIndex,
+                ScalingIndex = FantasyEntityStatsVariableTypes.Strength,
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, 10, 30, 10, 20)
             }
         };
         

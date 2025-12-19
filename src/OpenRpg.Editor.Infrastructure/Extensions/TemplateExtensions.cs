@@ -1,6 +1,7 @@
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Templates;
 using OpenRpg.Entities.Classes.Templates;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.TradeSkills.Templates;
@@ -86,18 +87,18 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
         {
             if (template is ItemTemplate itemTemplate)
             {
-                itemTemplate.Effects = itemTemplate.Effects.AsList();
+                itemTemplate.Variables.Effects = itemTemplate.Variables.Effects.AsList();
                 itemTemplate.Requirements = itemTemplate.Requirements.AsList();
                 itemTemplate.ModificationAllowances = itemTemplate.ModificationAllowances.AsList();
             }
             else if (template is ClassTemplate classTemplate)
             {
-                classTemplate.Effects = classTemplate.Effects.AsList();
+                classTemplate.Variables.Effects = classTemplate.Variables.Effects.AsList();
                 classTemplate.Requirements = classTemplate.Requirements.AsList();
             }
             else if (template is RaceTemplate raceTemplate)
             {
-                raceTemplate.Effects = raceTemplate.Effects.AsList();
+                raceTemplate.Variables.Effects = raceTemplate.Variables.Effects.AsList();
                 raceTemplate.Requirements = raceTemplate.Requirements.AsList();
             }
             else if (template is Quest quest)

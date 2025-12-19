@@ -38,8 +38,8 @@
     public ITemplateAccessor TemplateAccessor { get; set; }
 
     public IReadOnlyCollection<StaticEffect> GetRaceEffects()
-    { return TemplateAccessor.GetRaceTemplate(Character.Variables.Race.TemplateId).Effects.GetStaticEffects(); }
+    { return TemplateAccessor.GetRaceTemplate(Character.Variables.Race.TemplateId).Variables.Effects.GetStaticEffects(); }
     
     public IReadOnlyCollection<StaticEffect> GetClassEffects()
-    { return TemplateAccessor.GetClassTemplate(Character.Variables.Class.TemplateId).Effects.GetStaticEffects(); ; }
+    { return TemplateAccessor.GetClassTemplate(Character.Variables.Class.TemplateId).Variables.Effects.GetStaticEffects(); ; }
 }

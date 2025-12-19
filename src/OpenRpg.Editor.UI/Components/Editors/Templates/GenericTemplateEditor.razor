@@ -2,6 +2,7 @@
 @using OpenRpg.Core.Requirements
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Requirements
 @using OpenRpg.Localization.Data.Repositories
 
@@ -31,10 +32,10 @@
     @if(PrimaryDetailsContent != null)
     { @PrimaryDetailsContent(Template) }
     
-    @if (Template is IHasEffects hasEffects)
+    @if (Template.Variables.HasEffects())
     {
         <Accordion Title="Template Effects" IsExpanded="true">
-            <EffectsEditor Effects="hasEffects.Effects as List<IEffect>"/>
+            <EffectsEditor Effects="Template.Variables.Effects as List<IEffect>"/>
         </Accordion>
     }
 

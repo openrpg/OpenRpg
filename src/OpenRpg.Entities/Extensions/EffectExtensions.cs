@@ -16,13 +16,13 @@ namespace OpenRpg.Entities.Extensions
         public static IEnumerable<IEffect> GetEffects(this RaceData raceData, ITemplateAccessor templateAccessor)
         {
             var template = templateAccessor.GetRaceTemplate(raceData.TemplateId);
-            return template.Effects;
+            return template.Variables.Effects;
         }
         
         public static IEnumerable<IEffect> GetEffects(this ClassData classData, ITemplateAccessor templateAccessor)
         {
             var template = templateAccessor.GetClassTemplate(classData.TemplateId);
-            return template.Effects;
+            return template.Variables.Effects;
         }
     }
 }

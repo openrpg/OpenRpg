@@ -41,15 +41,15 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "A really bad looking sword, can slay things though",
                 ItemType = FantasyItemTypes.GenericWeapon,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = new[]
-                {
-                    new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
-                }
+                Requirements = Array.Empty<Requirement>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
             template.Variables.Value = 10;
             template.Variables.AssetCode = "sword";
+            template.Variables.Effects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
+            };
 
             return template;
         }
@@ -72,12 +72,12 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "So fancy it could slice through stone",
                 ItemType = FantasyItemTypes.GenericWeapon,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = swordEffects
+                Requirements = Array.Empty<Requirement>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.EpicQuality;
             template.Variables.Value = 10000;
             template.Variables.AssetCode = "sword";
+            template.Variables.Effects = swordEffects;
             
             return template;
         }
@@ -91,16 +91,16 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "A sketchy looking potion, lets hope it heals you",
                 ItemType = FantasyItemTypes.Potions,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = new[]
-                {
-                new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = 30.0f }
-            }
+                Requirements = Array.Empty<Requirement>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.UncommonQuality;
             template.Variables.Value = 20;
             template.Variables.MaxStacks = 5;
             template.Variables.AssetCode = "potion";
+            template.Variables.Effects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = 30.0f }
+            };
 
             return template;
         }
@@ -114,16 +114,16 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "Who knows whats in this...",
                 ItemType = FantasyItemTypes.Potions,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = new[]
-                {
-                new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = -5.0f }
-            }
+                Requirements = Array.Empty<Requirement>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
             template.Variables.Value = 0;
             template.Variables.MaxStacks = 5;
             template.Variables.AssetCode = "potion-2";
+            template.Variables.Effects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = -5.0f }
+            };
             
             return template;
         }
@@ -137,8 +137,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "A block of refined copper",
                 ItemType = FantasyItemTypes.GenericItem,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<StaticEffect>(),
+                Requirements = Array.Empty<Requirement>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
             template.Variables.Value = 5;
@@ -157,8 +156,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "A chunk of raw copper ore",
                 ItemType = FantasyItemTypes.GenericItem,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<StaticEffect>(),
+                Requirements = Array.Empty<Requirement>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
             template.Variables.Value = 1;
@@ -177,8 +175,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "A chunk of raw iron ore",
                 ItemType = FantasyItemTypes.GenericItem,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<StaticEffect>(),
+                Requirements = Array.Empty<Requirement>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
             template.Variables.Value = 1;
@@ -197,8 +194,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "A log cut from an Oak tree",
                 ItemType = FantasyItemTypes.GenericItem,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<StaticEffect>(),
+                Requirements = Array.Empty<Requirement>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
             template.Variables.Value = 1;
@@ -217,16 +213,16 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "An oak hilt with a copper blade",
                 ItemType = FantasyItemTypes.GenericWeapon,
                 ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = new[]
-                {
-                    new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 50 }
-                }
+                Requirements = Array.Empty<Requirement>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
             template.Variables.Value = 50;
             template.Variables.MaxStacks = 1;
             template.Variables.AssetCode = "copper-sword";
+            template.Variables.Effects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 50 }
+            };
             
             return template;
         }

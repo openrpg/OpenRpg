@@ -7,5 +7,8 @@ namespace OpenRpg.Entities.Types
         
         // For adding the notion of procedural effects 
         public static int ProceduralEffects = 5001;
+        
+        // General effects (replaces IHasEffects)
+        public static int Effects = 5002;
     }
 }

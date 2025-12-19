@@ -36,9 +36,9 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Id = ClassTypeLookups.Fighter,
                 NameLocaleId = "Fighter",
                 DescriptionLocaleId = "Super tough, hits things",
-                Effects = effects
             };
             classTemplate.Variables.AssetCode = "class-fighter";
+            classTemplate.Variables.Effects = effects;
             return classTemplate;
         }
 
@@ -56,10 +56,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
             {
                 Id = ClassTypeLookups.Mage,
                 NameLocaleId = "Mage",
-                DescriptionLocaleId = "Powerful magic users",
-                Effects = effects
+                DescriptionLocaleId = "Powerful magic users"
             };
             classTemplate.Variables.AssetCode = "class-mage";
+            classTemplate.Variables.Effects = effects;
             return classTemplate;
         }
 

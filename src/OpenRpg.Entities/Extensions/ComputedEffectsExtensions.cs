@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Core.Effects;
 using OpenRpg.Entities.Effects;
@@ -19,7 +20,7 @@ namespace OpenRpg.Entities.Extensions
             computedEffects.EffectResults[effectType] += potency;
         }
 
-        public static void AddDeferred(this ComputedEffects computedEffects, ScaledEffect effect, IHasEffects context)
+        public static void AddDeferred(this ComputedEffects computedEffects, ScaledEffect effect, IReadOnlyCollection<IEffect> context)
         { computedEffects.DeferredEffects.Add(new DeferredEffect() { ScaledEffect = effect, Context = context }); }
 
         public static float Get(this ComputedEffects computedEffects, int effectType)

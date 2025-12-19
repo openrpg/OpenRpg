@@ -32,12 +32,12 @@
         <div class="column">
             @if (IsWeapon)
             {
-                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType == FantasyEffectTypes.DamageBonusAmount).Sum(x => x.Potency))</h4>
+                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Variables.Effects.GetStaticEffects().Where(x => x.EffectType == FantasyEffectTypes.DamageBonusAmount).Sum(x => x.Potency))</h4>
                 <h6 class="subtitle is-7 has-text-dark has-text-centered">Damage</h6>
             }
             @if (IsArmour)
             {
-                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType == FantasyEffectTypes.DefenseBonusAmount).Sum(x => x.Potency))</h4>
+                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Variables.Effects.GetStaticEffects().Where(x => x.EffectType == FantasyEffectTypes.DefenseBonusAmount).Sum(x => x.Potency))</h4>
                 <h6 class="subtitle is-7 has-text-dark has-text-centered">Defense</h6>
             }
         </div>
@@ -93,9 +93,9 @@
     {
         get
         {
-            if (IsWeapon) { return ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType != FantasyEffectTypes.DamageBonusAmount); }
-            if (IsArmour) { return ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType != FantasyEffectTypes.DefenseBonusAmount); }
-            return ItemTemplate.Effects.GetStaticEffects();
+            if (IsWeapon) { return ItemTemplate.Variables.Effects.GetStaticEffects().Where(x => x.EffectType != FantasyEffectTypes.DamageBonusAmount); }
+            if (IsArmour) { return ItemTemplate.Variables.Effects.GetStaticEffects().Where(x => x.EffectType != FantasyEffectTypes.DefenseBonusAmount); }
+            return ItemTemplate.Variables.Effects.GetStaticEffects();
         }
     }
 

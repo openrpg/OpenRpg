@@ -17,6 +17,7 @@
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Types
 @using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Extensions
 @using OpenRpg.Genres.Requirements
 @using OpenRpg.Genres.Types
@@ -162,32 +163,9 @@
 
 @code {
 
-    public class EnemyTemplate : EntityTemplate, IHasEffects
-    {
-        public IReadOnlyCollection<IEffect> Effects { get; set; } = Array.Empty<IEffect>();
-    }
-    
-    public class Enemy : Character {}
-
     public static class EnemyTypes
     {
         public static int Bat = 1;
-    }
-
-    public class EnemyEffectProcessor : EntityEffectProcessor<Enemy>
-    {
-        public EnemyEffectProcessor(ITemplateAccessor templateAccessor, ICharacterRequirementChecker requirementChecker) : base(templateAccessor, requirementChecker)
-        {}
-
-        public override ComputedEffects ComputeEffects(Enemy entity)
-        {
-            var computedEffects =  base.ComputeEffects(entity);
-
-            var enemyTemplate = TemplateAccessor.Get<EnemyTemplate>(entity.TemplateId);
-            ComputeEffects(enemyTemplate, entity, computedEffects);
-            
-            return computedEffects;
-        }
     }
     
     public class LevelScaledFunction : ScalingFunction
@@ -197,15 +175,15 @@
         }
     }
     
-    private EnemyTemplate BatTemplate;
-    private Enemy Bat1, Bat2;
+    private EntityTemplate BatTemplate;
+    private Character Bat1, Bat2;
     private ManualTemplateAccessor ManualStatTemplateAccessor { get; } = new();
-    private EnemyEffectProcessor EffectProcessor;
+    private CharacterEffectProcessor EffectProcessor;
     private List<IEffect> ScaledEffects = new();
     
     protected override void OnInitialized()
     {
-        EffectProcessor = new EnemyEffectProcessor(ManualStatTemplateAccessor, RequirementChecker);
+        EffectProcessor = new CharacterEffectProcessor(ManualStatTemplateAccessor, RequirementChecker);
 
         var healthRange = new RangeF(100, 10000);
         ScaledEffects.Add(new ScaledEffect()
@@ -231,17 +209,17 @@
             PotencyFunction = new LevelScaledFunction(experienceRange)
         });
         
-        BatTemplate = new EnemyTemplate
+        BatTemplate = new EntityTemplate
         {
             Id = EnemyTypes.Bat,
             NameLocaleId = "Bat",
-            DescriptionLocaleId = "Its a big bat with leathery wings",
-            Effects = ScaledEffects
+            DescriptionLocaleId = "Its a big bat with leathery wings"
         };
+        BatTemplate.Variables.Effects = ScaledEffects;
         
         ManualStatTemplateAccessor.AddTemplate(BatTemplate);
         
-        Bat1 = new Enemy() { TemplateId = EnemyTypes.Bat };
+        Bat1 = new Character() { TemplateId = EnemyTypes.Bat };
         Bat1.Variables.Level = 1;
         Bat1.NameLocaleId = $"{BatTemplate.NameLocaleId} - Lv {Bat1.Variables.Level}";
         
@@ -250,7 +228,7 @@
         Bat1.State.Health = Bat1.Stats.MaxHealth;
         
 
-        Bat2 = new Enemy() { TemplateId = EnemyTypes.Bat };
+        Bat2 = new Character() { TemplateId = EnemyTypes.Bat };
         Bat2.Variables.Level = 100;
         Bat2.NameLocaleId = $"{BatTemplate.NameLocaleId} - Lv {Bat2.Variables.Level}";
         
