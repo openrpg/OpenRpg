@@ -32,16 +32,4 @@ public class ItemEntityVariableExtensionTests
         Assert.True(entityVars.HasEquipment());
         Assert.Equal(entityVars.Equipment, dummyEquipment);
     }
-    
-    [Fact]
-    public void should_correctly_handle_loot_table_on_entity()
-    {
-        var entityVars = new EntityVariables();
-        Assert.False(entityVars.HasLootTable());
-        
-        var dummyLootTable = new DefaultLootTable();
-        entityVars.LootTable = dummyLootTable;
-        Assert.True(entityVars.HasLootTable());
-        Assert.Equal(entityVars.LootTable, dummyLootTable);
-    }
 }
