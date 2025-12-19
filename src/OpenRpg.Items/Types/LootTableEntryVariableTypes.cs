@@ -6,5 +6,6 @@ namespace OpenRpg.Items.Types
 
         public static int DropRate = 1;
         public static int IsUnique = 2;
+        public static int Requirements = 3;
     }
 }

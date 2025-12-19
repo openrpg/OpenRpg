@@ -88,33 +88,33 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
             if (template is ItemTemplate itemTemplate)
             {
                 itemTemplate.Variables.Effects = itemTemplate.Variables.Effects.AsList();
-                itemTemplate.Requirements = itemTemplate.Requirements.AsList();
+                itemTemplate.Variables.Requirements = itemTemplate.Variables.Requirements.AsList();
                 itemTemplate.ModificationAllowances = itemTemplate.ModificationAllowances.AsList();
             }
             else if (template is ClassTemplate classTemplate)
             {
                 classTemplate.Variables.Effects = classTemplate.Variables.Effects.AsList();
-                classTemplate.Requirements = classTemplate.Requirements.AsList();
+                classTemplate.Variables.Requirements = classTemplate.Variables.Requirements.AsList();
             }
             else if (template is RaceTemplate raceTemplate)
             {
                 raceTemplate.Variables.Effects = raceTemplate.Variables.Effects.AsList();
-                raceTemplate.Requirements = raceTemplate.Requirements.AsList();
+                raceTemplate.Variables.Requirements = raceTemplate.Variables.Requirements.AsList();
             }
             else if (template is Quest quest)
             {
                 quest.Gifts = quest.Gifts.AsList();
                 quest.Objectives = quest.Objectives.AsList();
                 quest.Rewards = quest.Rewards.AsList();
-                quest.Requirements = quest.Requirements.AsList();
+                quest.Variables.Requirements = quest.Variables.Requirements.AsList();
             }
             else if (template is ItemCraftingTemplate craftingTemplate)
             {
-                craftingTemplate.Requirements = craftingTemplate.Requirements.AsList();
+                craftingTemplate.Variables.Requirements = craftingTemplate.Variables.Requirements.AsList();
             }
             else if (template is ItemGatheringTemplate gatheringTemplate)
             {
-                gatheringTemplate.Requirements = gatheringTemplate.Requirements.AsList();
+                gatheringTemplate.Variables.Requirements = gatheringTemplate.Variables.Requirements.AsList();
             }
         }
     }

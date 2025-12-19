@@ -3,6 +3,7 @@ using OpenRpg.Core.Associations;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Lookups;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.TradeSkills;
@@ -43,18 +44,23 @@ namespace OpenRpg.Demos.Infrastructure.Data
             var itemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.IronOre };
             itemEntry.Variables.Amount = 1;
         
-            return new ItemGatheringTemplate()
+            var template = new ItemGatheringTemplate()
             {
                 Id = ItemGatheringTemplateLookups.IronOre,
                 SkillType = FantasyGatheringTradeSkillTypes.Mining,
                 SkillDifficulty = 15,
                 TimeToComplete = 1.0f,
-                OutputItems = new List<TradeSkillItemEntry>() { itemEntry },
-                Requirements =  new []
-                {
-                    new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, Association = new Association(FantasyGatheringTradeSkillTypes.Mining, 10) }
-                },
+                OutputItems = new List<TradeSkillItemEntry>() { itemEntry }
             };
+            template.Variables.Requirements = new[]
+            {
+                new Requirement
+                {
+                    RequirementType = FantasyRequirementTypes.TradeSkillRequirement,
+                    Association = new Association(FantasyGatheringTradeSkillTypes.Mining, 10)
+                }
+            };
+            return template;
         }
 
         public ItemGatheringTemplate MakeOakLogGatheringTemplate()

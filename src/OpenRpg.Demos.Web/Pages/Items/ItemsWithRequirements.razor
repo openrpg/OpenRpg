@@ -126,10 +126,6 @@
             NameLocaleId = "Staff Of Hitting",
             DescriptionLocaleId = "A staff for hitting things, got gold bits on but still looks rubbish",
             ItemType = FantasyItemTypes.GenericWeapon,
-            Requirements = new[]
-            {
-                new Requirement {RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 10) }
-                }
         };
         template.Variables.QualityType = FantasyItemQualityTypes.UncommonQuality;
         template.Variables.Value = 150;
@@ -138,6 +134,10 @@
         {
             new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f },
             new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 3.0f }
+        };
+        template.Variables.Requirements = new[]
+        {
+            new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 10) }
         };
 
         return template;
@@ -150,11 +150,7 @@
             Id = 1,
             NameLocaleId = "Wizardy Wand",
             DescriptionLocaleId = "A super special wand with some gem on the end that can only be used by the strongest of wizardy woos",
-            ItemType = FantasyItemTypes.GenericWeapon,
-            Requirements = new[]
-            {
-                new Requirement { RequirementType = FantasyRequirementTypes.ClassRequirement, Association = new Association(ClassTypeLookups.Mage, 3)},
-            }
+            ItemType = FantasyItemTypes.GenericWeapon
         };
         template.Variables.QualityType = FantasyItemQualityTypes.RareQuality;
         template.Variables.Value = 300;
@@ -165,6 +161,10 @@
             new StaticEffect { EffectType = FantasyEffectTypes.DarkDamageAmount, Potency = 30.0f },
             new StaticEffect { EffectType = FantasyEffectTypes.IntelligenceBonusAmount, Potency = 5.0f },
             new StaticEffect { EffectType = FantasyEffectTypes.ManaBonusAmount, Potency = 40.0f }
+        };
+        template.Variables.Requirements = new[]
+        {
+            new Requirement { RequirementType = FantasyRequirementTypes.ClassRequirement, Association = new Association(ClassTypeLookups.Mage, 3) },
         };
 
         return template;
@@ -177,11 +177,7 @@
             Id = 1,
             NameLocaleId = "Sword For The Strong",
             DescriptionLocaleId = "A sword that can only unlock its full power for those with high strength",
-            ItemType = FantasyItemTypes.GenericWeapon,
-            Requirements = new[]
-            {
-                new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 8) },
-            }
+            ItemType = FantasyItemTypes.GenericWeapon 
         };
         template.Variables.QualityType = FantasyItemQualityTypes.EpicQuality;
         template.Variables.Value = 1000;
@@ -217,6 +213,11 @@
                     new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 12) }
                 }
             },
+        };
+        
+        template.Variables.Requirements = new[]
+        {
+            new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 8) },
         };
 
         return template;

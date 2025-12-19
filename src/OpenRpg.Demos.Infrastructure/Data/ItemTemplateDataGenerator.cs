@@ -40,8 +40,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Sword",
                 DescriptionLocaleId = "A really bad looking sword, can slay things though",
                 ItemType = FantasyItemTypes.GenericWeapon,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>()
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
             template.Variables.Value = 10;
@@ -71,8 +70,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Super Sword",
                 DescriptionLocaleId = "So fancy it could slice through stone",
                 ItemType = FantasyItemTypes.GenericWeapon,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>()
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.EpicQuality;
             template.Variables.Value = 10000;
@@ -90,8 +88,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Healing Potion",
                 DescriptionLocaleId = "A sketchy looking potion, lets hope it heals you",
                 ItemType = FantasyItemTypes.Potions,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>()
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.UncommonQuality;
             template.Variables.Value = 20;
@@ -113,8 +110,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Junk Potion Combi-Deal",
                 DescriptionLocaleId = "Who knows whats in this...",
                 ItemType = FantasyItemTypes.Potions,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>()
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
             template.Variables.Value = 0;
@@ -136,8 +132,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Copper Ingot",
                 DescriptionLocaleId = "A block of refined copper",
                 ItemType = FantasyItemTypes.GenericItem,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>()
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
             template.Variables.Value = 5;
@@ -155,8 +150,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Copper Ore",
                 DescriptionLocaleId = "A chunk of raw copper ore",
                 ItemType = FantasyItemTypes.GenericItem,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>()
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
             template.Variables.Value = 1;
@@ -174,8 +168,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Iron Ore",
                 DescriptionLocaleId = "A chunk of raw iron ore",
                 ItemType = FantasyItemTypes.GenericItem,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>()
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
             template.Variables.Value = 1;
@@ -193,8 +186,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Oak Log",
                 DescriptionLocaleId = "A log cut from an Oak tree",
                 ItemType = FantasyItemTypes.GenericItem,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>()
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
             template.Variables.Value = 1;
@@ -212,8 +204,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "A crafted copper sword",
                 DescriptionLocaleId = "An oak hilt with a copper blade",
                 ItemType = FantasyItemTypes.GenericWeapon,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>()
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
             template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
             template.Variables.Value = 50;

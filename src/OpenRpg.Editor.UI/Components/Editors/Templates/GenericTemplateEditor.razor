@@ -39,10 +39,10 @@
         </Accordion>
     }
 
-    @if (Template is IHasRequirements hasRequirements)
+    @if (Template.Variables.HasRequirements())
     {
         <Accordion Title="Template Requirements" IsExpanded="true">
-            <RequirementsEditor Requirements="hasRequirements.Requirements as List<Requirement>" />
+            <RequirementsEditor Requirements="Template.Variables.Requirements as List<Requirement>" />
         </Accordion>
     }
 

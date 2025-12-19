@@ -9,12 +9,12 @@ using OpenRpg.Genres.Scifi.Variables;
 
 namespace OpenRpg.Genres.Scifi.Ships
 {
-    public class ShipTemplate : ITemplate<ShipTemplateVariables>, IHasRequirements
+    public class ShipTemplate : ITemplate<ShipTemplateVariables>
     {
         public int Id { get; set; }
         public string NameLocaleId { get; set; }
         public string DescriptionLocaleId { get; set; }
-        public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
+        
         public ShipTemplateVariables Variables { get; set; } = new ShipTemplateVariables();
     }
 }

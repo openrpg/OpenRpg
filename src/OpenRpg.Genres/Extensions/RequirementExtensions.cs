@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Genres.Characters;
@@ -8,17 +9,17 @@ namespace OpenRpg.Genres.Extensions
 {
     public static class RequirementExtensions
     {
-        public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, Character character, IHasRequirements hasRequirements)
-        { return hasRequirements.Requirements.All(x => characterRequirementChecker.IsRequirementMet(character, x)); }
+        public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, Character character, IReadOnlyCollection<Requirement> hasRequirements)
+        { return hasRequirements.All(x => characterRequirementChecker.IsRequirementMet(character, x)); }
         
-        public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, IQuestState questState, IHasRequirements hasRequirements)
-        { return hasRequirements.Requirements.All(x => characterRequirementChecker.IsRequirementMet(questState, x)); }
+        public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, IQuestState questState, IReadOnlyCollection<Requirement> hasRequirements)
+        { return hasRequirements.All(x => characterRequirementChecker.IsRequirementMet(questState, x)); }
         
-        public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, ITriggerState triggerState, IHasRequirements hasRequirements)
-        { return hasRequirements.Requirements.All(x => characterRequirementChecker.IsRequirementMet(triggerState, x)); }
+        public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, ITriggerState triggerState, IReadOnlyCollection<Requirement> hasRequirements)
+        { return hasRequirements.All(x => characterRequirementChecker.IsRequirementMet(triggerState, x)); }
 
         public static bool AreRequirementsMet(this ICharacterRequirementChecker characterRequirementChecker, IQuestState questState, ITriggerState triggerState,
-            Character character, IHasRequirements hasRequirements)
+            Character character, IReadOnlyCollection<Requirement> hasRequirements)
         {
             return AreRequirementsMet(characterRequirementChecker, character, hasRequirements) &&
                    AreRequirementsMet(characterRequirementChecker, questState, hasRequirements) &&

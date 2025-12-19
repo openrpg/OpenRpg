@@ -56,11 +56,11 @@
             <EffectList Effects="DisplayEffects.ToArray()" Character="@Character"></EffectList>
         </div>
     }
-    @if (ItemTemplate.Requirements.Any())
+    @if (ItemTemplate.Variables.HasRequirements())
     {
         <h5 class="title is-5 has-text-centered has-text-dark mb-1 mt-3">Requirements</h5>
         <div>
-            <RequirementList Requirements="@ItemTemplate.Requirements.ToArray()" Character="@Character"></RequirementList>
+            <RequirementList Requirements="@ItemTemplate.Variables.Requirements" Character="@Character"></RequirementList>
         </div>
     }
 </CardSection>
@@ -105,7 +105,7 @@
     protected override void OnParametersSet()
     {
 
-        var areRequirementsMet = RequirementsChecker.AreRequirementsMet(Character, ItemTemplate);
+        var areRequirementsMet = RequirementsChecker.AreRequirementsMet(Character, ItemTemplate.Variables.Requirements);
         var requirementsClass = !areRequirementsMet ? "has-background-danger-light" : "";
         cardClasses = $"item-border item-quality-{_itemQualityTypeId} {requirementsClass}";
 
