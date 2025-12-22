@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using OpenRpg.Core.Extensions;
+using OpenRpg.Core.Requirements;
 using OpenRpg.Items.Types;
 using OpenRpg.Items.Variables;
 
@@ -6,6 +8,9 @@ namespace OpenRpg.Items.Extensions
 {
     public static class LootTableEntryVariablesExtensions
     {
+        public static bool HasRequirements(this LootTableEntryVariables variables) 
+            => variables.ContainsKey(LootTableEntryVariableTypes.Requirements);
+        
         extension(LootTableEntryVariables vars)
         {
             /// <summary>
@@ -23,6 +28,12 @@ namespace OpenRpg.Items.Extensions
             {
                 get => vars.GetBool(LootTableEntryVariableTypes.IsUnique);
                 set => vars[LootTableEntryVariableTypes.IsUnique] = value;
+            }
+
+            public IReadOnlyCollection<Requirement> Requirements
+            {
+                get => vars.GetAsOrDefault(LootTableEntryVariableTypes.Requirements, IReadOnlyCollection<Requirement>.Empty);
+                set => vars[LootTableEntryVariableTypes.Requirements] = value;
             }
         }
     }

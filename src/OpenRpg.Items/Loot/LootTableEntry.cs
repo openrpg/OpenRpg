@@ -8,9 +8,8 @@ using OpenRpg.Items.Variables;
 
 namespace OpenRpg.Items.Loot
 {
-    public class LootTableEntry : IHasRequirements, IHasVariables<LootTableEntryVariables>
+    public class LootTableEntry : IHasVariables<LootTableEntryVariables>
     {
-        public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
         public LootTableEntryVariables Variables { get; set; } = new LootTableEntryVariables();
         public ItemData ItemData { get; set; }
     }

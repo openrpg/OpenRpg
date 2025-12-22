@@ -35,17 +35,5 @@ namespace OpenRpg.Items.Extensions
                 set => vars[ItemEntityVariableTypes.Inventory] = value;
             }
         }
-       
-        public static bool HasLootTable(this EntityVariables vars) 
-        { return vars.ContainsKey(ItemEntityVariableTypes.LootTable); }
-        
-        extension(EntityVariables vars)
-        {
-            public ILootTable LootTable
-            {
-                get => vars.GetAsOrDefault(ItemEntityVariableTypes.LootTable, () => new DefaultLootTable());
-                set => vars[ItemEntityVariableTypes.LootTable] = value;
-            }
-        }
     }
 }

@@ -109,15 +109,15 @@
             Id = 1,
             NameLocaleId = "Sword",
             DescriptionLocaleId = "A really bad looking sword, can slay things though",
-            ItemType = FantasyItemTypes.GenericWeapon,
-            Effects = new []
-            {
-                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
-            }
+            ItemType = FantasyItemTypes.GenericWeapon
         };
         template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
         template.Variables.Value = 10;
         template.Variables.AssetCode = "sword";
+        template.Variables.Effects = new[]
+        {
+            new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
+        };
 
         var itemData = new ItemData { TemplateId = template.Id };
         var item = TemplateAccessor.ToInstance(itemData);

@@ -6,11 +6,12 @@ using OpenRpg.Entities.Effects;
 
 namespace OpenRpg.Cards.Effects
 {
-    public class CardEffects : IHasDataId, IHasLocaleDescription, IHasEffects
+    public class CardEffects : IHasDataId, IHasLocaleDescription
     {
         public int Id { get; set; }
         public string NameLocaleId { get; set; }
         public string DescriptionLocaleId { get; set; }
+        
         public IReadOnlyCollection<IEffect> Effects { get; set; } = Array.Empty<IEffect>();
     }
 }

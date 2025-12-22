@@ -11,7 +11,7 @@ namespace OpenRpg.Combat.Effects
     /// The active effects allows us to wrap up concerns for managing active effects and abstracting away certain details
     /// like the stacking etc
     /// </summary>
-    public interface IActiveEffects : IHasEffects, IHasVariables<IActiveEffectsVariables>
+    public interface IActiveEffects : IHasVariables<IActiveEffectsVariables>
     {
         event EventHandler<ActiveEffect> EffectAdded;
         event EventHandler<ActiveEffect> EffectTriggered;

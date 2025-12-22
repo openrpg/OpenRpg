@@ -39,11 +39,12 @@ namespace OpenRpg.Items.Extensions
             var variables = new LootTableEntryVariables();
             variables.DropRate = dropRate;
             variables.IsUnique = isUnique;
+            if(requirements is not null)
+            { variables.Requirements = requirements; }
 
             return new LootTableEntry
             {
                 ItemData = itemData,
-                Requirements = requirements ?? Array.Empty<Requirement>(),
                 Variables = variables
             };
         }

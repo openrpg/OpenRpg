@@ -39,9 +39,9 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 Id = RaceTypeLookups.Human,
                 NameLocaleId = "Human",
                 DescriptionLocaleId = "Humans are the most common of all races",
-                Effects = effects
             };
             raceTemplate.Variables.AssetCode = "race-human";
+            raceTemplate.Variables.Effects = effects;
             return raceTemplate;
         }
 
@@ -67,10 +67,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
             {
                 Id = RaceTypeLookups.Elf,
                 NameLocaleId = "Elf",
-                DescriptionLocaleId = "Elves are pretty common, have pointy ears too",
-                Effects = effects
+                DescriptionLocaleId = "Elves are pretty common, have pointy ears too"
             };
             raceTemplate.Variables.AssetCode = "race-elf";
+            raceTemplate.Variables.Effects = effects;
             return raceTemplate;
         }
 
@@ -95,10 +95,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
             {
                 Id = RaceTypeLookups.Dwarf,
                 NameLocaleId = "Dwarf",
-                DescriptionLocaleId = "Dwarves are strong and hardy",
-                Effects = effects
+                DescriptionLocaleId = "Dwarves are strong and hardy"
             };
             raceTemplate.Variables.AssetCode = "race-dwarf";
+            raceTemplate.Variables.Effects = effects;
             return raceTemplate;
         }
     }

@@ -6,7 +6,7 @@ namespace OpenRpg.Core.Effects
     /// <summary>
     /// Generic effect interface that lets us all agree every effect has a type and requirements
     /// </summary>
-    public interface IEffect : IHasRequirements
+    public interface IEffect
     {
         /// <summary>
         /// The effect type to apply
@@ -16,6 +16,6 @@ namespace OpenRpg.Core.Effects
         /// <summary>
         /// Requirements required for this object to function/be used
         /// </summary>
-        new IReadOnlyCollection<Requirement> Requirements { get; set; }
+        IReadOnlyCollection<Requirement> Requirements { get; set; }
     }
 }

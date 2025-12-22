@@ -19,13 +19,13 @@ namespace OpenRpg.Genres.Effects
         public void ComputeEffects(ItemData itemData, Character relatedEntity, ComputedEffects computedEffects)
         {
             var itemTemplate = TemplateAccessor.GetItemTemplate(itemData.TemplateId);
-            ComputeEffects(itemTemplate, relatedEntity, computedEffects);
+            ComputeEffects(itemTemplate.Variables.Effects, relatedEntity, computedEffects);
 
             if (itemTemplate.Variables.HasProceduralEffects())
             {
                 var proceduralEffects = itemTemplate.Variables.ProceduralEffects;
                 var associatedEffects = itemData.Variables.ProceduralAssociation;
-                ComputeProceduralEffects(proceduralEffects, associatedEffects, itemTemplate, computedEffects, relatedEntity);
+                ComputeProceduralEffects(proceduralEffects, associatedEffects, itemTemplate.Variables.Effects, computedEffects, relatedEntity);
             }
 
             if (!itemData.Modifications.Any())
@@ -34,7 +34,7 @@ namespace OpenRpg.Genres.Effects
             foreach (var modification in itemData.Modifications)
             {
                 var modificationTemplate = TemplateAccessor.GetModificationTemplate<ItemModificationTemplate>(modification.TemplateId);
-                ComputeEffects(modificationTemplate, relatedEntity, computedEffects);
+                ComputeEffects([], relatedEntity, computedEffects);
             }
         }
 

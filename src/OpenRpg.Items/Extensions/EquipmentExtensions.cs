@@ -1,3 +1,8 @@
+using OpenRpg.Core.Extensions;
+using OpenRpg.Core.Requirements;
+using OpenRpg.Entities.Entity;
+using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Requirements;
 using OpenRpg.Items.Equippables;
 using OpenRpg.Items.Equippables.Slots;
 using OpenRpg.Items.Templates;
@@ -17,6 +22,9 @@ namespace OpenRpg.Items.Extensions
             if(!equipment.Slots.ContainsKey(slotType)) { return false; }
             return equipment.Slots[slotType] != null;
         }
+        
+        public static ItemData GetItemInSlot(this Equipment equipment, int slotType)
+        { return equipment.Slots.TryGetValue(slotType, out var itemData) ? itemData : null; }
 
         public static bool HasSlot(this Equipment equipment, int slotType)
         { return equipment.Slots.ContainsKey(slotType); }
@@ -38,6 +46,14 @@ namespace OpenRpg.Items.Extensions
             if(!slotValidator.CanEquipItemType(slotType, template.ItemType)) { return false; }
             equipment.Slots[slotType] = itemData;
             return true;
+        }
+        
+        public static bool AttemptEquipSlot<T>(this Equipment equipment, IEquipmentSlotValidator slotValidator, IRequirementChecker<T> requirementChecker, int slotType, ItemData itemData, ItemTemplate itemTemplate, T requirementContext) where T : EntityData
+        {
+            if (!AttemptEquipSlot(equipment, slotValidator, slotType, itemData, itemTemplate))
+            { return false; }
+
+            return requirementChecker.AreRequirementsMet(itemTemplate.Variables, requirementContext);
         }
     }
 }

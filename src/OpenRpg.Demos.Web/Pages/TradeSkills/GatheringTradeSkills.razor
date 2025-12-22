@@ -10,6 +10,7 @@
 @using OpenRpg.Items.TradeSkills.Calculator
 @using OpenRpg.Items.TradeSkills.Templates
 @using OpenRpg.Core.Utils
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Fantasy.Extensions
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.TradeSkills.State
@@ -190,7 +191,7 @@
         }
     }
 
-    public bool CanMineIron => RequirementsChecker.AreRequirementsMet(DummyCharacter, IronOreGatheringTemplate);
+    public bool CanMineIron => RequirementsChecker.AreRequirementsMet(DummyCharacter, IronOreGatheringTemplate.Variables.Requirements);
 
     public TradeSkillItemEntry CopperOreTradeSkillItemEntry => CopperOreGatheringTemplate.OutputItems.First();
     public TradeSkillItemEntry OakLogTradeSkillItemEntry => OakLogGatheringTemplate.OutputItems.First();

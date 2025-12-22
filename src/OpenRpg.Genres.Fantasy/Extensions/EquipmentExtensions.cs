@@ -6,6 +6,22 @@ namespace OpenRpg.Genres.Fantasy.Extensions
 {
     public static class EquipmentExtensions
     {
+        public static void PopulateFantasySlots(this Equipment equipment)
+        {
+            var slots = equipment.Slots;
+            slots[FantasyEquipmentSlotTypes.HeadSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.BackSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.UpperBodySlot] =  null;
+            slots[FantasyEquipmentSlotTypes.LowerBodySlot] =  null;
+            slots[FantasyEquipmentSlotTypes.FootSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.MainHandSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.OffHandSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.NeckSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.Ring1Slot] =  null;
+            slots[FantasyEquipmentSlotTypes.Ring2Slot] =  null;
+            slots[FantasyEquipmentSlotTypes.WristSlot] =  null;
+        }
+        
         extension(Equipment equipment)
         {
             public ItemData BackSlot

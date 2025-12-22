@@ -7,7 +7,7 @@ using OpenRpg.Items.TradeSkills.Variables;
 
 namespace OpenRpg.Items.TradeSkills.Templates
 {
-    public class ItemGatheringTemplate : ITemplate<ItemGatheringTemplateVariables>, ITradeSkillData, IHasRequirements
+    public class ItemGatheringTemplate : ITemplate<ItemGatheringTemplateVariables>, ITradeSkillData
     {
         /// <inheritdoc />
         public int Id { get; set; }
@@ -26,9 +26,6 @@ namespace OpenRpg.Items.TradeSkills.Templates
     
         /// <inheritdoc />
         public int SkillDifficulty { get; set; }
-
-        /// <inheritdoc />
-        public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
 
         /// <inheritdoc />
         public ItemGatheringTemplateVariables Variables { get; set; } = new ItemGatheringTemplateVariables();

@@ -1,4 +1,4 @@
-﻿@page "/combat/looting"
+﻿@page "/inventory/looting"
 
 @using OpenRpg.Core.Templates
 @using OpenRpg.Core.Utils
@@ -12,10 +12,9 @@
 @inject IRandomizer Randomizer
 
 <Markdown>
-    ## Looting
-    So far we have covered the basic interactions that make up combat through attacking and defending. There is another
-    layer we can build on top of `ICharacter` at this point which is `IEnemy` which basically implies that a character
-    also has a loot table that can be accessed.
+    ## Loot Tables
+    So far we have covered the basic inventories, which can be used as a basic fixed set of items to provide if a
+    creature/entity dies, but we have a more specific notion for that known as `ILootTable`.
 </Markdown>
 <br />
 <Markdown>
