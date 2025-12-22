@@ -22,6 +22,9 @@ namespace OpenRpg.Demos.Infrastructure.Data
             {
                 MakeRubbishSword(),
                 MakeSuperSword(),
+                MakeChest(),
+                MakeBoots(),
+                MakeHelm(),
                 MakePotion(),
                 MakeJunkPotion(),
                 MakeCopperIngot(),
@@ -72,10 +75,79 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 ItemType = FantasyItemTypes.GenericWeapon,
                 ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
-            template.Variables.QualityType = FantasyItemQualityTypes.EpicQuality;
+            template.Variables.QualityType = FantasyItemQualityTypes.LegendaryQuality;
             template.Variables.Value = 10000;
             template.Variables.AssetCode = "sword";
             template.Variables.Effects = swordEffects;
+            
+            return template;
+        }
+        
+        private ItemTemplate MakeChest()
+        {
+            var chestEffects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 20.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.DexterityBonusAmount, Potency = 1.0f }
+            };
+
+            var template = new ItemTemplate
+            {
+                Id = ItemTemplateLookups.Chest,
+                NameLocaleId = "Generic Chest Piece",
+                DescriptionLocaleId = "Its so generic you cannot ascertain what its made of, but its certainly a chest piece",
+                ItemType = FantasyItemTypes.UpperBodyArmour
+            };
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 100;
+            template.Variables.AssetCode = "chest";
+            template.Variables.Effects = chestEffects;
+            
+            return template;
+        }
+        
+        private ItemTemplate MakeBoots()
+        {
+            var bootsEffects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.DexterityBonusAmount, Potency = 1.0f }
+            };
+
+            var template = new ItemTemplate
+            {
+                Id = ItemTemplateLookups.Boots,
+                NameLocaleId = "Muddy Boots",
+                DescriptionLocaleId = "In a way, the dried mud and clay provides extra defense",
+                ItemType = FantasyItemTypes.FootArmour
+            };
+            template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
+            template.Variables.Value = 10;
+            template.Variables.AssetCode = "boots";
+            template.Variables.Effects = bootsEffects;
+            
+            return template;
+        }
+        
+        private ItemTemplate MakeHelm()
+        {
+            var helmEffects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 1.0f }
+            };
+
+            var template = new ItemTemplate
+            {
+                Id = ItemTemplateLookups.Helm,
+                NameLocaleId = "Magic Helmet",
+                DescriptionLocaleId = "Wearing it makes you feel stronger",
+                ItemType = FantasyItemTypes.HeadItem
+            };
+            template.Variables.QualityType = FantasyItemQualityTypes.MagicalQuality;
+            template.Variables.Value = 50;
+            template.Variables.AssetCode = "helm";
+            template.Variables.Effects = helmEffects;
             
             return template;
         }
