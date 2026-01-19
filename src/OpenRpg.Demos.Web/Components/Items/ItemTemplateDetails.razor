@@ -26,18 +26,18 @@
     <div class="columns">
         <div class="column">
             <figure class="image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
-                <img src="images/items/@(ItemTemplate.Variables.AssetCode).png">
+                <img src="images/items/@(ItemTemplate.Variables.AssetCode).png" alt="@($"{ItemTemplate.NameLocaleId ?? "Unnamed Item"} Image")">
             </figure>
         </div>
         <div class="column">
             @if (IsWeapon)
             {
-                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Variables.Effects.GetStaticEffects().Where(x => x.EffectType == FantasyEffectTypes.DamageBonusAmount).Sum(x => x.Potency))</h4>
+                <h4 class="title is-4 has-text-dark has-text-centered">@(SumDamage())</h4>
                 <h6 class="subtitle is-7 has-text-dark has-text-centered">Damage</h6>
             }
             @if (IsArmour)
             {
-                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Variables.Effects.GetStaticEffects().Where(x => x.EffectType == FantasyEffectTypes.DefenseBonusAmount).Sum(x => x.Potency))</h4>
+                <h4 class="title is-4 has-text-dark has-text-centered">@(SumDefense())</h4>
                 <h6 class="subtitle is-7 has-text-dark has-text-centered">Defense</h6>
             }
         </div>
@@ -75,6 +75,22 @@
 
     private bool IsWeapon => ItemTemplate.ItemType == FantasyItemTypes.GenericWeapon;
 
+    public int SumDamage()
+    {
+        return (int)ItemTemplate.Variables.Effects
+            .GetStaticEffects()
+            .Where(x => x.EffectType == FantasyEffectTypes.DamageBonusAmount)
+            .Sum(x => x.Potency);
+    }
+
+    public int SumDefense()
+    {
+        return (int)ItemTemplate.Variables.Effects
+            .GetStaticEffects()
+            .Where(x => x.EffectType == FantasyEffectTypes.DefenseBonusAmount)
+            .Sum(x => x.Potency);
+    }
+    
     private bool IsArmour
     {
         get

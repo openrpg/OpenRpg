@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Core.Associations;
+using OpenRpg.Core.Effects;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Utils;
 using OpenRpg.Entities.Effects;
@@ -43,6 +44,29 @@ namespace OpenRpg.Entities.Extensions
 
             takenEffects.AddRange(secondaryEffects);
             return takenEffects;
+        }
+        
+        public static IReadOnlyCollection<IEffect> GenerateEffectsFrom(this ProceduralEffects proceduralEffects, int proceduralValue)
+        {
+            var primaryEffects = proceduralEffects.Effects
+                .Where(x => x.GroupType == CoreProceduralGroupTypes.Primary);
+
+            var resultingEffects = new List<IEffect>();
+            foreach (var primaryEffect in primaryEffects)
+            {
+                if(primaryEffect.PotencyFunction.InputScale.IsOutsideRange(proceduralValue)) 
+                { continue; }
+                
+                var effect = new StaticEffect
+                {
+                    EffectType = primaryEffect.EffectType,
+                    Potency = primaryEffect.PotencyFunction.Plot(proceduralValue),
+                    Requirements = primaryEffect.Requirements
+                };
+                resultingEffects.Add(effect);
+            }
+
+            return resultingEffects;
         }
     }
 }

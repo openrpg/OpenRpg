@@ -1,0 +1,163 @@
+@page "/procedural/pattern-generated-items"
+
+@using Newtonsoft.Json
+@using OpenRpg.Core.Utils
+@using OpenRpg.Core.Variables.General
+@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Scaling
+@using OpenRpg.Demos.Infrastructure.Templates
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Entities.Procedural
+@using OpenRpg.Entities.Procedural.Builders
+@using OpenRpg.Entities.Types
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+
+@inject IRandomizer Randomizer;
+
+<Markdown>
+    ## Pattern Generation
+    You can generate templates with a given pattern like so
+</Markdown>
+
+<br />
+
+<h3 class="is-size-3">Ores</h3>
+<div class="fixed-grid has-3-cols">
+    <div class="grid">
+        @foreach (var itemTemplate in _ores)
+        {
+            <div class="cell">
+                <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+            </div>
+        }
+    </div>    
+</div>
+
+<h3 class="is-size-3">Ingots</h3>
+<div class="fixed-grid has-3-cols">
+    <div class="grid">
+        @foreach (var itemTemplate in _ingots)
+        {
+            <div class="cell">
+                <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+            </div>
+        }
+    </div>    
+</div>
+
+<h2 class="is-size-3">Swords</h2>
+<div class="fixed-grid has-3-cols">
+    <div class="grid">
+        @foreach (var itemTemplate in _swords)
+        {
+            <div class="cell">
+                <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+            </div>
+        }
+    </div>    
+</div>
+
+<h3 class="is-size-3">Armour</h3>
+<div class="fixed-grid has-3-cols">
+    <div class="grid">
+        @foreach (var itemTemplate in _armours)
+        {
+            <div class="cell">
+                <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+            </div>
+        }
+    </div>    
+</div>
+
+@code {
+
+    private ItemTemplatePatternGenerator _itemTemplatePatternGenerator;
+    private IReadOnlyCollection<ItemTemplate> _ores, _ingots, _swords, _armours;
+    
+    public class PatternGeneratorVariables : ObjectVariables
+    {
+        public int StartingId { get; set; }
+        public string TypeName { get; set; }
+        public int ItemType { get; set; }
+        public ProceduralEffects Effects { get; set; }
+    }
+    
+    public class ItemTemplatePatternGenerator
+    {
+        public string[] NamePattern { get; set; }
+
+        public IReadOnlyCollection<ItemTemplate> Generate(PatternGeneratorVariables variables)
+        {
+            var itemTemplates = new List<ItemTemplate>();
+            var id = variables.StartingId;
+            for (var i = 0; i < NamePattern.Length; i++)
+            {
+                var namePattern = NamePattern[i];
+                var template = new ItemTemplate();
+                template.Id = id++;
+                template.NameLocaleId = string.Format(namePattern, variables.TypeName);
+                template.ItemType = variables.ItemType;
+                template.Variables.AssetCode = string.Format(namePattern.ToLower(), variables.TypeName.ToLower()).Replace(" ", "-");
+                template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+
+                if (variables.Effects is not null)
+                {
+                    var resultingEffects = variables.Effects.GenerateEffectsFrom(i);
+                    template.Variables.Effects = resultingEffects;
+                }
+                
+                itemTemplates.Add(template);
+            }
+
+            return itemTemplates;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _itemTemplatePatternGenerator = new ItemTemplatePatternGenerator
+        {
+            NamePattern = ["Copper {0}", "Bronze {0}", "Silver {0}", "Gold {0}", "Iron {0}", "Steel {0}", "Mythril {0}"]
+        };
+
+        var numberGenerated = _itemTemplatePatternGenerator.NamePattern.Length;
+        
+        _ores = _itemTemplatePatternGenerator.Generate(new PatternGeneratorVariables() { TypeName = "Ore", StartingId = 0, ItemType = FantasyItemTypes.GenericItem });
+        _ingots = _itemTemplatePatternGenerator.Generate(new PatternGeneratorVariables() { TypeName = "Ingot", StartingId = 10, ItemType = FantasyItemTypes.GenericItem });
+
+        var swordEffects = ProceduralEffectsBuilder.Create()
+            .WithPrimaryEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.DamageBonusAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 100), new RangeF(0, numberGenerated)),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .Build();
+        
+        _swords = _itemTemplatePatternGenerator.Generate(new PatternGeneratorVariables() { TypeName = "Sword", StartingId = 20, ItemType = FantasyItemTypes.GenericWeapon, Effects = swordEffects});
+        
+        var armourEffects = ProceduralEffectsBuilder.Create()
+            .WithPrimaryEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.DefenseBonusAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 100), new RangeF(0, numberGenerated)),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .WithPrimaryEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.HealthBonusAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 20), new RangeF(4, numberGenerated)),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .Build();
+        
+        _armours = _itemTemplatePatternGenerator.Generate(new PatternGeneratorVariables() { TypeName = "Armor", StartingId = 30, ItemType = FantasyItemTypes.UpperBodyArmour, Effects = armourEffects});
+    }
+
+}
