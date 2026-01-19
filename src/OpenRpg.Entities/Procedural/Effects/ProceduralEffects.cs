@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using OpenRpg.Entities.Effects;
 using Range = OpenRpg.Core.Utils.Range;
 
-namespace OpenRpg.Entities.Procedural
+namespace OpenRpg.Entities.Procedural.Effects
 {
     public class ProceduralEffects
     {

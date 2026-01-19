@@ -1,19 +1,25 @@
 @page "/procedural/pattern-generated-items"
 
 @using Newtonsoft.Json
+@using OpenRpg.Core.Templates
 @using OpenRpg.Core.Utils
 @using OpenRpg.Core.Variables.General
 @using OpenRpg.CurveFunctions
 @using OpenRpg.CurveFunctions.Scaling
+@using OpenRpg.Demos.Infrastructure.Extensions
 @using OpenRpg.Demos.Infrastructure.Templates
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Entities.Procedural
-@using OpenRpg.Entities.Procedural.Builders
+@using OpenRpg.Entities.Procedural.Effects
+@using OpenRpg.Entities.Procedural.Effects.Builders
+@using OpenRpg.Entities.Procedural.Patterns
 @using OpenRpg.Entities.Types
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items
 @using OpenRpg.Items.Extensions
+@using OpenRpg.Items.TradeSkills.Templates
+@using OpenRpg.Items.TradeSkills
 @using OpenRpg.Items.Templates
 
 @inject IRandomizer Randomizer;
@@ -77,36 +83,101 @@
 
     private ItemTemplatePatternGenerator _itemTemplatePatternGenerator;
     private IReadOnlyCollection<ItemTemplate> _ores, _ingots, _swords, _armours;
-    
-    public class PatternGeneratorVariables : ObjectVariables
+    public ManualTemplateAccessor TemplateAccessor = new ManualTemplateAccessor();
+
+    public interface MetalItemPatternLookups
     {
+        public static int Unknown = 0;
+    
+        public static int Copper = 1;
+        public static int Bronze = 2;
+        public static int Silver = 3;
+        public static int Gold = 4;
+        public static int Iron = 5;
+        public static int Steel = 6;
+        public static int Mythril = 7;
+    }
+
+    public static Dictionary<int, string> MetalLookups = typeof(MetalItemPatternLookups).GetTypeFieldsDictionary();
+    
+    public class ItemTemplatePatternGeneratorConfig : PatternGeneratorVariables
+    {
+        public string NamePattern { get; set; }
         public int StartingId { get; set; }
         public string TypeName { get; set; }
         public int ItemType { get; set; }
         public ProceduralEffects Effects { get; set; }
     }
-    
-    public class ItemTemplatePatternGenerator
-    {
-        public string[] NamePattern { get; set; }
 
-        public IReadOnlyCollection<ItemTemplate> Generate(PatternGeneratorVariables variables)
+    public class ItemCraftingTemplatePatternGeneratorConfig : PatternGeneratorVariables
+    {
+        public string NamePattern { get; set; }
+        public int StartingId { get; set; }
+        public int SkillType { get; set; }
+        
+    }
+
+    public class CraftingTemplatePatternGenerator : ITemplatePatternGenerator<ItemCraftingTemplate, ItemCraftingTemplatePatternGeneratorConfig>
+    {
+        public ITemplateAccessor TemplateAccessor { get; }
+
+        public CraftingTemplatePatternGenerator(ITemplateAccessor templateAccessor)
+        {
+            TemplateAccessor = templateAccessor;
+        }
+
+        public IReadOnlyCollection<ItemCraftingTemplate> Generate(ItemCraftingTemplatePatternGeneratorConfig config)
+        {
+            var itemCraftingTemplates = new List<ItemCraftingTemplate>();
+            var id = config.StartingId;
+            var patternIds = config.PatternIds;
+            
+            for (var i = 0; i < patternIds.Length; i++)
+            {
+                var patternId = patternIds[i];
+
+                var inputItemTemplates = new List<TradeSkillItemEntry>();
+                var outputItemTemplates = new List<TradeSkillItemEntry>();
+                
+                var template = new ItemCraftingTemplate();
+                template.Id = id++;
+                template.SkillType = config.SkillType;
+                template.InputItems = inputItemTemplates;
+                template.OutputItems = outputItemTemplates;
+                template.Variables[CoreTemplateVariableTypes.PatternId] = patternId;
+                itemCraftingTemplates.Add(template);
+            }
+
+            return itemCraftingTemplates;
+        }
+    }
+    
+    public class ItemTemplatePatternGenerator : ITemplatePatternGenerator<ItemTemplate, ItemTemplatePatternGeneratorConfig>
+    {
+        public IReadOnlyCollection<ItemTemplate> Generate(ItemTemplatePatternGeneratorConfig config)
         {
             var itemTemplates = new List<ItemTemplate>();
-            var id = variables.StartingId;
-            for (var i = 0; i < NamePattern.Length; i++)
+            var id = config.StartingId;
+            var patternIds = config.PatternIds;
+            for (var i = 0; i < patternIds.Length; i++)
             {
-                var namePattern = NamePattern[i];
-                var template = new ItemTemplate();
-                template.Id = id++;
-                template.NameLocaleId = string.Format(namePattern, variables.TypeName);
-                template.ItemType = variables.ItemType;
-                template.Variables.AssetCode = string.Format(namePattern.ToLower(), variables.TypeName.ToLower()).Replace(" ", "-");
-                template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
-
-                if (variables.Effects is not null)
+                var patternId = patternIds[i];
+                var localeNameForId = MetalLookups[patternId];
+                var name = string.Format(config.NamePattern, localeNameForId, config.TypeName);
+                
+                var template = new ItemTemplate
                 {
-                    var resultingEffects = variables.Effects.GenerateEffectsFrom(i);
+                    Id = id++,
+                    NameLocaleId = name,
+                    ItemType = config.ItemType
+                };
+                template.Variables.AssetCode = name.ToLower().Replace(" ", "-");
+                template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+                template.Variables[CoreTemplateVariableTypes.PatternId] = patternId;
+
+                if (config.Effects is not null)
+                {
+                    var resultingEffects = config.Effects.GenerateEffectsFrom(i);
                     template.Variables.Effects = resultingEffects;
                 }
                 
@@ -121,43 +192,45 @@
     {
         base.OnInitialized();
 
-        _itemTemplatePatternGenerator = new ItemTemplatePatternGenerator
-        {
-            NamePattern = ["Copper {0}", "Bronze {0}", "Silver {0}", "Gold {0}", "Iron {0}", "Steel {0}", "Mythril {0}"]
-        };
+        var namePattern = "{0} {1}";
+        var patternIds = MetalLookups.Keys.ToArray();
 
-        var numberGenerated = _itemTemplatePatternGenerator.NamePattern.Length;
-        
-        _ores = _itemTemplatePatternGenerator.Generate(new PatternGeneratorVariables() { TypeName = "Ore", StartingId = 0, ItemType = FantasyItemTypes.GenericItem });
-        _ingots = _itemTemplatePatternGenerator.Generate(new PatternGeneratorVariables() { TypeName = "Ingot", StartingId = 10, ItemType = FantasyItemTypes.GenericItem });
+        _itemTemplatePatternGenerator = new ItemTemplatePatternGenerator();
+        _ores = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig() { PatternIds = patternIds, NamePattern = namePattern, TypeName = "Ore", StartingId = 0, ItemType = FantasyItemTypes.GenericItem });
+        _ingots = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig() { PatternIds = patternIds, NamePattern = namePattern, TypeName = "Ingot", StartingId = 10, ItemType = FantasyItemTypes.GenericItem });
 
         var swordEffects = ProceduralEffectsBuilder.Create()
             .WithPrimaryEffect(new ScaledEffect()
             {
                 EffectType = FantasyEffectTypes.DamageBonusAmount,
-                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 100), new RangeF(0, numberGenerated)),
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 100), new RangeF(0, patternIds.Length)),
                 ScalingType = CoreEffectScalingTypes.Value
             })
             .Build();
         
-        _swords = _itemTemplatePatternGenerator.Generate(new PatternGeneratorVariables() { TypeName = "Sword", StartingId = 20, ItemType = FantasyItemTypes.GenericWeapon, Effects = swordEffects});
+        _swords = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig() { PatternIds = patternIds, NamePattern = namePattern, TypeName = "Sword", StartingId = 20, ItemType = FantasyItemTypes.GenericWeapon, Effects = swordEffects});
         
         var armourEffects = ProceduralEffectsBuilder.Create()
             .WithPrimaryEffect(new ScaledEffect()
             {
                 EffectType = FantasyEffectTypes.DefenseBonusAmount,
-                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 100), new RangeF(0, numberGenerated)),
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 100), new RangeF(0, patternIds.Length)),
                 ScalingType = CoreEffectScalingTypes.Value
             })
             .WithPrimaryEffect(new ScaledEffect()
             {
                 EffectType = FantasyEffectTypes.HealthBonusAmount,
-                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 20), new RangeF(4, numberGenerated)),
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 20), new RangeF(4, patternIds.Length)),
                 ScalingType = CoreEffectScalingTypes.Value
             })
             .Build();
         
-        _armours = _itemTemplatePatternGenerator.Generate(new PatternGeneratorVariables() { TypeName = "Armor", StartingId = 30, ItemType = FantasyItemTypes.UpperBodyArmour, Effects = armourEffects});
+        _armours = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig() { PatternIds = patternIds, NamePattern = namePattern, TypeName = "Armor", StartingId = 30, ItemType = FantasyItemTypes.UpperBodyArmour, Effects = armourEffects});
+        
+        TemplateAccessor.AddTemplates(_ores);
+        TemplateAccessor.AddTemplates(_ingots);
+        TemplateAccessor.AddTemplates(_swords);
+        TemplateAccessor.AddTemplates(_armours);
     }
 
 }

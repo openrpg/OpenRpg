@@ -6,6 +6,7 @@ using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Utils;
 using OpenRpg.Entities.Effects;
 using OpenRpg.Entities.Procedural;
+using OpenRpg.Entities.Procedural.Effects;
 using OpenRpg.Entities.Types;
 
 namespace OpenRpg.Entities.Extensions

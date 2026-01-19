@@ -7,6 +7,7 @@ using OpenRpg.Entities.Entity;
 using OpenRpg.Entities.Entity.Templates;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Procedural;
+using OpenRpg.Entities.Procedural.Effects;
 using OpenRpg.Entities.Requirements;
 using OpenRpg.Entities.Types;
 
