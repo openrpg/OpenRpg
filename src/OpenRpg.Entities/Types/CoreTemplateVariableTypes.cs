@@ -14,6 +14,7 @@ namespace OpenRpg.Entities.Types
         public static int Requirements = 4003; // replaces IHasRequirements
         
         // Patterns
-        public static int PatternId = 4020;
+        public static int PatternTypeId = 4020;
+        public static int PatternId = 4021;
     }
 }

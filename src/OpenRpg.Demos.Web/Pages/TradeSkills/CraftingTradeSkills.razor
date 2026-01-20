@@ -1,7 +1,6 @@
 ﻿@page "/trade-skills/crafting"
 
 @using OpenRpg.Core.Templates
-@using OpenRpg.Items.TradeSkills
 @using OpenRpg.Demos.Infrastructure.Lookups
 @using OpenRpg.Items.TradeSkills.Extensions
 @using OpenRpg.Genres.Characters
@@ -48,21 +47,9 @@
                 
                 In this case we want to craft `Copper Ingots` which require 5x`Copper Ore` per ingot.
             </Markdown>
-            <div class="columns">
-                @foreach (var inputItem in CopperIngotCraftingTemplate.InputItems)
-                {
-                    <div class="column">
-                        <TradeSkillItemIcon Item="inputItem" ItemTemplate="TemplateAccessor.GetItemTemplate(inputItem.TemplateId)"/>
-                    </div>
-                }
-                <div class="column"><span class="tag is-success">Makes</span></div>
-                @foreach (var outputItem in CopperIngotCraftingTemplate.OutputItems)
-                {
-                    <div class="column">
-                        <TradeSkillItemIcon Item="outputItem" ItemTemplate="TemplateAccessor.GetItemTemplate(outputItem.TemplateId)"/>
-                    </div>
-                }
-            </div>
+            <br />
+            <ItemCraftingTemplateDetails ItemCraftingTemplate="CopperIngotCraftingTemplate" TemplateAccessor="TemplateAccessor" />
+            <br/>
             <div class="field">
                 <div class="control">
                     <button class="button @(CanCraftCopperIngot ? "is-success" : "is-danger")" @onclick="StartCraftingCopperIngot">Craft Copper Ingots</button>
@@ -80,21 +67,9 @@
                 so click the buttons below to give yourself some `Copper Ingots` and `Oak Logs` and keep leveling your smithing
                 skill to 10.
             </Markdown>
-            <div class="columns">
-                @foreach (var inputItem in CopperSwordCraftingTemplate.InputItems)
-                {
-                    <div class="column">
-                        <TradeSkillItemIcon Item="inputItem" ItemTemplate="TemplateAccessor.GetItemTemplate(inputItem.TemplateId)"/>
-                    </div>
-                }
-                <div class="column"><span class="tag is-success">Makes</span></div>
-                @foreach (var outputItem in CopperSwordCraftingTemplate.OutputItems)
-                {
-                    <div class="column">
-                        <TradeSkillItemIcon Item="outputItem" ItemTemplate="TemplateAccessor.GetItemTemplate(outputItem.TemplateId)"/>
-                    </div>
-                }
-            </div>
+            <br />
+            <ItemCraftingTemplateDetails ItemCraftingTemplate="CopperSwordCraftingTemplate" TemplateAccessor="TemplateAccessor" />
+            <br />
             <div class="field">
                 <div class="control">
                     <button class="button is-success" @onclick="() => GiveCopperOre()">Give Copper Ore</button>
