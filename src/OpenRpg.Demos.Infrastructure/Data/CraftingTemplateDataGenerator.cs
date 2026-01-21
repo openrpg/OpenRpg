@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Associations;
 using OpenRpg.Core.Requirements;
-using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Entities.Extensions;
-using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.TradeSkills;
 using OpenRpg.Items.TradeSkills.Extensions;
@@ -31,15 +29,15 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
         var outputItemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperIngot };
         outputItemEntry.Variables.Amount = 1;
         
-        return new ItemCraftingTemplate()
+        var template = new ItemCraftingTemplate()
         {
             Id = ItemCraftingTemplateLookups.CopperIngot,
-            SkillType = FantasyCraftingTradeSkillTypes.Smelting,
-            SkillDifficulty = 0,
-            TimeToComplete = 2.0f,
             InputItems = new List<TradeSkillItemEntry>() { inputItemEntry },
             OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry },
         };
+        template.Variables.SkillType = FantasyTradeSkillTypes.Smelting;
+        template.Variables.TimeToAction = 2.0f;
+        return template;
     }
 
     public ItemCraftingTemplate MakeCopperSwordCraftingTemplate()
@@ -55,18 +53,26 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
         var craftingTemplate = new ItemCraftingTemplate()
         {
             Id = ItemCraftingTemplateLookups.CopperSword,
-            SkillType = FantasyCraftingTradeSkillTypes.Smithing,
-            SkillDifficulty = 10,
-            TimeToComplete = 2.0f,
             InputItems = new List<TradeSkillItemEntry>() { inputItem1Entry, inputItem2Entry },
             OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry }
         };
+        craftingTemplate.Variables.SkillType = FantasyTradeSkillTypes.Smithing;
+        craftingTemplate.Variables.TimeToAction = 2.0f;
+        craftingTemplate.Variables.Requirements =
+        [
+            new Requirement
+            {
+                RequirementType = FantasyRequirementTypes.TradeSkillRequirement,
+                Association = new Association(FantasyTradeSkillTypes.Smithing, 10)
+            }
+        ];
+        
         craftingTemplate.Variables.Requirements = new[]
         {
             new Requirement
             {
                 RequirementType = FantasyRequirementTypes.TradeSkillRequirement,
-                Association = new Association(FantasyCraftingTradeSkillTypes.Smithing, 5)
+                Association = new Association(FantasyTradeSkillTypes.Smithing, 5)
             }
         };
         return craftingTemplate;

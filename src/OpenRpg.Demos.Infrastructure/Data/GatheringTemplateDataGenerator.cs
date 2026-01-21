@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using OpenRpg.Core.Associations;
 using OpenRpg.Core.Requirements;
-using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Lookups;
 using OpenRpg.Entities.Extensions;
-using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.TradeSkills;
 using OpenRpg.Items.TradeSkills.Extensions;
@@ -29,14 +27,14 @@ namespace OpenRpg.Demos.Infrastructure.Data
             var itemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperOre };
             itemEntry.Variables.Amount = 1;
         
-            return new ItemGatheringTemplate()
+            var template = new ItemGatheringTemplate()
             {
                 Id = ItemGatheringTemplateLookups.CopperOre,
-                SkillType = FantasyGatheringTradeSkillTypes.Mining,
-                SkillDifficulty = 5,
-                TimeToComplete = 1.0f,
                 OutputItems = new List<TradeSkillItemEntry>() { itemEntry }
             };
+            template.Variables.SkillType = FantasyTradeSkillTypes.Mining;
+            template.Variables.TimeToAction = 1.0f;
+            return template;
         }
         
         public ItemGatheringTemplate MakeIronOreGatheringTemplate()
@@ -47,19 +45,18 @@ namespace OpenRpg.Demos.Infrastructure.Data
             var template = new ItemGatheringTemplate()
             {
                 Id = ItemGatheringTemplateLookups.IronOre,
-                SkillType = FantasyGatheringTradeSkillTypes.Mining,
-                SkillDifficulty = 15,
-                TimeToComplete = 1.0f,
                 OutputItems = new List<TradeSkillItemEntry>() { itemEntry }
             };
-            template.Variables.Requirements = new[]
-            {
+            template.Variables.SkillType = FantasyTradeSkillTypes.Mining;
+            template.Variables.TimeToAction = 1.0f;
+            template.Variables.Requirements =
+            [
                 new Requirement
                 {
                     RequirementType = FantasyRequirementTypes.TradeSkillRequirement,
-                    Association = new Association(FantasyGatheringTradeSkillTypes.Mining, 10)
+                    Association = new Association(FantasyTradeSkillTypes.Mining, 10)
                 }
-            };
+            ];
             return template;
         }
 
@@ -68,14 +65,16 @@ namespace OpenRpg.Demos.Infrastructure.Data
             var itemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.OakLog };
             itemEntry.Variables.Amount = 1;
         
-            return new ItemGatheringTemplate()
+            var template = new ItemGatheringTemplate()
             {
                 Id = ItemGatheringTemplateLookups.OakLog,
-                SkillType = FantasyGatheringTradeSkillTypes.Logging,
-                SkillDifficulty = 0,
-                TimeToComplete = 1.0f,
                 OutputItems = new List<TradeSkillItemEntry>() { itemEntry }
             };
+            
+            template.Variables.SkillType = FantasyTradeSkillTypes.Logging;
+            template.Variables.TimeToAction = 1.0f;
+
+            return template;
         }
 
     }

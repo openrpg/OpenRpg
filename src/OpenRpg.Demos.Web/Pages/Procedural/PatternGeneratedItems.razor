@@ -1,6 +1,8 @@
 @page "/procedural/pattern-generated-items"
 
 @using Newtonsoft.Json
+@using OpenRpg.Core.Associations
+@using OpenRpg.Core.Requirements
 @using OpenRpg.Core.Templates
 @using OpenRpg.Core.Utils
 @using OpenRpg.Core.Variables.General
@@ -172,6 +174,7 @@
     {
         public int StartingId { get; set; }
         public int SkillType { get; set; }
+        public ScalingFunction SkillScore { get; set; }
         public int InputPatternTypeId { get; set; }
         public int OutputPatternTypeId { get; set; }
         public int AmountRequired { get; set; }
@@ -214,11 +217,24 @@
                 
                 var template = new ItemCraftingTemplate();
                 template.Id = id;
-                template.SkillType = config.SkillType;
                 template.InputItems = inputItems;
                 template.OutputItems = outputItems;
                 template.Variables.PatternId = patternId;
                 template.Variables.PatternTypeId = config.PatternTypeId;
+                template.Variables.SkillType = config.SkillType;
+                
+                var skillDifficulty = (int)Math.Round(config.SkillScore.Plot(patternId));
+                if(skillDifficulty > 0)
+                {
+                    template.Variables.Requirements = [
+                        new Requirement
+                        {
+                            RequirementType = FantasyRequirementTypes.TradeSkillRequirement,
+                            Association = new Association(config.SkillType, skillDifficulty)
+                        }
+                    ];
+                }
+                
                 itemCraftingTemplates.Add(template);
             }
 
@@ -359,7 +375,8 @@
         {
             PatternIds = patternIds,
             StartingId = 0,
-            SkillType = FantasyCraftingTradeSkillTypes.Smelting,
+            SkillType = FantasyTradeSkillTypes.Smelting,
+            SkillScore = new ScalingFunction(PresetCurves.Linear, new RangeF(0, 200), new RangeF(0, patternIds.Length)),
             AmountRequired = 5,
             InputPatternTypeId = ItemPatternTypes.Ore,
             AmountOutput = 1,
@@ -371,7 +388,8 @@
         {
             PatternIds = patternIds,
             StartingId = 20,
-            SkillType = FantasyCraftingTradeSkillTypes.Smithing,
+            SkillType = FantasyTradeSkillTypes.Smithing,
+            SkillScore = new ScalingFunction(PresetCurves.Linear, new RangeF(0, 200), new RangeF(0, patternIds.Length)),
             AmountRequired = 4,
             InputPatternTypeId = ItemPatternTypes.Ingot,
             AmountOutput = 1,
@@ -383,7 +401,8 @@
         {
             PatternIds = patternIds,
             StartingId = 40,
-            SkillType = FantasyCraftingTradeSkillTypes.Smithing,
+            SkillType = FantasyTradeSkillTypes.Smithing,
+            SkillScore = new ScalingFunction(PresetCurves.Linear, new RangeF(0, 200), new RangeF(0, patternIds.Length)),
             AmountRequired = 4,
             InputPatternTypeId = ItemPatternTypes.Ingot,
             AmountOutput = 1,

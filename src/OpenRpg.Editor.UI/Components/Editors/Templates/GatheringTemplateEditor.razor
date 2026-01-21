@@ -3,7 +3,7 @@
 <GenericTemplateEditor TTemplate="ItemGatheringTemplate" AssetCodePrefix="gathering" Template="Template">
     <PrimaryDetailsContent>
         <Accordion Title="Skill Details" IsExpanded="true">
-            <TradeSkillDetailsEditor IsGatheringSkill="true" TradeSkillData="context" />
+            <TradeSkillDetailsEditor IsGatheringSkill="true" TradeSkillTemplateVariables="context.Variables" />
         </Accordion>
         <Accordion Title="Output Item Details" IsExpanded="true">
             <TradeSkillItemEntriesEditor TradeSkillItemEntries="context.OutputItems" />

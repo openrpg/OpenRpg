@@ -11,6 +11,7 @@
 @using OpenRpg.Core.Utils
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 @using OpenRpg.Items.TradeSkills.State
@@ -130,7 +131,7 @@
     public bool IsCrafting { get; set; }
     public ItemCraftingTemplate CurrentTemplate { get; set; }
     
-    public float CurrentGatherTime => (CurrentTemplate?.TimeToComplete / 2 ?? 0.0f);
+    public float CurrentGatherTime => (CurrentTemplate?.Variables.TimeToAction / 2 ?? 0.0f);
     public string CurrentCraftName
     {
         get
@@ -202,8 +203,9 @@
         CurrentTemplate.CraftFrom(CraftingInventory, TemplateAccessor);
         ActionBarRef?.Reset();
         
-        var currentSkill = TradeSkillState.Smithing;
-        var tradeSkillPoints = TradeSkillCalculator.CalculateSkillUpPointsFor(currentSkill, CurrentTemplate.SkillDifficulty);
+        var currentSkillScore = TradeSkillState.Smithing;
+        var skillDifficulty = CurrentTemplate.Variables.Requirements.GetTradeSkillRequirementValue(FantasyTradeSkillTypes.Smithing);
+        var tradeSkillPoints = TradeSkillCalculator.CalculateSkillUpPointsFor(currentSkillScore, skillDifficulty);
         TradeSkillState.AddSmithing(tradeSkillPoints);
         
         CraftingInventoryRef.Refresh();

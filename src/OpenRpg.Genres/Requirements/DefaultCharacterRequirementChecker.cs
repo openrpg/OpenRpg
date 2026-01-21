@@ -2,7 +2,6 @@ using System.Linq;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Entities.Extensions;
-using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Types;
@@ -91,7 +90,7 @@ namespace OpenRpg.Genres.Requirements
             
             if(requirement.RequirementType == GenreRequirementTypes.MovementSpeedRequirement)
             { return character.Stats.MovementSpeed >= requirement.Association.AssociatedValue; }
-
+            
             if (requirement.RequirementType == GenreRequirementTypes.ActiveEffectRequirement)
             {
                 if(!character.Variables.HasActiveEffects()) { return false; }

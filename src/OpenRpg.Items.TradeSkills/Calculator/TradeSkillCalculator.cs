@@ -39,17 +39,10 @@ namespace OpenRpg.Items.TradeSkills.Calculator
         /// </summary>
         /// <param name="randomizer">The randomizer to use</param>
         /// <param name="curveFunction">The optional curve function to apply, by default uses inverse linear</param>
-        public TradeSkillCalculator(IRandomizer randomizer, ICurveFunction curveFunction = null)
+        public TradeSkillCalculator(IRandomizer randomizer)
         {
-            SkillPointCurve = new ScalingFunction(curveFunction ?? PresetCurves.InverseLinear, 0, 1, 0, MaximumSkillDifference);
+            SkillPointCurve = new ScalingFunction(PresetCurves.BellCurve, new RangeF(0, 1), new RangeF(0, MaximumSkillDifference));
             Randomizer = randomizer;
-        }
-
-        public bool CanUseSkill(int skillScore, int skillDifficulty)
-        {
-            var skillDifference = skillDifficulty - skillScore;
-            var absoluteScore = Math.Abs(skillDifference);
-            return absoluteScore <= MaximumSkillDifference;
         }
     
         public int CalculateSkillUpPointsFor(int skillScore, int skillDifficulty)
