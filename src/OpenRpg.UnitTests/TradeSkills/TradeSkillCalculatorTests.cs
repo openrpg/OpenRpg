@@ -22,7 +22,8 @@ public class TradeSkillCalculatorTests
         {
             MinimumPointThreshold = minimumPointThreshold,
             PointMultiplier = pointMultiplier,
-            MaximumSkillDifference = maxSkillDifference
+            MaximumSkillDifference = maxSkillDifference,
+            RandomnessVariance = 0.0f,
         };
         var actualPoints = tradeSkillCalculator.CalculateSkillUpPointsFor(skillScore, skillDifficulty);
         Assert.Equal(expectedPoints, actualPoints);

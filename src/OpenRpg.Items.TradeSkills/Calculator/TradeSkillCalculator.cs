@@ -11,7 +11,7 @@ namespace OpenRpg.Items.TradeSkills.Calculator
     public class TradeSkillCalculator : ITradeSkillCalculator
     {
         /// <summary>
-        /// This is the gated minimum threshold of the 0-1 plot check, defaults to 0.5f
+        /// This is the gated minimum threshold of the 0-1 plot check, defaults to 0.1f
         /// </summary>
         public float MinimumPointThreshold { get; set; } = 0.1f;
         
@@ -53,8 +53,9 @@ namespace OpenRpg.Items.TradeSkills.Calculator
 
             var result = SkillPointCurve.Plot(absoluteScore);
             var randomVariance = Randomizer.Random(-RandomnessVariance, RandomnessVariance);
-            if (result < MinimumPointThreshold) { return 0; }
-            return (int)Math.Round((result + randomVariance) * PointMultiplier);
+            var totalResult = result + randomVariance;
+            if (totalResult <= MinimumPointThreshold) { return 0; }
+            return (int)Math.Ceiling(totalResult * PointMultiplier);
         }
     }
 }

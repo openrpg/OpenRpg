@@ -202,7 +202,7 @@
     
     protected override void OnInitialized()
     {
-        TradeSkillCalculator = new TradeSkillCalculator(Randomizer) { RandomnessVariance = 0.2f };
+        TradeSkillCalculator = new TradeSkillCalculator(Randomizer) { RandomnessVariance = 0.2f, MaximumSkillDifference = 20 };
         
         Example1Inventory.Variables.MaxSlots = 10;
         Example2Inventory.Variables.MaxSlots = 10;
