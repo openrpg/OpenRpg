@@ -8,7 +8,8 @@ namespace OpenRpg.UnitTests.TradeSkills;
 public class TradeSkillCalculatorTests
 {
     [Theory]
-    [InlineData(1, 1, 10, 0.5f, 1, 1)]
+    [InlineData(0, 0, 10, 0.1f, 1, 1)]
+    [InlineData(1, 1, 10, 0.1f, 1, 1)]
     [InlineData(1, 1, 10, 0.5f, 3, 3)]
     [InlineData(1, 10, 10, 0.5f, 1, 0)]
     [InlineData(1, 10, 10, 0.1f, 5, 1)]

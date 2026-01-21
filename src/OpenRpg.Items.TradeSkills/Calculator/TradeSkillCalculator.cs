@@ -13,7 +13,7 @@ namespace OpenRpg.Items.TradeSkills.Calculator
         /// <summary>
         /// This is the gated minimum threshold of the 0-1 plot check, defaults to 0.5f
         /// </summary>
-        public float MinimumPointThreshold { get; set; } = 0.5f;
+        public float MinimumPointThreshold { get; set; } = 0.1f;
         
         /// <summary>
         /// This is the multiplier added to the resulting value post randomness calculations, defaults to 1.0f
@@ -39,9 +39,9 @@ namespace OpenRpg.Items.TradeSkills.Calculator
         /// </summary>
         /// <param name="randomizer">The randomizer to use</param>
         /// <param name="curveFunction">The optional curve function to apply, by default uses inverse linear</param>
-        public TradeSkillCalculator(IRandomizer randomizer)
+        public TradeSkillCalculator(IRandomizer randomizer, ICurveFunction curveFunction = null)
         {
-            SkillPointCurve = new ScalingFunction(PresetCurves.BellCurve, new RangeF(0, 1), new RangeF(0, MaximumSkillDifference));
+            SkillPointCurve = new ScalingFunction(curveFunction ?? PresetCurves.InverseLinear, new RangeF(0, 1), new RangeF(0, MaximumSkillDifference));
             Randomizer = randomizer;
         }
     
