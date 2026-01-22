@@ -1,8 +1,14 @@
 @using OpenRpg.Core.Templates
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 @using OpenRpg.Genres.Characters
+@using OpenRpg.Items.TradeSkills.Extensions
 @using OpenRpg.Items.TradeSkills.Templates
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject ILocaleRepository LocaleRepository;
 
 <CardSection customClasses="item-border">
     <h4 class="title is-4 has-text-centered has-text-dark">@(Name)</h4>
@@ -23,12 +29,12 @@
     <div class="columns is-vcentered is-centered">
         <div class="column is-two-fifths">
             <div class="columns is-centered">
-                    @foreach (var itemEntry in ItemCraftingTemplate.InputItems)
-                    {
-                        <div class="cell mr-2">
-                            <TradeSkillItemIcon Character="Character" Item="itemEntry" ItemTemplate="InputTemplates[itemEntry.TemplateId]"/>
-                        </div>
-                    }
+                @foreach (var itemEntry in ItemCraftingTemplate.InputItems)
+                {
+                    <div class="cell mr-2">
+                        <TradeSkillItemIcon Character="Character" Item="itemEntry" ItemTemplate="InputTemplates[itemEntry.TemplateId]"/>
+                    </div>
+                }
             </div>
         </div>        
         <div class="column is-one-fifth has-text-centered">
@@ -45,6 +51,15 @@
             </div>
         </div>
     </div>
+    @if (ItemCraftingTemplate.Variables.HasTradeSkillRequirements())
+    {
+        @foreach (var requirement in ItemCraftingTemplate.Variables.GetTradeSkillRequirements())
+        {
+            <div class="container has-text-centered">
+                <span class="tag is-info">Requires @(LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.TradeSkillTypesTextKey, requirement.Association.AssociatedId))) @(requirement.Association.AssociatedValue)</span>
+            </div>       
+        }
+    }
 </CardSection>
 
 @code {

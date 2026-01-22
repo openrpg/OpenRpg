@@ -223,7 +223,7 @@
                 template.Variables.PatternTypeId = config.PatternTypeId;
                 template.Variables.SkillType = config.SkillType;
                 
-                var skillDifficulty = (int)Math.Round(config.SkillScore.Plot(patternId));
+                var skillDifficulty = (int)Math.Round(config.SkillScore.Plot(i));
                 if(skillDifficulty > 0)
                 {
                     template.Variables.Requirements = [

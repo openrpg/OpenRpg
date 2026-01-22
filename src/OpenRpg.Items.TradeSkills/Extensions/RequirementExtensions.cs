@@ -1,13 +1,25 @@
 using System.Collections.Generic;
 using System.Linq;
-using OpenRpg.Core.Associations;
 using OpenRpg.Core.Requirements;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Items.TradeSkills.Types;
+using OpenRpg.Items.TradeSkills.Variables;
 
 namespace OpenRpg.Items.TradeSkills.Extensions;
 
 public static class RequirementExtensions
 {
+    public static bool HasTradeSkillRequirements(this IItemTradeSkillTemplateVariables vars)
+    { return vars.HasRequirements() && vars.Requirements.HasTradeSkillRequirement(); }
+
+    public static IReadOnlyCollection<Requirement> GetTradeSkillRequirements(this IItemTradeSkillTemplateVariables vars)
+    {
+        if (!vars.HasTradeSkillRequirements())
+        { return []; }
+
+        return vars.Requirements.GetTradeSkillRequirements();
+    }
+    
     extension(IReadOnlyCollection<Requirement> requirements)
     {
         public bool HasTradeSkillRequirement()
