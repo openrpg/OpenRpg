@@ -6,7 +6,7 @@ namespace OpenRpg.Items.Equippables
 {
     public class Equipment : IHasVariables<EquipmentVariables>
     {
-        public EquipmentSlots Slots { get; set; } = new EquipmentSlots();
-        public EquipmentVariables Variables { get; set; } = new EquipmentVariables();
+        public EquipmentSlots Slots { get; set; } = new();
+        public EquipmentVariables Variables { get; set; } = new();
     }
 }
