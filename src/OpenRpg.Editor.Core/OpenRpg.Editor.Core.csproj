@@ -17,6 +17,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.Genres\OpenRpg.Genres.csproj" />
+      <ProjectReference Include="..\OpenRpg.Projects\OpenRpg.Projects.csproj" />
+      <ProjectReference Include="..\OpenRpg.Projects.Json\OpenRpg.Projects.Json.csproj" />
     </ItemGroup>
 
     <ItemGroup>

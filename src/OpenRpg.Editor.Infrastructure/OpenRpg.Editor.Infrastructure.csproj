@@ -19,6 +19,7 @@
         <ProjectReference Include="..\OpenRpg.Editor.Core\OpenRpg.Editor.Core.csproj" />
         <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
         <ProjectReference Include="..\OpenRpg.Localization\OpenRpg.Localization.csproj" />
+        <ProjectReference Include="..\OpenRpg.Projects.Json\OpenRpg.Projects.Json.csproj" />
     </ItemGroup>
 
 </Project>

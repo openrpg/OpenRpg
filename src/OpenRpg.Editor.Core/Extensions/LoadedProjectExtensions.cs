@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using OpenRpg.Editor.Core.Models;
+using OpenRpg.Projects.Json.Extensions;
 
 namespace OpenRpg.Editor.Core.Extensions;
 
@@ -29,9 +30,9 @@ public static class LoadedProjectExtensions
 
     public static string GetAssetPath(LoadedProject project)
     {
-        var isAbsolutePath = Path.IsPathFullyQualified(project.Project.AssetsFolder);
-        return isAbsolutePath ? project.Project.AssetsFolder :
-            $"{project.ProjectPath}/{project.Project.AssetsFolder}";
+        var isAbsolutePath = Path.IsPathFullyQualified(project.Project.AssetFolder);
+        return isAbsolutePath ? project.Project.AssetFolder :
+            $"{project.ProjectPath}/{project.Project.AssetFolder}";
     }
     
     public static string GetAssetPath(this LoadedProject project, string type)

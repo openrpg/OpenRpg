@@ -14,6 +14,12 @@ using OpenRpg.Editor.Infrastructure.Services;
 using OpenRpg.Editor.Services.FileSystem;
 using OpenRpg.Localization.Data.DataSources;
 using OpenRpg.Localization.Data.Repositories;
+using OpenRpg.Projects.Json.Loaders;
+using OpenRpg.Projects.Json.Loaders.Locales;
+using OpenRpg.Projects.Json.Loaders.Templates;
+using OpenRpg.Projects.Loaders;
+using OpenRpg.Projects.Loaders.Locales;
+using OpenRpg.Projects.Loaders.Templates;
 using Persistity.Core.Serialization;
 using Persistity.Flow.Builders;
 using Persistity.Serializers.Json;
@@ -46,6 +52,11 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<IRepository, Repository>();
             
             services.AddSingleton<IProjectMigration, ProjectMigration_1_0_0>();
+            services.AddSingleton<IProjectLoader, JsonProjectLoader>();
+            services.AddSingleton<ITemplateLoader, JsonTemplateLoader>();
+            services.AddSingleton<ITemplateDatastorePopulator, JsonTemplateDatastorePopulator>();
+            services.AddSingleton<ILocaleLoader, JsonLocaleLoader>();
+            services.AddSingleton<ILocaleDatastorePopulator, JsonLocaleDatastorePopulator>();
 
             services.AddSingleton<EditorLocaleDatasource>();
             services.AddSingleton<ILocaleDataSource>(x => x.GetService<EditorLocaleDatasource>());

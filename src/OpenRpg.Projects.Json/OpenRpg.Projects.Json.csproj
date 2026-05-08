@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\OpenRpg.Items.TradeSkills\OpenRpg.Items.TradeSkills.csproj" />
+      <ProjectReference Include="..\OpenRpg.Items\OpenRpg.Items.csproj" />
+      <ProjectReference Include="..\OpenRpg.Projects\OpenRpg.Projects.csproj" />
+      <ProjectReference Include="..\OpenRpg.Quests\OpenRpg.Quests.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    </ItemGroup>
+
+</Project>
