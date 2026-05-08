@@ -12,8 +12,10 @@
 @using OpenRpg.Core.Utils
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.TradeSkills.State
+@using OpenRpg.Items.TradeSkills.Types
 
 @using Inventory = OpenRpg.Items.Inventories.Inventory;
 
@@ -181,7 +183,7 @@
     public bool IsGathering { get; set; }
     public ItemGatheringTemplate CurrentTemplate { get; set; }
     
-    public float CurrentGatherTime => (CurrentTemplate?.TimeToComplete ?? 0.0f);
+    public float CurrentGatherTime => (CurrentTemplate?.Variables.TimeToAction ?? 0.0f);
     public string CurrentGatherName
     {
         get
@@ -200,7 +202,7 @@
     
     protected override void OnInitialized()
     {
-        TradeSkillCalculator = new TradeSkillCalculator(Randomizer) { RandomnessVariance = 0.2f };
+        TradeSkillCalculator = new TradeSkillCalculator(Randomizer) { RandomnessVariance = 0.2f, MaximumSkillDifference = 20 };
         
         Example1Inventory.Variables.MaxSlots = 10;
         Example2Inventory.Variables.MaxSlots = 10;
@@ -229,8 +231,9 @@
         CurrentTemplate.GatherInto(Example2Inventory, TemplateAccessor);
         Example2InventoryRef.Refresh();
 
-        var currentMiningSkill = TradeSkillState.Mining;
-        var tradeSkillPoints = TradeSkillCalculator.CalculateSkillUpPointsFor(currentMiningSkill, CurrentTemplate.SkillDifficulty);
+        var currentSkillScore = TradeSkillState.Mining;
+        var skillDifficulty = CurrentTemplate.Variables.Requirements.GetTradeSkillRequirementValue(FantasyTradeSkillTypes.Mining);
+        var tradeSkillPoints = TradeSkillCalculator.CalculateSkillUpPointsFor(currentSkillScore, skillDifficulty);
         TradeSkillState.AddMining(tradeSkillPoints);
         
         InvokeAsync(StateHasChanged);

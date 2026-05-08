@@ -6,6 +6,12 @@ namespace OpenRpg.Items.Extensions
 {
     public static class ItemTemplateVariablesExtensions
     {
+        public static bool HasQualityType(this ItemTemplateVariables vars) => vars.ContainsKey(ItemTemplateVariableTypes.QualityType);
+        public static bool HasValue(this ItemTemplateVariables vars) => vars.ContainsKey(ItemTemplateVariableTypes.Value);
+        public static bool HasMaxStacks(this ItemTemplateVariables vars) => vars.ContainsKey(ItemTemplateVariableTypes.MaxStacks);
+        public static bool HasWeight(this ItemTemplateVariables vars) => vars.ContainsKey(ItemTemplateVariableTypes.Weight);
+        public static bool HasSlotType(this ItemTemplateVariables vars) => vars.ContainsKey(ItemTemplateVariableTypes.SlotType);
+        
         extension(ItemTemplateVariables vars)
         {
             public int QualityType

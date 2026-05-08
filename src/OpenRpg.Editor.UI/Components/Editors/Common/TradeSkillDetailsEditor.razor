@@ -1,5 +1,10 @@
+@using OpenRpg.Core.Associations
+@using OpenRpg.Core.Requirements
 @using OpenRpg.Editor.Infrastructure.Helpers
-@using OpenRpg.Items.TradeSkills.Templates
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items.TradeSkills.Extensions
+@using OpenRpg.Items.TradeSkills.Variables
 
 <div class="field is-horizontal">
     <div class="field-label">
@@ -9,7 +14,7 @@
         <div class="field">
             <div class="control">
                 <div class="select is-fullwidth">
-                    <select @bind="TradeSkillData.SkillType">
+                    <select @bind="TradeSkillTemplateVariables.SkillType">
                         @{ var gatheringTypes = IsGatheringSkill ? TypesHelper.GetGatheringSkillTypes : TypesHelper.GetCraftingSkillTypes; }
                         @foreach (var tradeSkillType in gatheringTypes)
                         {
@@ -28,8 +33,7 @@
     <div class="field-body">
         <div class="field">
             <div class="control">
-                <input class="input" type="text" placeholder="i.e 25"
-                       @bind="@TradeSkillData.SkillDifficulty" />
+                <input class="input" type="text" placeholder="i.e 25" @bind="@SkillDifficulty" />
             </div>
         </div>
     </div>
@@ -42,7 +46,7 @@
         <div class="field">
             <div class="control">
                 <input class="input" type="text" placeholder="i.e 1.5 seconds"
-                       @bind="@TradeSkillData.TimeToComplete" />
+                       @bind="@TradeSkillTemplateVariables.TimeToAction" />
             </div>
         </div>
     </div>
@@ -50,8 +54,35 @@
 
 @code {
     [Parameter]
-    public ITradeSkillData TradeSkillData { get; set; }
+    public IItemTradeSkillTemplateVariables TradeSkillTemplateVariables { get; set; }
     
     [Parameter]
     public bool IsGatheringSkill { get; set; }
+
+    public int SkillDifficulty
+    {
+        get
+        {
+            if(!TradeSkillTemplateVariables.HasRequirements()) { return 0; }
+            return TradeSkillTemplateVariables.Requirements.GetTradeSkillRequirementValue(TradeSkillTemplateVariables.SkillType);
+        }
+        set
+        {
+            if(!TradeSkillTemplateVariables.HasRequirements())
+            {
+                TradeSkillTemplateVariables.Requirements = new[]
+                {
+                    new Requirement
+                    {
+                        RequirementType = FantasyRequirementTypes.TradeSkillRequirement,
+                        Association = new Association(TradeSkillTemplateVariables.SkillType, value)
+                    }
+                };
+                return;
+            }
+            
+            var requirement = TradeSkillTemplateVariables.Requirements.GetTradeSkillRequirement(TradeSkillTemplateVariables.SkillType);
+            requirement.Association = new Association(TradeSkillTemplateVariables.SkillType, value);
+        }
+    }
 }

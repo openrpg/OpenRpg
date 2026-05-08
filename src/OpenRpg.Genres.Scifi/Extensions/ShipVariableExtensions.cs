@@ -1,4 +1,5 @@
 using OpenRpg.Core.Extensions;
+using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Scifi.Equippables.ShipSlots;
 using OpenRpg.Genres.Scifi.Types;
 using OpenRpg.Genres.Scifi.Variables;
@@ -24,6 +25,12 @@ namespace OpenRpg.Genres.Scifi.Extensions
                 get => vars.GetAsOrDefault(ShipVariableTypes.Inventory, () => new Inventory());
                 set => vars[ShipVariableTypes.Inventory] = value;
             }
+
+            public Character Pilot
+            {
+                get => vars.GetAsOrDefault(ShipVariableTypes.Pilot, () => new Character());
+                set => vars[ShipVariableTypes.Pilot] = value;
+            }
         }
         
         public static bool HasEquipment(this ShipVariables vars) 
@@ -31,5 +38,8 @@ namespace OpenRpg.Genres.Scifi.Extensions
         
         public static bool HasInventory(this ShipVariables vars) 
         { return vars.ContainsKey(ShipVariableTypes.Inventory); }
+        
+        public static bool HasPilot(this ShipVariables vars) 
+        { return vars.ContainsKey(ShipVariableTypes.Pilot); }
     }
 }

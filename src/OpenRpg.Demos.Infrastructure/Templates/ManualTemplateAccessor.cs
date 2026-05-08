@@ -18,6 +18,12 @@ public class ManualTemplateAccessor : ITemplateAccessor
         TemplateData[templateType].Add(template.Id, template);
     }
     
+    public void AddTemplates(IEnumerable<ITemplate> templates)
+    {
+        foreach(var template in templates) 
+        { AddTemplate(template); }
+    }
+    
     public void AddTemplate<T>(T template) where T : ITemplate
     {
         var templateType = typeof(T);

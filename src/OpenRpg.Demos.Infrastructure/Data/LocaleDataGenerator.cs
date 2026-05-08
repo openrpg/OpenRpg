@@ -27,6 +27,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
         public static readonly string CardTypesTextKey = "types-cards-";
         public static readonly string UtilityTypesTextKey = "types-ai-utility-";
         public static readonly string AdviceTypesTextKey = "types-ai-advice-";
+        public static readonly string TradeSkillTypesTextKey = "types-trade-skill-";
         
         public IEnumerable<LocaleDataset> GenerateData()
         {
@@ -44,6 +45,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             GenerateCardTypeLocaleText(localeDataset);
             GenerateUtilityTypeLocaleText(localeDataset);
             GenerateAdviceTypeLocaleText(localeDataset);
+            GenerateTradeSkillTypeLocaleText(localeDataset);
 
             return new[] { localeDataset };
         }
@@ -131,6 +133,12 @@ namespace OpenRpg.Demos.Infrastructure.Data
         {
             GetTypeFieldsDictionary<AdviceVariableTypes>()
                 .ForEach((key, value) => localeDataset.LocaleData.Add(GetKeyFor(AdviceTypesTextKey, key), value));
+        }
+        
+        public void GenerateTradeSkillTypeLocaleText(LocaleDataset localeDataset)
+        {
+            GetTypeFieldsDictionary<FantasyTradeSkillTypes>()
+                .ForEach((key, value) => localeDataset.LocaleData.Add(GetKeyFor(TradeSkillTypesTextKey, key), value));
         }
     }
 }

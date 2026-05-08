@@ -1,0 +1,102 @@
+@using OpenRpg.Core.Templates
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Items.TradeSkills.Extensions
+@using OpenRpg.Items.TradeSkills.Templates
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject ILocaleRepository LocaleRepository;
+
+<CardSection customClasses="item-border">
+    <h4 class="title is-4 has-text-centered has-text-dark">@(Name)</h4>
+    @if (!string.IsNullOrEmpty(ItemCraftingTemplate.DescriptionLocaleId))
+    {
+        <h6 class="subtitle is-7 has-text-dark has-text-centered">@(ItemCraftingTemplate.DescriptionLocaleId)</h6>
+    }
+    <div class="columns is-centered">
+        <div class="column is-two-fifths has-text-centered">
+            <span class="tag is-info">Requires</span>
+        </div>
+        <div class="column is-one-fifths">
+        </div>
+        <div class="column is-two-fifths has-text-centered">
+            <span class="tag is-success">Makes</span>
+        </div>
+    </div>
+    <div class="columns is-vcentered is-centered">
+        <div class="column is-two-fifths">
+            <div class="columns is-centered">
+                @foreach (var itemEntry in ItemCraftingTemplate.InputItems)
+                {
+                    <div class="cell mr-2">
+                        <TradeSkillItemIcon Character="Character" Item="itemEntry" ItemTemplate="InputTemplates[itemEntry.TemplateId]"/>
+                    </div>
+                }
+            </div>
+        </div>        
+        <div class="column is-one-fifth has-text-centered">
+            <span class="tag">=></span>
+        </div>
+        <div class="column is-two-fifths">
+            <div class="columns is-centered">
+                @foreach (var itemEntry in ItemCraftingTemplate.OutputItems)
+                {
+                    <div class="cell mr-2">
+                        <TradeSkillItemIcon Character="Character" Item="itemEntry" ItemTemplate="OutputTemplates[itemEntry.TemplateId]"/>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    @if (ItemCraftingTemplate.Variables.HasTradeSkillRequirements())
+    {
+        @foreach (var requirement in ItemCraftingTemplate.Variables.GetTradeSkillRequirements())
+        {
+            <div class="container has-text-centered">
+                <span class="tag is-info">Requires @(LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.TradeSkillTypesTextKey, requirement.Association.AssociatedId))) @(requirement.Association.AssociatedValue)</span>
+            </div>       
+        }
+    }
+</CardSection>
+
+@code {
+
+    [Parameter]
+    public ItemCraftingTemplate ItemCraftingTemplate { get; set; }
+
+    [Parameter]
+    public ITemplateAccessor TemplateAccessor { get; set; }
+    
+    [Parameter]
+    public Character Character { get; set; }
+    
+    private string Name { get; set; }
+
+    private Dictionary<int, ItemTemplate> InputTemplates { get; set; } = new();
+    private Dictionary<int, ItemTemplate> OutputTemplates { get; set; } = new();
+    
+    protected override void OnInitialized()
+    {
+        foreach (var inputItem in ItemCraftingTemplate.InputItems)
+        {
+            var inputItemTemplate = TemplateAccessor.GetItemTemplate(inputItem.TemplateId);
+            InputTemplates.Add(inputItemTemplate.Id, inputItemTemplate);
+        }
+        
+        foreach (var outputItem in ItemCraftingTemplate.OutputItems)
+        {
+            var outputItemTemplate = TemplateAccessor.GetItemTemplate(outputItem.TemplateId);
+            OutputTemplates.Add(outputItemTemplate.Id, outputItemTemplate);
+        }
+        
+        if (string.IsNullOrEmpty(ItemCraftingTemplate.NameLocaleId))
+        {
+            var outputItemTemplate = OutputTemplates.Values.First();
+            Name = $"Craft {outputItemTemplate.NameLocaleId}";
+        }
+        else { Name = ItemCraftingTemplate.NameLocaleId; }
+    }
+}

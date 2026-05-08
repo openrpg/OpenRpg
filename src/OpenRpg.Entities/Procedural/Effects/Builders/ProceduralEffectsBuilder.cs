@@ -3,7 +3,7 @@ using OpenRpg.Core.Utils;
 using OpenRpg.Entities.Effects;
 using OpenRpg.Entities.Types;
 
-namespace OpenRpg.Entities.Procedural.Builders;
+namespace OpenRpg.Entities.Procedural.Effects.Builders;
 
 public class ProceduralEffectsBuilder
 {

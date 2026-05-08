@@ -11,7 +11,7 @@
     <img src="images/items/@(ItemTemplate.Variables.AssetCode).png">
     <div class="item-amount">@(_itemAmount > 0 ? $"{_itemAmount}" : "")</div>
     <div class="item-icon-summary">
-        <ItemTemplateDetails ItemTemplate="@ItemTemplate" Character="Character"></ItemTemplateDetails>
+        <ItemTemplateDetails ItemTemplate="@ItemTemplate" Character="Character" />
     </div>
 </figure>
 
@@ -33,12 +33,12 @@
 
     protected override void OnParametersSet()
     {
-        if (Item.Variables != null && Item.Variables.ContainsKey(ItemVariableTypes.Amount))
+        if (Item.Variables != null && Item.Variables.HasAmount())
         { _itemAmount = Item.Variables.Amount; }
         else
         { _itemAmount = 0;}
 
-        if (ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
+        if (ItemTemplate.Variables.HasQualityType())
         { _itemQualityTypeId = ItemTemplate.Variables.QualityType; }
 
         base.OnParametersSet();

@@ -273,7 +273,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             var template = new ItemTemplate
             {
                 Id = ItemTemplateLookups.CopperSword,
-                NameLocaleId = "A crafted copper sword",
+                NameLocaleId = "Copper Sword",
                 DescriptionLocaleId = "An oak hilt with a copper blade",
                 ItemType = FantasyItemTypes.GenericWeapon,
                 ModificationAllowances = Array.Empty<ModificationAllowance>()

@@ -1,6 +1,6 @@
 namespace OpenRpg.Items.TradeSkills.Types
 {
-    public interface GatheringTradeSkillTypes
+    public interface TradeSkillTypes
     {
         public static readonly int Unknown = 0;
     }
