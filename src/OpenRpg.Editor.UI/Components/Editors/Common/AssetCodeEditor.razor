@@ -1,6 +1,6 @@
 @using OpenRpg.Core.Templates.Variables
-@using OpenRpg.Editor.Infrastructure.Variables
 @using OpenRpg.Entities.Extensions
+@using OpenRpg.Entities.Types
 
 <div class="field is-horizontal">
     <div class="field-label">
@@ -29,7 +29,7 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (!Variables.ContainsKey(CustomVariableTypes.AssetCode))
+        if (!Variables.ContainsKey(CoreAnyVariableTypes.AssetCode))
         { Variables.AssetCode = DefaultAssetCode; }
     }
 
