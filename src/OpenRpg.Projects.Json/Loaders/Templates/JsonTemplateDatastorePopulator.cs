@@ -27,9 +27,9 @@ public class JsonTemplateDatastorePopulator : ITemplateDatastorePopulator
     public async Task PopulateDatastore(Project project, string projectPath, IDataSource dataSource)
     {
         var templateFolderPath = project.TemplatesFolder;
-        var absoluteTemplateFolderPath = $"{projectPath}/{templateFolderPath}";
+        var absoluteTemplateFolderPath = Path.Combine(projectPath, templateFolderPath);
         var templatePathExists = await FileService.Exists(absoluteTemplateFolderPath);
-        if(templatePathExists) { throw new Exception($"Template folder [{absoluteTemplateFolderPath}] cannot be found"); }
+        if(!templatePathExists) { throw new Exception($"Template folder [{absoluteTemplateFolderPath}] cannot be found"); }
         
         await ProcessTemplates<ItemTemplate>(project, absoluteTemplateFolderPath, dataSource);
         await ProcessTemplates<ClassTemplate>(project, absoluteTemplateFolderPath, dataSource);
@@ -41,7 +41,7 @@ public class JsonTemplateDatastorePopulator : ITemplateDatastorePopulator
 
     protected async Task ProcessTemplates<T>(Project project, string templateFolderPath, IDataSource dataSource) where T : ITemplate
     {
-        var itemTemplatePath = $"{templateFolderPath}/{typeof(T).Name}.json";
+        var itemTemplatePath = Path.Combine(templateFolderPath, $"{typeof(T).Name}.json");
         var templatePathExists = await FileService.Exists(itemTemplatePath);
         if(!templatePathExists) { throw new Exception($"Template file [{itemTemplatePath}] cannot be found"); }
         

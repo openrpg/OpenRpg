@@ -34,8 +34,9 @@ public class LoadProjectExecutor
     public async Task Execute(string projectFile)
     {
         var project = await ProjectLoader.LoadProject(projectFile);
-        EditorState.CurrentProject = new LoadedProject() { Project = project, ProjectPath = Path.GetDirectoryName(projectFile) };
-        await TemplateDatastorePopulator.PopulateDatastore(project, projectFile, EditorDatasource);
-        await LocaleDatastorePopulator.PopulateDatastore(project, projectFile, EditorLocaleDatasource);
+        var projectPath = Path.GetDirectoryName(projectFile);
+        EditorState.CurrentProject = new LoadedProject() { Project = project, ProjectPath = projectPath };
+        await TemplateDatastorePopulator.PopulateDatastore(project, projectPath, EditorDatasource);
+        await LocaleDatastorePopulator.PopulateDatastore(project, projectPath, EditorLocaleDatasource);
     }
 }

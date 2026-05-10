@@ -11,7 +11,12 @@ namespace OpenRpg.Projects.Json.Loaders.Locales;
 public class JsonLocaleLoader : ILocaleLoader
 {
     public IFileService FileService { get; }
-    
+
+    public JsonLocaleLoader(IFileService fileService)
+    {
+        FileService = fileService;
+    }
+
     public async Task<LocaleDataset> LoadLocales(Project project, string localeFilePath)
     {
         var localePathExists = await FileService.Exists(localeFilePath);

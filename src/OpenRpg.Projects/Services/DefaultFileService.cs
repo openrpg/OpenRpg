@@ -10,7 +10,7 @@ public class DefaultFileService : IFileService
 
     public async Task<bool> Exists(string file)
     {
-        var attriutes = File.GetAttributes(file);
-        return attriutes.HasFlag(FileAttributes.Directory) ? Directory.Exists(file) : File.Exists(file);
+        var attributes = File.GetAttributes(file);
+        return attributes.HasFlag(FileAttributes.Directory) ? Directory.Exists(file) : File.Exists(file);
     }
 }

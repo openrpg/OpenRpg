@@ -24,9 +24,9 @@ public class JsonLocaleDatastorePopulator : ILocaleDatastorePopulator
     public async Task PopulateDatastore(Project project, string projectPath, ILocaleDataSource dataSource)
     {
         var localesFolderPath = project.LocalesFolder;
-        var absoluteLocaleFolderPath = $"{projectPath}/{localesFolderPath}";
+        var absoluteLocaleFolderPath = Path.Combine(projectPath, localesFolderPath);
         var localePathExists = await FileService.Exists(absoluteLocaleFolderPath);
-        if(localePathExists) { throw new Exception($"Locale folder [{absoluteLocaleFolderPath}] cannot be found"); }
+        if(!localePathExists) { throw new Exception($"Locale folder [{absoluteLocaleFolderPath}] cannot be found"); }
         
         var localeFiles = await GetAllLocaleFiles(absoluteLocaleFolderPath);
         foreach (var localeFile in localeFiles)
