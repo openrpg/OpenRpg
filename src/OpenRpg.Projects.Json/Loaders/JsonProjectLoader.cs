@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OpenRpg.Projects.Loaders;
+using OpenRpg.Projects.Loaders.Projects;
 using OpenRpg.Projects.Models;
 using OpenRpg.Projects.Services;
 

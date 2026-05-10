@@ -11,7 +11,7 @@
 @inject IFileBrowser FileBrowser
 @inject EditorState EditorState
 @inject CreateProjectExecutor CreateProjectExecutor;
-@inject LoadProjectExecutor LoadProjectExecutor;
+@inject EditorDataLoader EditorDataLoader;
 @inject IEventBus EventBus; 
 
 <h1 class="title is-1">OpenRpg Data Editor</h1>
@@ -58,7 +58,7 @@
         var projectFile = FileBrowser.BrowseToOpenFile(filterList: "*.json");
         if(string.IsNullOrEmpty(projectFile)) { return; }
 
-        await LoadProjectExecutor.Execute(projectFile);
+        await EditorDataLoader.Load(projectFile);
         EventBus.PublishAsync(new ProjectChangedEvent());
     }
 }

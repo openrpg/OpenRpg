@@ -1,6 +1,6 @@
 using OpenRpg.Projects.Models;
 
-namespace OpenRpg.Projects.Loaders;
+namespace OpenRpg.Projects.Loaders.Projects;
 
 public interface IProjectLoader
 {

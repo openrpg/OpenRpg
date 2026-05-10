@@ -19,6 +19,7 @@ using OpenRpg.Projects.Json.Loaders.Locales;
 using OpenRpg.Projects.Json.Loaders.Templates;
 using OpenRpg.Projects.Loaders;
 using OpenRpg.Projects.Loaders.Locales;
+using OpenRpg.Projects.Loaders.Projects;
 using OpenRpg.Projects.Loaders.Templates;
 using OpenRpg.Projects.Services;
 using Persistity.Core.Serialization;
@@ -46,7 +47,7 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<EditorState>();
             services.AddSingleton<CreateProjectExecutor>();
             services.AddSingleton<SaveProjectExecutor>();
-            services.AddSingleton<LoadProjectExecutor>();
+            services.AddSingleton<EditorDataLoader>();
             
             services.AddSingleton<EditorDatasource>();
             services.AddSingleton<IDataSource>(x => x.GetService<EditorDatasource>());
