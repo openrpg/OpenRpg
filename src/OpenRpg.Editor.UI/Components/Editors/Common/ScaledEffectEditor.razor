@@ -1,5 +1,5 @@
 @using OpenRpg.CurveFunctions.Scaling
-@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Editor.UI.Services
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Types
 
@@ -8,7 +8,7 @@
     <div class="control">
         <div class="select is-fullwidth">
             <select @bind="ScaledEffect.ScalingType">
-                @foreach (var scalingType in TypesHelper.GetEffectScalingType)
+                @foreach (var scalingType in GenreTypes.EffectScalingType)
                 {
                     <option value=@scalingType.Id>@scalingType.Name</option>
                 }
@@ -23,7 +23,7 @@
         <div class="control">
             <div class="select is-fullwidth">
                 <select @bind="ScaledEffect.ScalingIndex">
-                    @{ var scalingIndexOptions = ScaledEffect.ScalingType == CoreEffectScalingTypes.StatIndex ? TypesHelper.GetStatTypes : TypesHelper.GetStateTypes; }
+                    @{ var scalingIndexOptions = ScaledEffect.ScalingType == CoreEffectScalingTypes.StatIndex ? GenreTypes.StatTypes : GenreTypes.StateTypes; }
                     @foreach (var scalingIndex in scalingIndexOptions)
                     {
                         <option value=@scalingIndex.Id>@scalingIndex.Name</option>
@@ -52,13 +52,16 @@
 
 
 @code {
+    [Inject]
+    public GenreTypesService GenreTypes { get; set; }
+
     [Parameter]
     public ScaledEffect ScaledEffect { get; set; }
-    
-    public string ScalingTypeName => TypesHelper.GetEffectScalingType
+
+    public string ScalingTypeName => GenreTypes.EffectScalingType
         .First(x => x.Id == ScaledEffect.ScalingType)
         .Name;
-    
+
     public string YAxisLabel => "Potency";
     public string ChartScalingLabel
     {
@@ -68,16 +71,16 @@
             { return ScalingTypeName; }
 
             if (ScaledEffect.ScalingType == CoreEffectScalingTypes.StatIndex)
-            { return TypesHelper.GetStatTypes.First(x => x.Id == ScaledEffect.ScalingIndex).Name; }
+            { return GenreTypes.StatTypes.First(x => x.Id == ScaledEffect.ScalingIndex).Name; }
 
-            return TypesHelper.GetStateTypes.First(x => x.Id == ScaledEffect.ScalingIndex).Name;
+            return GenreTypes.StateTypes.First(x => x.Id == ScaledEffect.ScalingIndex).Name;
         }
     }
 
     public float TestOutputValue { get; set; }
     public float TestInputValue { get; set; }
 
-    public bool RequiresScalingIndex => ScaledEffect.ScalingType == CoreEffectScalingTypes.StatIndex 
+    public bool RequiresScalingIndex => ScaledEffect.ScalingType == CoreEffectScalingTypes.StatIndex
                                     || ScaledEffect.ScalingType == CoreEffectScalingTypes.StateIndex;
 
     public async Task OnScalingFunctionUpdated(ScalingFunction scalingFunction)

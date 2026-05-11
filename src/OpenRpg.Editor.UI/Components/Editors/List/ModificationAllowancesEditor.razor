@@ -1,7 +1,7 @@
 ﻿@using OpenRpg.Core.Requirements
 @using OpenRpg.Editor.Core.Services.Modal
 @using OpenRpg.Editor.Infrastructure.Extensions
-@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Editor.UI.Services
 @using OpenRpg.Entities.Modifications
 @using OpenRpg.Entities.Requirements
 
@@ -16,7 +16,7 @@
             <div class="control">
                 <div class="select is-fullwidth">
                     <select bind="@context.ModificationType">
-                        @foreach (var modificationType in TypesHelper.GetModificationTypes)
+                        @foreach (var modificationType in GenreTypes.ModificationTypes)
                         {
                             <option value=@modificationType.Id>@modificationType.Name</option>
                         }
@@ -50,24 +50,27 @@
     </DynamicContentModal>
 </ModalContent>
 
-@functions {
+@code {
+    [Inject]
+    public GenreTypesService GenreTypes { get; set; }
+
     [CascadingParameter]
     public IModalInteractionService ModalService { get; set; }
-    
+
     [Parameter]
     public List<ModificationAllowance> ModificationAllowances { get; set; }
-    
+
     bool IsRequirementModalActive { get; set; }
-    
+
     public ModificationAllowance CurrentContext { get; set; }
-    
+
     public ModalElementReference EditRequirementModal { get; set; }
     void ShowRequirementModal() => ModalService.ShowModal(EditRequirementModal.Reference);
-    
+
     public void SetCurrentContext(ModificationAllowance modifcationAllowance)
     {
         modifcationAllowance.Requirements = modifcationAllowance.Requirements.AsList();
         CurrentContext = modifcationAllowance;
         StateHasChanged();
-    }    
+    }
 }

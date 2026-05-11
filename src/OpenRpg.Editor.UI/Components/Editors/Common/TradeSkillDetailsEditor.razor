@@ -1,8 +1,7 @@
 @using OpenRpg.Core.Associations
 @using OpenRpg.Core.Requirements
-@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Editor.UI.Services
 @using OpenRpg.Entities.Extensions
-@using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items.TradeSkills.Extensions
 @using OpenRpg.Items.TradeSkills.Variables
 
@@ -15,7 +14,7 @@
             <div class="control">
                 <div class="select is-fullwidth">
                     <select @bind="TradeSkillTemplateVariables.SkillType">
-                        @{ var gatheringTypes = IsGatheringSkill ? TypesHelper.GetGatheringSkillTypes : TypesHelper.GetCraftingSkillTypes; }
+                        @{ var gatheringTypes = IsGatheringSkill ? GenreTypes.GatheringSkillTypes : GenreTypes.CraftingSkillTypes; }
                         @foreach (var tradeSkillType in gatheringTypes)
                         {
                             <option value="@tradeSkillType.Id">@tradeSkillType.Name</option>
@@ -53,9 +52,12 @@
 </div>
 
 @code {
+    [Inject]
+    public GenreTypesService GenreTypes { get; set; }
+
     [Parameter]
     public IItemTradeSkillTemplateVariables TradeSkillTemplateVariables { get; set; }
-    
+
     [Parameter]
     public bool IsGatheringSkill { get; set; }
 
@@ -74,13 +76,13 @@
                 {
                     new Requirement
                     {
-                        RequirementType = FantasyRequirementTypes.TradeSkillRequirement,
+                        RequirementType = 100,
                         Association = new Association(TradeSkillTemplateVariables.SkillType, value)
                     }
                 };
                 return;
             }
-            
+
             var requirement = TradeSkillTemplateVariables.Requirements.GetTradeSkillRequirement(TradeSkillTemplateVariables.SkillType);
             requirement.Association = new Association(TradeSkillTemplateVariables.SkillType, value);
         }

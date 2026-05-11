@@ -1,20 +1,33 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OpenRpg.Editor.Core.Extensions;
 using OpenRpg.Editor.Core.Models;
+using OpenRpg.Projects.Models;
 
 namespace OpenRpg.Editor.Infrastructure.Persistence;
 
 public class CreateProjectExecutor(EditorState EditorState)
 {
-    public async Task<LoadedProject> Execute(string folderPath)
+    public async Task<LoadedProject> Execute(string folderPath, IEnumerable<string> enabledGenreIds = null)
     {
         if(string.IsNullOrEmpty(folderPath))
         { throw new ArgumentException("Folder path is empty", nameof(folderPath)); }
         
+        var plugins = new List<PluginDescriptor>();
+        if (enabledGenreIds != null)
+        {
+            foreach (var id in enabledGenreIds)
+            {
+                plugins.Add(new PluginDescriptor { Id = id });
+            }
+        }
+        
         var newProject = new LoadedProject { ProjectPath = folderPath };
+        newProject.Project.Plugins = plugins;
+        
         var projectFile = $"{folderPath}/project.json";
         var projectContent = JsonConvert.SerializeObject(newProject.Project, Formatting.Indented);
 

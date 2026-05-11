@@ -6,13 +6,15 @@
 @using OpenRpg.Editor.Core.Services.FileSystem
 @using OpenRpg.Editor.Infrastructure.Events
 @using OpenRpg.Editor.Infrastructure.Persistence
+@using OpenRpg.Editor.Infrastructure.Plugins
 @using OpenRpg.Editor.UI.Models
 
 @inject IFileBrowser FileBrowser
 @inject EditorState EditorState
 @inject CreateProjectExecutor CreateProjectExecutor;
 @inject EditorDataLoader EditorDataLoader;
-@inject IEventBus EventBus; 
+@inject IEventBus EventBus;
+@inject GenreService GenreService;
 
 <h1 class="title is-1">OpenRpg Data Editor</h1>
 
@@ -40,16 +42,75 @@
     }
 </div>
 
+@if (showGenreSelection)
+{
+    <div class="modal is-active">
+        <div class="modal-background" @onclick="() => showGenreSelection = false"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Select Genres</p>
+                <button class="delete" aria-label="close" @onclick="() => showGenreSelection = false"></button>
+            </header>
+            <section class="modal-card-body">
+                <p class="content">Choose the genre plugins to enable for this project:</p>
+                @if (GenreService.AvailableGenres.Any())
+                {
+                    <div class="field">
+                        @foreach (var genre in GenreService.AvailableGenres)
+                        {
+                            <div class="control">
+                                <label class="checkbox">
+                                    <input type="checkbox" @bind="selectedGenres[genre.Id]" />
+                                    @genre.Name (@genre.Version)
+                                </label>
+                                <p class="help">@genre.Description</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="notification is-warning">
+                        <p>No genre plugins found. Place genre DLLs in the Plugins folder.</p>
+                        <p class="content">You can download genre plugins and place them in the <code>Plugins/</code> folder.</p>
+                    </div>
+                }
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-primary" @onclick="ConfirmCreateProject">Create Project</button>
+                <button class="button" @onclick="() => showGenreSelection = false">Cancel</button>
+            </footer>
+        </div>
+    </div>
+}
 
 @code 
 {
+    private bool showGenreSelection = false;
+    private Dictionary<string, bool> selectedGenres = new();
+
     public async Task CreateProject()
     {
-        var projectFolder = FileBrowser.BrowseToFolder();
-        if(string.IsNullOrEmpty(projectFolder)) { return; }
+        GenreService.RefreshPlugins();
+        selectedGenres = GenreService.AvailableGenres.ToDictionary(g => g.Id, g => false);
+        showGenreSelection = true;
+    }
 
-        var newProject = await CreateProjectExecutor.Execute(projectFolder);
+    private async Task ConfirmCreateProject()
+    {
+        var projectFolder = FileBrowser.BrowseToFolder();
+        if (string.IsNullOrEmpty(projectFolder)) { return; }
+
+        var enabledGenreIds = selectedGenres.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
+        var newProject = await CreateProjectExecutor.Execute(projectFolder, enabledGenreIds);
         EditorState.CurrentProject = newProject;
+        
+        foreach (var genreId in enabledGenreIds)
+        {
+            GenreService.EnableGenre(genreId);
+        }
+        
+        showGenreSelection = false;
         EventBus.PublishAsync(new ProjectChangedEvent());
     }
     
@@ -59,6 +120,15 @@
         if(string.IsNullOrEmpty(projectFile)) { return; }
 
         await EditorDataLoader.Load(projectFile);
+        
+        if (EditorState.CurrentProject?.Project?.Plugins != null)
+        {
+            foreach (var plugin in EditorState.CurrentProject.Project.Plugins)
+            {
+                GenreService.EnableGenre(plugin.Id);
+            }
+        }
+        
         EventBus.PublishAsync(new ProjectChangedEvent());
     }
 }

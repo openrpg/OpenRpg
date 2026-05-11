@@ -1,6 +1,6 @@
 ﻿@using OpenRpg.Core.Associations
 @using OpenRpg.Core.Utils
-@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Editor.UI.Services
 @using OpenRpg.Quests
 
 <ListEditor Data="Rewards" TItem="Reward">
@@ -15,7 +15,7 @@
             <div class="control">
                 <div class="select is-fullwidth">
                     <select bind="@context.RewardType">
-                        @foreach (var rewardType in TypesHelper.GetRewardTypes)
+                        @foreach (var rewardType in GenreTypes.RewardTypes)
                         {
                             <option value=@rewardType.Id>@rewardType.Name</option>
                         }
@@ -43,6 +43,9 @@
     </RowTemplate>
 </ListEditor>
 
-@functions {
+@code {
+    [Inject]
+    public GenreTypesService GenreTypes { get; set; }
+
     [Parameter] public List<Reward> Rewards { get; set; }
 }

@@ -1,0 +1,226 @@
+@page "/genres"
+@using System.Reactive.Disposables
+@using OpenRpg.Editor.Core.Models
+@using OpenRpg.Editor.Core.Genres
+@using OpenRpg.Editor.Core.Services.Events.Bus
+@using OpenRpg.Editor.Infrastructure.Plugins
+@using OpenRpg.Editor.Infrastructure.Events
+@using OpenRpg.Editor.UI.Services
+@using System.Reactive.Linq
+
+@implements IDisposable
+
+@inject EditorState EditorState
+@inject GenrePluginLoader PluginLoader
+@inject GenreService GenreService
+@inject GenreTypesService GenreTypes
+@inject IEventBus EventBus
+
+<h1 class="title is-1">Genre Manager</h1>
+
+<div class="box">
+    <div class="content">
+        <p>Manage the genre plugins available in the editor. Drop genre DLL files into the <code>Plugins/</code> folder and click "Refresh" to load them.</p>
+    </div>
+
+    <div class="field">
+        <button class="button is-primary" @onclick="RefreshPlugins">
+            <span class="icon"><i class="fas fa-refresh" aria-hidden="true"></i></span>
+            <span>Refresh Plugins</span>
+        </button>
+    </div>
+</div>
+
+@if (!GenreService.HasGenresLoaded)
+{
+    <div class="box has-background-grey-dark">
+        <div class="content has-text-centered">
+            <span class="icon is-large">
+                <i class="fas fa-plug fa-3x" aria-hidden="true"></i>
+            </span>
+            <p class="title is-4 mt-4">No Genre Plugins Loaded</p>
+            <p class="subtitle is-6">Drop genre plugin DLLs into the Plugins folder to get started.</p>
+            <p class="content">
+                <small>The Plugins folder is located at: <code>@PluginPath</code></small>
+            </p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="box">
+        <h2 class="title is-3">Available Genres</h2>
+        <table class="table is-fullwidth is-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Version</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var plugin in PluginLoader.LoadedPlugins)
+                {
+                    <tr>
+                        <td><strong>@plugin.Name</strong></td>
+                        <td><code>@plugin.Id</code></td>
+                        <td>@plugin.Version</td>
+                        <td>@plugin.Description</td>
+                        <td>
+                            @if (IsGenreEnabled(plugin))
+                            {
+                                <span class="tag is-success">Enabled</span>
+                            }
+                            else
+                            {
+                                <span class="tag is-light">Disabled</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="buttons are-small">
+                                @if (IsGenreEnabled(plugin))
+                                {
+                                    <button class="button is-warning" @onclick="() => DisableGenre(plugin)">
+                                        <span class="icon"><i class="fas fa-ban" aria-hidden="true"></i></span>
+                                        <span>Disable</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="button is-success" @onclick="() => EnableGenre(plugin)">
+                                        <span class="icon"><i class="fas fa-check" aria-hidden="true"></i></span>
+                                        <span>Enable</span>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (GenreService.HasEnabledGenres)
+    {
+        <div class="box">
+            <h2 class="title is-3">Enabled Genres</h2>
+            <div class="tags">
+                @foreach (var genre in GenreService.EnabledGenres)
+                {
+                    <span class="tag is-primary is-medium">@genre.Name</span>
+                }
+            </div>
+            <div class="content mt-4">
+                <p><strong>Type Summary:</strong></p>
+                <ul>
+                    <li>Item Types: @GetTotalTypeCount(GenreService.GetCombinedTypesProvider().ItemTypes)</li>
+                    <li>Requirement Types: @GetTotalTypeCount(GenreService.GetCombinedTypesProvider().RequirementTypes)</li>
+                    <li>Effect Types: @GetTotalTypeCount(GenreService.GetCombinedTypesProvider().EffectTypes)</li>
+                </ul>
+            </div>
+        </div>
+    }
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="notification is-danger is-light">
+        <button class="delete" @onclick="() => ErrorMessage = null"></button>
+        @ErrorMessage
+    </div>
+}
+
+@code {
+    private IDisposable _subscription;
+    private List<System.Reactive.Disposables.CompositeDisposable> _composites = new();
+
+    public string PluginPath { get; set; } = "";
+    public string ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        PluginPath = OpenRpg.Editor.Core.Services.Paths.PathHelper.PluginPath;
+
+        var composite = new System.Reactive.Disposables.CompositeDisposable();
+        _composites.Add(composite);
+        _subscription = EventBus.Receive<ProjectChangedEvent>().Subscribe(_ => InvokeAsync(StateHasChanged));
+        composite.Add(_subscription);
+
+        RefreshPlugins();
+    }
+
+    public void RefreshPlugins()
+    {
+        ErrorMessage = null;
+        PluginLoader.LoadPluginsAsync();
+        StateHasChanged();
+    }
+
+    public bool IsGenreEnabled(IGenrePlugin plugin)
+    {
+        return GenreService.EnabledGenres.Any(g => g.Id == plugin.Id);
+    }
+
+    public async Task EnableGenre(IGenrePlugin plugin)
+    {
+        var validation = GenreService.ValidateGenreCombination(plugin);
+        if (!validation.IsValid)
+        {
+            ErrorMessage = validation.ErrorMessage;
+            return;
+        }
+
+        GenreService.EnableGenre(plugin);
+        UpdateGenreTypes();
+        await NotifyChange();
+    }
+
+    public async Task DisableGenre(IGenrePlugin plugin)
+    {
+        GenreService.DisableGenre(plugin.Id);
+        UpdateGenreTypes();
+        await NotifyChange();
+    }
+
+    private void UpdateGenreTypes()
+    {
+        if (GenreService.HasEnabledGenres)
+        {
+            GenreTypes.SetTypesProvider(GenreService.GetCombinedTypesProvider());
+        }
+        else
+        {
+            GenreTypes.SetTypesProvider(new EmptyTypesProvider());
+        }
+    }
+
+    private async Task NotifyChange()
+    {
+        EditorState.AvailableGenres = PluginLoader.LoadedPlugins;
+        EditorState.EnabledGenres = GenreService.EnabledGenres;
+        EditorState.CurrentTypesProvider = GenreService.HasEnabledGenres
+            ? GenreService.GetCombinedTypesProvider()
+            : null;
+        EventBus.PublishAsync(new ProjectChangedEvent());
+        await Task.CompletedTask;
+    }
+
+    private int GetTotalTypeCount(OptionData[] types)
+    {
+        return types?.Length ?? 0;
+    }
+
+    public void Dispose()
+    {
+        foreach (var composite in _composites)
+        {
+            composite.Dispose();
+        }
+        _composites.Clear();
+    }
+}
