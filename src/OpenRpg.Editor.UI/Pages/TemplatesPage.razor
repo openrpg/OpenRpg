@@ -1,0 +1,326 @@
+@page "/templates"
+@page "/templates/{TemplateType}"
+
+@using System
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Collections
+@using System.Linq
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Core.Plugins
+@using OpenRpg.Editor.Core.Services.Notifications
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Plugins
+@using OpenRpg.Editor.UI.Components.Editors
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Localization.Data.Repositories
+@using OpenRpg.Quests
+@using OpenRpg.Items.Templates
+@using OpenRpg.Items.TradeSkills.Templates
+@using OpenRpg.Entities.Classes.Templates
+@using OpenRpg.Entities.Races.Templates
+@using OpenRpg.Editor.Infrastructure.Services
+
+@inject INotifier Notifier
+@inject IRepository Repository
+@inject ILocaleRepository LocaleRepository
+@inject ICloner Cloner
+@inject NavigationManager NavigationManager
+@inject GenreService GenreService
+
+<div class="columns">
+    <div class="column is-one-fifth">
+        @if (Descriptor != null)
+        {
+            <div class="box">
+                <div class="content">
+                    <h4 class="title is-5">@Descriptor.Name</h4>
+                    <p class="mb-2">
+                        <span class="tag is-info">@TemplateType</span>
+                    </p>
+                    <button class="button is-primary is-fullwidth" @onclick="AddTemplate">
+                        <span class="icon"><i class="fas fa-plus"></i></span>
+                        <span>Add New</span>
+                    </button>
+                </div>
+            </div>
+            <div class="box">
+                <p class="menu-label">@Descriptor.Name</p>
+                <ul class="menu-list">
+                    @foreach (var template in GetTemplateList())
+                    {
+                        var id = template.GetType().GetProperty("Id")?.GetValue(template) as int? ?? 0;
+                        var assetCode = template.GetType().GetProperty("Variables")?.PropertyType
+                            .GetProperty("AssetCode")?.GetValue(template.GetType().GetProperty("Variables")?.GetValue(template))?.ToString() ?? "Unknown";
+                        
+                        <li>
+                            <a class="@(CurrentTemplate == template ? "is-active" : "")" @onclick="() => SelectTemplate(template)">
+                                <span class="icon-text">
+                                    <span class="icon"><i class="fas fa-file-alt"></i></span>
+                                    <span>@assetCode</span>
+                                </span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+        else
+        {
+            <div class="box">
+                <p class="content">Select a template type to edit:</p>
+                @foreach (var type in GetTemplateTypes())
+                {
+                    <button class="button is-fullwidth mb-2 is-align-items-center" @onclick="() => NavigateToType(type.Key)">
+                        <span class="icon mr-2">
+                            <i class="fas fa-file-alt"></i>
+                        </span>
+                        <span>@type.Name</span>
+                    </button>
+                }
+            </div>
+        }
+    </div>
+    <div class="column">
+        @if (CurrentTemplate != null && Descriptor != null)
+        {
+            @switch (Descriptor.Key)
+            {
+                case "item":
+                    <DynamicTemplateEditor ItemTemplate Template="@GetItemTemplate()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
+                    break;
+                case "class":
+                    <DynamicTemplateEditor ClassTemplate Template="@GetClassTemplate()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
+                    break;
+                case "race":
+                    <DynamicTemplateEditor RaceTemplate Template="@GetRaceTemplate()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
+                    break;
+                case "quest":
+                    <DynamicTemplateEditor Quest Template="@GetQuest()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
+                    break;
+                case "crafting":
+                    <DynamicTemplateEditor ItemCraftingTemplate Template="@GetCraftingTemplate()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
+                    break;
+                case "gathering":
+                    <DynamicTemplateEditor ItemGatheringTemplate Template="@GetGatheringTemplate()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
+                    break;
+                default:
+                    <div class="notification is-warning">Unknown template type: @Descriptor.Key</div>
+                    break;
+            }
+        }
+        else if (Descriptor != null)
+        {
+            <div class="notification is-info">
+                No @Descriptor.Name selected. Click "Add New" above to create one.
+            </div>
+        }
+        else
+        {
+            <div class="notification is-warning">
+                Please select a template type from the left panel.
+            </div>
+        }
+    </div>
+</div>
+
+@if (CurrentTemplate != null)
+{
+    <div class="container m-4">
+        <div class="field is-grouped has-text-centered">
+            <p class="control">
+                <a class="button is-info" @onclick="CloneTemplate">
+                    Clone @(FriendlyName) Template
+                </a>
+            </p>
+            <p class="control">
+                <a class="button is-danger" @onclick="DeleteTemplate">
+                    Delete @(FriendlyName) Template
+                </a>
+            </p>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string TemplateType { get; set; }
+
+    private ITemplateTypeDescriptor Descriptor;
+    private object CurrentTemplate;
+    private Type _templateType;
+    private string FriendlyName = "";
+    private MethodInfo _getAllMethod;
+    private MethodInfo _createMethod;
+    private MethodInfo _deleteMethod;
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrEmpty(TemplateType))
+        {
+            LoadTemplateType();
+        }
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrEmpty(TemplateType))
+        {
+            LoadTemplateType();
+        }
+        else
+        {
+            Descriptor = null;
+            CurrentTemplate = null;
+        }
+        base.OnParametersSet();
+    }
+
+    private void LoadTemplateType()
+    {
+        var registry = GenreService.GetTemplateTypeRegistry();
+        Descriptor = registry.GetTemplateType(TemplateType);
+
+        if (Descriptor == null)
+        {
+            return;
+        }
+
+        _templateType = Type.GetType(Descriptor.TemplateTypeName);
+        if (_templateType == null)
+        {
+            return;
+        }
+
+        FriendlyName = Descriptor.Name;
+        _getAllMethod = typeof(IRepository).GetMethod("GetAll")?.MakeGenericMethod(_templateType);
+        _createMethod = typeof(IRepository).GetMethod("Create")?.MakeGenericMethod(_templateType);
+        _deleteMethod = typeof(IRepository).GetMethod("Delete")?.MakeGenericMethod(_templateType);
+
+        var templates = _getAllMethod?.Invoke(Repository, null) as IEnumerable;
+        CurrentTemplate = templates?.Cast<object>().FirstOrDefault();
+
+        if (CurrentTemplate == null)
+        {
+            AddTemplate();
+        }
+    }
+
+    private IEnumerable<ITemplateTypeDescriptor> GetTemplateTypes()
+    {
+        var registry = GenreService.GetTemplateTypeRegistry();
+        return registry.GetTemplateTypes();
+    }
+
+    private List<object> GetTemplateList()
+    {
+        if (_getAllMethod == null) return new List<object>();
+        var templates = _getAllMethod.Invoke(Repository, null) as IEnumerable;
+        return templates?.Cast<object>().ToList() ?? new List<object>();
+    }
+
+    private void NavigateToType(string type)
+    {
+        NavigationManager.NavigateTo($"/templates/{type}");
+    }
+
+    private void AddTemplate()
+    {
+        var newId = GetNewId();
+        var newTemplate = Activator.CreateInstance(_templateType);
+        if (newTemplate == null) return;
+
+        var setIdMethod = newTemplate.GetType().GetMethod("SetId");
+        setIdMethod?.Invoke(newTemplate, new object[] { newId });
+
+        var listifyMethod = newTemplate.GetType().GetMethod("ListifyProperties");
+        listifyMethod?.Invoke(newTemplate, null);
+
+        var variablesProperty = newTemplate.GetType().GetProperty("Variables");
+        var assetCodeProperty = variablesProperty?.PropertyType.GetProperty("AssetCode");
+        assetCodeProperty?.SetValue(variablesProperty?.GetValue(newTemplate), $"{Descriptor.AssetCodePrefix}-{newId}");
+
+        var generateLocaleMethod = newTemplate.GetType().GetMethod("GenerateLocaleCodes");
+        var assetCode = assetCodeProperty?.GetValue(variablesProperty?.GetValue(newTemplate))?.ToString() ?? "";
+        generateLocaleMethod?.Invoke(newTemplate, new object[] { assetCode });
+
+        _createMethod?.Invoke(Repository, new object[] { newTemplate });
+
+        CurrentTemplate = newTemplate;
+        StateHasChanged();
+    }
+
+    private void SelectTemplate(object template)
+    {
+        var listifyMethod = template.GetType().GetMethod("ListifyProperties");
+        listifyMethod?.Invoke(template, null);
+        CurrentTemplate = template;
+        StateHasChanged();
+    }
+
+    private int GetNewId()
+    {
+        var templates = _getAllMethod?.Invoke(Repository, null) as IEnumerable;
+        var count = templates?.Cast<object>().Count() ?? 0;
+        return count + 1;
+    }
+
+    private async Task DeleteTemplate()
+    {
+        if (CurrentTemplate == null) return;
+
+        var idProperty = CurrentTemplate.GetType().GetProperty("Id");
+        var id = idProperty?.GetValue(CurrentTemplate) as int? ?? 0;
+
+        _deleteMethod?.Invoke(Repository, new object[] { id });
+
+        await Notifier.ShowNotification($"Deleted {FriendlyName} Template");
+
+        var templates = _getAllMethod?.Invoke(Repository, null) as IEnumerable;
+        CurrentTemplate = templates?.Cast<object>().FirstOrDefault();
+
+        if (CurrentTemplate == null)
+        {
+            AddTemplate();
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task CloneTemplate()
+    {
+        if (CurrentTemplate == null) return;
+
+        var clone = Cloner.Clone(CurrentTemplate);
+
+        var setIdMethod = clone.GetType().GetMethod("SetId");
+        setIdMethod?.Invoke(clone, new object[] { GetNewId() });
+
+        var listifyMethod = clone.GetType().GetMethod("ListifyProperties");
+        listifyMethod?.Invoke(clone, null);
+
+        var variablesProperty = clone.GetType().GetProperty("Variables");
+        var assetCodeProperty = variablesProperty?.PropertyType.GetProperty("AssetCode");
+        var currentAssetCode = assetCodeProperty?.GetValue(variablesProperty?.GetValue(clone))?.ToString() ?? "";
+        assetCodeProperty?.SetValue(variablesProperty?.GetValue(clone), $"{currentAssetCode}-clone");
+
+        var generateLocaleMethod = clone.GetType().GetMethod("GenerateLocaleCodes");
+        generateLocaleMethod?.Invoke(clone, new object[] { $"{currentAssetCode}-clone" });
+
+        _createMethod?.Invoke(Repository, new object[] { clone });
+
+        await Notifier.ShowNotification($"Cloned {FriendlyName} Template");
+
+        CurrentTemplate = clone;
+        StateHasChanged();
+    }
+
+    private ItemTemplate GetItemTemplate() => CurrentTemplate as ItemTemplate;
+    private ClassTemplate GetClassTemplate() => CurrentTemplate as ClassTemplate;
+    private RaceTemplate GetRaceTemplate() => CurrentTemplate as RaceTemplate;
+    private Quest GetQuest() => CurrentTemplate as Quest;
+    private ItemCraftingTemplate GetCraftingTemplate() => CurrentTemplate as ItemCraftingTemplate;
+    private ItemGatheringTemplate GetGatheringTemplate() => CurrentTemplate as ItemGatheringTemplate;
+}

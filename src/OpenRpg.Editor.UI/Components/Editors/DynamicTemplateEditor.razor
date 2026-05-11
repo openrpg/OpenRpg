@@ -1,0 +1,267 @@
+@using System
+@using System.Reflection
+@using System.Collections.Generic
+@using System.Linq
+@using Microsoft.AspNetCore.Components
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Editor.Core.Plugins
+@using OpenRpg.Editor.Infrastructure.Editors
+@using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Localization.Data.Repositories
+@using OpenRpg.Quests
+
+@typeparam TTemplate where TTemplate : class, OpenRpg.Core.Templates.ITemplate, OpenRpg.Core.Variables.General.IHasVariables<OpenRpg.Core.Templates.Variables.ITemplateVariables>, new()
+
+@inject ILocaleRepository LocaleRepository
+
+<div class="container">
+    <Accordion Title="Template Asset Details" IsExpanded="true">
+        <BasicDetailsEditor Data="Template">
+            <AdditionalContent>
+                <AssetCodeEditor Variables="Template.Variables" 
+                                 DefaultAssetCode="@($"{AssetCodePrefix}-{Template.Id}")" 
+                                 OnAssetCodeChanged="OnAssetCodeChanged"/>
+            </AdditionalContent>
+        </BasicDetailsEditor>
+    </Accordion>
+
+    <Accordion Title="Locale Details" IsExpanded="true">
+        <LocaleDetails LocaleData="Template" />
+    </Accordion>
+
+    @if (PrimaryDetailsContent != null)
+    {
+        @PrimaryDetailsContent(Template)
+    }
+    
+    @foreach (var sec in GetSections())
+    {
+        <Accordion Title="@sec.Title" IsExpanded="true">
+            @RenderSection(sec)
+        </Accordion>
+    }
+
+    @if (Template.Variables.HasEffects())
+    {
+        <Accordion Title="Template Effects" IsExpanded="true">
+            <EffectsEditor Effects="Template.Variables.Effects as List<IEffect>"/>
+        </Accordion>
+    }
+
+    @if (Template.Variables.HasRequirements())
+    {
+        <Accordion Title="Template Requirements" IsExpanded="true">
+            <RequirementsEditor Requirements="Template.Variables.Requirements as List<Requirement>" />
+        </Accordion>
+    }
+
+    @if (SecondaryDetailsContent != null)
+    {
+        @SecondaryDetailsContent(Template)
+    }
+</div>
+
+@code {
+    [Parameter]
+    public TTemplate Template { get; set; }
+    
+    [Parameter]
+    public RenderFragment<TTemplate> AvatarContent { get; set; }
+    
+    [Parameter]
+    public RenderFragment<TTemplate> PrimaryDetailsContent { get; set; }
+    
+    [Parameter]
+    public RenderFragment<TTemplate> SecondaryDetailsContent { get; set; }
+    
+    [Parameter]
+    public string AssetCodePrefix { get; set; }
+    
+    [Parameter]
+    public IReadOnlyList<SectionDefinition> Sections { get; set; } = new List<SectionDefinition>();
+    
+    public string FriendlyName { get; set; } = "";
+
+    private Type _templateType;
+    private Dictionary<string, PropertyInfo> _propertyMap = new();
+
+    protected override void OnInitialized()
+    {
+        FriendlyName = AssetCodePrefix?.Capitalize() ?? "Template";
+        Template.ListifyProperties();
+        _templateType = typeof(TTemplate);
+        BuildPropertyMap();
+        base.OnInitialized();
+    }
+
+    private void BuildPropertyMap()
+    {
+        _propertyMap.Clear();
+        var properties = _templateType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        foreach (var prop in properties)
+        {
+            _propertyMap[prop.Name] = prop;
+        }
+    }
+
+    private IEnumerable<SectionDefinition> GetSections()
+    {
+        if (Sections != null && Sections.Count > 0)
+        {
+            return Sections;
+        }
+
+        var conventions = new List<SectionDefinition>();
+        var properties = _templateType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        
+        foreach (var prop in properties)
+        {
+            var editorType = TemplateEditorConventions.GetEditorType(prop.Name);
+            if (editorType == "scalar") continue;
+            
+            var section = new SectionDefinition
+            {
+                Title = prop.Name,
+                Property = prop.Name,
+                EditorType = editorType
+            };
+
+            if (editorType == "collection")
+            {
+                var elementType = TemplateEditorConventions.GetCollectionElementType(prop);
+                section.EditorComponent = TemplateEditorConventions.GetCollectionComponent(elementType);
+            }
+
+            conventions.Add(section);
+        }
+
+        return conventions;
+    }
+
+    private RenderFragment RenderSection(SectionDefinition sec)
+    {
+        if (string.IsNullOrEmpty(sec.Property)) return null;
+
+        if (!_propertyMap.TryGetValue(sec.Property, out var property))
+        {
+            return @<div class="notification is-warning">Property '@sec.Property' not found on @FriendlyName</div>;
+        }
+
+        var editorType = sec.EditorType ?? TemplateEditorConventions.GetEditorType(sec.Property);
+
+        return editorType switch
+        {
+            "collection" => RenderCollection(property, sec),
+            "enumDropdown" => RenderEnumDropdown(property, sec),
+            "variableField" => RenderVariableField(property, sec),
+            _ => RenderScalar(property, sec)
+        };
+    }
+
+    private RenderFragment RenderCollection(PropertyInfo property, SectionDefinition sec)
+    {
+        var elementType = TemplateEditorConventions.GetCollectionElementType(property);
+        var componentName = sec.EditorComponent ?? TemplateEditorConventions.GetCollectionComponent(elementType);
+        var collection = GetCollection(property);
+
+        return componentName switch
+        {
+            "ObjectivesEditor" => @<ObjectivesEditor Objectives="@GetObjectivesList()" />,
+            "RewardsEditor" => @<RewardsEditor Rewards="@GetRewardsList()" />,
+            "ModificationAllowancesEditor" => @<ModificationAllowancesEditor ModificationAllowances="@GetModificationAllowancesList()" />,
+            "TradeSkillItemEntriesEditor" => @<TradeSkillItemEntriesEditor TradeSkillItemEntries="@GetTradeSkillItemsList()" />,
+            _ => @<div class="notification">[@property.Name - Collection Editor: @componentName]</div>
+        };
+    }
+
+    private List<Objective> GetObjectivesList()
+    {
+        var value = _propertyMap.GetValueOrDefault("Objectives")?.GetValue(Template) as IEnumerable<Objective>;
+        return value?.ToList() ?? new List<Objective>();
+    }
+
+    private List<Reward> GetRewardsList()
+    {
+        return new List<Reward>();
+    }
+
+    private List<OpenRpg.Entities.Modifications.ModificationAllowance> GetModificationAllowancesList()
+    {
+        return new List<OpenRpg.Entities.Modifications.ModificationAllowance>();
+    }
+
+    private List<OpenRpg.Items.TradeSkills.TradeSkillItemEntry> GetTradeSkillItemsList()
+    {
+        return new List<OpenRpg.Items.TradeSkills.TradeSkillItemEntry>();
+    }
+
+    private IEnumerable<object> GetCollection(PropertyInfo property)
+    {
+        var value = property.GetValue(Template);
+        if (value is IEnumerable<object> enumerable)
+        {
+            return enumerable;
+        }
+        return Enumerable.Empty<object>();
+    }
+
+    private RenderFragment RenderEnumDropdown(PropertyInfo property, SectionDefinition sec)
+    {
+        var typeSource = sec.Options.GetValueOrDefault("typeSource") ?? TemplateEditorConventions.GetTypeSource(property.Name);
+        var currentValue = property.GetValue(Template) as int? ?? 0;
+
+        return @<div class="field">
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select value="@currentValue" @onchange="@(e => property.SetValue(Template, int.Parse(e.Value?.ToString() ?? "0")))">
+                        <option value="0">@typeSource options</option>
+                    </select>
+                </div>
+            </div>
+        </div>;
+    }
+
+    private RenderFragment RenderVariableField(PropertyInfo property, SectionDefinition sec)
+    {
+        var fieldName = property.Name.Replace("Variables.", "");
+        var variablesType = _templateType.GetProperty("Variables")?.PropertyType;
+        var field = variablesType?.GetProperty(fieldName);
+        var currentValue = field?.GetValue(Template.Variables)?.ToString() ?? "";
+
+        return @<div class="field">
+            <div class="control">
+                <input class="input" type="text" value="@currentValue" @onchange="@(e => SetVariablesFieldValue(property, e.Value))" />
+            </div>
+        </div>;
+    }
+
+    private RenderFragment RenderScalar(PropertyInfo property, SectionDefinition sec)
+    {
+        return @<div class="notification is-info">[@property.Name: @property.PropertyType.Name]</div>;
+    }
+
+    private void SetVariablesFieldValue(PropertyInfo property, object newValue)
+    {
+        var fieldName = property.Name.Replace("Variables.", "");
+        var variablesType = _templateType.GetProperty("Variables")?.PropertyType;
+        var field = variablesType?.GetProperty(fieldName);
+        if (field != null)
+        {
+            if (field.PropertyType == typeof(int))
+            {
+                field.SetValue(Template.Variables, int.TryParse(newValue?.ToString(), out var result) ? result : 0);
+            }
+            else
+            {
+                field.SetValue(Template.Variables, newValue);
+            }
+        }
+    }
+
+    public void OnAssetCodeChanged(string newAssetCode)
+    { 
+        Template.UpdateLocale(newAssetCode, LocaleRepository);
+    }
+}

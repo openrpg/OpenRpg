@@ -22,7 +22,11 @@
     "item": {
       "name": "Item Template",
       "templateType": "OpenRpg.Items.Templates.ItemTemplate, OpenRpg.Items",
-      "assetCodePrefix": "item"
+      "assetCodePrefix": "item",
+      "sections": [
+        { "title": "Item Details", "property": "ItemType", "editorType": "enumDropdown" },
+        { "title": "Modification Allowances", "property": "ModificationAllowances", "editorComponent": "ModificationAllowancesEditor" }
+      ]
     },
     "class": {
       "name": "Class Template",
@@ -35,19 +39,33 @@
       "assetCodePrefix": "race"
     },
     "quest": {
-      "name": "Quest Template",
+      "name": "Quest",
       "templateType": "OpenRpg.Quests.Quest, OpenRpg.Quests",
-      "assetCodePrefix": "quest"
+      "assetCodePrefix": "quest",
+      "sections": [
+        { "title": "Objectives", "property": "Objectives", "editorComponent": "ObjectivesEditor" },
+        { "title": "Quest Gifts", "property": "Gifts", "editorComponent": "RewardsEditor" },
+        { "title": "Quest Rewards", "property": "Rewards", "editorComponent": "RewardsEditor" }
+      ]
     },
     "crafting": {
       "name": "Crafting Template",
       "templateType": "OpenRpg.Items.TradeSkills.Templates.ItemCraftingTemplate, OpenRpg.Items.TradeSkills",
-      "assetCodePrefix": "crafting"
+      "assetCodePrefix": "crafting",
+      "sections": [
+        { "title": "Skill Details", "property": "SkillType", "editorType": "enumDropdown" },
+        { "title": "Input Items", "property": "InputItems", "editorComponent": "TradeSkillItemEntriesEditor" },
+        { "title": "Output Items", "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
+      ]
     },
     "gathering": {
       "name": "Gathering Template",
       "templateType": "OpenRpg.Items.TradeSkills.Templates.ItemGatheringTemplate, OpenRpg.Items.TradeSkills",
-      "assetCodePrefix": "gathering"
+      "assetCodePrefix": "gathering",
+      "sections": [
+        { "title": "Skill Details", "property": "SkillType", "editorType": "enumDropdown" },
+        { "title": "Output Items", "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
+      ]
     }
   }
 }
