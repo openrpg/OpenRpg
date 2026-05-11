@@ -25,4 +25,8 @@
         <ProjectReference Include="..\OpenRpg.Projects.Json\OpenRpg.Projects.Json.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="Plugins\default-manifest.json" />
+    </ItemGroup>
+
 </Project>

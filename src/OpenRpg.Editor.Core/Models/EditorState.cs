@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using OpenRpg.Editor.Core.Genres;
+using OpenRpg.Editor.Core.Plugins;
 using OpenRpg.Projects.Models;
 
 namespace OpenRpg.Editor.Core.Models;
@@ -7,8 +7,8 @@ namespace OpenRpg.Editor.Core.Models;
 public class EditorState
 {
     public LoadedProject CurrentProject { get; set; }
-    public IReadOnlyList<IGenrePlugin> AvailableGenres { get; set; } = new List<IGenrePlugin>();
-    public IReadOnlyList<IGenrePlugin> EnabledGenres { get; set; } = new List<IGenrePlugin>();
+    public IReadOnlyList<EditorPluginInfo> AvailableGenres { get; set; } = new List<EditorPluginInfo>();
+    public IReadOnlyList<EditorPluginInfo> EnabledGenres { get; set; } = new List<EditorPluginInfo>();
 
     public bool HasGenresLoaded => AvailableGenres.Count > 0;
     public bool HasEnabledGenres => EnabledGenres.Count > 0;

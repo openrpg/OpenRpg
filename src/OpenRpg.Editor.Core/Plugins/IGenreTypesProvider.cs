@@ -1,10 +1,9 @@
-namespace OpenRpg.Editor.Core.Genres;
+namespace OpenRpg.Editor.Core.Plugins;
 
 public interface IGenreTypesProvider
 {
-    string GenreId { get; }
-    string GenreName { get; }
-
+    string PluginId { get; }
+    
     OptionData[] ItemTypes { get; }
     OptionData[] ItemQualityTypes { get; }
     OptionData[] RequirementTypes { get; }

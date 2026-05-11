@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0.0",
+  "pluginId": "default",
+  "name": "Default Types",
+  "version": "1.0.0",
+  "description": "Built-in base types and templates from OpenRpg library",
+  "typeSources": {
+    "itemTypes": "OpenRpg.Genres.Types.GenresItemTypes, OpenRpg.Genres",
+    "itemQualityTypes": "OpenRpg.Genres.Types.GenresItemQualityTypes, OpenRpg.Genres",
+    "requirementTypes": "OpenRpg.Genres.Types.GenreRequirementTypes, OpenRpg.Genres",
+    "effectTypes": "OpenRpg.Genres.Types.GenreEffectTypes, OpenRpg.Genres",
+    "rewardTypes": "OpenRpg.Genres.Types.GenreRewardTypes, OpenRpg.Genres",
+    "modificationTypes": "OpenRpg.Genres.Types.GenreModificationTypes, OpenRpg.Genres",
+    "objectiveTypes": "OpenRpg.Quests.Types.GenresObjectiveTypes, OpenRpg.Quests",
+    "effectScalingType": "OpenRpg.Entities.Types.CoreEffectScalingTypes, OpenRpg.Entities",
+    "statTypes": "OpenRpg.Genres.Types.GenreEntityStatsVariableTypes, OpenRpg.Genres",
+    "stateTypes": "OpenRpg.Genres.Types.GenreEntityStateVariableTypes, OpenRpg.Genres",
+    "craftingSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills",
+    "gatheringSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills"
+  },
+  "templateTypes": {
+    "item": {
+      "name": "Item Template",
+      "templateType": "OpenRpg.Items.Templates.ItemTemplate, OpenRpg.Items",
+      "assetCodePrefix": "item"
+    },
+    "class": {
+      "name": "Class Template",
+      "templateType": "OpenRpg.Entities.Classes.Templates.ClassTemplate, OpenRpg.Entities",
+      "assetCodePrefix": "class"
+    },
+    "race": {
+      "name": "Race Template",
+      "templateType": "OpenRpg.Entities.Races.Templates.RaceTemplate, OpenRpg.Entities",
+      "assetCodePrefix": "race"
+    },
+    "quest": {
+      "name": "Quest Template",
+      "templateType": "OpenRpg.Quests.Quest, OpenRpg.Quests",
+      "assetCodePrefix": "quest"
+    },
+    "crafting": {
+      "name": "Crafting Template",
+      "templateType": "OpenRpg.Items.TradeSkills.Templates.ItemCraftingTemplate, OpenRpg.Items.TradeSkills",
+      "assetCodePrefix": "crafting"
+    },
+    "gathering": {
+      "name": "Gathering Template",
+      "templateType": "OpenRpg.Items.TradeSkills.Templates.ItemGatheringTemplate, OpenRpg.Items.TradeSkills",
+      "assetCodePrefix": "gathering"
+    }
+  }
+}

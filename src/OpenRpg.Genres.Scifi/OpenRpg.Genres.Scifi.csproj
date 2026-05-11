@@ -16,4 +16,8 @@
       <ProjectReference Include="..\OpenRpg.Genres\OpenRpg.Genres.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="manifest.json" />
+    </ItemGroup>
+
 </Project>

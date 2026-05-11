@@ -9,6 +9,7 @@ using OpenRpg.Editor.Core.Services.Notifications;
 using OpenRpg.Editor.Core.Services.Threading;
 using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Editor.Infrastructure.Persistence;
+using OpenRpg.Editor.Infrastructure.Persistence.Loaders;
 using OpenRpg.Editor.Infrastructure.Persistence.Migrations;
 using OpenRpg.Editor.Infrastructure.Plugins;
 using OpenRpg.Editor.Infrastructure.Services;
@@ -67,9 +68,11 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<ILocaleDataSource>(x => x.GetService<EditorLocaleDatasource>());
             services.AddSingleton<ILocaleRepository>(x => new LocaleRepository(x.GetService<EditorLocaleDatasource>(), "en-gb"));
             
-            services.AddSingleton<GenrePluginLoader>();
+            services.AddSingleton<ManifestPluginLoader>();
             services.AddSingleton<GenreService>();
             services.AddSingleton<GenreTypesService>();
+            services.AddSingleton<DynamicTemplateDatastorePopulator>();
+            services.AddSingleton<ITemplateDatastorePopulator>(sp => sp.GetRequiredService<DynamicTemplateDatastorePopulator>());
         }
     }
 }

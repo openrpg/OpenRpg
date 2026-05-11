@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Components;
-using OpenRpg.Editor.Core.Genres;
+using OpenRpg.Editor.Core.Plugins;
 
 namespace OpenRpg.Editor.UI.Services;
 
@@ -33,9 +33,7 @@ public class GenreTypesService
 
 public class EmptyTypesProvider : IGenreTypesProvider
 {
-    public string GenreId => "none";
-    public string GenreName => "No Genre Loaded";
-
+    public string PluginId => "empty";
     public OptionData[] ItemTypes => Array.Empty<OptionData>();
     public OptionData[] ItemQualityTypes => Array.Empty<OptionData>();
     public OptionData[] RequirementTypes => Array.Empty<OptionData>();

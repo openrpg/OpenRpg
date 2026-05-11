@@ -1,7 +1,7 @@
 @page "/genres"
 @using System.Reactive.Disposables
 @using OpenRpg.Editor.Core.Models
-@using OpenRpg.Editor.Core.Genres
+@using OpenRpg.Editor.Core.Plugins
 @using OpenRpg.Editor.Core.Services.Events.Bus
 @using OpenRpg.Editor.Infrastructure.Plugins
 @using OpenRpg.Editor.Infrastructure.Events
@@ -11,7 +11,6 @@
 @implements IDisposable
 
 @inject EditorState EditorState
-@inject GenrePluginLoader PluginLoader
 @inject GenreService GenreService
 @inject GenreTypesService GenreTypes
 @inject IEventBus EventBus
@@ -31,7 +30,7 @@
     </div>
 </div>
 
-@if (!GenreService.HasGenresLoaded)
+@if (!GenreService.HasLoadErrors && GenreService.AvailablePlugins.Count == 0)
 {
     <div class="box has-background-grey-dark">
         <div class="content has-text-centered">
@@ -62,11 +61,11 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var plugin in PluginLoader.LoadedPlugins)
+                @foreach (var plugin in GenreService.AvailablePlugins)
                 {
                     <tr>
                         <td><strong>@plugin.Name</strong></td>
-                        <td><code>@plugin.Id</code></td>
+                        <td><code>@plugin.PluginId</code></td>
                         <td>@plugin.Version</td>
                         <td>@plugin.Description</td>
                         <td>
@@ -103,12 +102,12 @@ else
         </table>
     </div>
 
-    @if (GenreService.HasEnabledGenres)
+    @if (GenreService.EnabledPlugins.Count > 0)
     {
         <div class="box">
             <h2 class="title is-3">Enabled Genres</h2>
             <div class="tags">
-                @foreach (var genre in GenreService.EnabledGenres)
+                @foreach (var genre in GenreService.EnabledPlugins)
                 {
                     <span class="tag is-primary is-medium">@genre.Name</span>
                 }
@@ -125,11 +124,16 @@ else
     }
 }
 
-@if (!string.IsNullOrEmpty(ErrorMessage))
+@if (GenreService.HasLoadErrors)
 {
     <div class="notification is-danger is-light">
-        <button class="delete" @onclick="() => ErrorMessage = null"></button>
-        @ErrorMessage
+        <strong>Plugin Load Errors:</strong>
+        <ul>
+            @foreach (var error in GenreService.LoadErrors)
+            {
+                <li>@error</li>
+            }
+        </ul>
     </div>
 }
 
@@ -138,7 +142,6 @@ else
     private List<System.Reactive.Disposables.CompositeDisposable> _composites = new();
 
     public string PluginPath { get; set; } = "";
-    public string ErrorMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -156,40 +159,39 @@ else
 
     public void RefreshPlugins()
     {
-        ErrorMessage = null;
-        PluginLoader.LoadPluginsAsync();
+        GenreService.RefreshPlugins();
+        UpdateGenreTypes();
         StateHasChanged();
     }
 
-    public bool IsGenreEnabled(IGenrePlugin plugin)
+    public bool IsGenreEnabled(EditorPluginInfo plugin)
     {
-        return GenreService.EnabledGenres.Any(g => g.Id == plugin.Id);
+        return GenreService.EnabledPlugins.Any(g => g.PluginId == plugin.PluginId);
     }
 
-    public async Task EnableGenre(IGenrePlugin plugin)
+    public async Task EnableGenre(EditorPluginInfo plugin)
     {
-        var validation = GenreService.ValidateGenreCombination(plugin);
-        if (!validation.IsValid)
+        var (isValid, conflicts) = GenreService.ValidatePluginCombination(plugin);
+        if (!isValid)
         {
-            ErrorMessage = validation.ErrorMessage;
             return;
         }
 
-        GenreService.EnableGenre(plugin);
+        GenreService.EnablePlugin(plugin.PluginId);
         UpdateGenreTypes();
         await NotifyChange();
     }
 
-    public async Task DisableGenre(IGenrePlugin plugin)
+    public async Task DisableGenre(EditorPluginInfo plugin)
     {
-        GenreService.DisableGenre(plugin.Id);
+        GenreService.DisablePlugin(plugin.PluginId);
         UpdateGenreTypes();
         await NotifyChange();
     }
 
     private void UpdateGenreTypes()
     {
-        if (GenreService.HasEnabledGenres)
+        if (GenreService.EnabledPlugins.Count > 0)
         {
             GenreTypes.SetTypesProvider(GenreService.GetCombinedTypesProvider());
         }
@@ -201,9 +203,9 @@ else
 
     private async Task NotifyChange()
     {
-        EditorState.AvailableGenres = PluginLoader.LoadedPlugins;
-        EditorState.EnabledGenres = GenreService.EnabledGenres;
-        EditorState.CurrentTypesProvider = GenreService.HasEnabledGenres
+        EditorState.AvailableGenres = GenreService.AvailablePlugins;
+        EditorState.EnabledGenres = GenreService.EnabledPlugins;
+        EditorState.CurrentTypesProvider = GenreService.EnabledPlugins.Count > 0
             ? GenreService.GetCombinedTypesProvider()
             : null;
         EventBus.PublishAsync(new ProjectChangedEvent());

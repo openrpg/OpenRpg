@@ -2,6 +2,7 @@
 
 @using OpenRpg.CurveFunctions
 @using OpenRpg.Editor.Core.Models
+@using OpenRpg.Editor.Core.Plugins
 @using OpenRpg.Editor.Core.Services.Events.Bus
 @using OpenRpg.Editor.Core.Services.FileSystem
 @using OpenRpg.Editor.Infrastructure.Events
@@ -11,10 +12,10 @@
 
 @inject IFileBrowser FileBrowser
 @inject EditorState EditorState
-@inject CreateProjectExecutor CreateProjectExecutor;
-@inject EditorDataLoader EditorDataLoader;
-@inject IEventBus EventBus;
-@inject GenreService GenreService;
+@inject CreateProjectExecutor CreateProjectExecutor
+@inject EditorDataLoader EditorDataLoader
+@inject IEventBus EventBus
+@inject GenreService GenreService
 
 <h1 class="title is-1">OpenRpg Data Editor</h1>
 
@@ -53,14 +54,14 @@
             </header>
             <section class="modal-card-body">
                 <p class="content">Choose the genre plugins to enable for this project:</p>
-                @if (GenreService.AvailableGenres.Any())
+                @if (GenreService.AvailablePlugins.Any())
                 {
                     <div class="field">
-                        @foreach (var genre in GenreService.AvailableGenres)
+                        @foreach (var genre in GenreService.AvailablePlugins)
                         {
                             <div class="control">
                                 <label class="checkbox">
-                                    <input type="checkbox" @bind="selectedGenres[genre.Id]" />
+                                    <input type="checkbox" @bind="selectedGenres[genre.PluginId]" />
                                     @genre.Name (@genre.Version)
                                 </label>
                                 <p class="help">@genre.Description</p>
@@ -92,7 +93,7 @@
     public async Task CreateProject()
     {
         GenreService.RefreshPlugins();
-        selectedGenres = GenreService.AvailableGenres.ToDictionary(g => g.Id, g => false);
+        selectedGenres = GenreService.AvailablePlugins.ToDictionary(g => g.PluginId, g => false);
         showGenreSelection = true;
     }
 
@@ -102,12 +103,12 @@
         if (string.IsNullOrEmpty(projectFolder)) { return; }
 
         var enabledGenreIds = selectedGenres.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
-        var newProject = await CreateProjectExecutor.Execute(projectFolder, enabledGenreIds);
+        var newProject = await CreateProjectExecutor.Execute(projectFolder);
         EditorState.CurrentProject = newProject;
         
         foreach (var genreId in enabledGenreIds)
         {
-            GenreService.EnableGenre(genreId);
+            GenreService.EnablePlugin(genreId);
         }
         
         showGenreSelection = false;
@@ -125,7 +126,7 @@
         {
             foreach (var plugin in EditorState.CurrentProject.Project.Plugins)
             {
-                GenreService.EnableGenre(plugin.Id);
+                GenreService.EnablePlugin(plugin.Id);
             }
         }
         

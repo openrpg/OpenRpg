@@ -14,7 +14,10 @@
     
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.Genres\OpenRpg.Genres.csproj" />
-      <ProjectReference Include="..\OpenRpg.Editor.Core\OpenRpg.Editor.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="manifest.json" />
     </ItemGroup>
 
 </Project>

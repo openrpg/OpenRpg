@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "1.0.0",
+  "pluginId": "scifi",
+  "name": "Sci-Fi RPG",
+  "version": "1.0.0",
+  "description": "Sci-fi and space ship related game types and mechanics",
+  "typeSources": {
+    "itemTypes": "OpenRpg.Genres.Scifi.Types.ScifiItemTypes, OpenRpg.Genres.Scifi",
+    "itemQualityTypes": "OpenRpg.Genres.Types.GenresItemQualityTypes, OpenRpg.Genres",
+    "requirementTypes": "OpenRpg.Genres.Types.GenreRequirementTypes, OpenRpg.Genres",
+    "effectTypes": "OpenRpg.Genres.Scifi.Types.ScifiEffectTypes, OpenRpg.Genres.Scifi",
+    "rewardTypes": "OpenRpg.Genres.Types.GenreRewardTypes, OpenRpg.Genres",
+    "modificationTypes": "OpenRpg.Genres.Types.GenreModificationTypes, OpenRpg.Genres",
+    "objectiveTypes": "OpenRpg.Quests.Types.GenresObjectiveTypes, OpenRpg.Quests",
+    "effectScalingType": "OpenRpg.Entities.Types.CoreEffectScalingTypes, OpenRpg.Entities",
+    "statTypes": "OpenRpg.Genres.Scifi.Types.ScifiEntityStatsVariableTypes, OpenRpg.Genres.Scifi",
+    "stateTypes": "OpenRpg.Genres.Scifi.Types.ScifiShipStateVariableTypes, OpenRpg.Genres.Scifi",
+    "craftingSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills",
+    "gatheringSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills"
+  },
+  "templateTypes": {
+    "ship": {
+      "name": "Ship Template",
+      "templateType": "OpenRpg.Genres.Scifi.Ships.ShipTemplate, OpenRpg.Genres.Scifi",
+      "assetCodePrefix": "ship"
+    }
+  }
+}
