@@ -312,6 +312,14 @@
         prop = componentType.GetProperty(giftsToRewards);
         if (prop != null) return giftsToRewards;
 
+        var inputToTradeSkillItemEntries = propertyName.Replace("InputItems", "TradeSkillItemEntries");
+        prop = componentType.GetProperty(inputToTradeSkillItemEntries);
+        if (prop != null) return inputToTradeSkillItemEntries;
+
+        var outputToTradeSkillItemEntries = propertyName.Replace("OutputItems", "TradeSkillItemEntries");
+        prop = componentType.GetProperty(outputToTradeSkillItemEntries);
+        if (prop != null) return outputToTradeSkillItemEntries;
+
         return propertyName;
     }
 

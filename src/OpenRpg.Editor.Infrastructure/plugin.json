@@ -54,10 +54,20 @@
       "assetCodePrefix": "quest",
       "groups": [
         {
-          "title": "Quest Details",
+          "title": "Objectives",
           "fields": [
-            { "property": "Objectives", "editorComponent": "ObjectivesEditor" },
-            { "property": "Gifts", "editorComponent": "RewardsEditor" },
+            { "property": "Objectives", "editorComponent": "ObjectivesEditor" }
+          ]
+        },
+        {
+          "title": "Quest Gifts",
+          "fields": [
+            { "property": "Gifts", "editorComponent": "RewardsEditor" }
+          ]
+        },
+        {
+          "title": "Quest Rewards",
+          "fields": [
             { "property": "Rewards", "editorComponent": "RewardsEditor" }
           ]
         }
@@ -74,9 +84,14 @@
           "options": { "isGatheringSkill": "false" }
         },
         {
-          "title": "Items",
+          "title": "Input Items",
           "fields": [
-            { "property": "InputItems", "editorComponent": "TradeSkillItemEntriesEditor" },
+            { "property": "InputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
+          ]
+        },
+        {
+          "title": "Output Items",
+          "fields": [
             { "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
           ]
         }
@@ -93,7 +108,7 @@
           "options": { "isGatheringSkill": "true" }
         },
         {
-          "title": "Items",
+          "title": "Output Items",
           "fields": [
             { "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
           ]
