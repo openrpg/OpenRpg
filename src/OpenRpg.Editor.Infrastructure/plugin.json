@@ -23,48 +23,81 @@
       "name": "Item Template",
       "templateType": "OpenRpg.Items.Templates.ItemTemplate, OpenRpg.Items",
       "assetCodePrefix": "item",
-      "sections": [
-        { "title": "Item Details", "property": "ItemType", "editorType": "enumDropdown" },
-        { "title": "Modification Allowances", "property": "ModificationAllowances", "editorComponent": "ModificationAllowancesEditor" }
+      "groups": [
+        {
+          "title": "Item Details",
+          "editorComponent": "ItemTemplateDetailsEditor"
+        },
+        {
+          "title": "Modification",
+          "fields": [
+            { "property": "ModificationAllowances", "editorComponent": "ModificationAllowancesEditor" }
+          ]
+        }
       ]
     },
     "class": {
       "name": "Class Template",
       "templateType": "OpenRpg.Entities.Classes.Templates.ClassTemplate, OpenRpg.Entities",
-      "assetCodePrefix": "class"
+      "assetCodePrefix": "class",
+      "groups": []
     },
     "race": {
       "name": "Race Template",
       "templateType": "OpenRpg.Entities.Races.Templates.RaceTemplate, OpenRpg.Entities",
-      "assetCodePrefix": "race"
+      "assetCodePrefix": "race",
+      "groups": []
     },
     "quest": {
       "name": "Quest",
       "templateType": "OpenRpg.Quests.Quest, OpenRpg.Quests",
       "assetCodePrefix": "quest",
-      "sections": [
-        { "title": "Objectives", "property": "Objectives", "editorComponent": "ObjectivesEditor" },
-        { "title": "Quest Gifts", "property": "Gifts", "editorComponent": "RewardsEditor" },
-        { "title": "Quest Rewards", "property": "Rewards", "editorComponent": "RewardsEditor" }
+      "groups": [
+        {
+          "title": "Quest Details",
+          "fields": [
+            { "property": "Objectives", "editorComponent": "ObjectivesEditor" },
+            { "property": "Gifts", "editorComponent": "RewardsEditor" },
+            { "property": "Rewards", "editorComponent": "RewardsEditor" }
+          ]
+        }
       ]
     },
     "crafting": {
       "name": "Crafting Template",
       "templateType": "OpenRpg.Items.TradeSkills.Templates.ItemCraftingTemplate, OpenRpg.Items.TradeSkills",
       "assetCodePrefix": "crafting",
-      "sections": [
-        { "title": "Skill Details", "property": "SkillType", "editorType": "enumDropdown" },
-        { "title": "Input Items", "property": "InputItems", "editorComponent": "TradeSkillItemEntriesEditor" },
-        { "title": "Output Items", "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
+      "groups": [
+        {
+          "title": "Skill Details",
+          "editorComponent": "TradeSkillDetailsEditor",
+          "options": { "isGatheringSkill": "false" }
+        },
+        {
+          "title": "Items",
+          "fields": [
+            { "property": "InputItems", "editorComponent": "TradeSkillItemEntriesEditor" },
+            { "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
+          ]
+        }
       ]
     },
     "gathering": {
       "name": "Gathering Template",
       "templateType": "OpenRpg.Items.TradeSkills.Templates.ItemGatheringTemplate, OpenRpg.Items.TradeSkills",
       "assetCodePrefix": "gathering",
-      "sections": [
-        { "title": "Skill Details", "property": "SkillType", "editorType": "enumDropdown" },
-        { "title": "Output Items", "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
+      "groups": [
+        {
+          "title": "Skill Details",
+          "editorComponent": "TradeSkillDetailsEditor",
+          "options": { "isGatheringSkill": "true" }
+        },
+        {
+          "title": "Items",
+          "fields": [
+            { "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
+          ]
+        }
       ]
     }
   }

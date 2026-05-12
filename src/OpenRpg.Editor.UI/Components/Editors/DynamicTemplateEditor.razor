@@ -8,21 +8,10 @@
 @using OpenRpg.Editor.Infrastructure.Editors
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Models
+@using OpenRpg.Editor.UI.Components.Editors
 @using OpenRpg.Editor.UI.Components.Editors.List
 @using OpenRpg.Editor.UI.Services
 @using OpenRpg.Entities.Extensions
-
-public class OptionData
-{
-    public int Id { get; }
-    public string Name { get; }
-
-    public OptionData(int id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
-}
 
 @inject GenreTypesService GenreTypes
 
@@ -36,24 +25,28 @@ public class OptionData
         }
     </AvatarContent>
     <PrimaryDetailsContent>
-        @foreach (var section in PrimarySections)
+        @foreach (var group in Groups)
         {
-            <Accordion Title="@(section.Title)" IsExpanded="true">
-                @RenderSection(section)
+            <Accordion Title="@(group.Title)" IsExpanded="true">
+                @RenderGroup(group)
             </Accordion>
         }
     </PrimaryDetailsContent>
-    <SecondaryDetailsContent>
-        @foreach (var section in SecondarySections)
-        {
-            <Accordion Title="@(section.Title)" IsExpanded="true">
-                @RenderSection(section)
-            </Accordion>
-        }
-    </SecondaryDetailsContent>
 </GenericTemplateEditor>
 
 @code {
+    public class OptionData
+    {
+        public int Id { get; }
+        public string Name { get; }
+
+        public OptionData(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+    }
+
     [Parameter]
     public TTemplate Template { get; set; }
 
@@ -61,13 +54,12 @@ public class OptionData
     public string AssetCodePrefix { get; set; }
 
     [Parameter]
-    public IReadOnlyList<TemplateEditorSection> ExternalSections { get; set; } = new List<TemplateEditorSection>();
+    public IReadOnlyList<TemplateEditorGroup> ExternalGroups { get; set; } = new List<TemplateEditorGroup>();
 
     [Parameter]
     public RenderFragment<TTemplate> AvatarContent { get; set; }
 
-    private List<TemplateEditorSection> PrimarySections = new();
-    private List<TemplateEditorSection> SecondarySections = new();
+    private List<TemplateEditorGroup> Groups = new();
 
     private Dictionary<string, PropertyInfo> _propertyMap = new();
 
@@ -76,7 +68,7 @@ public class OptionData
         if (Template != null)
         {
             BuildPropertyMap();
-            BuildSections();
+            Groups = ExternalGroups.ToList();
         }
         base.OnParametersSet();
     }
@@ -91,143 +83,92 @@ public class OptionData
         }
     }
 
-    private void BuildSections()
+    private RenderFragment RenderGroup(TemplateEditorGroup group)
     {
-        var allSections = new List<TemplateEditorSection>();
-
-        foreach (var section in ExternalSections)
+        if (!string.IsNullOrEmpty(group.EditorComponent))
         {
-            allSections.Add(new TemplateEditorSection
-            {
-                Title = section.Title,
-                Property = section.Property,
-                EditorType = section.EditorType,
-                EditorComponent = section.EditorComponent,
-                Options = section.Options,
-                Priority = section.Priority > 0 ? section.Priority : GetDefaultPriority(section.EditorType)
-            });
+            return RenderTemplateLevelGroup(group);
         }
 
-        var conventions = GenerateConventionSections();
-        foreach (var section in conventions)
+        if (group.Fields.Count == 0) return null;
+
+        return builder =>
         {
-            if (allSections.All(s => s.Property != section.Property))
+            var seq = 0;
+            foreach (var field in group.Fields)
             {
-                section.Priority = section.Priority > 0 ? section.Priority : GetDefaultPriority(section.EditorType);
-                allSections.Add(section);
+                var content = RenderField(field);
+                builder.AddContent(seq++, content);
             }
-        }
-
-        var variableSections = GenerateVariableFieldSections();
-        foreach (var section in variableSections)
-        {
-            if (allSections.All(s => s.Property != section.Property))
-            {
-                section.Priority = section.Priority > 0 ? section.Priority : GetDefaultPriority(section.EditorType);
-                allSections.Add(section);
-            }
-        }
-
-        PrimarySections = allSections.Where(s => s.Priority > 0).OrderBy(s => s.Priority).ToList();
-        SecondarySections = allSections.Where(s => s.Priority == 0).OrderBy(s => s.Title).ToList();
+        };
     }
 
-    private int GetDefaultPriority(string editorType)
+    private RenderFragment RenderField(TemplateEditorField field)
     {
+        if (!_propertyMap.TryGetValue(field.Property, out var property))
+        {
+            if (field.Property.StartsWith("Variables."))
+            {
+                return RenderVariableField(field);
+            }
+
+            return @<div class="notification is-warning mt-2">Property '@(field.Property)' not found</div>;
+        }
+
+        var editorType = field.EditorType ?? GetEditorType(property);
+
         return editorType switch
         {
-            "enumDropdown" => 8,
-            "variableField" => 7,
-            "bool" => 5,
-            "collection" => 2,
-            _ => 5
+            "collection" => RenderCollection(property, field),
+            "enumDropdown" => RenderEnumDropdown(property, field),
+            "bool" => RenderBoolField(property, field),
+            _ => RenderScalar(property, field)
         };
     }
 
-    private List<TemplateEditorSection> GenerateConventionSections()
+    private RenderFragment RenderTemplateLevelGroup(TemplateEditorGroup group)
     {
-        var sections = new List<TemplateEditorSection>();
-        var properties = typeof(TTemplate).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        var componentName = group.EditorComponent;
+        var componentType = GetGroupComponentType(componentName);
 
-        foreach (var prop in properties)
+        if (componentType == null)
         {
-            var editorType = GetEditorType(prop);
-            if (editorType == "scalar" || editorType == "unknown") continue;
+            return @<div class="notification is-warning">Editor '@(componentName)' not found</div>;
+        }
 
-            var section = new TemplateEditorSection
+        if (componentName == "TradeSkillDetailsEditor")
+        {
+            var isGathering = group.Options?.GetValueOrDefault("isGatheringSkill")?.ToLower() == "true";
+            return builder =>
             {
-                Title = TemplateEditorConventions.GetLabel(prop.Name),
-                Property = prop.Name,
-                EditorType = editorType
+                builder.OpenComponent(0, componentType);
+                builder.AddAttribute(1, "TradeSkillTemplateVariables", Template.Variables);
+                builder.AddAttribute(2, "IsGatheringSkill", isGathering);
+                builder.CloseComponent();
             };
-
-            if (editorType == "collection")
-            {
-                var elementType = GetCollectionElementType(prop);
-                section.EditorComponent = GetCollectionComponent(elementType);
-            }
-
-            sections.Add(section);
         }
 
-        return sections;
-    }
-
-    private List<TemplateEditorSection> GenerateVariableFieldSections()
-    {
-        var sections = new List<TemplateEditorSection>();
-        var templateTypeName = typeof(TTemplate).Name;
-
-        var variableFields = templateTypeName switch
+        return builder =>
         {
-            "ItemTemplate" => new[] { "Variables.QualityType", "Variables.Value", "Variables.MaxStacks", "Variables.Weight" },
-            "Quest" => Array.Empty<string>(),
-            "ItemCraftingTemplate" => new[] { "Variables.SkillType", "Variables.TimeToAction" },
-            "ItemGatheringTemplate" => new[] { "Variables.SkillType", "Variables.TimeToAction" },
-            "ClassTemplate" => Array.Empty<string>(),
-            "RaceTemplate" => Array.Empty<string>(),
-            _ => Array.Empty<string>()
+            builder.OpenComponent(0, componentType);
+            builder.AddAttribute(1, "Template", Template);
+            builder.CloseComponent();
         };
-
-        foreach (var field in variableFields)
-        {
-            sections.Add(new TemplateEditorSection
-            {
-                Title = TemplateEditorConventions.GetLabel(field),
-                Property = field,
-                EditorType = "variableField"
-            });
-        }
-
-        return sections;
     }
 
     private string GetEditorType(PropertyInfo prop)
     {
         var name = prop.Name;
+        if (name.EndsWith("Type")) return "enumDropdown";
 
-        if (TemplateEditorConventions.PropertyToEditorType.TryGetValue(name, out var editorType))
-            return editorType;
-
-        if (name.EndsWith("Type"))
-            return "enumDropdown";
-
-        if (IsCollection(prop))
+        if (prop.PropertyType.IsGenericType &&
+            typeof(System.Collections.IEnumerable).IsAssignableFrom(prop.PropertyType))
             return "collection";
 
-        if (prop.PropertyType == typeof(bool))
-            return "bool";
-
-        if (prop.PropertyType == typeof(int))
-            return "enumDropdown";
+        if (prop.PropertyType == typeof(bool)) return "bool";
+        if (prop.PropertyType == typeof(int)) return "enumDropdown";
 
         return "unknown";
-    }
-
-    private bool IsCollection(PropertyInfo property)
-    {
-        return property.PropertyType.IsGenericType &&
-               typeof(System.Collections.IEnumerable).IsAssignableFrom(property.PropertyType);
     }
 
     private Type GetCollectionElementType(PropertyInfo property)
@@ -236,84 +177,32 @@ public class OptionData
         return genericArgs.Length > 0 ? genericArgs[0] : typeof(object);
     }
 
-    private string GetCollectionComponent(Type elementType)
-    {
-        var typeName = elementType.Name;
-
-        if (TemplateEditorConventions.CollectionTypeToComponent.TryGetValue(typeName, out var component))
-            return component;
-
-        if (typeName.Contains("Effect"))
-            return "EffectsEditor";
-        if (typeName.Contains("Requirement"))
-            return "RequirementsEditor";
-
-        return string.Empty;
-    }
-
-    private RenderFragment RenderSection(TemplateEditorSection sec)
-    {
-        if (string.IsNullOrEmpty(sec.Property)) return null;
-
-        if (!_propertyMap.TryGetValue(sec.Property, out var property))
-        {
-            if (sec.Property.StartsWith("Variables."))
-            {
-                return RenderVariableFieldSection(sec);
-            }
-
-            return @<div class="notification is-warning">Property '@(sec.Property)' not found</div>;
-        }
-
-        var editorType = sec.EditorType ?? GetEditorType(property);
-
-        return editorType switch
-        {
-            "collection" => RenderCollection(property, sec),
-            "enumDropdown" => RenderEnumDropdown(property, sec),
-            "bool" => RenderBoolField(property, sec),
-            _ => RenderScalar(property, sec)
-        };
-    }
-
-    private RenderFragment RenderVariableFieldSection(TemplateEditorSection sec)
+    private RenderFragment RenderVariableField(TemplateEditorField field)
     {
         var variables = Template.Variables;
         if (variables == null) return null;
 
-        var fieldName = sec.Property.Replace("Variables.", "");
-        var typeSource = TemplateEditorConventions.GetTypeSource(sec.Property);
-        var label = sec.Title;
+        var fieldName = field.Property.Replace("Variables.", "");
+        var typeSource = field.Options?.GetValueOrDefault("typeSource") ?? TemplateEditorConventions.GetTypeSource(field.Property);
+        var label = TemplateEditorConventions.GetLabel(fieldName);
         var variablesType = variables.GetType();
-        var field = variablesType.GetProperty(fieldName);
+        var prop = variablesType.GetProperty(fieldName);
 
-        if (field == null) return null;
-
-        var fieldEditorType = "int";
-        if (TemplateEditorConventions.VariableFieldToEditorType.TryGetValue(fieldName, out var foundType))
-        {
-            fieldEditorType = foundType;
-        }
+        if (prop == null) return null;
 
         if (!string.IsNullOrEmpty(typeSource))
-        {
-            return RenderVariableEnumDropdown(variables, field, typeSource, label);
-        }
+            return RenderVariableEnumDropdown(variables, prop, typeSource, label);
 
-        if (fieldEditorType == "float" || field.PropertyType == typeof(float) || field.PropertyType == typeof(double))
-        {
-            return RenderVariableFloatField(variables, field, label);
-        }
+        if (prop.PropertyType == typeof(int))
+            return RenderVariableIntField(variables, prop, label);
 
-        if (field.PropertyType == typeof(int))
-        {
-            return RenderVariableIntField(variables, field, label);
-        }
+        if (prop.PropertyType == typeof(float) || prop.PropertyType == typeof(double))
+            return RenderVariableFloatField(variables, prop, label);
 
-        return RenderVariableTextField(variables, field, label);
+        return RenderVariableTextField(variables, prop, label);
     }
 
-    private RenderFragment RenderBoolField(PropertyInfo property, TemplateEditorSection sec)
+    private RenderFragment RenderBoolField(PropertyInfo property, TemplateEditorField field)
     {
         var currentValue = property.GetValue(Template) as bool? ?? false;
         var label = TemplateEditorConventions.GetLabel(property.Name);
@@ -338,10 +227,10 @@ public class OptionData
         property.SetValue(Template, value);
     }
 
-    private RenderFragment RenderCollection(PropertyInfo property, TemplateEditorSection sec)
+    private RenderFragment RenderCollection(PropertyInfo property, TemplateEditorField field)
     {
         var elementType = GetCollectionElementType(property);
-        var componentName = sec.EditorComponent ?? GetCollectionComponent(elementType);
+        var componentName = field.EditorComponent;
         var collectionValue = property.GetValue(Template) as System.Collections.IList;
 
         if (collectionValue == null)
@@ -351,14 +240,13 @@ public class OptionData
             property.SetValue(Template, collectionValue);
         }
 
-        var paramName = property.Name;
         var componentType = GetCollectionComponentType(componentName);
-
         if (componentType == null)
         {
             return @<div class="notification is-warning">Editor '@(componentName)' not found for '@(property.Name)'</div>;
         }
 
+        var paramName = GetCollectionParamName(property.Name, componentName);
         return builder =>
         {
             builder.OpenComponent(0, componentType);
@@ -367,10 +255,12 @@ public class OptionData
         };
     }
 
-    private Type GetCollectionComponentType(string componentName)
+    private Type GetGroupComponentType(string componentName)
     {
         return componentName switch
         {
+            "ItemTemplateDetailsEditor" => typeof(ItemTemplateDetailsEditor),
+            "TradeSkillDetailsEditor" => typeof(TradeSkillDetailsEditor),
             "ObjectivesEditor" => typeof(ObjectivesEditor),
             "RewardsEditor" => typeof(RewardsEditor),
             "ModificationAllowancesEditor" => typeof(ModificationAllowancesEditor),
@@ -381,9 +271,33 @@ public class OptionData
         };
     }
 
-    private RenderFragment RenderEnumDropdown(PropertyInfo property, TemplateEditorSection sec)
+    private Type GetCollectionComponentType(string componentName)
     {
-        var typeSource = sec.Options?.GetValueOrDefault("typeSource") ?? TemplateEditorConventions.GetTypeSource(property.Name);
+        return GetGroupComponentType(componentName);
+    }
+
+    private string GetCollectionParamName(string propertyName, string componentName)
+    {
+        var componentType = GetCollectionComponentType(componentName);
+        if (componentType == null) return propertyName;
+
+        var prop = componentType.GetProperty(propertyName);
+        if (prop != null) return propertyName;
+
+        var singularName = propertyName.TrimEnd('s');
+        prop = componentType.GetProperty(singularName);
+        if (prop != null) return singularName;
+
+        var withoutAllowance = propertyName.Replace("Allowances", "Allowance");
+        prop = componentType.GetProperty(withoutAllowance);
+        if (prop != null) return withoutAllowance;
+
+        return propertyName;
+    }
+
+    private RenderFragment RenderEnumDropdown(PropertyInfo property, TemplateEditorField field)
+    {
+        var typeSource = field.Options?.GetValueOrDefault("typeSource") ?? TemplateEditorConventions.GetTypeSource(property.Name);
         var currentValue = property.GetValue(Template) as int? ?? 0;
         var options = GetOptionsForType(typeSource, property.Name);
         var label = TemplateEditorConventions.GetLabel(property.Name);
@@ -425,14 +339,8 @@ public class OptionData
         if (!string.IsNullOrEmpty(propertyName) && propertyName.Contains("SkillType"))
         {
             var templateTypeName = typeof(TTemplate).Name;
-            if (templateTypeName == "ItemCraftingTemplate")
-            {
-                finalTypeSource = "craftingSkillTypes";
-            }
-            else if (templateTypeName == "ItemGatheringTemplate")
-            {
-                finalTypeSource = "gatheringSkillTypes";
-            }
+            if (templateTypeName == "ItemCraftingTemplate") finalTypeSource = "craftingSkillTypes";
+            else if (templateTypeName == "ItemGatheringTemplate") finalTypeSource = "gatheringSkillTypes";
         }
 
         return finalTypeSource switch
@@ -534,7 +442,7 @@ public class OptionData
         </div>;
     }
 
-    private RenderFragment RenderScalar(PropertyInfo property, TemplateEditorSection sec)
+    private RenderFragment RenderScalar(PropertyInfo property, TemplateEditorField field)
     {
         var currentValue = property.GetValue(Template);
         return @<div class="notification is-info">[@(property.Name): @(currentValue?.ToString() ?? "null")]</div>;
@@ -550,17 +458,11 @@ public class OptionData
         if (field != null)
         {
             if (field.PropertyType == typeof(int))
-            {
                 field.SetValue(variables, int.TryParse(newValue?.ToString(), out var result) ? result : 0);
-            }
             else if (field.PropertyType == typeof(float) || field.PropertyType == typeof(double))
-            {
                 field.SetValue(variables, float.TryParse(newValue?.ToString(), out var fResult) ? fResult : 0f);
-            }
             else
-            {
                 field.SetValue(variables, newValue);
-            }
         }
     }
 }

@@ -22,7 +22,8 @@
     "ship": {
       "name": "Ship Template",
       "templateType": "OpenRpg.Genres.Scifi.Ships.ShipTemplate, OpenRpg.Genres.Scifi",
-      "assetCodePrefix": "ship"
+      "assetCodePrefix": "ship",
+      "groups": []
     }
   }
 }

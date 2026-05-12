@@ -221,7 +221,7 @@
         {
             { "Template", CurrentTemplate },
             { "AssetCodePrefix", Descriptor.AssetCodePrefix },
-            { "ExternalSections", GetEditorSections() }
+            { "ExternalGroups", GetEditorGroups() }
         };
     }
 
@@ -231,20 +231,25 @@
         return registry.GetTemplateTypes();
     }
 
-    private List<TemplateEditorSection> GetEditorSections()
+    private List<TemplateEditorGroup> GetEditorGroups()
     {
-        if (Descriptor?.Sections != null)
+        if (Descriptor?.Groups != null)
         {
-            return Descriptor.Sections.Select(s => new TemplateEditorSection
+            return Descriptor.Groups.Select(g => new TemplateEditorGroup
             {
-                Title = s.Title,
-                Property = s.Property,
-                EditorType = s.EditorType,
-                EditorComponent = s.EditorComponent,
-                Options = s.Options ?? new Dictionary<string, string>()
+                Title = g.Title,
+                EditorComponent = g.EditorComponent,
+                Options = g.Options ?? new Dictionary<string, string>(),
+                Fields = g.Fields?.Select(f => new TemplateEditorField
+                {
+                    Property = f.Property,
+                    EditorType = f.EditorType,
+                    EditorComponent = f.EditorComponent,
+                    Options = f.Options ?? new Dictionary<string, string>()
+                }).ToList() ?? new List<TemplateEditorField>()
             }).ToList();
         }
-        return new List<TemplateEditorSection>();
+        return new List<TemplateEditorGroup>();
     }
 
     private List<object> GetTemplateList()

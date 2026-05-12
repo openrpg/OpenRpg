@@ -9,12 +9,19 @@ public class TemplateTypeEntry
     public string Name { get; set; } = string.Empty;
     public string TemplateType { get; set; } = string.Empty;
     public string AssetCodePrefix { get; set; } = string.Empty;
-    public List<SectionDefinition> Sections { get; set; } = new();
+    public List<SectionDefinition> Groups { get; set; } = new();
 }
 
 public class SectionDefinition
 {
     public string Title { get; set; } = string.Empty;
+    public string EditorComponent { get; set; } = string.Empty;
+    public Dictionary<string, string> Options { get; set; } = new();
+    public List<FieldDefinition> Fields { get; set; } = new();
+}
+
+public class FieldDefinition
+{
     public string Property { get; set; } = string.Empty;
     public string EditorType { get; set; } = string.Empty;
     public string EditorComponent { get; set; } = string.Empty;
@@ -27,7 +34,7 @@ public interface ITemplateTypeDescriptor
     string Name { get; }
     string TemplateTypeName { get; }
     string AssetCodePrefix { get; }
-    IReadOnlyList<SectionDefinition> Sections { get; }
+    IReadOnlyList<SectionDefinition> Groups { get; }
 }
 
 public class TemplateTypeDescriptor : ITemplateTypeDescriptor
@@ -36,7 +43,7 @@ public class TemplateTypeDescriptor : ITemplateTypeDescriptor
     public string Name { get; }
     public string TemplateTypeName { get; }
     public string AssetCodePrefix { get; }
-    public IReadOnlyList<SectionDefinition> Sections { get; }
+    public IReadOnlyList<SectionDefinition> Groups { get; }
 
     public TemplateTypeDescriptor(TemplateTypeEntry entry)
     {
@@ -44,15 +51,15 @@ public class TemplateTypeDescriptor : ITemplateTypeDescriptor
         Name = entry.Name;
         TemplateTypeName = entry.TemplateType;
         AssetCodePrefix = entry.AssetCodePrefix;
-        Sections = entry.Sections.AsReadOnly();
+        Groups = entry.Groups.AsReadOnly();
     }
 
-    public TemplateTypeDescriptor(string key, string name, string templateTypeName, string assetCodePrefix, IEnumerable<SectionDefinition> sections = null)
+    public TemplateTypeDescriptor(string key, string name, string templateTypeName, string assetCodePrefix, IEnumerable<SectionDefinition> groups = null)
     {
         Key = key;
         Name = name;
         TemplateTypeName = templateTypeName;
         AssetCodePrefix = assetCodePrefix;
-        Sections = (sections ?? Enumerable.Empty<SectionDefinition>()).ToList().AsReadOnly();
+        Groups = (groups ?? Enumerable.Empty<SectionDefinition>()).ToList().AsReadOnly();
     }
 }
