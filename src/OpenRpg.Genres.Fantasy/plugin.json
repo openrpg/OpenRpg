@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "pluginId": "fantasy",
-  "name": "Fantasy RPG",
+  "name": "Fantasy Genre Plugin",
   "version": "1.0.0",
   "description": "Classic fantasy RPG types and mechanics",
   "typeSources": {

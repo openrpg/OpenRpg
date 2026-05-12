@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "pluginId": "scifi",
-  "name": "Sci-Fi RPG",
+  "name": "Sci-fi Genre Plugin",
   "version": "1.0.0",
   "description": "Sci-fi and space ship related game types and mechanics",
   "typeSources": {

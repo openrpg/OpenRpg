@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "pluginId": "default",
-  "name": "Default Types",
+  "name": "Base Genres",
   "version": "1.0.0",
   "description": "Built-in base types and templates from OpenRpg library",
   "typeSources": {

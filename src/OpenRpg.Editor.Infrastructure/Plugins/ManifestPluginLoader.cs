@@ -33,11 +33,11 @@ public class ManifestPluginLoader
         var assembly = Assembly.GetExecutingAssembly();
         _defaultAssembly = assembly;
 
-        var resourceName = "OpenRpg.Editor.Infrastructure.Plugins.default-manifest.json";
+        var resourceName = "OpenRpg.Editor.Infrastructure.plugin.json";
         using var stream = assembly.GetManifestResourceStream(resourceName);
         if (stream == null)
         {
-            _errors.Add("Could not find default-manifest.json embedded resource");
+            _errors.Add("Could not find default plugin.json embedded resource");
             return;
         }
 
@@ -47,7 +47,7 @@ public class ManifestPluginLoader
 
         if (manifest == null || !manifest.IsValid())
         {
-            _errors.Add("Default manifest is invalid");
+            _errors.Add("Default plugin manifest is invalid");
             return;
         }
 
@@ -109,7 +109,7 @@ public class ManifestPluginLoader
     private PluginManifest? LoadManifestFromAssembly(Assembly assembly, string dllPath)
     {
         var resourceName = assembly.GetManifestResourceNames()
-            .FirstOrDefault(n => n.EndsWith("manifest.json", StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(n => n.EndsWith("plugin.json", StringComparison.OrdinalIgnoreCase));
 
         if (resourceName == null)
         {

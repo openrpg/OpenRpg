@@ -20,14 +20,10 @@ using OpenRpg.Localization.Data.Repositories;
 using OpenRpg.Projects.Json.Loaders;
 using OpenRpg.Projects.Json.Loaders.Locales;
 using OpenRpg.Projects.Json.Loaders.Templates;
-using OpenRpg.Projects.Loaders;
 using OpenRpg.Projects.Loaders.Locales;
 using OpenRpg.Projects.Loaders.Projects;
 using OpenRpg.Projects.Loaders.Templates;
 using OpenRpg.Projects.Services;
-using Persistity.Core.Serialization;
-using Persistity.Flow.Builders;
-using Persistity.Serializers.Json;
 
 namespace OpenRpg.Editor.Modules
 {
@@ -35,10 +31,7 @@ namespace OpenRpg.Editor.Modules
     {
         public static void Setup(IServiceCollection services)
         {
-            services.AddSingleton<ISerializer, JsonSerializer>();
-            services.AddSingleton<IDeserializer, JsonDeserializer>();
             services.AddSingleton<ICloner, Cloner>();
-            services.AddSingleton<PipelineBuilder>();
             services.AddTransient<IModalService, ModalService>();
             services.AddTransient<INotifier, Notifier>();
             services.AddSingleton<IFileBrowser, PhotinoNativeFileBrowser>();
