@@ -12,15 +12,10 @@
 @using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Plugins
+@using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Editor.UI.Components.Editors
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Localization.Data.Repositories
-@using OpenRpg.Quests
-@using OpenRpg.Items.Templates
-@using OpenRpg.Items.TradeSkills.Templates
-@using OpenRpg.Entities.Classes.Templates
-@using OpenRpg.Entities.Races.Templates
-@using OpenRpg.Editor.Infrastructure.Services
 
 @inject INotifier Notifier
 @inject IRepository Repository
@@ -51,8 +46,8 @@
                     @foreach (var template in GetTemplateList())
                     {
                         var id = template.GetType().GetProperty("Id")?.GetValue(template) as int? ?? 0;
-                        var assetCode = template.GetType().GetProperty("Variables")?.PropertyType
-                            .GetProperty("AssetCode")?.GetValue(template.GetType().GetProperty("Variables")?.GetValue(template))?.ToString() ?? "Unknown";
+                        var variables = template.GetType().GetProperty("Variables")?.GetValue(template);
+                        var assetCode = variables?.GetType().GetProperty("AssetCode")?.GetValue(variables)?.ToString() ?? "Unknown";
                         
                         <li>
                             <a class="@(CurrentTemplate == template ? "is-active" : "")" @onclick="() => SelectTemplate(template)">
@@ -85,30 +80,9 @@
     <div class="column">
         @if (CurrentTemplate != null && Descriptor != null)
         {
-            @switch (Descriptor.Key)
-            {
-                case "item":
-                    <DynamicTemplateEditor ItemTemplate Template="@GetItemTemplate()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
-                    break;
-                case "class":
-                    <DynamicTemplateEditor ClassTemplate Template="@GetClassTemplate()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
-                    break;
-                case "race":
-                    <DynamicTemplateEditor RaceTemplate Template="@GetRaceTemplate()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
-                    break;
-                case "quest":
-                    <DynamicTemplateEditor Quest Template="@GetQuest()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
-                    break;
-                case "crafting":
-                    <DynamicTemplateEditor ItemCraftingTemplate Template="@GetCraftingTemplate()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
-                    break;
-                case "gathering":
-                    <DynamicTemplateEditor ItemGatheringTemplate Template="@GetGatheringTemplate()" AssetCodePrefix="@Descriptor.AssetCodePrefix" Sections="@Descriptor.Sections" />
-                    break;
-                default:
-                    <div class="notification is-warning">Unknown template type: @Descriptor.Key</div>
-                    break;
-            }
+            <DynamicTemplateEditor Template="@CurrentTemplate" 
+                                   AssetCodePrefix="@Descriptor.AssetCodePrefix" 
+                                   Sections="@GetEditorSections()" />
         }
         else if (Descriptor != null)
         {
@@ -214,6 +188,22 @@
         return registry.GetTemplateTypes();
     }
 
+    private List<TemplateEditorSection> GetEditorSections()
+    {
+        if (Descriptor?.Sections != null)
+        {
+            return Descriptor.Sections.Select(s => new TemplateEditorSection
+            {
+                Title = s.Title,
+                Property = s.Property,
+                EditorType = s.EditorType,
+                EditorComponent = s.EditorComponent,
+                Options = s.Options ?? new Dictionary<string, string>()
+            }).ToList();
+        }
+        return new List<TemplateEditorSection>();
+    }
+
     private List<object> GetTemplateList()
     {
         if (_getAllMethod == null) return new List<object>();
@@ -316,11 +306,4 @@
         CurrentTemplate = clone;
         StateHasChanged();
     }
-
-    private ItemTemplate GetItemTemplate() => CurrentTemplate as ItemTemplate;
-    private ClassTemplate GetClassTemplate() => CurrentTemplate as ClassTemplate;
-    private RaceTemplate GetRaceTemplate() => CurrentTemplate as RaceTemplate;
-    private Quest GetQuest() => CurrentTemplate as Quest;
-    private ItemCraftingTemplate GetCraftingTemplate() => CurrentTemplate as ItemCraftingTemplate;
-    private ItemGatheringTemplate GetGatheringTemplate() => CurrentTemplate as ItemGatheringTemplate;
 }
