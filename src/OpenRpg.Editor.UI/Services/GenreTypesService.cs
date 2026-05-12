@@ -3,19 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Components;
 using OpenRpg.Editor.Core.Plugins;
+using OpenRpg.Editor.Infrastructure.Plugins;
 
 namespace OpenRpg.Editor.UI.Services;
 
 public class GenreTypesService
 {
-    private IGenreTypesProvider _typesProvider;
+    private readonly GenreService _genreService;
+    private IGenreTypesProvider _overrideProvider;
+
+    public GenreTypesService(GenreService genreService)
+    {
+        _genreService = genreService;
+    }
 
     public void SetTypesProvider(IGenreTypesProvider typesProvider)
     {
-        _typesProvider = typesProvider;
+        _overrideProvider = typesProvider;
     }
 
-    public IGenreTypesProvider TypesProvider => _typesProvider ?? new EmptyTypesProvider();
+    public IGenreTypesProvider TypesProvider => 
+        _overrideProvider ?? _genreService.GetLoadedTypesProvider();
 
     public OptionData[] ItemTypes => TypesProvider.ItemTypes;
     public OptionData[] ItemQualityTypes => TypesProvider.ItemQualityTypes;

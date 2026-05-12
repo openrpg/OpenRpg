@@ -89,6 +89,18 @@ public class GenreService
         return new CombinedGenreTypesProvider(_enabledPlugins.Select(p => p.TypesProvider).ToList());
     }
 
+    public IGenreTypesProvider GetLoadedTypesProvider()
+    {
+        EnsureInitialized();
+        if (_pluginLoader.LoadedPlugins.Count == 0)
+        {
+            return new EmptyGenreTypesProvider();
+        }
+        return new CombinedGenreTypesProvider(
+            _pluginLoader.LoadedPlugins.Select(p => p.TypesProvider).ToList()
+        );
+    }
+
     public (bool IsValid, List<string> Conflicts) ValidatePluginCombination(EditorPluginInfo newPlugin)
     {
         EnsureInitialized();

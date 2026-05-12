@@ -63,13 +63,28 @@ public static class TypeReflectionHelper
         }
 
         var typeName = parts[0].Trim();
-        var type = assembly.GetType(typeName);
+        var assemblyName = parts[1].Trim();
+
+        var targetAssembly = TryLoadAssembly(assemblyName) ?? assembly;
+        var type = targetAssembly.GetType(typeName);
         if (type == null)
         {
             return Array.Empty<OptionData>();
         }
 
         return GetTypesFromInterface(type);
+    }
+
+    private static Assembly TryLoadAssembly(string assemblyName)
+    {
+        try
+        {
+            return Assembly.Load(assemblyName);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     public static OptionData[] GetTypesFromInterface(Type interfaceType)
