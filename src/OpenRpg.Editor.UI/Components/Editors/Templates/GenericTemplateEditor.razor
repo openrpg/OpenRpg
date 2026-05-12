@@ -10,7 +10,7 @@
 
 <div class="container">
     <Accordion Title="Template Asset Details" IsExpanded="true">
-        <BasicDetailsEditor Data="Template">
+        <CommonDetailsEditor Data="Template">
             <AvatarContent>
                 @if (AvatarContent != null)
                 { @AvatarContent(Template) }
@@ -20,7 +20,7 @@
                                  DefaultAssetCode="@($"{AssetCodePrefix}-{Template.Id}")" 
                                  OnAssetCodeChanged="OnAssetCodeChanged"/>
             </AdditionalContent>
-        </BasicDetailsEditor>
+        </CommonDetailsEditor>
     </Accordion>
 
     <Accordion Title="Locale Details" IsExpanded="true">

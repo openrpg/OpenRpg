@@ -6,6 +6,7 @@
 @using System.Collections.Generic
 @using System.Collections
 @using System.Linq
+@using Microsoft.AspNetCore.Components.Routing
 @using OpenRpg.Data
 @using OpenRpg.Data.Conventions.Extensions
 @using OpenRpg.Editor.Core.Plugins
@@ -48,7 +49,7 @@
                         var id = template.GetType().GetProperty("Id")?.GetValue(template) as int? ?? 0;
                         var variables = template.GetType().GetProperty("Variables")?.GetValue(template);
                         var assetCode = variables?.GetType().GetProperty("AssetCode")?.GetValue(variables)?.ToString() ?? "Unknown";
-                        
+
                         <li>
                             <a class="@(CurrentTemplate == template ? "is-active" : "")" @onclick="() => SelectTemplate(template)">
                                 <span class="icon-text">
@@ -78,11 +79,9 @@
         }
     </div>
     <div class="column">
-        @if (CurrentTemplate != null && Descriptor != null)
+        @if (CurrentTemplate != null && Descriptor != null && _dynamicEditor != null)
         {
-            <DynamicTemplateEditor Template="@CurrentTemplate" 
-                                   AssetCodePrefix="@Descriptor.AssetCodePrefix" 
-                                   Sections="@GetEditorSections()" />
+            <DynamicComponent Type="@_dynamicEditor" Parameters="@_editorParams" />
         }
         else if (Descriptor != null)
         {
@@ -129,12 +128,18 @@
     private MethodInfo _createMethod;
     private MethodInfo _deleteMethod;
 
+    private Type _dynamicEditor;
+    private Dictionary<string, object> _editorParams = new();
+
+    private static readonly Dictionary<Type, Type> _templateToEditorType = new();
+
     protected override void OnInitialized()
     {
         if (!string.IsNullOrEmpty(TemplateType))
         {
             LoadTemplateType();
         }
+        BuildEditorMapping();
         base.OnInitialized();
     }
 
@@ -148,8 +153,24 @@
         {
             Descriptor = null;
             CurrentTemplate = null;
+            _dynamicEditor = null;
+            _editorParams.Clear();
         }
         base.OnParametersSet();
+    }
+
+    private void BuildEditorMapping()
+    {
+        if (_templateToEditorType.Count == 0)
+        {
+            _templateToEditorType[typeof(OpenRpg.Items.Templates.ItemTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Items.Templates.ItemTemplate>);
+            _templateToEditorType[typeof(OpenRpg.Quests.Quest)] = typeof(DynamicTemplateEditor<OpenRpg.Quests.Quest>);
+            _templateToEditorType[typeof(OpenRpg.Entities.Classes.Templates.ClassTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Entities.Classes.Templates.ClassTemplate>);
+            _templateToEditorType[typeof(OpenRpg.Entities.Races.Templates.RaceTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Entities.Races.Templates.RaceTemplate>);
+            _templateToEditorType[typeof(OpenRpg.Items.TradeSkills.Templates.ItemCraftingTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Items.TradeSkills.Templates.ItemCraftingTemplate>);
+            _templateToEditorType[typeof(OpenRpg.Items.TradeSkills.Templates.ItemGatheringTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Items.TradeSkills.Templates.ItemGatheringTemplate>);
+            _templateToEditorType[typeof(OpenRpg.Genres.Scifi.Ships.ShipTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Genres.Scifi.Ships.ShipTemplate>);
+        }
     }
 
     private void LoadTemplateType()
@@ -168,10 +189,22 @@
             return;
         }
 
+        if (_templateToEditorType.TryGetValue(_templateType, out var editorType))
+        {
+            _dynamicEditor = editorType;
+        }
+        else
+        {
+            var genericEditorType = typeof(DynamicTemplateEditor<>).MakeGenericType(_templateType);
+            _dynamicEditor = genericEditorType;
+        }
+
         FriendlyName = Descriptor.Name;
         _getAllMethod = typeof(IRepository).GetMethod("GetAll")?.MakeGenericMethod(_templateType);
         _createMethod = typeof(IRepository).GetMethod("Create")?.MakeGenericMethod(_templateType);
         _deleteMethod = typeof(IRepository).GetMethod("Delete")?.MakeGenericMethod(_templateType);
+
+        UpdateEditorParams();
 
         var templates = _getAllMethod?.Invoke(Repository, null) as IEnumerable;
         CurrentTemplate = templates?.Cast<object>().FirstOrDefault();
@@ -180,6 +213,16 @@
         {
             AddTemplate();
         }
+    }
+
+    private void UpdateEditorParams()
+    {
+        _editorParams = new Dictionary<string, object>
+        {
+            { "Template", CurrentTemplate },
+            { "AssetCodePrefix", Descriptor.AssetCodePrefix },
+            { "ExternalSections", GetEditorSections() }
+        };
     }
 
     private IEnumerable<ITemplateTypeDescriptor> GetTemplateTypes()
@@ -239,6 +282,7 @@
         _createMethod?.Invoke(Repository, new object[] { newTemplate });
 
         CurrentTemplate = newTemplate;
+        UpdateEditorParams();
         StateHasChanged();
     }
 
@@ -247,6 +291,7 @@
         var listifyMethod = template.GetType().GetMethod("ListifyProperties");
         listifyMethod?.Invoke(template, null);
         CurrentTemplate = template;
+        UpdateEditorParams();
         StateHasChanged();
     }
 
@@ -274,6 +319,10 @@
         if (CurrentTemplate == null)
         {
             AddTemplate();
+        }
+        else
+        {
+            UpdateEditorParams();
         }
 
         StateHasChanged();
@@ -304,6 +353,7 @@
         await Notifier.ShowNotification($"Cloned {FriendlyName} Template");
 
         CurrentTemplate = clone;
+        UpdateEditorParams();
         StateHasChanged();
     }
 }

@@ -4,6 +4,7 @@
   "name": "Fantasy Genre Plugin",
   "version": "1.0.0",
   "description": "Classic fantasy RPG types and mechanics",
+  "isDefault": true,
   "typeSources": {
     "itemTypes": "OpenRpg.Genres.Fantasy.Types.FantasyItemTypes, OpenRpg.Genres.Fantasy",
     "itemQualityTypes": "OpenRpg.Genres.Fantasy.Types.FantasyItemQualityTypes, OpenRpg.Genres.Fantasy",

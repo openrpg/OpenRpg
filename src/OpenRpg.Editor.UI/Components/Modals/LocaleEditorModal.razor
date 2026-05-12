@@ -57,7 +57,14 @@
 
     protected override void OnParametersSet()
     {
-        LocaleEntry = GetLocaleEntries();
+        if (string.IsNullOrEmpty(LocaleId))
+        {
+            LocaleEntry = new LocaleEntry { LocaleCode = Repository.CurrentLocaleCode, LocaleId = "", LocaleText = "", Exists = false };
+        }
+        else
+        {
+            LocaleEntry = GetLocaleEntries();
+        }
         base.OnParametersSet();
     }
     

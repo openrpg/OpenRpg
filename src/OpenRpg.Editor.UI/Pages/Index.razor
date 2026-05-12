@@ -59,7 +59,7 @@
                     <div class="field">
                         @foreach (var genre in GenreService.AvailablePlugins)
                         {
-                            <div class="control">
+                            <div class="control has-text-dark">
                                 <label class="checkbox">
                                     <input type="checkbox" @bind="selectedGenres[genre.PluginId]" />
                                     @genre.Name (@genre.Version)
@@ -93,7 +93,7 @@
     public async Task CreateProject()
     {
         GenreService.RefreshPlugins();
-        selectedGenres = GenreService.AvailablePlugins.ToDictionary(g => g.PluginId, g => false);
+        selectedGenres = GenreService.AvailablePlugins.ToDictionary(g => g.PluginId, g => g.IsDefault);
         showGenreSelection = true;
     }
 

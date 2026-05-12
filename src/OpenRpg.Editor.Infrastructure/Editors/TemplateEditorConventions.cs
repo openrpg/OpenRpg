@@ -15,6 +15,7 @@ public static class TemplateEditorConventions
         ["InputItems"] = "collection",
         ["OutputItems"] = "collection",
         ["ModificationAllowances"] = "collection",
+        ["IsRepeatable"] = "bool",
     };
 
     public static readonly Dictionary<string, string> CollectionTypeToComponent = new()
@@ -46,11 +47,19 @@ public static class TemplateEditorConventions
         ["Value"] = "Value",
         ["QualityType"] = "Item Quality",
         ["Weight"] = "Weight",
+        ["SlotType"] = "Slot Type",
+        ["TimeToAction"] = "Time To Complete (seconds)",
     };
 
     public static readonly Dictionary<string, string> VariableFieldToTypeSource = new()
     {
         ["QualityType"] = "itemQualityTypes",
+        ["SlotType"] = "itemSlotTypes",
+    };
+
+    public static readonly Dictionary<string, string> VariableFieldToEditorType = new()
+    {
+        ["TimeToAction"] = "float",
     };
 
     public static string GetEditorType(string propertyName)
@@ -64,6 +73,25 @@ public static class TemplateEditorConventions
         if (propertyName.StartsWith("Variables."))
             return "variableField";
 
+        return "unknown";
+    }
+
+    public static string GetEditorTypeForProperty(PropertyInfo property)
+    {
+        var name = property.Name;
+        var typeResult = GetEditorType(name);
+        if (typeResult != "unknown")
+            return typeResult;
+        
+        if (IsCollection(property))
+            return "collection";
+        
+        if (property.PropertyType == typeof(bool))
+            return "bool";
+        
+        if (property.PropertyType == typeof(int))
+            return "enumDropdown";
+        
         return "scalar";
     }
 
@@ -77,6 +105,11 @@ public static class TemplateEditorConventions
             var fieldName = propertyName.Replace("Variables.", "");
             if (VariableFieldToTypeSource.TryGetValue(fieldName, out var fieldTypeSource))
                 return fieldTypeSource;
+            
+            if (fieldName == "SkillType")
+            {
+                return "gatheringSkillTypes";
+            }
         }
 
         return string.Empty;
@@ -108,6 +141,17 @@ public static class TemplateEditorConventions
         }
 
         return propertyName;
+    }
+
+    public static string GetVariableFieldEditorType(string propertyName)
+    {
+        if (propertyName.StartsWith("Variables."))
+        {
+            var fieldName = propertyName.Replace("Variables.", "");
+            if (VariableFieldToEditorType.TryGetValue(fieldName, out var editorType))
+                return editorType;
+        }
+        return "int";
     }
 
     public static bool IsCollection(PropertyInfo property)

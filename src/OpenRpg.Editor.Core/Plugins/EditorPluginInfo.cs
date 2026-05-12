@@ -10,6 +10,7 @@ public class EditorPluginInfo : IEditorPluginInfo
     public string Name => Manifest.Name;
     public string Version => Manifest.Version;
     public string Description => Manifest.Description;
+    public bool IsDefault => Manifest.IsDefault;
     public PluginManifest Manifest { get; }
     public IGenreTypesProvider TypesProvider { get; }
     public IReadOnlyList<ITemplateTypeDescriptor> TemplateTypes { get; }

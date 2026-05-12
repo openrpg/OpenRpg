@@ -20,6 +20,9 @@ public class PluginManifest
     [JsonProperty("description")]
     public string Description { get; set; } = string.Empty;
 
+    [JsonProperty("isDefault")]
+    public bool IsDefault { get; set; }
+
     [JsonProperty("typeSources")]
     public Dictionary<string, string> TypeSources { get; set; } = new();
 
