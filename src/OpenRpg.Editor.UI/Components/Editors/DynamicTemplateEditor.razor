@@ -115,13 +115,14 @@
             return @<div class="notification is-warning mt-2">Property '@(field.Property)' not found</div>;
         }
 
-        var editorType = field.EditorType ?? GetEditorType(property);
+        var editorType = !string.IsNullOrEmpty(field.EditorType) ? field.EditorType : GetEditorType(property);
 
         return editorType switch
         {
             "collection" => RenderCollection(property, field),
             "enumDropdown" => RenderEnumDropdown(property, field),
             "bool" => RenderBoolField(property, field),
+            "unknown" => @<div class="notification is-warning mt-2">Unknown editor for '@(field.Property)'</div>,
             _ => RenderScalar(property, field)
         };
     }
@@ -159,6 +160,10 @@
     private string GetEditorType(PropertyInfo prop)
     {
         var name = prop.Name;
+
+        if (TemplateEditorConventions.PropertyToEditorType.TryGetValue(name, out var conventionType))
+            return conventionType;
+
         if (name.EndsWith("Type")) return "enumDropdown";
 
         if (prop.PropertyType.IsGenericType &&
@@ -240,10 +245,21 @@
             property.SetValue(Template, collectionValue);
         }
 
+        if (string.IsNullOrEmpty(componentName))
+        {
+            componentName = TemplateEditorConventions.GetCollectionComponent(elementType);
+        }
+
         var componentType = GetCollectionComponentType(componentName);
+        if (componentType == null && !string.IsNullOrEmpty(componentName))
+        {
+            componentName = TemplateEditorConventions.GetCollectionComponent(elementType);
+            componentType = GetCollectionComponentType(componentName);
+        }
+
         if (componentType == null)
         {
-            return @<div class="notification is-warning">Editor '@(componentName)' not found for '@(property.Name)'</div>;
+            return @<div class="notification is-warning">Editor '@(componentName)' not found for '@(property.Name)' (field.EditorComponent='@(field.EditorComponent ?? "null")', element=@(elementType?.Name ?? "null"))</div>;
         }
 
         var paramName = GetCollectionParamName(property.Name, componentName);
@@ -291,6 +307,10 @@
         var withoutAllowance = propertyName.Replace("Allowances", "Allowance");
         prop = componentType.GetProperty(withoutAllowance);
         if (prop != null) return withoutAllowance;
+
+        var giftsToRewards = propertyName.Replace("Gifts", "Rewards");
+        prop = componentType.GetProperty(giftsToRewards);
+        if (prop != null) return giftsToRewards;
 
         return propertyName;
     }
