@@ -23,7 +23,7 @@ public class GenreTypesService
     }
 
     public IGenreTypesProvider TypesProvider => 
-        _overrideProvider ?? _genreService.GetLoadedTypesProvider();
+        _overrideProvider ?? _genreService.GetCombinedTypesProvider();
 
     public OptionData[] ItemTypes => TypesProvider.ItemTypes;
     public OptionData[] ItemQualityTypes => TypesProvider.ItemQualityTypes;

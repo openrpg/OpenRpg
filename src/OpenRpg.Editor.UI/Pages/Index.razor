@@ -53,21 +53,19 @@
                 <button class="delete" aria-label="close" @onclick="() => showGenreSelection = false"></button>
             </header>
             <section class="modal-card-body">
-                <p class="content">Choose the genre plugins to enable for this project:</p>
+                <p class="content has-text-dark">Choose the genre plugins to enable for this project:</p>
                 @if (GenreService.AvailablePlugins.Any())
                 {
-                    <div class="field">
-                        @foreach (var genre in GenreService.AvailablePlugins)
-                        {
-                            <div class="control has-text-dark">
-                                <label class="checkbox">
-                                    <input type="checkbox" @bind="selectedGenres[genre.PluginId]" />
-                                    @genre.Name (@genre.Version)
-                                </label>
-                                <p class="help">@genre.Description</p>
-                            </div>
-                        }
-                    </div>
+                    @foreach (var genre in GenreService.AvailablePlugins)
+                    {
+                        <div class="control has-text-dark">
+                            <label class="checkbox">
+                                <input type="checkbox" @bind="selectedGenres[genre.PluginId]" />
+                                @genre.Name (@genre.Version)
+                            </label>
+                            <p class="help">@genre.Description</p>
+                        </div>
+                    }
                 }
                 else
                 {
