@@ -4,6 +4,7 @@
   "name": "Base Genres",
   "version": "1.0.0",
   "description": "Built-in base types and templates from OpenRpg library",
+  "isDefault": true,
   "typeSources": {
     "itemTypes": "OpenRpg.Genres.Types.GenresItemTypes, OpenRpg.Genres",
     "itemQualityTypes": "OpenRpg.Genres.Types.GenresItemQualityTypes, OpenRpg.Genres",

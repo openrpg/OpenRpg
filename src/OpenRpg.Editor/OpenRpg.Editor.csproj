@@ -21,6 +21,8 @@
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.Data.InMemory\OpenRpg.Data.InMemory.csproj" />
       <ProjectReference Include="..\OpenRpg.Editor.UI\OpenRpg.Editor.UI.csproj" />
+      <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
+      <ProjectReference Include="..\OpenRpg.Genres.Scifi\OpenRpg.Genres.Scifi.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -48,6 +50,14 @@
             <_SourceItemsToCopyToOutputDirectory Remove="@(_ExternalBuildStaticWebAsset)" />
             <_SourceItemsToCopyToOutputDirectory Include="@(_ExternalBuildStaticWebAsset)" />
         </ItemGroup>
+    </Target>
+
+    <Target Name="CopyGenrePlugins" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+        <MakeDir Directories="$(OutputPath)Plugins" />
+        <Copy SourceFiles="$(OutputPath)OpenRpg.Genres.Fantasy.dll" DestinationFolder="$(OutputPath)Plugins" />
+        <Copy SourceFiles="$(OutputPath)OpenRpg.Genres.Fantasy.pdb" DestinationFolder="$(OutputPath)Plugins" />
+        <Copy SourceFiles="$(OutputPath)OpenRpg.Genres.Scifi.dll" DestinationFolder="$(OutputPath)Plugins" />
+        <Copy SourceFiles="$(OutputPath)OpenRpg.Genres.Scifi.pdb" DestinationFolder="$(OutputPath)Plugins" />
     </Target>
     
 </Project>
