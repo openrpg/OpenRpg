@@ -18,6 +18,7 @@
     <ItemGroup>
         <ProjectReference Include="..\OpenRpg.Data.InMemory\OpenRpg.Data.InMemory.csproj" />
         <ProjectReference Include="..\OpenRpg.Editor.Core\OpenRpg.Editor.Core.csproj" />
+        <ProjectReference Include="..\OpenRpg.Genres.Scifi\OpenRpg.Genres.Scifi.csproj" />
         <ProjectReference Include="..\OpenRpg.Localization\OpenRpg.Localization.csproj" />
         <ProjectReference Include="..\OpenRpg.Projects.Json\OpenRpg.Projects.Json.csproj" />
     </ItemGroup>

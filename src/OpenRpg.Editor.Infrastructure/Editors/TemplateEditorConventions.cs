@@ -49,6 +49,8 @@ public static class TemplateEditorConventions
         ["Weight"] = "Weight",
         ["SlotType"] = "Slot Type",
         ["TimeToAction"] = "Time To Complete (seconds)",
+        ["EquipmentSlots.WeaponSlots"] = "Weapon Slots",
+        ["EquipmentSlots.MiscSlots"] = "Misc Slots",
     };
 
     public static readonly Dictionary<string, string> VariableFieldToTypeSource = new()

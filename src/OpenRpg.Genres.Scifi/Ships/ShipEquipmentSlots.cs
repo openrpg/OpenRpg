@@ -1,4 +1,4 @@
-﻿namespace Game.Code.OpenRpg.Models
+﻿namespace OpenRpg.Genres.Scifi.Ships
 {
     public class ShipEquipmentSlots
     {

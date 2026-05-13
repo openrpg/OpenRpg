@@ -190,6 +190,12 @@
         var fieldName = field.Property.Replace("Variables.", "");
         var typeSource = field.Options?.GetValueOrDefault("typeSource") ?? TemplateEditorConventions.GetTypeSource(field.Property);
         var label = TemplateEditorConventions.GetLabel(fieldName);
+
+        if (fieldName.Contains("."))
+        {
+            return RenderNestedVariableField(fieldName, field, label);
+        }
+
         var variablesType = variables.GetType();
         var prop = variablesType.GetProperty(fieldName);
 
@@ -205,6 +211,152 @@
             return RenderVariableFloatField(variables, prop, label);
 
         return RenderVariableTextField(variables, prop, label);
+    }
+
+    private RenderFragment RenderNestedVariableField(string fieldName, TemplateEditorField field, string label)
+    {
+        var parts = fieldName.Split('.');
+        if (parts.Length != 2) return null;
+
+        var containerName = parts[0];
+        var propertyName = parts[1];
+        var editorType = field.EditorType ?? TemplateEditorConventions.GetVariableFieldEditorType(fieldName);
+
+        var container = GetNestedVariableContainer(containerName);
+        if (container == null) return null;
+
+        var containerType = container.GetType();
+        var prop = containerType.GetProperty(propertyName);
+        if (prop == null) return null;
+
+        if (prop.PropertyType == typeof(int))
+        {
+            var currentValue = prop.GetValue(container) as int? ?? 0;
+            return @<div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label">@label</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="number" value="@currentValue" @onchange="e => OnNestedVariableChanged(container, prop, e.Value)" />
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+
+        if (prop.PropertyType == typeof(float) || prop.PropertyType == typeof(double))
+        {
+            var currentValue = prop.GetValue(container)?.ToString() ?? "0";
+            return @<div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label">@label</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="number" step="0.1" value="@currentValue" @onchange="e => OnNestedVariableChanged(container, prop, e.Value)" />
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+
+        return @<div class="notification is-info">[@containerName.@propertyName]</div>;
+    }
+
+    private object GetNestedVariableContainer(string containerName)
+    {
+        var variables = Template.Variables;
+        if (variables == null) return null;
+
+        var variablesType = variables.GetType();
+
+        var prop = variablesType.GetProperty(containerName);
+        if (prop != null)
+        {
+            return prop.GetValue(variables);
+        }
+
+        if (containerName == "EquipmentSlots")
+        {
+            return GetOrCreateEquipmentSlots(variables);
+        }
+
+        var internalVarsProp = variablesType.GetProperty("InternalVariables");
+        if (internalVarsProp != null)
+        {
+            var internalVars = internalVarsProp.GetValue(variables) as System.Collections.IDictionary;
+            if (internalVars != null)
+            {
+                foreach (var key in internalVars.Keys)
+                {
+                    var value = internalVars[key];
+                    if (value != null)
+                    {
+                        var valueType = value.GetType();
+                        if (valueType.GetProperty("WeaponSlots") != null && valueType.GetProperty("MiscSlots") != null)
+                        {
+                            return value;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private object GetOrCreateEquipmentSlots(object variables)
+    {
+        try
+        {
+            var variablesType = variables.GetType();
+
+            var containsKeyMethod = variablesType.GetMethod("ContainsKey");
+            if (containsKeyMethod != null)
+            {
+                var containsKey = (bool)containsKeyMethod.Invoke(variables, new object[] { 1 });
+                if (!containsKey)
+                {
+                    var addVariableMethod = variablesType.GetMethod("AddVariable");
+                    var slotType = Type.GetType("OpenRpg.Genres.Scifi.Ships.ShipEquipmentSlots, OpenRpg.Genres.Scifi");
+                    if (slotType != null)
+                    {
+                        var slots = Activator.CreateInstance(slotType);
+                        addVariableMethod?.Invoke(variables, new object[] { 1, slots });
+                        return slots;
+                    }
+                }
+                else
+                {
+                    var indexer = variablesType.GetProperty("Item");
+                    return indexer?.GetValue(variables, new object[] { 1 });
+                }
+            }
+        }
+        catch
+        {
+            // Fall through to return null
+        }
+        return null;
+    }
+
+    private void OnNestedVariableChanged(object container, PropertyInfo prop, object newValue)
+    {
+        if (prop.PropertyType == typeof(int))
+        {
+            prop.SetValue(container, int.TryParse(newValue?.ToString(), out var result) ? result : 0);
+        }
+        else if (prop.PropertyType == typeof(float) || prop.PropertyType == typeof(double))
+        {
+            prop.SetValue(container, float.TryParse(newValue?.ToString(), out var fResult) ? fResult : 0f);
+        }
+        else
+        {
+            prop.SetValue(container, newValue);
+        }
     }
 
     private RenderFragment RenderBoolField(PropertyInfo property, TemplateEditorField field)

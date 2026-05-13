@@ -1,4 +1,4 @@
-using Game.Code.OpenRpg.Models;
+using OpenRpg.Genres.Scifi.Ships;
 using OpenRpg.Genres.Scifi.Types;
 using OpenRpg.Genres.Scifi.Variables;
 
