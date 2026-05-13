@@ -23,6 +23,7 @@ public class SectionDefinition
 public class FieldDefinition
 {
     public string Property { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
     public string EditorType { get; set; } = string.Empty;
     public string EditorComponent { get; set; } = string.Empty;
     public Dictionary<string, string> Options { get; set; } = new();

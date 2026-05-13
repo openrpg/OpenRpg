@@ -189,7 +189,7 @@
 
         var fieldName = field.Property.Replace("Variables.", "");
         var typeSource = field.Options?.GetValueOrDefault("typeSource") ?? TemplateEditorConventions.GetTypeSource(field.Property);
-        var label = TemplateEditorConventions.GetLabel(fieldName);
+        var label = !string.IsNullOrEmpty(field.Name) ? field.Name : TemplateEditorConventions.GetLabel(fieldName);
 
         if (fieldName.Contains("."))
         {
@@ -362,7 +362,7 @@
     private RenderFragment RenderBoolField(PropertyInfo property, TemplateEditorField field)
     {
         var currentValue = property.GetValue(Template) as bool? ?? false;
-        var label = TemplateEditorConventions.GetLabel(property.Name);
+        var label = !string.IsNullOrEmpty(field?.Name) ? field.Name : TemplateEditorConventions.GetLabel(property.Name);
 
         return @<div class="field is-horizontal">
             <div class="field-label">
@@ -480,7 +480,7 @@
         var typeSource = field.Options?.GetValueOrDefault("typeSource") ?? TemplateEditorConventions.GetTypeSource(property.Name);
         var currentValue = property.GetValue(Template) as int? ?? 0;
         var options = GetOptionsForType(typeSource, property.Name);
-        var label = TemplateEditorConventions.GetLabel(property.Name);
+        var label = !string.IsNullOrEmpty(field?.Name) ? field.Name : TemplateEditorConventions.GetLabel(property.Name);
 
         return @<div class="field is-horizontal">
             <div class="field-label">

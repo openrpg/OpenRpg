@@ -24,6 +24,7 @@ public class TemplateEditorGroup
 public class TemplateEditorField
 {
     public string Property { get; set; }
+    public string Name { get; set; }
     public string EditorType { get; set; }
     public string EditorComponent { get; set; }
     public Dictionary<string, string> Options { get; set; } = new();

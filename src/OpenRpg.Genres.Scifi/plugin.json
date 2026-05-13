@@ -27,8 +27,8 @@
         {
           "title": "Equipment Slots",
           "fields": [
-            { "property": "Variables.EquipmentSlots.WeaponSlots", "editorType": "int" },
-            { "property": "Variables.EquipmentSlots.MiscSlots", "editorType": "int" }
+            { "property": "Variables.EquipmentSlots.WeaponSlots", "editorType": "int", "name": "Weapon Slots" },
+            { "property": "Variables.EquipmentSlots.MiscSlots", "editorType": "int", "name": "Misc Slots" }
           ]
         }
       ]

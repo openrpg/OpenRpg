@@ -243,6 +243,7 @@
                 Fields = g.Fields?.Select(f => new TemplateEditorField
                 {
                     Property = f.Property,
+                    Name = f.Name,
                     EditorType = f.EditorType,
                     EditorComponent = f.EditorComponent,
                     Options = f.Options ?? new Dictionary<string, string>()
