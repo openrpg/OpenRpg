@@ -6,6 +6,7 @@ namespace OpenRpg.Genres.Types
 
         public static readonly int JunkQuality = 1;
         public static readonly int CommonQuality = 2;
-        public static readonly int RareQuality = 3;
+        public static readonly int UncommonQuality = 3;
+        public static readonly int RareQuality = 4;
     }
 }
