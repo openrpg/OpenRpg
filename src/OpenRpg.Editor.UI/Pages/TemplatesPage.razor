@@ -8,6 +8,7 @@
 @using Microsoft.AspNetCore.Components.Routing
 @using OpenRpg.Data
 @using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Data.Conventions
 @using OpenRpg.Editor.Core.Plugins
 @using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Extensions
@@ -199,13 +200,13 @@
         }
 
         FriendlyName = Descriptor.Name;
-        _getAllMethod = typeof(IRepository).GetMethod("GetAll")?.MakeGenericMethod(_templateType);
-        _createMethod = typeof(IRepository).GetMethod("Create")?.MakeGenericMethod(_templateType);
-        _deleteMethod = typeof(IRepository).GetMethod("Delete")?.MakeGenericMethod(_templateType);
+        _getAllMethod = typeof(RepositoryExtensions).GetMethod("GetAll")?.MakeGenericMethod(_templateType);
+        _createMethod = typeof(RepositoryExtensions).GetMethod("Create")?.MakeGenericMethod(_templateType);
+        _deleteMethod = typeof(RepositoryExtensions).GetMethod("Delete")?.MakeGenericMethod(_templateType);
 
         UpdateEditorParams();
 
-        var templates = _getAllMethod?.Invoke(Repository, null) as IEnumerable;
+        var templates = _getAllMethod?.Invoke(null, new object[] { Repository }) as IEnumerable;
         CurrentTemplate = templates?.Cast<object>().FirstOrDefault();
 
         if (CurrentTemplate == null)
@@ -255,7 +256,7 @@
     private List<object> GetTemplateList()
     {
         if (_getAllMethod == null) return new List<object>();
-        var templates = _getAllMethod.Invoke(Repository, null) as IEnumerable;
+        var templates = _getAllMethod.Invoke(null, new object[] { Repository }) as IEnumerable;
         return templates?.Cast<object>().ToList() ?? new List<object>();
     }
 
@@ -284,7 +285,7 @@
         var assetCode = assetCodeProperty?.GetValue(variablesProperty?.GetValue(newTemplate))?.ToString() ?? "";
         generateLocaleMethod?.Invoke(newTemplate, new object[] { assetCode });
 
-        _createMethod?.Invoke(Repository, new object[] { newTemplate });
+        _createMethod?.Invoke(null, new object[] { Repository, newTemplate, newId });
 
         CurrentTemplate = newTemplate;
         UpdateEditorParams();
@@ -302,7 +303,7 @@
 
     private int GetNewId()
     {
-        var templates = _getAllMethod?.Invoke(Repository, null) as IEnumerable;
+        var templates = _getAllMethod?.Invoke(null, new object[] { Repository }) as IEnumerable;
         var count = templates?.Cast<object>().Count() ?? 0;
         return count + 1;
     }
@@ -314,11 +315,11 @@
         var idProperty = CurrentTemplate.GetType().GetProperty("Id");
         var id = idProperty?.GetValue(CurrentTemplate) as int? ?? 0;
 
-        _deleteMethod?.Invoke(Repository, new object[] { id });
+        _deleteMethod?.Invoke(null, new object[] { Repository, id });
 
         await Notifier.ShowNotification($"Deleted {FriendlyName} Template");
 
-        var templates = _getAllMethod?.Invoke(Repository, null) as IEnumerable;
+        var templates = _getAllMethod?.Invoke(null, new object[] { Repository }) as IEnumerable;
         CurrentTemplate = templates?.Cast<object>().FirstOrDefault();
 
         if (CurrentTemplate == null)
@@ -338,9 +339,10 @@
         if (CurrentTemplate == null) return;
 
         var clone = Cloner.Clone(CurrentTemplate);
+        var newId = GetNewId();
 
         var setIdMethod = clone.GetType().GetMethod("SetId");
-        setIdMethod?.Invoke(clone, new object[] { GetNewId() });
+        setIdMethod?.Invoke(clone, new object[] { newId });
 
         var listifyMethod = clone.GetType().GetMethod("ListifyProperties");
         listifyMethod?.Invoke(clone, null);
@@ -353,7 +355,7 @@
         var generateLocaleMethod = clone.GetType().GetMethod("GenerateLocaleCodes");
         generateLocaleMethod?.Invoke(clone, new object[] { $"{currentAssetCode}-clone" });
 
-        _createMethod?.Invoke(Repository, new object[] { clone });
+        _createMethod?.Invoke(null, new object[] { Repository, clone, newId });
 
         await Notifier.ShowNotification($"Cloned {FriendlyName} Template");
 
