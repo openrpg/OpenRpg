@@ -34,7 +34,6 @@ public class EditorPluginInfo : IEditorPluginInfo
         return new PluginDescriptor
         {
             Id = PluginId,
-            Name = Name,
             Version = Version
         };
     }

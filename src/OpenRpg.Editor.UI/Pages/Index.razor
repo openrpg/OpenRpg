@@ -101,7 +101,7 @@
         if (string.IsNullOrEmpty(projectFolder)) { return; }
 
         var enabledGenreIds = selectedGenres.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
-        var newProject = await CreateProjectExecutor.Execute(projectFolder);
+        var newProject = await CreateProjectExecutor.Execute(projectFolder, enabledGenreIds);
         EditorState.CurrentProject = newProject;
         
         foreach (var genreId in enabledGenreIds)
