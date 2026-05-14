@@ -1,23 +1,17 @@
 @page "/templates/{TemplateType}"
 
-@using System
 @using System.Reflection
-@using System.Collections.Generic
 @using System.Collections
 @using System.Linq
-@using Microsoft.AspNetCore.Components.Routing
+@using OpenRpg.Core.Templates
 @using OpenRpg.Data
 @using OpenRpg.Data.Conventions.Extensions
-@using OpenRpg.Data.Conventions
 @using OpenRpg.Editor.Core.Plugins
 @using OpenRpg.Editor.Core.Services.Notifications
-@using OpenRpg.Editor.Infrastructure.Extensions
 @using OpenRpg.Editor.Infrastructure.Plugins
 @using OpenRpg.Editor.Infrastructure.Services
-@using OpenRpg.Editor.UI.Components.Editors
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Localization.Data.Repositories
-@using OpenRpg.Entities.Types
 @using OpenRpg.Core.Variables
 
 @inject INotifier Notifier
@@ -135,7 +129,7 @@
     public string TemplateType { get; set; }
 
     private ITemplateTypeDescriptor Descriptor;
-    private object CurrentTemplate;
+    private ITemplate CurrentTemplate;
     private Type _templateType;
     private string FriendlyName = "";
     private MethodInfo _getAllMethod;
@@ -220,8 +214,8 @@
 
         UpdateEditorParams();
 
-        var templates = _getAllMethod?.Invoke(null, new object[] { Repository }) as IEnumerable;
-        CurrentTemplate = templates?.Cast<object>().FirstOrDefault();
+        var templates = _getAllMethod?.Invoke(null, [Repository]) as IEnumerable;
+        CurrentTemplate = templates?.Cast<ITemplate>().FirstOrDefault();
 
         if (CurrentTemplate != null)
         {
@@ -273,11 +267,11 @@
         return new List<TemplateEditorGroup>();
     }
 
-    private List<object> GetTemplateList()
+    private List<ITemplate> GetTemplateList()
     {
-        if (_getAllMethod == null) return new List<object>();
-        var templates = _getAllMethod.Invoke(null, new object[] { Repository }) as IEnumerable;
-        return templates?.Cast<object>().ToList() ?? new List<object>();
+        if (_getAllMethod == null) return new List<ITemplate>();
+        var templates = _getAllMethod.Invoke(null, [Repository]) as IEnumerable;
+        return templates?.Cast<ITemplate>().ToList() ?? new List<ITemplate>();
     }
 
     private void NavigateToType(string type)
@@ -288,11 +282,11 @@
     private void AddTemplate()
     {
         var newId = GetNewId();
-        var newTemplate = Activator.CreateInstance(_templateType);
+        var newTemplate = Activator.CreateInstance(_templateType) as ITemplate;
         if (newTemplate == null) return;
 
         var setIdMethod = newTemplate.GetType().GetMethod("SetId");
-        setIdMethod?.Invoke(newTemplate, new object[] { newId });
+        setIdMethod?.Invoke(newTemplate, [newId]);
 
         var listifyMethod = newTemplate.GetType().GetMethod("ListifyProperties");
         listifyMethod?.Invoke(newTemplate, null);
@@ -312,7 +306,7 @@
         StateHasChanged();
     }
 
-    private void SelectTemplate(object template)
+    private void SelectTemplate(ITemplate template)
     {
         var listifyMethod = template.GetType().GetMethod("ListifyProperties");
         listifyMethod?.Invoke(template, null);
@@ -349,7 +343,7 @@
         await Notifier.ShowNotification($"Deleted {FriendlyName} Template");
 
         var templates = _getAllMethod?.Invoke(null, [Repository]) as IEnumerable;
-        CurrentTemplate = templates?.Cast<object>().FirstOrDefault();
+        CurrentTemplate = templates?.Cast<ITemplate>().FirstOrDefault();
 
         if (CurrentTemplate == null)
         {
@@ -367,7 +361,7 @@
     {
         if (CurrentTemplate == null) return;
 
-        var clone = Cloner.Clone(CurrentTemplate);
+        var clone = Cloner.Clone<object>(CurrentTemplate);
         var newId = GetNewId();
 
         var setIdMethod = clone.GetType().GetMethod("SetId");
@@ -388,7 +382,7 @@
 
         await Notifier.ShowNotification($"Cloned {FriendlyName} Template");
 
-        CurrentTemplate = clone;
+        CurrentTemplate = (ITemplate)clone;
         UpdateEditorParams();
         StateHasChanged();
     }

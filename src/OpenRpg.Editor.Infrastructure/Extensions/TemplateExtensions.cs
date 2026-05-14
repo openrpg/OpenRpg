@@ -116,7 +116,7 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
             {
                 gatheringTemplate.Variables.Requirements = gatheringTemplate.Variables.Requirements.AsList();
             }
-            else if (template is OpenRpg.Genres.Scifi.Ships.ShipTemplate shipTemplate)
+            else if (template is Genres.Scifi.Ships.ShipTemplate shipTemplate)
             {
                 shipTemplate.Variables.Effects = shipTemplate.Variables.Effects.AsList();
                 shipTemplate.Variables.Requirements = shipTemplate.Variables.Requirements.AsList();
