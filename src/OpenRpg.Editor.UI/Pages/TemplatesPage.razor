@@ -17,6 +17,8 @@
 @using OpenRpg.Editor.UI.Components.Editors
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Localization.Data.Repositories
+@using OpenRpg.Entities.Types
+@using OpenRpg.Core.Variables
 
 @inject INotifier Notifier
 @inject IRepository Repository
@@ -24,6 +26,21 @@
 @inject ICloner Cloner
 @inject NavigationManager NavigationManager
 @inject GenreService GenreService
+
+<style>
+    .template-link {
+        color: #363636 !important;
+        font-weight: 500;
+    }
+    .template-link:hover {
+        background-color: #f5f5f5;
+        color: #363636 !important;
+    }
+    .template-link.is-active {
+        background-color: #3273dc !important;
+        color: white !important;
+    }
+</style>
 
 <div class="columns">
     <div class="column is-one-fifth">
@@ -47,15 +64,14 @@
                     @foreach (var template in GetTemplateList())
                     {
                         var id = template.GetType().GetProperty("Id")?.GetValue(template) as int? ?? 0;
-                        var variables = template.GetType().GetProperty("Variables")?.GetValue(template);
-                        var assetCode = variables?.GetType().GetProperty("AssetCode")?.GetValue(variables)?.ToString() ?? "Unknown";
+                        var variables = template.GetType().GetProperty("Variables")?.GetValue(template) as IVariables<object>;
+                        var assetCode = variables?.ContainsKey(CoreAnyVariableTypes.AssetCode) == true 
+                            ? variables[CoreAnyVariableTypes.AssetCode]?.ToString() 
+                            : $"{Descriptor.AssetCodePrefix}-{id}";
 
                         <li>
-                            <a class="@(CurrentTemplate == template ? "is-active" : "")" @onclick="() => SelectTemplate(template)">
-                                <span class="icon-text">
-                                    <span class="icon"><i class="fas fa-file-alt"></i></span>
-                                    <span>@assetCode</span>
-                                </span>
+                            <a class="template-link @(CurrentTemplate == template ? "is-active" : "")" @onclick="() => SelectTemplate(template)">
+                                <span>@assetCode</span>
                             </a>
                         </li>
                     }
