@@ -65,10 +65,8 @@
                     {
                         var id = template.GetType().GetProperty("Id")?.GetValue(template) as int? ?? 0;
                         var variables = template.GetType().GetProperty("Variables")?.GetValue(template) as IVariables<object>;
-                        var assetCode = variables?.ContainsKey(CoreAnyVariableTypes.AssetCode) == true 
-                            ? variables[CoreAnyVariableTypes.AssetCode]?.ToString() 
-                            : $"{Descriptor.AssetCodePrefix}-{id}";
-
+                        var assetCode = variables?.HasAssetCode() == true 
+                            ? variables.AssetCode : $"{Descriptor.AssetCodePrefix}-{id}";
                         <li>
                             <a class="template-link @(CurrentTemplate == template ? "is-active" : "")" @onclick="() => SelectTemplate(template)">
                                 <span>@assetCode</span>
@@ -300,14 +298,14 @@
         listifyMethod?.Invoke(newTemplate, null);
 
         var variablesProperty = newTemplate.GetType().GetProperty("Variables");
-        var assetCodeProperty = variablesProperty?.PropertyType.GetProperty("AssetCode");
-        assetCodeProperty?.SetValue(variablesProperty?.GetValue(newTemplate), $"{Descriptor.AssetCodePrefix}-{newId}");
+        var variables = variablesProperty?.GetValue(newTemplate) as IVariables<object>;
+        var assetCode = $"{Descriptor.AssetCodePrefix}-{newId}";
+        if (variables != null) { variables.AssetCode = assetCode; }
 
         var generateLocaleMethod = newTemplate.GetType().GetMethod("GenerateLocaleCodes");
-        var assetCode = assetCodeProperty?.GetValue(variablesProperty?.GetValue(newTemplate))?.ToString() ?? "";
-        generateLocaleMethod?.Invoke(newTemplate, new object[] { assetCode });
+        generateLocaleMethod?.Invoke(newTemplate, [assetCode]);
 
-        _createMethod?.Invoke(null, new object[] { Repository, newTemplate, newId });
+        _createMethod?.Invoke(null, [Repository, newTemplate, newId]);
 
         CurrentTemplate = newTemplate;
         UpdateEditorParams();
@@ -325,9 +323,18 @@
 
     private int GetNewId()
     {
-        var templates = _getAllMethod?.Invoke(null, new object[] { Repository }) as IEnumerable;
-        var count = templates?.Cast<object>().Count() ?? 0;
-        return count + 1;
+        var templates = _getAllMethod?.Invoke(null, [Repository]) as IEnumerable;
+        var existingIds = templates?.Cast<object>()
+            .Select(t => t.GetType().GetProperty("Id")?.GetValue(t) as int? ?? 0)
+            .Where(id => id > 0)
+            .ToHashSet() ?? new HashSet<int>();
+
+        var newId = 1;
+        while (existingIds.Contains(newId))
+        {
+            newId++;
+        }
+        return newId;
     }
 
     private async Task DeleteTemplate()
@@ -337,11 +344,11 @@
         var idProperty = CurrentTemplate.GetType().GetProperty("Id");
         var id = idProperty?.GetValue(CurrentTemplate) as int? ?? 0;
 
-        _deleteMethod?.Invoke(null, new object[] { Repository, id });
+        _deleteMethod?.Invoke(null, [Repository, id]);
 
         await Notifier.ShowNotification($"Deleted {FriendlyName} Template");
 
-        var templates = _getAllMethod?.Invoke(null, new object[] { Repository }) as IEnumerable;
+        var templates = _getAllMethod?.Invoke(null, [Repository]) as IEnumerable;
         CurrentTemplate = templates?.Cast<object>().FirstOrDefault();
 
         if (CurrentTemplate == null)
@@ -364,7 +371,7 @@
         var newId = GetNewId();
 
         var setIdMethod = clone.GetType().GetMethod("SetId");
-        setIdMethod?.Invoke(clone, new object[] { newId });
+        setIdMethod?.Invoke(clone, [newId]);
 
         var listifyMethod = clone.GetType().GetMethod("ListifyProperties");
         listifyMethod?.Invoke(clone, null);
@@ -375,9 +382,9 @@
         assetCodeProperty?.SetValue(variablesProperty?.GetValue(clone), $"{currentAssetCode}-clone");
 
         var generateLocaleMethod = clone.GetType().GetMethod("GenerateLocaleCodes");
-        generateLocaleMethod?.Invoke(clone, new object[] { $"{currentAssetCode}-clone" });
+        generateLocaleMethod?.Invoke(clone, [$"{currentAssetCode}-clone"]);
 
-        _createMethod?.Invoke(null, new object[] { Repository, clone, newId });
+        _createMethod?.Invoke(null, [Repository, clone, newId]);
 
         await Notifier.ShowNotification($"Cloned {FriendlyName} Template");
 
