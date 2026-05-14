@@ -1,17 +1,15 @@
 @page "/templates/{TemplateType}"
 
-@using System.Reflection
-@using System.Collections
 @using System.Linq
 @using OpenRpg.Core.Templates
 @using OpenRpg.Data
-@using OpenRpg.Data.Conventions.Extensions
 @using OpenRpg.Editor.Core.Plugins
 @using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Plugins
 @using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Localization.Data.Repositories
+@using OpenRpg.Editor.Infrastructure.Helpers
 @using OpenRpg.Core.Variables
 
 @inject INotifier Notifier
@@ -127,19 +125,16 @@
 @code {
     [Parameter]
     public string TemplateType { get; set; }
+    
+    public DynamicTemplateHelper TemplateHelper { get; private set; }
 
     private ITemplateTypeDescriptor Descriptor;
     private ITemplate CurrentTemplate;
-    private Type _templateType;
     private string FriendlyName = "";
-    private MethodInfo _getAllMethod;
-    private MethodInfo _createMethod;
-    private MethodInfo _deleteMethod;
+
 
     private Type _dynamicEditor;
     private Dictionary<string, object> _editorParams = new();
-
-    private static readonly Dictionary<Type, Type> _templateToEditorType = new();
 
     protected override void OnInitialized()
     {
@@ -147,7 +142,6 @@
         {
             LoadTemplateType();
         }
-        BuildEditorMapping();
         base.OnInitialized();
     }
 
@@ -166,67 +160,33 @@
         }
         base.OnParametersSet();
     }
-
-    private void BuildEditorMapping()
-    {
-        if (_templateToEditorType.Count == 0)
-        {
-            _templateToEditorType[typeof(OpenRpg.Items.Templates.ItemTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Items.Templates.ItemTemplate>);
-            _templateToEditorType[typeof(OpenRpg.Quests.Quest)] = typeof(DynamicTemplateEditor<OpenRpg.Quests.Quest>);
-            _templateToEditorType[typeof(OpenRpg.Entities.Classes.Templates.ClassTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Entities.Classes.Templates.ClassTemplate>);
-            _templateToEditorType[typeof(OpenRpg.Entities.Races.Templates.RaceTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Entities.Races.Templates.RaceTemplate>);
-            _templateToEditorType[typeof(OpenRpg.Items.TradeSkills.Templates.ItemCraftingTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Items.TradeSkills.Templates.ItemCraftingTemplate>);
-            _templateToEditorType[typeof(OpenRpg.Items.TradeSkills.Templates.ItemGatheringTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Items.TradeSkills.Templates.ItemGatheringTemplate>);
-            _templateToEditorType[typeof(OpenRpg.Genres.Scifi.Ships.ShipTemplate)] = typeof(DynamicTemplateEditor<OpenRpg.Genres.Scifi.Ships.ShipTemplate>);
-        }
-    }
-
+    
     private void LoadTemplateType()
     {
         var registry = GenreService.GetTemplateTypeRegistry();
         Descriptor = registry.GetTemplateType(TemplateType);
 
-        if (Descriptor == null)
-        {
-            return;
-        }
+        if (Descriptor == null) { return; }
 
-        _templateType = Type.GetType(Descriptor.TemplateTypeName);
-        if (_templateType == null)
-        {
-            return;
-        }
+        var templateType = Type.GetType(Descriptor.TemplateTypeName);
+        if (templateType == null) { return; }
 
-        if (_templateToEditorType.TryGetValue(_templateType, out var editorType))
-        {
-            _dynamicEditor = editorType;
-        }
-        else
-        {
-            var genericEditorType = typeof(DynamicTemplateEditor<>).MakeGenericType(_templateType);
-            _dynamicEditor = genericEditorType;
-        }
+        TemplateHelper = new DynamicTemplateHelper(templateType, Repository);
 
+        var genericEditorType = typeof(DynamicTemplateEditor<>).MakeGenericType(templateType);
+        _dynamicEditor = genericEditorType;
+        
         FriendlyName = Descriptor.Name;
-        _getAllMethod = typeof(RepositoryExtensions).GetMethod("GetAll")?.MakeGenericMethod(_templateType);
-        _createMethod = typeof(RepositoryExtensions).GetMethod("Create")?.MakeGenericMethod(_templateType);
-        _deleteMethod = typeof(RepositoryExtensions).GetMethod("Delete")?.MakeGenericMethod(_templateType);
 
         UpdateEditorParams();
 
-        var templates = _getAllMethod?.Invoke(null, [Repository]) as IEnumerable;
-        CurrentTemplate = templates?.Cast<ITemplate>().FirstOrDefault();
+        var templates = TemplateHelper.GetAll();
+        CurrentTemplate = templates.FirstOrDefault();
 
         if (CurrentTemplate != null)
-        {
-            var listifyMethod = CurrentTemplate.GetType().GetMethod("ListifyProperties");
-            listifyMethod?.Invoke(CurrentTemplate, null);
-        }
-
-        if (CurrentTemplate == null)
-        {
-            AddTemplate();
-        }
+        { TemplateHelper.ListifyProperties(CurrentTemplate); }
+        else
+        { AddTemplate(); }
     }
 
     private void UpdateEditorParams()
@@ -268,38 +228,24 @@
     }
 
     private List<ITemplate> GetTemplateList()
-    {
-        if (_getAllMethod == null) return new List<ITemplate>();
-        var templates = _getAllMethod.Invoke(null, [Repository]) as IEnumerable;
-        return templates?.Cast<ITemplate>().ToList() ?? new List<ITemplate>();
-    }
+    { return TemplateHelper.GetAll().ToList(); }
 
     private void NavigateToType(string type)
-    {
-        NavigationManager.NavigateTo($"/templates/{type}");
-    }
-
+    { NavigationManager.NavigateTo($"/templates/{type}"); }
+    
     private void AddTemplate()
     {
-        var newId = GetNewId();
-        var newTemplate = Activator.CreateInstance(_templateType) as ITemplate;
-        if (newTemplate == null) return;
+        var newId = TemplateHelper.GetNewId();
+        var newTemplate = Activator.CreateInstance(TemplateHelper.TemplateType) as ITemplate;
+        if (newTemplate == null) { return; }
 
-        var setIdMethod = newTemplate.GetType().GetMethod("SetId");
-        setIdMethod?.Invoke(newTemplate, [newId]);
-
-        var listifyMethod = newTemplate.GetType().GetMethod("ListifyProperties");
-        listifyMethod?.Invoke(newTemplate, null);
-
-        var variablesProperty = newTemplate.GetType().GetProperty("Variables");
-        var variables = variablesProperty?.GetValue(newTemplate) as IVariables<object>;
-        var assetCode = $"{Descriptor.AssetCodePrefix}-{newId}";
-        if (variables != null) { variables.AssetCode = assetCode; }
-
-        var generateLocaleMethod = newTemplate.GetType().GetMethod("GenerateLocaleCodes");
-        generateLocaleMethod?.Invoke(newTemplate, [assetCode]);
-
-        _createMethod?.Invoke(null, [Repository, newTemplate, newId]);
+        var variables = TemplateHelper.GetVariables(newTemplate);
+        variables.AssetCode = $"{Descriptor.AssetCodePrefix}-{newId}";
+        
+        TemplateHelper.SetId(newTemplate, newId);
+        TemplateHelper.ListifyProperties(newTemplate);
+        TemplateHelper.GenerateLocaleCodes(newTemplate);
+        TemplateHelper.Create(newTemplate, newId);
 
         CurrentTemplate = newTemplate;
         UpdateEditorParams();
@@ -308,51 +254,25 @@
 
     private void SelectTemplate(ITemplate template)
     {
-        var listifyMethod = template.GetType().GetMethod("ListifyProperties");
-        listifyMethod?.Invoke(template, null);
+        TemplateHelper.ListifyProperties(template);
         CurrentTemplate = template;
         UpdateEditorParams();
         StateHasChanged();
     }
-
-    private int GetNewId()
-    {
-        var templates = _getAllMethod?.Invoke(null, [Repository]) as IEnumerable;
-        var existingIds = templates?.Cast<object>()
-            .Select(t => t.GetType().GetProperty("Id")?.GetValue(t) as int? ?? 0)
-            .Where(id => id > 0)
-            .ToHashSet() ?? new HashSet<int>();
-
-        var newId = 1;
-        while (existingIds.Contains(newId))
-        {
-            newId++;
-        }
-        return newId;
-    }
-
+    
     private async Task DeleteTemplate()
     {
         if (CurrentTemplate == null) return;
 
-        var idProperty = CurrentTemplate.GetType().GetProperty("Id");
-        var id = idProperty?.GetValue(CurrentTemplate) as int? ?? 0;
-
-        _deleteMethod?.Invoke(null, [Repository, id]);
-
+        TemplateHelper.Delete(CurrentTemplate);
         await Notifier.ShowNotification($"Deleted {FriendlyName} Template");
 
-        var templates = _getAllMethod?.Invoke(null, [Repository]) as IEnumerable;
-        CurrentTemplate = templates?.Cast<ITemplate>().FirstOrDefault();
+        CurrentTemplate = TemplateHelper.GetAll().FirstOrDefault();
 
         if (CurrentTemplate == null)
-        {
-            AddTemplate();
-        }
+        { AddTemplate(); }
         else
-        {
-            UpdateEditorParams();
-        }
+        { UpdateEditorParams(); }
 
         StateHasChanged();
     }
@@ -361,28 +281,20 @@
     {
         if (CurrentTemplate == null) return;
 
-        var clone = Cloner.Clone<object>(CurrentTemplate);
-        var newId = GetNewId();
-
-        var setIdMethod = clone.GetType().GetMethod("SetId");
-        setIdMethod?.Invoke(clone, [newId]);
-
-        var listifyMethod = clone.GetType().GetMethod("ListifyProperties");
-        listifyMethod?.Invoke(clone, null);
-
-        var variablesProperty = clone.GetType().GetProperty("Variables");
-        var assetCodeProperty = variablesProperty?.PropertyType.GetProperty("AssetCode");
-        var currentAssetCode = assetCodeProperty?.GetValue(variablesProperty?.GetValue(clone))?.ToString() ?? "";
-        assetCodeProperty?.SetValue(variablesProperty?.GetValue(clone), $"{currentAssetCode}-clone");
-
-        var generateLocaleMethod = clone.GetType().GetMethod("GenerateLocaleCodes");
-        generateLocaleMethod?.Invoke(clone, [$"{currentAssetCode}-clone"]);
-
-        _createMethod?.Invoke(null, [Repository, clone, newId]);
-
+        var clone = Cloner.Clone<object>(CurrentTemplate) as ITemplate;
+        var newId = TemplateHelper.GetNewId();
+        
+        var variables = TemplateHelper.GetVariables(clone);
+        variables.AssetCode = $"{variables.AssetCode}-clone";
+        
+        TemplateHelper.SetId(clone, newId);
+        TemplateHelper.ListifyProperties(clone);
+        TemplateHelper.GenerateLocaleCodes(clone);
+        TemplateHelper.Create(clone, newId);
+        
         await Notifier.ShowNotification($"Cloned {FriendlyName} Template");
 
-        CurrentTemplate = (ITemplate)clone;
+        CurrentTemplate = clone;
         UpdateEditorParams();
         StateHasChanged();
     }
