@@ -18,7 +18,6 @@
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.Editor.Infrastructure\OpenRpg.Editor.Infrastructure.csproj" />
       <ProjectReference Include="..\OpenRpg.Editor.Core\OpenRpg.Editor.Core.csproj" />
-      <ProjectReference Include="..\OpenRpg.Genres.Scifi\OpenRpg.Genres.Scifi.csproj" />
     </ItemGroup>
 
     <ItemGroup>
