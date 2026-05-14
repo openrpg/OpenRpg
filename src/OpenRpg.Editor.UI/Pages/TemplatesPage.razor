@@ -209,6 +209,12 @@
         var templates = _getAllMethod?.Invoke(null, new object[] { Repository }) as IEnumerable;
         CurrentTemplate = templates?.Cast<object>().FirstOrDefault();
 
+        if (CurrentTemplate != null)
+        {
+            var listifyMethod = CurrentTemplate.GetType().GetMethod("ListifyProperties");
+            listifyMethod?.Invoke(CurrentTemplate, null);
+        }
+
         if (CurrentTemplate == null)
         {
             AddTemplate();

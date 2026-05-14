@@ -396,6 +396,21 @@
             collectionValue = Activator.CreateInstance(listType) as System.Collections.IList;
             property.SetValue(Template, collectionValue);
         }
+        else if (collectionValue.GetType().IsArray)
+        {
+            var array = collectionValue as System.Array;
+            var listType = typeof(List<>).MakeGenericType(elementType);
+            var newList = Activator.CreateInstance(listType) as System.Collections.IList;
+            if (array != null)
+            {
+                foreach (var item in array)
+                {
+                    newList?.Add(item);
+                }
+            }
+            collectionValue = newList;
+            property.SetValue(Template, collectionValue);
+        }
 
         if (string.IsNullOrEmpty(componentName))
         {
