@@ -14,6 +14,8 @@ using OpenRpg.Editor.Infrastructure.Persistence.Migrations;
 using OpenRpg.Editor.Infrastructure.Plugins;
 using OpenRpg.Editor.Infrastructure.Services;
 using OpenRpg.Editor.Services.FileSystem;
+using OpenRpg.Editor.UI.Components.Editors.Common;
+using OpenRpg.Editor.UI.Components.Editors.List;
 using OpenRpg.Editor.UI.Services;
 using OpenRpg.Localization.Data.DataSources;
 using OpenRpg.Localization.Data.Repositories;
@@ -66,6 +68,22 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<GenreTypesService>();
             services.AddSingleton<DynamicTemplateDatastorePopulator>();
             services.AddSingleton<ITemplateDatastorePopulator>(sp => sp.GetRequiredService<DynamicTemplateDatastorePopulator>());
+
+            services.AddSingleton<IComponentTypeRegistry>(sp =>
+            {
+                var registry = new ComponentTypeRegistry();
+                registry.Register(nameof(ItemTemplateDetailsEditor), typeof(ItemTemplateDetailsEditor));
+                registry.Register(nameof(TradeSkillDetailsEditor), typeof(TradeSkillDetailsEditor));
+                registry.Register(nameof(ObjectivesEditor), typeof(ObjectivesEditor));
+                registry.Register(nameof(RewardsEditor), typeof(RewardsEditor));
+                registry.Register(nameof(ModificationAllowancesEditor), typeof(ModificationAllowancesEditor));
+                registry.Register(nameof(TradeSkillItemEntriesEditor), typeof(TradeSkillItemEntriesEditor));
+                registry.Register(nameof(EffectsEditor), typeof(EffectsEditor));
+                registry.Register(nameof(RequirementsEditor), typeof(RequirementsEditor));
+                return registry;
+            });
+            services.AddSingleton<IEditorPropertyResolver, EditorPropertyResolver>();
+            services.AddSingleton<ITemplateOptionsResolver, TemplateOptionsResolver>();
         }
     }
 }

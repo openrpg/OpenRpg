@@ -5,15 +5,21 @@
 @using Microsoft.AspNetCore.Components
 @using OpenRpg.Core.Effects
 @using OpenRpg.Core.Requirements
+@using OpenRpg.Core.Templates.Variables
 @using OpenRpg.Editor.Core.Plugins
 @using OpenRpg.Editor.Infrastructure.Editors
 @using OpenRpg.Editor.Infrastructure.Extensions
+@using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Editor.UI.Components.Editors
+@using OpenRpg.Editor.UI.Components.Editors.Common
 @using OpenRpg.Editor.UI.Components.Editors.List
 @using OpenRpg.Editor.UI.Services
 @using OpenRpg.Entities.Extensions
 
 @inject GenreTypesService GenreTypes
+@inject IComponentTypeRegistry ComponentRegistry
+@inject IEditorPropertyResolver PropertyResolver
+@inject ITemplateOptionsResolver OptionsResolver
 
 @typeparam TTemplate where TTemplate : class, OpenRpg.Core.Templates.ITemplate, OpenRpg.Core.Variables.General.IHasVariables<OpenRpg.Core.Templates.Variables.ITemplateVariables>, new()
 
@@ -55,20 +61,10 @@
     {
         if (Template != null)
         {
-            BuildPropertyMap();
+            _propertyMap = PropertyResolver.BuildPropertyMap(typeof(TTemplate));
             Groups = ExternalGroups.ToList();
         }
         base.OnParametersSet();
-    }
-
-    private void BuildPropertyMap()
-    {
-        _propertyMap.Clear();
-        var properties = typeof(TTemplate).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        foreach (var prop in properties)
-        {
-            _propertyMap[prop.Name] = prop;
-        }
     }
 
     private RenderFragment RenderGroup(TemplateEditorGroup group)
@@ -103,7 +99,7 @@
             return @<div class="notification is-warning mt-2">Property '@(field.Property)' not found</div>;
         }
 
-        var editorType = !string.IsNullOrEmpty(field.EditorType) ? field.EditorType : GetEditorType(property);
+        var editorType = !string.IsNullOrEmpty(field.EditorType) ? field.EditorType : PropertyResolver.GetEditorType(property);
 
         return editorType switch
         {
@@ -118,14 +114,14 @@
     private RenderFragment RenderTemplateLevelGroup(TemplateEditorGroup group)
     {
         var componentName = group.EditorComponent;
-        var componentType = GetGroupComponentType(componentName);
+        var componentType = ComponentRegistry.GetComponentType(componentName);
 
         if (componentType == null)
         {
             return @<div class="notification is-warning">Editor '@(componentName)' not found</div>;
         }
 
-        if (componentName == "TradeSkillDetailsEditor")
+        if (componentName == nameof(TradeSkillDetailsEditor))
         {
             var isGathering = group.Options?.GetValueOrDefault("isGatheringSkill")?.ToLower() == "true";
             return builder =>
@@ -143,31 +139,6 @@
             builder.AddAttribute(1, "Template", Template);
             builder.CloseComponent();
         };
-    }
-
-    private string GetEditorType(PropertyInfo prop)
-    {
-        var name = prop.Name;
-
-        if (TemplateEditorConventions.PropertyToEditorType.TryGetValue(name, out var conventionType))
-            return conventionType;
-
-        if (name.EndsWith("Type")) return "enumDropdown";
-
-        if (prop.PropertyType.IsGenericType &&
-            typeof(System.Collections.IEnumerable).IsAssignableFrom(prop.PropertyType))
-            return "collection";
-
-        if (prop.PropertyType == typeof(bool)) return "bool";
-        if (prop.PropertyType == typeof(int)) return "scalar";
-
-        return "unknown";
-    }
-
-    private Type GetCollectionElementType(PropertyInfo property)
-    {
-        var genericArgs = property.PropertyType.GetGenericArguments();
-        return genericArgs.Length > 0 ? genericArgs[0] : typeof(object);
     }
 
     private RenderFragment RenderVariableField(TemplateEditorField field)
@@ -208,9 +179,8 @@
 
         var containerName = parts[0];
         var propertyName = parts[1];
-        var editorType = field.EditorType ?? TemplateEditorConventions.GetVariableFieldEditorType(fieldName);
 
-        var container = GetNestedVariableContainer(containerName);
+        var container = PropertyResolver.GetNestedVariableContainer(Template.Variables, containerName);
         if (container == null) return null;
 
         var containerType = container.GetType();
@@ -227,7 +197,7 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input" type="number" value="@currentValue" @onchange="e => OnNestedVariableChanged(container, prop, e.Value)" />
+                            <input class="input" type="number" value="@currentValue" @onchange="e => TemplatePropertyWriter.SetValue(prop, container, e.Value)" />
                         </div>
                     </div>
                 </div>
@@ -244,7 +214,7 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input" type="number" step="0.1" value="@currentValue" @onchange="e => OnNestedVariableChanged(container, prop, e.Value)" />
+                            <input class="input" type="number" step="0.1" value="@currentValue" @onchange="e => TemplatePropertyWriter.SetValue(prop, container, e.Value)" />
                         </div>
                     </div>
                 </div>
@@ -252,97 +222,6 @@
         }
 
         return @<div class="notification is-info">[@containerName.@propertyName]</div>;
-    }
-
-    private object GetNestedVariableContainer(string containerName)
-    {
-        var variables = Template.Variables;
-        if (variables == null) return null;
-
-        var variablesType = variables.GetType();
-
-        var prop = variablesType.GetProperty(containerName);
-        if (prop != null)
-        {
-            return prop.GetValue(variables);
-        }
-
-        if (containerName == "EquipmentSlots")
-        {
-            return GetOrCreateEquipmentSlots(variables);
-        }
-
-        var internalVarsProp = variablesType.GetProperty("InternalVariables");
-        if (internalVarsProp != null)
-        {
-            var internalVars = internalVarsProp.GetValue(variables) as System.Collections.IDictionary;
-            if (internalVars != null)
-            {
-                foreach (var key in internalVars.Keys)
-                {
-                    var value = internalVars[key];
-                    if (value != null)
-                    {
-                        var valueType = value.GetType();
-                        if (valueType.GetProperty("WeaponSlots") != null && valueType.GetProperty("MiscSlots") != null)
-                        {
-                            return value;
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private object GetOrCreateEquipmentSlots(object variables)
-    {
-        try
-        {
-            var variablesType = variables.GetType();
-            var containsKeyMethod = variablesType.GetMethod("ContainsKey");
-            if (containsKeyMethod == null) return null;
-
-            // Uses ShipTemplateVariableTypes.EquipmentSlots (key = 1)
-            const int equipmentSlotsKey = 1;
-            var containsKey = (bool)containsKeyMethod.Invoke(variables, new object[] { equipmentSlotsKey });
-            if (containsKey)
-            {
-                var indexer = variablesType.GetProperty("Item");
-                return indexer?.GetValue(variables, new object[] { equipmentSlotsKey });
-            }
-
-            var addVariableMethod = variablesType.GetMethod("AddVariable");
-            if (addVariableMethod == null) return null;
-
-            var slotType = Type.GetType("OpenRpg.Genres.Scifi.Ships.ShipEquipmentSlots, OpenRpg.Genres.Scifi");
-            if (slotType == null) return null;
-
-            var slots = Activator.CreateInstance(slotType);
-            addVariableMethod.Invoke(variables, new object[] { equipmentSlotsKey, slots });
-            return slots;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private void OnNestedVariableChanged(object container, PropertyInfo prop, object newValue)
-    {
-        if (prop.PropertyType == typeof(int))
-        {
-            prop.SetValue(container, int.TryParse(newValue?.ToString(), out var result) ? result : 0);
-        }
-        else if (prop.PropertyType == typeof(float) || prop.PropertyType == typeof(double))
-        {
-            prop.SetValue(container, float.TryParse(newValue?.ToString(), out var fResult) ? fResult : 0f);
-        }
-        else
-        {
-            prop.SetValue(container, newValue);
-        }
     }
 
     private RenderFragment RenderBoolField(PropertyInfo property, TemplateEditorField field)
@@ -367,12 +246,12 @@
 
     private void OnBoolChanged(PropertyInfo property, object value)
     {
-        property.SetValue(Template, value);
+        TemplatePropertyWriter.SetValue(property, Template, value);
     }
 
     private RenderFragment RenderCollection(PropertyInfo property, TemplateEditorField field)
     {
-        var elementType = GetCollectionElementType(property);
+        var elementType = PropertyResolver.GetCollectionElementType(property);
         var componentName = field.EditorComponent;
         var collectionValue = property.GetValue(Template) as System.Collections.IList;
 
@@ -403,11 +282,11 @@
             componentName = TemplateEditorConventions.GetCollectionComponent(elementType);
         }
 
-        var componentType = GetCollectionComponentType(componentName);
+        var componentType = ComponentRegistry.GetComponentType(componentName);
         if (componentType == null && !string.IsNullOrEmpty(componentName))
         {
             componentName = TemplateEditorConventions.GetCollectionComponent(elementType);
-            componentType = GetCollectionComponentType(componentName);
+            componentType = ComponentRegistry.GetComponentType(componentName);
         }
 
         if (componentType == null)
@@ -415,7 +294,7 @@
             return @<div class="notification is-warning">Editor '@(componentName)' not found for '@(property.Name)' (field.EditorComponent='@(field.EditorComponent ?? "null")', element=@(elementType?.Name ?? "null"))</div>;
         }
 
-        var paramName = GetCollectionParamName(property.Name, componentName);
+        var paramName = PropertyResolver.GetCollectionParamName(property.Name, componentType);
         return builder =>
         {
             builder.OpenComponent(0, componentType);
@@ -424,63 +303,11 @@
         };
     }
 
-    private Type GetGroupComponentType(string componentName)
-    {
-        return componentName switch
-        {
-            "ItemTemplateDetailsEditor" => typeof(ItemTemplateDetailsEditor),
-            "TradeSkillDetailsEditor" => typeof(TradeSkillDetailsEditor),
-            "ObjectivesEditor" => typeof(ObjectivesEditor),
-            "RewardsEditor" => typeof(RewardsEditor),
-            "ModificationAllowancesEditor" => typeof(ModificationAllowancesEditor),
-            "TradeSkillItemEntriesEditor" => typeof(TradeSkillItemEntriesEditor),
-            "EffectsEditor" => typeof(EffectsEditor),
-            "RequirementsEditor" => typeof(RequirementsEditor),
-            _ => null
-        };
-    }
-
-    private Type GetCollectionComponentType(string componentName)
-    {
-        return GetGroupComponentType(componentName);
-    }
-
-    private string GetCollectionParamName(string propertyName, string componentName)
-    {
-        var componentType = GetCollectionComponentType(componentName);
-        if (componentType == null) return propertyName;
-
-        var prop = componentType.GetProperty(propertyName);
-        if (prop != null) return propertyName;
-
-        var singularName = propertyName.TrimEnd('s');
-        prop = componentType.GetProperty(singularName);
-        if (prop != null) return singularName;
-
-        var withoutAllowance = propertyName.Replace("Allowances", "Allowance");
-        prop = componentType.GetProperty(withoutAllowance);
-        if (prop != null) return withoutAllowance;
-
-        var giftsToRewards = propertyName.Replace("Gifts", "Rewards");
-        prop = componentType.GetProperty(giftsToRewards);
-        if (prop != null) return giftsToRewards;
-
-        var inputToTradeSkillItemEntries = propertyName.Replace("InputItems", "TradeSkillItemEntries");
-        prop = componentType.GetProperty(inputToTradeSkillItemEntries);
-        if (prop != null) return inputToTradeSkillItemEntries;
-
-        var outputToTradeSkillItemEntries = propertyName.Replace("OutputItems", "TradeSkillItemEntries");
-        prop = componentType.GetProperty(outputToTradeSkillItemEntries);
-        if (prop != null) return outputToTradeSkillItemEntries;
-
-        return propertyName;
-    }
-
     private RenderFragment RenderEnumDropdown(PropertyInfo property, TemplateEditorField field)
     {
         var typeSource = field.Options?.GetValueOrDefault("typeSource") ?? TemplateEditorConventions.GetTypeSource(property.Name);
         var currentValue = property.GetValue(Template) as int? ?? 0;
-        var options = GetOptionsForType(typeSource, property.Name);
+        var options = OptionsResolver.GetOptionsForType(typeSource, typeof(TTemplate).Name);
         var label = !string.IsNullOrEmpty(field?.Name) ? field.Name : TemplateEditorConventions.GetLabel(property.Name);
 
         return @<div class="field is-horizontal">
@@ -507,45 +334,13 @@
 
     private void OnEnumChanged(PropertyInfo property, object value)
     {
-        if (int.TryParse(value?.ToString(), out var result))
-        {
-            property.SetValue(Template, result);
-        }
-    }
-
-    private OpenRpg.Editor.Core.Plugins.OptionData[] GetOptionsForType(string typeSource, string propertyName = "")
-    {
-        var finalTypeSource = typeSource;
-
-        if (!string.IsNullOrEmpty(propertyName) && propertyName.Contains("SkillType"))
-        {
-            var templateTypeName = typeof(TTemplate).Name;
-            if (templateTypeName == "ItemCraftingTemplate") finalTypeSource = "craftingSkillTypes";
-            else if (templateTypeName == "ItemGatheringTemplate") finalTypeSource = "gatheringSkillTypes";
-        }
-
-        return finalTypeSource switch
-        {
-            "itemTypes" => GenreTypes.ItemTypes,
-            "itemQualityTypes" => GenreTypes.ItemQualityTypes,
-            "modificationTypes" => GenreTypes.ModificationTypes,
-            "effectTypes" => GenreTypes.EffectTypes,
-            "requirementTypes" => GenreTypes.RequirementTypes,
-            "objectiveTypes" => GenreTypes.ObjectiveTypes,
-            "rewardTypes" => GenreTypes.RewardTypes,
-            "gatheringSkillTypes" => GenreTypes.GatheringSkillTypes,
-            "craftingSkillTypes" => GenreTypes.CraftingSkillTypes,
-            "effectScalingType" => GenreTypes.EffectScalingType,
-            "statTypes" => GenreTypes.StatTypes,
-            "stateTypes" => GenreTypes.StateTypes,
-            _ => Array.Empty<OptionData>()
-        };
+        TemplatePropertyWriter.SetValue(property, Template, value);
     }
 
     private RenderFragment RenderVariableEnumDropdown(object variables, PropertyInfo field, string typeSource, string label)
     {
         var currentValue = field.GetValue(variables) as int? ?? 0;
-        var options = GetOptionsForType(typeSource);
+        var options = OptionsResolver.GetOptionsForType(typeSource);
 
         return @<div class="field is-horizontal">
             <div class="field-label">
@@ -635,7 +430,7 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input" type="number" value="@currentValue" @onchange="e => OnScalarChanged(property, e.Value)" />
+                            <input class="input" type="number" value="@currentValue" @onchange="e => TemplatePropertyWriter.SetValue(property, Template, e.Value)" />
                         </div>
                     </div>
                 </div>
@@ -652,7 +447,7 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input" type="number" step="0.1" value="@currentValue" @onchange="e => OnScalarChanged(property, e.Value)" />
+                            <input class="input" type="number" step="0.1" value="@currentValue" @onchange="e => TemplatePropertyWriter.SetValue(property, Template, e.Value)" />
                         </div>
                     </div>
                 </div>
@@ -669,7 +464,7 @@
                 <div class="field-body">
                     <div class="field">
                         <div class="control">
-                            <input class="input" type="text" value="@currentValue" @onchange="e => OnScalarChanged(property, e.Value)" />
+                            <input class="input" type="text" value="@currentValue" @onchange="e => TemplatePropertyWriter.SetValue(property, Template, e.Value)" />
                         </div>
                     </div>
                 </div>
@@ -678,27 +473,6 @@
 
         var currentRawValue = property.GetValue(Template);
         return @<div class="notification is-info">[@(property.Name): @(currentRawValue?.ToString() ?? "null")]</div>;
-    }
-
-    private void OnScalarChanged(PropertyInfo property, object newValue)
-    {
-        var propType = property.PropertyType;
-        if (propType == typeof(int))
-        {
-            property.SetValue(Template, int.TryParse(newValue?.ToString(), out var result) ? result : 0);
-        }
-        else if (propType == typeof(float))
-        {
-            property.SetValue(Template, float.TryParse(newValue?.ToString(), out var fResult) ? fResult : 0f);
-        }
-        else if (propType == typeof(double))
-        {
-            property.SetValue(Template, double.TryParse(newValue?.ToString(), out var dResult) ? dResult : 0d);
-        }
-        else
-        {
-            property.SetValue(Template, newValue);
-        }
     }
 
     private void OnVariableFieldChanged(string fieldName, object newValue)
@@ -710,12 +484,7 @@
         var field = variablesType.GetProperty(fieldName);
         if (field != null)
         {
-            if (field.PropertyType == typeof(int))
-                field.SetValue(variables, int.TryParse(newValue?.ToString(), out var result) ? result : 0);
-            else if (field.PropertyType == typeof(float) || field.PropertyType == typeof(double))
-                field.SetValue(variables, float.TryParse(newValue?.ToString(), out var fResult) ? fResult : 0f);
-            else
-                field.SetValue(variables, newValue);
+            TemplatePropertyWriter.SetValue(field, variables, newValue);
         }
     }
 }
