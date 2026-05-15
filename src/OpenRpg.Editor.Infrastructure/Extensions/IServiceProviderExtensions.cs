@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Editor.Infrastructure.Data;
+using OpenRpg.Editor.Infrastructure.Plugins;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
@@ -24,10 +24,18 @@ public static class IServiceProviderExtensions
         dataSource.Database.Add(typeof(ItemCraftingTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(ItemGatheringTemplate), new Dictionary<object, object>());
 
-        var shipTemplateType = Type.GetType("OpenRpg.Genres.Scifi.Ships.ShipTemplate, OpenRpg.Genres.Scifi");
-        if (shipTemplateType != null)
+        var genreService = serviceProvider.GetService<GenreService>();
+        if (genreService != null)
         {
-            dataSource.Database.Add(shipTemplateType, new Dictionary<object, object>());
+            var templateTypeRegistry = genreService.GetTemplateTypeRegistry();
+            foreach (var templateType in templateTypeRegistry.GetTemplateTypes())
+            {
+                var classType = templateTypeRegistry.GetTemplateClassType(templateType);
+                if (!dataSource.Database.ContainsKey(classType))
+                {
+                    dataSource.Database.Add(classType, new Dictionary<object, object>());
+                }
+            }
         }
 
         var localeDataSource = serviceProvider.GetService<EditorLocaleDatasource>();

@@ -87,10 +87,8 @@ public class EditorPropertyResolver : IEditorPropertyResolver
             return prop.GetValue(variables);
         }
 
-        if (containerName == "EquipmentSlots")
-        {
-            return GetOrCreateEquipmentSlots(variables);
-        }
+        var container = GetOrCreateNestedContainer(variables, containerName);
+        if (container != null) return container;
 
         var internalVarsProp = variablesType.GetProperty("InternalVariables");
         if (internalVarsProp != null)
@@ -98,13 +96,13 @@ public class EditorPropertyResolver : IEditorPropertyResolver
             var internalVars = internalVarsProp.GetValue(variables) as System.Collections.IDictionary;
             if (internalVars != null)
             {
-                foreach (var key in internalVars.Keys)
+                var expectedProps = GetContainerProperties(containerName);
+                if (expectedProps.Count > 0)
                 {
-                    var value = internalVars[key];
-                    if (value != null)
+                    foreach (var key in internalVars.Keys)
                     {
-                        var valueType = value.GetType();
-                        if (valueType.GetProperty("WeaponSlots") != null && valueType.GetProperty("MiscSlots") != null)
+                        var value = internalVars[key];
+                        if (value != null && expectedProps.All(p => value.GetType().GetProperty(p) != null))
                         {
                             return value;
                         }
@@ -116,7 +114,7 @@ public class EditorPropertyResolver : IEditorPropertyResolver
         return null;
     }
 
-    public object GetOrCreateEquipmentSlots(ITemplateVariables variables)
+    public object GetOrCreateNestedContainer(ITemplateVariables variables, string containerName)
     {
         try
         {
@@ -124,27 +122,65 @@ public class EditorPropertyResolver : IEditorPropertyResolver
             var containsKeyMethod = variablesType.GetMethod("ContainsKey");
             if (containsKeyMethod == null) return null;
 
-            const int equipmentSlotsKey = 1;
-            var containsKey = (bool)containsKeyMethod.Invoke(variables, new object[] { equipmentSlotsKey });
-            if (containsKey)
-            {
-                var indexer = variablesType.GetProperty("Item");
-                return indexer?.GetValue(variables, new object[] { equipmentSlotsKey });
-            }
-
             var addVariableMethod = variablesType.GetMethod("AddVariable");
             if (addVariableMethod == null) return null;
 
-            var slotType = Type.GetType("OpenRpg.Genres.Scifi.Ships.ShipEquipmentSlots, OpenRpg.Genres.Scifi");
-            if (slotType == null) return null;
+            var containerKey = GetContainerKey(containerName);
+            if (containerKey == null) return null;
 
-            var slots = Activator.CreateInstance(slotType);
-            addVariableMethod.Invoke(variables, new object[] { equipmentSlotsKey, slots });
-            return slots;
+            var containsKey = (bool)containsKeyMethod.Invoke(variables, new object[] { containerKey.Value });
+            if (containsKey)
+            {
+                var indexer = variablesType.GetProperty("Item");
+                return indexer?.GetValue(variables, new object[] { containerKey.Value });
+            }
+
+            var containerType = FindContainerType(containerName);
+            if (containerType == null) return null;
+
+            var container = Activator.CreateInstance(containerType);
+            addVariableMethod.Invoke(variables, new object[] { containerKey.Value, container });
+            return container;
         }
         catch
         {
             return null;
         }
+    }
+
+    private static int? GetContainerKey(string containerName)
+    {
+        return containerName switch
+        {
+            "EquipmentSlots" => 1,
+            _ => null
+        };
+    }
+
+    private static List<string> GetContainerProperties(string containerName)
+    {
+        return containerName switch
+        {
+            "EquipmentSlots" => ["WeaponSlots", "MiscSlots"],
+            _ => []
+        };
+    }
+
+    private static Type FindContainerType(string containerName)
+    {
+        var expectedProperties = GetContainerProperties(containerName);
+        if (expectedProperties.Count == 0) return null;
+
+        return AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsDynamic && !a.ReflectionOnly)
+            .SelectMany(GetLoadableTypes)
+            .FirstOrDefault(t => expectedProperties.All(p => t.GetProperty(p) != null));
+    }
+
+    private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+    {
+        try { return assembly.GetTypes(); }
+        catch (ReflectionTypeLoadException e) { return e.Types.Where(t => t != null); }
+        catch { return Type.EmptyTypes; }
     }
 }

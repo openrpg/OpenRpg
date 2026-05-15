@@ -12,5 +12,5 @@ public interface IEditorPropertyResolver
     Type GetCollectionElementType(PropertyInfo property);
     string GetCollectionParamName(string propertyName, Type componentType);
     object GetNestedVariableContainer(ITemplateVariables variables, string containerName);
-    object GetOrCreateEquipmentSlots(ITemplateVariables variables);
+    object GetOrCreateNestedContainer(ITemplateVariables variables, string containerName);
 }
