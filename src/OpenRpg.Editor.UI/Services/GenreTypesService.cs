@@ -29,6 +29,7 @@ public class GenreTypesService
     public OptionData[] ItemQualityTypes => TypesProvider.ItemQualityTypes;
     public OptionData[] RequirementTypes => TypesProvider.RequirementTypes;
     public OptionData[] EffectTypes => TypesProvider.EffectTypes;
+    public OptionData[] GenderTypes => TypesProvider.GenderTypes;
     public OptionData[] RewardTypes => TypesProvider.RewardTypes;
     public OptionData[] ModificationTypes => TypesProvider.ModificationTypes;
     public OptionData[] ObjectiveTypes => TypesProvider.ObjectiveTypes;
@@ -46,6 +47,7 @@ public class EmptyTypesProvider : IGenreTypesProvider
     public OptionData[] ItemQualityTypes => Array.Empty<OptionData>();
     public OptionData[] RequirementTypes => Array.Empty<OptionData>();
     public OptionData[] EffectTypes => Array.Empty<OptionData>();
+    public OptionData[] GenderTypes => Array.Empty<OptionData>();
     public OptionData[] RewardTypes => Array.Empty<OptionData>();
     public OptionData[] ModificationTypes => Array.Empty<OptionData>();
     public OptionData[] ObjectiveTypes => Array.Empty<OptionData>();

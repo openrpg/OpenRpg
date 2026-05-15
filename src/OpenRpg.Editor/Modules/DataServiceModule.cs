@@ -71,6 +71,7 @@ namespace OpenRpg.Editor.Modules
             {
                 var registry = new ComponentTypeRegistry();
                 registry.Register(nameof(ItemTemplateDetailsEditor), typeof(ItemTemplateDetailsEditor));
+                registry.Register(nameof(EntityTemplateDetailsEditor), typeof(EntityTemplateDetailsEditor));
                 registry.Register(nameof(TradeSkillDetailsEditor), typeof(TradeSkillDetailsEditor));
                 registry.Register(nameof(ObjectivesEditor), typeof(ObjectivesEditor));
                 registry.Register(nameof(RewardsEditor), typeof(RewardsEditor));

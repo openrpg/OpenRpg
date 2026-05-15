@@ -10,6 +10,7 @@ public interface IGenreTypesProvider
     OptionData[] EffectTypes { get; }
     OptionData[] RewardTypes { get; }
     OptionData[] ModificationTypes { get; }
+    OptionData[] GenderTypes { get; }
     OptionData[] ObjectiveTypes { get; }
     OptionData[] EffectScalingType { get; }
     OptionData[] StatTypes { get; }

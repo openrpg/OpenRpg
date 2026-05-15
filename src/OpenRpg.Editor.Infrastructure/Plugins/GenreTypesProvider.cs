@@ -14,6 +14,7 @@ public class GenreTypesProvider : IGenreTypesProvider
     public OptionData[] ItemQualityTypes { get; }
     public OptionData[] RequirementTypes { get; }
     public OptionData[] EffectTypes { get; }
+    public OptionData[] GenderTypes { get; }
     public OptionData[] RewardTypes { get; }
     public OptionData[] ModificationTypes { get; }
     public OptionData[] ObjectiveTypes { get; }
@@ -31,6 +32,7 @@ public class GenreTypesProvider : IGenreTypesProvider
         ItemQualityTypes = GetTypesFromSource(assembly, manifest.TypeSources, "itemQualityTypes");
         RequirementTypes = GetTypesFromSource(assembly, manifest.TypeSources, "requirementTypes");
         EffectTypes = GetTypesFromSource(assembly, manifest.TypeSources, "effectTypes");
+        GenderTypes = GetTypesFromSource(assembly, manifest.TypeSources, "genderTypes");
         RewardTypes = GetTypesFromSource(assembly, manifest.TypeSources, "rewardTypes");
         ModificationTypes = GetTypesFromSource(assembly, manifest.TypeSources, "modificationTypes");
         ObjectiveTypes = GetTypesFromSource(assembly, manifest.TypeSources, "objectiveTypes");

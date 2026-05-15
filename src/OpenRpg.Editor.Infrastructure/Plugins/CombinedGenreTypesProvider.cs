@@ -13,6 +13,7 @@ public class CombinedGenreTypesProvider : IGenreTypesProvider
     public OptionData[] ItemQualityTypes => _providers.SelectMany(p => p.ItemQualityTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
     public OptionData[] RequirementTypes => _providers.SelectMany(p => p.RequirementTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
     public OptionData[] EffectTypes => _providers.SelectMany(p => p.EffectTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
+    public OptionData[] GenderTypes => _providers.SelectMany(p => p.GenderTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
     public OptionData[] RewardTypes => _providers.SelectMany(p => p.RewardTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
     public OptionData[] ModificationTypes => _providers.SelectMany(p => p.ModificationTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
     public OptionData[] ObjectiveTypes => _providers.SelectMany(p => p.ObjectiveTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();

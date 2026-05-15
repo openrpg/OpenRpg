@@ -10,6 +10,7 @@
     "itemQualityTypes": "OpenRpg.Genres.Types.GenresItemQualityTypes, OpenRpg.Genres",
     "requirementTypes": "OpenRpg.Genres.Types.GenreRequirementTypes, OpenRpg.Genres",
     "effectTypes": "OpenRpg.Genres.Types.GenreEffectTypes, OpenRpg.Genres",
+    "genderTypes": "OpenRpg.Genres.Types.GenreGenderTypes, OpenRpg.Genres",
     "rewardTypes": "OpenRpg.Genres.Types.GenreRewardTypes, OpenRpg.Genres",
     "modificationTypes": "OpenRpg.Genres.Types.GenreModificationTypes, OpenRpg.Genres",
     "objectiveTypes": "OpenRpg.Quests.Types.GenresObjectiveTypes, OpenRpg.Quests",
@@ -113,6 +114,17 @@
           "fields": [
             { "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
           ]
+        }
+      ]
+    },
+    "entity": {
+      "name": "Entity Template",
+      "templateType": "OpenRpg.Entities.Entity.Templates.EntityTemplate, OpenRpg.Entities",
+      "assetCodePrefix": "entity",
+      "groups": [
+        {
+          "title": "Entity Details",
+          "editorComponent": "EntityTemplateDetailsEditor"
         }
       ]
     }

@@ -22,6 +22,7 @@ public class TemplateOptionsResolver : ITemplateOptionsResolver
             "itemQualityTypes" => _genreTypes.ItemQualityTypes,
             "modificationTypes" => _genreTypes.ModificationTypes,
             "effectTypes" => _genreTypes.EffectTypes,
+            "genderTypes" => _genreTypes.GenderTypes,
             "requirementTypes" => _genreTypes.RequirementTypes,
             "objectiveTypes" => _genreTypes.ObjectiveTypes,
             "rewardTypes" => _genreTypes.RewardTypes,
