@@ -92,7 +92,7 @@ public static class TemplateEditorConventions
             return "bool";
         
         if (property.PropertyType == typeof(int))
-            return "enumDropdown";
+            return "scalar";
         
         return "scalar";
     }

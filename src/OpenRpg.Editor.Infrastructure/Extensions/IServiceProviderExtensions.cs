@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Entities.Classes.Templates;
@@ -22,6 +23,12 @@ public static class IServiceProviderExtensions
         dataSource.Database.Add(typeof(Quest), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(ItemCraftingTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(ItemGatheringTemplate), new Dictionary<object, object>());
+
+        var shipTemplateType = Type.GetType("OpenRpg.Genres.Scifi.Ships.ShipTemplate, OpenRpg.Genres.Scifi");
+        if (shipTemplateType != null)
+        {
+            dataSource.Database.Add(shipTemplateType, new Dictionary<object, object>());
+        }
 
         var localeDataSource = serviceProvider.GetService<EditorLocaleDatasource>();
         localeDataSource.LocaleDatasets.Add("en-gb", new LocaleDataset() { LocaleCode = "en-gb" });

@@ -79,6 +79,15 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
                 quest.Objectives = quest.Objectives.AsList();
                 quest.Rewards = quest.Rewards.AsList();
             }
+            else if (template is ItemCraftingTemplate craftingTemplate)
+            {
+                craftingTemplate.InputItems = craftingTemplate.InputItems.AsList();
+                craftingTemplate.OutputItems = craftingTemplate.OutputItems.AsList();
+            }
+            else if (template is ItemGatheringTemplate gatheringTemplate)
+            {
+                gatheringTemplate.OutputItems = gatheringTemplate.OutputItems.AsList();
+            }
         }
     }
 }

@@ -5,9 +5,9 @@
 @using Microsoft.AspNetCore.Components
 @using OpenRpg.Core.Effects
 @using OpenRpg.Core.Requirements
+@using OpenRpg.Editor.Core.Plugins
 @using OpenRpg.Editor.Infrastructure.Editors
 @using OpenRpg.Editor.Infrastructure.Extensions
-@using OpenRpg.Editor.Infrastructure.Models
 @using OpenRpg.Editor.UI.Components.Editors
 @using OpenRpg.Editor.UI.Components.Editors.List
 @using OpenRpg.Editor.UI.Services
@@ -35,18 +35,6 @@
 </GenericTemplateEditor>
 
 @code {
-    public class OptionData
-    {
-        public int Id { get; }
-        public string Name { get; }
-
-        public OptionData(int id, string name)
-        {
-            Id = id;
-            Name = name;
-        }
-    }
-
     [Parameter]
     public TTemplate Template { get; set; }
 
@@ -171,7 +159,7 @@
             return "collection";
 
         if (prop.PropertyType == typeof(bool)) return "bool";
-        if (prop.PropertyType == typeof(int)) return "enumDropdown";
+        if (prop.PropertyType == typeof(int)) return "scalar";
 
         return "unknown";
     }
@@ -313,34 +301,32 @@
         try
         {
             var variablesType = variables.GetType();
-
             var containsKeyMethod = variablesType.GetMethod("ContainsKey");
-            if (containsKeyMethod != null)
+            if (containsKeyMethod == null) return null;
+
+            // Uses ShipTemplateVariableTypes.EquipmentSlots (key = 1)
+            const int equipmentSlotsKey = 1;
+            var containsKey = (bool)containsKeyMethod.Invoke(variables, new object[] { equipmentSlotsKey });
+            if (containsKey)
             {
-                var containsKey = (bool)containsKeyMethod.Invoke(variables, new object[] { 1 });
-                if (!containsKey)
-                {
-                    var addVariableMethod = variablesType.GetMethod("AddVariable");
-                    var slotType = Type.GetType("OpenRpg.Genres.Scifi.Ships.ShipEquipmentSlots, OpenRpg.Genres.Scifi");
-                    if (slotType != null)
-                    {
-                        var slots = Activator.CreateInstance(slotType);
-                        addVariableMethod?.Invoke(variables, new object[] { 1, slots });
-                        return slots;
-                    }
-                }
-                else
-                {
-                    var indexer = variablesType.GetProperty("Item");
-                    return indexer?.GetValue(variables, new object[] { 1 });
-                }
+                var indexer = variablesType.GetProperty("Item");
+                return indexer?.GetValue(variables, new object[] { equipmentSlotsKey });
             }
+
+            var addVariableMethod = variablesType.GetMethod("AddVariable");
+            if (addVariableMethod == null) return null;
+
+            var slotType = Type.GetType("OpenRpg.Genres.Scifi.Ships.ShipEquipmentSlots, OpenRpg.Genres.Scifi");
+            if (slotType == null) return null;
+
+            var slots = Activator.CreateInstance(slotType);
+            addVariableMethod.Invoke(variables, new object[] { equipmentSlotsKey, slots });
+            return slots;
         }
         catch
         {
-            // Fall through to return null
+            return null;
         }
-        return null;
     }
 
     private void OnNestedVariableChanged(object container, PropertyInfo prop, object newValue)
@@ -527,7 +513,7 @@
         }
     }
 
-    private OptionData[] GetOptionsForType(string typeSource, string propertyName = "")
+    private OpenRpg.Editor.Core.Plugins.OptionData[] GetOptionsForType(string typeSource, string propertyName = "")
     {
         var finalTypeSource = typeSource;
 
@@ -540,23 +526,20 @@
 
         return finalTypeSource switch
         {
-            "itemTypes" => ConvertOptions(GenreTypes.ItemTypes),
-            "itemQualityTypes" => ConvertOptions(GenreTypes.ItemQualityTypes),
-            "modificationTypes" => ConvertOptions(GenreTypes.ModificationTypes),
-            "effectTypes" => ConvertOptions(GenreTypes.EffectTypes),
-            "requirementTypes" => ConvertOptions(GenreTypes.RequirementTypes),
-            "objectiveTypes" => ConvertOptions(GenreTypes.ObjectiveTypes),
-            "rewardTypes" => ConvertOptions(GenreTypes.RewardTypes),
-            "gatheringSkillTypes" => ConvertOptions(GenreTypes.GatheringSkillTypes),
-            "craftingSkillTypes" => ConvertOptions(GenreTypes.CraftingSkillTypes),
-            "effectScalingType" => ConvertOptions(GenreTypes.EffectScalingType),
+            "itemTypes" => GenreTypes.ItemTypes,
+            "itemQualityTypes" => GenreTypes.ItemQualityTypes,
+            "modificationTypes" => GenreTypes.ModificationTypes,
+            "effectTypes" => GenreTypes.EffectTypes,
+            "requirementTypes" => GenreTypes.RequirementTypes,
+            "objectiveTypes" => GenreTypes.ObjectiveTypes,
+            "rewardTypes" => GenreTypes.RewardTypes,
+            "gatheringSkillTypes" => GenreTypes.GatheringSkillTypes,
+            "craftingSkillTypes" => GenreTypes.CraftingSkillTypes,
+            "effectScalingType" => GenreTypes.EffectScalingType,
+            "statTypes" => GenreTypes.StatTypes,
+            "stateTypes" => GenreTypes.StateTypes,
             _ => Array.Empty<OptionData>()
         };
-    }
-
-    private OptionData[] ConvertOptions(OpenRpg.Editor.Core.Plugins.OptionData[] source)
-    {
-        return source.Select(x => new OptionData(x.Id, x.Name)).ToArray();
     }
 
     private RenderFragment RenderVariableEnumDropdown(object variables, PropertyInfo field, string typeSource, string label)
@@ -639,8 +622,83 @@
 
     private RenderFragment RenderScalar(PropertyInfo property, TemplateEditorField field)
     {
-        var currentValue = property.GetValue(Template);
-        return @<div class="notification is-info">[@(property.Name): @(currentValue?.ToString() ?? "null")]</div>;
+        var label = !string.IsNullOrEmpty(field?.Name) ? field.Name : TemplateEditorConventions.GetLabel(property.Name);
+        var propType = property.PropertyType;
+
+        if (propType == typeof(int))
+        {
+            var currentValue = property.GetValue(Template) as int? ?? 0;
+            return @<div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label">@label</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="number" value="@currentValue" @onchange="e => OnScalarChanged(property, e.Value)" />
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+
+        if (propType == typeof(float) || propType == typeof(double))
+        {
+            var currentValue = property.GetValue(Template)?.ToString() ?? "0";
+            return @<div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label">@label</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="number" step="0.1" value="@currentValue" @onchange="e => OnScalarChanged(property, e.Value)" />
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+
+        if (propType == typeof(string))
+        {
+            var currentValue = property.GetValue(Template)?.ToString() ?? "";
+            return @<div class="field is-horizontal">
+                <div class="field-label">
+                    <label class="label">@label</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input" type="text" value="@currentValue" @onchange="e => OnScalarChanged(property, e.Value)" />
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+
+        var currentRawValue = property.GetValue(Template);
+        return @<div class="notification is-info">[@(property.Name): @(currentRawValue?.ToString() ?? "null")]</div>;
+    }
+
+    private void OnScalarChanged(PropertyInfo property, object newValue)
+    {
+        var propType = property.PropertyType;
+        if (propType == typeof(int))
+        {
+            property.SetValue(Template, int.TryParse(newValue?.ToString(), out var result) ? result : 0);
+        }
+        else if (propType == typeof(float))
+        {
+            property.SetValue(Template, float.TryParse(newValue?.ToString(), out var fResult) ? fResult : 0f);
+        }
+        else if (propType == typeof(double))
+        {
+            property.SetValue(Template, double.TryParse(newValue?.ToString(), out var dResult) ? dResult : 0d);
+        }
+        else
+        {
+            property.SetValue(Template, newValue);
+        }
     }
 
     private void OnVariableFieldChanged(string fieldName, object newValue)

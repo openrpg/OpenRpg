@@ -12,6 +12,7 @@ using OpenRpg.Data.Conventions.Extensions;
 using OpenRpg.Editor.Infrastructure.Extensions;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Items.Templates;
+using OpenRpg.Items.TradeSkills.Templates;
 using OpenRpg.Quests;
 
 namespace OpenRpg.Editor.Infrastructure.Helpers;
@@ -114,6 +115,19 @@ public class DynamicTemplateHelper
             quest.Objectives = quest.Objectives.AsList();
             quest.Rewards = quest.Rewards.AsList();
             quest.Variables.Requirements = quest.Variables.Requirements.AsList();
+            return;
+        }
+
+        if (template is ItemCraftingTemplate craftingTemplate)
+        {
+            craftingTemplate.InputItems = craftingTemplate.InputItems.AsList();
+            craftingTemplate.OutputItems = craftingTemplate.OutputItems.AsList();
+            return;
+        }
+
+        if (template is ItemGatheringTemplate gatheringTemplate)
+        {
+            gatheringTemplate.OutputItems = gatheringTemplate.OutputItems.AsList();
             return;
         }
     }

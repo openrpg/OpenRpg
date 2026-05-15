@@ -13,7 +13,7 @@
         <td>
             <div class="control">
                 <div class="select is-fullwidth">
-                    <select bind="@context.ObjectiveType">
+                    <select @bind="context.ObjectiveType">
                         @foreach (var objectiveType in GenreTypes.ObjectiveTypes)
                         {
                             <option value=@objectiveType.Id>@objectiveType.Name</option>

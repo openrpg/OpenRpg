@@ -15,7 +15,7 @@
         <td>
             <div class="control">
                 <div class="select is-fullwidth">
-                    <select bind="@context.ModificationType">
+                    <select @bind="context.ModificationType">
                         @foreach (var modificationType in GenreTypes.ModificationTypes)
                         {
                             <option value=@modificationType.Id>@modificationType.Name</option>
@@ -26,7 +26,7 @@
         </td>
         <td>
             <div class="control">
-                <input class="input" type="text" bind="@context.AmountAllowed" />
+                <input class="input" type="text" @bind="context.AmountAllowed" />
             </div>
         </td>
         <td>
