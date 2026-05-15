@@ -24,20 +24,6 @@ public static class IServiceProviderExtensions
         dataSource.Database.Add(typeof(ItemCraftingTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(ItemGatheringTemplate), new Dictionary<object, object>());
 
-        var genreService = serviceProvider.GetService<GenreService>();
-        if (genreService != null)
-        {
-            var templateTypeRegistry = genreService.GetTemplateTypeRegistry();
-            foreach (var templateType in templateTypeRegistry.GetTemplateTypes())
-            {
-                var classType = templateTypeRegistry.GetTemplateClassType(templateType);
-                if (!dataSource.Database.ContainsKey(classType))
-                {
-                    dataSource.Database.Add(classType, new Dictionary<object, object>());
-                }
-            }
-        }
-
         var localeDataSource = serviceProvider.GetService<EditorLocaleDatasource>();
         localeDataSource.LocaleDatasets.Add("en-gb", new LocaleDataset() { LocaleCode = "en-gb" });
 

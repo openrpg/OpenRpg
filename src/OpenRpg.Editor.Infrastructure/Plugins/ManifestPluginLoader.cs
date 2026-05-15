@@ -78,8 +78,7 @@ public class ManifestPluginLoader
     {
         try
         {
-            var assemblyName = AssemblyName.GetAssemblyName(dllPath);
-            var assembly = Assembly.Load(assemblyName);
+            var assembly = Assembly.LoadFrom(dllPath);
 
             var manifest = LoadManifestFromAssembly(assembly, dllPath);
             if (manifest == null)

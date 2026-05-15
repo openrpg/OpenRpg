@@ -10,10 +10,6 @@ public static class EditorDatasourceExtensions
 {
     public static string SerializeData<T>(this EditorDatasource datasource) where T : ITemplate
     {
-        var type = typeof(T);
-        if(!datasource.Database.ContainsKey(type))
-        { throw new Exception($"Editor contains no template data for type [{type.Name}]"); }
-
         var dataForType = datasource.GetAll<T>();
         return JsonConvert.SerializeObject(dataForType, new JsonSerializerSettings
         {

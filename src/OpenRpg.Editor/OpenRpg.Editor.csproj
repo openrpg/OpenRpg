@@ -21,6 +21,8 @@
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.Data.InMemory\OpenRpg.Data.InMemory.csproj" />
       <ProjectReference Include="..\OpenRpg.Editor.UI\OpenRpg.Editor.UI.csproj" />
+      <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" ReferenceOutputAssembly="false" />
+      <ProjectReference Include="..\OpenRpg.Genres.Scifi\OpenRpg.Genres.Scifi.csproj" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OpenRpg.Data;
 using OpenRpg.Editor.Core.Models;
+using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Editor.Infrastructure.Persistence.Migrations;
 using OpenRpg.Editor.Infrastructure.Plugins;
 using OpenRpg.Localization.Data.DataSources;
@@ -35,6 +36,19 @@ public class EditorDataLoader : FileDataLoader
         {
             var pluginIds = project.Plugins.Select(p => p.Id).ToList();
             GenreService.SetEnabledPlugins(pluginIds);
+
+            if (Datasource is EditorDatasource editorDs)
+            {
+                var templateTypeRegistry = GenreService.GetTemplateTypeRegistry();
+                foreach (var templateType in templateTypeRegistry.GetTemplateTypes())
+                {
+                    var classType = templateTypeRegistry.GetTemplateClassType(templateType);
+                    if (classType != null && !editorDs.Database.ContainsKey(classType))
+                    {
+                        editorDs.Database.Add(classType, new Dictionary<object, object>());
+                    }
+                }
+            }
         }
     }
 }

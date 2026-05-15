@@ -39,6 +39,9 @@ public class DynamicTemplateDatastorePopulator : JsonTemplateDatastorePopulator
             try
             {
                 var templateClassType = templateTypeRegistry.GetTemplateClassType(templateType);
+                var typeFilePath = Path.Combine(absoluteTemplateFolderPath, $"{templateClassType.Name}.json");
+                if (!await FileService.Exists(typeFilePath)) { continue; }
+
                 var genericMethod = processMethod.MakeGenericMethod(templateClassType);
                 var task = (Task)genericMethod.Invoke(this, [project, absoluteTemplateFolderPath, dataSource]);
                 if(task == null) { throw new Exception($"Failed to invoke dynamic template process for type [{templateType.Key}]");  }
