@@ -532,6 +532,7 @@
         if (group.Fields.Count == 0)
             return null;
 
+        var hasCollection = false;
         var total = 0;
         foreach (var field in group.Fields)
         {
@@ -545,11 +546,12 @@
             if (editorType != "collection")
                 continue;
 
+            hasCollection = true;
             var collectionValue = property.GetValue(Template) as System.Collections.IList;
             total += collectionValue?.Count ?? 0;
         }
 
-        return total;
+        return hasCollection ? total : null;
     }
 
     private void OnVariableFieldChanged(string fieldName, object newValue)
