@@ -230,10 +230,10 @@
         
         FriendlyName = Descriptor.Name;
 
-        UpdateEditorParams();
-
         RefreshTemplateList();
         CurrentTemplate = _allTemplates.FirstOrDefault();
+        
+        UpdateEditorParams();
 
         if (CurrentTemplate != null)
         { TemplateHelper.ListifyProperties(CurrentTemplate); }
