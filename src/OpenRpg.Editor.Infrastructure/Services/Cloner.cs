@@ -7,7 +7,7 @@ namespace OpenRpg.Editor.Infrastructure.Services
     public class Cloner : ICloner
     {
         public JsonSerializerSettings SerializationSettings { get; } = new() { 
-            TypeNameHandling = TypeNameHandling.Auto, 
+            TypeNameHandling = TypeNameHandling.Auto,
             Converters = [new VariablesConverter()],
             MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead
         };

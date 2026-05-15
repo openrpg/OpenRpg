@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenRpg.Data;
@@ -28,19 +27,14 @@ public class EditorDataLoader : FileDataLoader
         GenreService = genreService;
     }
 
-    public override async Task<Project> Load(string projectFile)
+    public override async Task OnProjectLoaded(Project project, string projectPath)
     {
-        var project = await base.Load(projectFile);
-        
-        var projectPath = Path.GetDirectoryName(projectFile);
         EditorState.CurrentProject = new LoadedProject() { Project = project, ProjectPath = projectPath };
 
-        if (project.Plugins?.Any() == true)
+        if (project.Plugins.Count > 0)
         {
             var pluginIds = project.Plugins.Select(p => p.Id).ToList();
             GenreService.SetEnabledPlugins(pluginIds);
         }
-
-        return project;
     }
 }
