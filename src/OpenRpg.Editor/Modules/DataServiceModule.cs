@@ -55,7 +55,6 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<IFileService, DefaultFileService>();
             services.AddSingleton<IProjectLoader, JsonProjectLoader>();
             services.AddSingleton<ITemplateLoader, JsonTemplateLoader>();
-            services.AddSingleton<ITemplateDatastorePopulator, JsonTemplateDatastorePopulator>();
             services.AddSingleton<ILocaleLoader, JsonLocaleLoader>();
             services.AddSingleton<ILocaleDatastorePopulator, JsonLocaleDatastorePopulator>();
 
@@ -66,8 +65,7 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<ManifestPluginLoader>();
             services.AddSingleton<GenreService>();
             services.AddSingleton<GenreTypesService>();
-            services.AddSingleton<DynamicTemplateDatastorePopulator>();
-            services.AddSingleton<ITemplateDatastorePopulator>(sp => sp.GetRequiredService<DynamicTemplateDatastorePopulator>());
+            services.AddSingleton<ITemplateDatastorePopulator, DynamicTemplateDatastorePopulator>();
 
             services.AddSingleton<IComponentTypeRegistry>(sp =>
             {

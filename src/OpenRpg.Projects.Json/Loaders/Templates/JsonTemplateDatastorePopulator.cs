@@ -23,6 +23,16 @@ public class JsonTemplateDatastorePopulator : ITemplateDatastorePopulator
         FileService = fileService;
         TemplateLoader = templateLoader;
     }
+
+    public virtual async Task ProcessTemplateTypes(Project project, string absoluteTemplateFolderPath, IDataSource dataSource)
+    {
+        await ProcessTemplates<ItemTemplate>(project, absoluteTemplateFolderPath, dataSource);
+        await ProcessTemplates<ClassTemplate>(project, absoluteTemplateFolderPath, dataSource);
+        await ProcessTemplates<RaceTemplate>(project, absoluteTemplateFolderPath, dataSource);
+        await ProcessTemplates<Quest>(project, absoluteTemplateFolderPath, dataSource);
+        await ProcessTemplates<ItemCraftingTemplate>(project, absoluteTemplateFolderPath, dataSource);
+        await ProcessTemplates<ItemGatheringTemplate>(project, absoluteTemplateFolderPath, dataSource);
+    }
     
     public async Task PopulateDatastore(Project project, string projectPath, IDataSource dataSource)
     {
@@ -31,12 +41,7 @@ public class JsonTemplateDatastorePopulator : ITemplateDatastorePopulator
         var templatePathExists = await FileService.Exists(absoluteTemplateFolderPath);
         if(!templatePathExists) { throw new Exception($"Template folder [{absoluteTemplateFolderPath}] cannot be found"); }
         
-        await ProcessTemplates<ItemTemplate>(project, absoluteTemplateFolderPath, dataSource);
-        await ProcessTemplates<ClassTemplate>(project, absoluteTemplateFolderPath, dataSource);
-        await ProcessTemplates<RaceTemplate>(project, absoluteTemplateFolderPath, dataSource);
-        await ProcessTemplates<Quest>(project, absoluteTemplateFolderPath, dataSource);
-        await ProcessTemplates<ItemCraftingTemplate>(project, absoluteTemplateFolderPath, dataSource);
-        await ProcessTemplates<ItemGatheringTemplate>(project, absoluteTemplateFolderPath, dataSource);
+        await ProcessTemplateTypes(project, absoluteTemplateFolderPath, dataSource);
     }
 
     protected async Task ProcessTemplates<T>(Project project, string templateFolderPath, IDataSource dataSource) where T : ITemplate

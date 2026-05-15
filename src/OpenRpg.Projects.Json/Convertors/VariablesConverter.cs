@@ -3,28 +3,18 @@ using Newtonsoft.Json.Linq;
 
 namespace OpenRpg.Projects.Json.Convertors;
 
-public class VariablesConverter
-    : JsonConverter<Dictionary<int, object?>>
+public class VariablesConverter : JsonConverter<Dictionary<int, object?>>
 {
-    public override Dictionary<int, object?>? ReadJson(
-        JsonReader reader,
-        Type objectType,
-        Dictionary<int, object?>? existingValue,
-        bool hasExistingValue,
-        JsonSerializer serializer)
+    public override Dictionary<int, object?>? ReadJson(JsonReader reader, Type objectType,
+        Dictionary<int, object?>? existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         var obj = JObject.Load(reader);
 
         return obj.Properties()
-            .ToDictionary(
-                p => int.Parse(p.Name),
-                p => ReadToken(p.Value, serializer)
-            );
+            .ToDictionary(p => int.Parse(p.Name), p => ReadToken(p.Value, serializer));
     }
 
-    private object? ReadToken(
-        JToken token,
-        JsonSerializer serializer)
+    private object? ReadToken(JToken token, JsonSerializer serializer)
     {
         switch (token.Type)
         {
@@ -88,11 +78,6 @@ public class VariablesConverter
         }
     }
 
-    public override void WriteJson(
-        JsonWriter writer,
-        Dictionary<int, object?>? value,
-        JsonSerializer serializer)
-    {
-        serializer.Serialize(writer, value);
-    }
+    public override void WriteJson(JsonWriter writer, Dictionary<int, object?>? value, JsonSerializer serializer)
+    { serializer.Serialize(writer, value); }
 }

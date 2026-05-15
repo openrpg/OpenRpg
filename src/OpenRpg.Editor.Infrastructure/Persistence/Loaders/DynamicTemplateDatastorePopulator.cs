@@ -8,62 +8,44 @@ using OpenRpg.Core.Templates;
 using OpenRpg.Data;
 using OpenRpg.Editor.Infrastructure.Plugins;
 using OpenRpg.Projects.Json.Extensions;
+using OpenRpg.Projects.Json.Loaders.Templates;
 using OpenRpg.Projects.Loaders.Templates;
 using OpenRpg.Projects.Models;
 using OpenRpg.Projects.Services;
 
 namespace OpenRpg.Editor.Infrastructure.Persistence.Loaders;
 
-public class DynamicTemplateDatastorePopulator : ITemplateDatastorePopulator
+public class DynamicTemplateDatastorePopulator : JsonTemplateDatastorePopulator
 {
     public IFileService FileService { get; }
     public ITemplateLoader TemplateLoader { get; }
     public GenreService GenreService { get; }
 
-    public DynamicTemplateDatastorePopulator(IFileService fileService, ITemplateLoader templateLoader, GenreService genreService)
+    public DynamicTemplateDatastorePopulator(IFileService fileService, ITemplateLoader templateLoader, GenreService genreService) : base(fileService, templateLoader)
     {
         FileService = fileService;
         TemplateLoader = templateLoader;
         GenreService = genreService;
     }
 
-    public async Task PopulateDatastore(Project project, string projectPath, IDataSource dataSource)
+    public override async Task ProcessTemplateTypes(Project project, string absoluteTemplateFolderPath, IDataSource dataSource)
     {
-        var templateFolderPath = project.TemplatesFolder;
-        var absoluteTemplateFolderPath = Path.Combine(projectPath, templateFolderPath);
-        var templatePathExists = await FileService.Exists(absoluteTemplateFolderPath);
-        if (!templatePathExists) { throw new Exception($"Template folder [{absoluteTemplateFolderPath}] cannot be found"); }
-
         var templateTypeRegistry = GenreService.GetTemplateTypeRegistry();
         var templateTypes = templateTypeRegistry.GetTemplateTypes();
         var processMethod = typeof(DynamicTemplateDatastorePopulator).GetMethod(nameof(ProcessTemplates), BindingFlags.NonPublic | BindingFlags.Instance);
-
+        
         foreach (var templateType in templateTypes)
         {
             try
             {
                 var templateClassType = templateTypeRegistry.GetTemplateClassType(templateType);
                 var genericMethod = processMethod.MakeGenericMethod(templateClassType);
-                var task = (Task)genericMethod.Invoke(this, new object[] { project, absoluteTemplateFolderPath, dataSource });
+                var task = (Task)genericMethod.Invoke(this, [project, absoluteTemplateFolderPath, dataSource]);
+                if(task == null) { throw new Exception($"Failed to invoke dynamic template process for type [{templateType.Key}]");  }
                 await task;
             }
             catch (Exception ex)
-            {
-                throw new Exception($"Failed to process template type '{templateType.Key}': {ex.Message}", ex);
-            }
-        }
-    }
-
-    protected async Task ProcessTemplates<T>(Project project, string templateFolderPath, IDataSource dataSource) where T : ITemplate
-    {
-        var templatePath = Path.Combine(templateFolderPath, $"{typeof(T).Name}.json");
-        var templatePathExists = await FileService.Exists(templatePath);
-        if (!templatePathExists) { return; }
-
-        var templates = await TemplateLoader.LoadTemplates<T>(project, templatePath);
-        foreach (var template in templates)
-        {
-            dataSource.Update(template, template.Id);
+            { throw new Exception($"Failed to process template type '{templateType.Key}': {ex.Message}", ex); }
         }
     }
 }
