@@ -116,6 +116,22 @@
     <div class="column">
         @if (CurrentTemplate != null && Descriptor != null && _dynamicEditor != null)
         {
+            <div class="is-flex is-justify-content-flex-end mb-3">
+                <div class="field is-grouped">
+                    <p class="control">
+                        <a class="button is-info" @onclick="CloneTemplate">
+                            <span class="icon"><i class="fas fa-clone"></i></span>
+                            <span>Clone</span>
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a class="button is-danger" @onclick="ShowDeleteConfirmation">
+                            <span class="icon"><i class="fas fa-trash"></i></span>
+                            <span>Delete</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
             <DynamicComponent Type="@_dynamicEditor" Parameters="@_editorParams" />
         }
         else if (Descriptor != null)
@@ -133,24 +149,6 @@
     </div>
 </div>
 
-@if (CurrentTemplate != null)
-{
-    <div class="container m-4">
-        <div class="field is-grouped has-text-centered">
-            <p class="control">
-                <a class="button is-info" @onclick="CloneTemplate">
-                    Clone @(FriendlyName) Template
-                </a>
-            </p>
-            <p class="control">
-                <a class="button is-danger" @onclick="ShowDeleteConfirmation">
-                    Delete @(FriendlyName) Template
-                </a>
-            </p>
-        </div>
-    </div>
-}
-
 @if (_showDeleteConfirm)
 {
     <div class="modal is-active">
@@ -160,7 +158,7 @@
                 <p class="modal-card-title">Delete @(FriendlyName)</p>
                 <button class="delete" aria-label="close" @onclick="CancelDelete"></button>
             </header>
-            <section class="modal-card-body">
+            <section class="modal-card-body has-text-dark">
                 <p>Are you sure you want to delete <strong>@GetAssetCode(CurrentTemplate)</strong>?</p>
                 <p class="mt-2">This action cannot be undone.</p>
             </section>
