@@ -33,7 +33,7 @@
     <PrimaryDetailsContent>
         @foreach (var group in Groups)
         {
-            <Accordion Title="@(group.Title)" IsExpanded="true">
+            <Accordion Title="@(group.Title)" IsExpanded="false">
                 @RenderGroup(group)
             </Accordion>
         }
