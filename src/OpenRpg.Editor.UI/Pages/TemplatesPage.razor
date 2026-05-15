@@ -38,18 +38,23 @@
     <div class="column is-one-fifth">
         @if (Descriptor != null)
         {
-            <div class="box">
-                <div class="content">
-                    <h4 class="title is-5">@Descriptor.Name</h4>
-                    <p class="mb-2">
-                        <span class="tag is-info">@TemplateType</span>
-                    </p>
-                    <button class="button is-primary is-fullwidth" @onclick="AddTemplate">
-                        <span class="icon"><i class="fas fa-plus"></i></span>
-                        <span>Add New</span>
+            <Accordion Title="Template Actions" IsExpanded="true" HeaderClasses="is-info is-light">
+                <button class="button is-primary is-fullwidth" @onclick="AddTemplate">
+                    <span class="icon"><i class="fas fa-plus"></i></span>
+                    <span>Add New</span>
+                </button>
+                @if (CurrentTemplate != null)
+                {
+                    <button class="button is-info is-fullwidth mt-2" @onclick="CloneTemplate">
+                        <span class="icon"><i class="fas fa-clone"></i></span>
+                        <span>Clone</span>
                     </button>
-                </div>
-            </div>
+                    <button class="button is-danger is-fullwidth mt-2" @onclick="ShowDeleteConfirmation">
+                        <span class="icon"><i class="fas fa-trash"></i></span>
+                        <span>Delete</span>
+                    </button>
+                }
+            </Accordion>
             <div class="box">
                 <p class="menu-label">@Descriptor.Name</p>
                 <div class="field mb-2">
@@ -116,22 +121,6 @@
     <div class="column">
         @if (CurrentTemplate != null && Descriptor != null && _dynamicEditor != null)
         {
-            <div class="is-flex is-justify-content-flex-end mb-3">
-                <div class="field is-grouped">
-                    <p class="control">
-                        <a class="button is-info" @onclick="CloneTemplate">
-                            <span class="icon"><i class="fas fa-clone"></i></span>
-                            <span>Clone</span>
-                        </a>
-                    </p>
-                    <p class="control">
-                        <a class="button is-danger" @onclick="ShowDeleteConfirmation">
-                            <span class="icon"><i class="fas fa-trash"></i></span>
-                            <span>Delete</span>
-                        </a>
-                    </p>
-                </div>
-            </div>
             <DynamicComponent Type="@_dynamicEditor" Parameters="@_editorParams" />
         }
         else if (Descriptor != null)
