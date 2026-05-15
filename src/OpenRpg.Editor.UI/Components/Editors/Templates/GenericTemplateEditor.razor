@@ -32,14 +32,14 @@
     
     @if (Template.Variables.HasEffects())
     {
-        <Accordion Title="Template Effects" IsExpanded="@(Template.Variables.Effects.Count > 0)">
+        <Accordion Title="Template Effects" BadgeCount="@(Template.Variables.Effects.Count)" IsExpanded="@(Template.Variables.Effects.Count > 0)">
             <EffectsEditor Effects="Template.Variables.Effects as List<IEffect>"/>
         </Accordion>
     }
 
     @if (Template.Variables.HasRequirements())
     {
-        <Accordion Title="Template Requirements" IsExpanded="@(Template.Variables.Requirements.Count > 0)">
+        <Accordion Title="Template Requirements" BadgeCount="@(Template.Variables.Requirements.Count)" IsExpanded="@(Template.Variables.Requirements.Count > 0)">
             <RequirementsEditor Requirements="Template.Variables.Requirements as List<Requirement>" />
         </Accordion>
     }

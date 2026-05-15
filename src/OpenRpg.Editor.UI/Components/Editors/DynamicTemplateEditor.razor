@@ -33,7 +33,7 @@
     <PrimaryDetailsContent>
         @foreach (var group in Groups)
         {
-            <Accordion Title="@(group.Title)" IsExpanded="@ShouldGroupBeExpanded(group)">
+            <Accordion Title="@(group.Title)" IsExpanded="@ShouldGroupBeExpanded(group)" BadgeCount="@GetGroupBadgeCount(group)">
                 @RenderGroup(group)
             </Accordion>
         }
@@ -522,6 +522,34 @@
         }
 
         return false;
+    }
+
+    private int? GetGroupBadgeCount(TemplateEditorGroup group)
+    {
+        if (!string.IsNullOrEmpty(group.EditorComponent))
+            return null;
+
+        if (group.Fields.Count == 0)
+            return null;
+
+        var total = 0;
+        foreach (var field in group.Fields)
+        {
+            if (!_propertyMap.TryGetValue(field.Property, out var property))
+                continue;
+
+            var editorType = !string.IsNullOrEmpty(field.EditorType)
+                ? field.EditorType
+                : PropertyResolver.GetEditorType(property);
+
+            if (editorType != "collection")
+                continue;
+
+            var collectionValue = property.GetValue(Template) as System.Collections.IList;
+            total += collectionValue?.Count ?? 0;
+        }
+
+        return total;
     }
 
     private void OnVariableFieldChanged(string fieldName, object newValue)
