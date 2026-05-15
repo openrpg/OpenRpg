@@ -52,20 +52,49 @@
             </div>
             <div class="box">
                 <p class="menu-label">@Descriptor.Name</p>
-                <ul class="menu-list">
-                    @foreach (var template in GetTemplateList())
+                <div class="field mb-2">
+                    <div class="control">
+                        <input class="input is-small" type="text" placeholder="Filter by asset code..." @bind="SearchTerm" @bind:event="oninput" />
+                    </div>
+                </div>
+                @if (PagedTemplates.Count == 0)
+                {
+                    <div class="notification is-warning is-light py-2 my-2">
+                        No matching templates found.
+                    </div>
+                }
+                else
+                {
+                    <ul class="menu-list">
+                        @foreach (var template in PagedTemplates)
+                        {
+                            <li>
+                                <a class="template-link @(CurrentTemplate == template ? "is-active" : "")" @onclick="() => SelectTemplate(template)">
+                                    <span>@GetAssetCode(template)</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                    @if (TotalPages > 1)
                     {
-                        var id = template.GetType().GetProperty("Id")?.GetValue(template) as int? ?? 0;
-                        var variables = template.GetType().GetProperty("Variables")?.GetValue(template) as IVariables<object>;
-                        var assetCode = variables?.HasAssetCode() == true 
-                            ? variables.AssetCode : $"{Descriptor.AssetCodePrefix}-{id}";
-                        <li>
-                            <a class="template-link @(CurrentTemplate == template ? "is-active" : "")" @onclick="() => SelectTemplate(template)">
-                                <span>@assetCode</span>
-                            </a>
-                        </li>
+                        <div class="is-flex is-justify-content-center is-align-items-center mt-2 is-size-7">
+                            <button class="button is-small" disabled="@(_currentPage <= 1)" @onclick="() => GoToPage(1)" title="First page">
+                                <span class="icon is-small"><i class="fas fa-angle-double-left"></i></span>
+                            </button>
+                            <button class="button is-small" disabled="@(_currentPage <= 1)" @onclick="() => GoToPage(_currentPage - 1)" title="Previous page">
+                                <span class="icon is-small"><i class="fas fa-angle-left"></i></span>
+                            </button>
+                            <span class="px-2 has-text-weight-medium">@_currentPage / @TotalPages</span>
+                            <button class="button is-small" disabled="@(_currentPage >= TotalPages)" @onclick="() => GoToPage(_currentPage + 1)" title="Next page">
+                                <span class="icon is-small"><i class="fas fa-angle-right"></i></span>
+                            </button>
+                            <button class="button is-small" disabled="@(_currentPage >= TotalPages)" @onclick="() => GoToPage(TotalPages)" title="Last page">
+                                <span class="icon is-small"><i class="fas fa-angle-double-right"></i></span>
+                            </button>
+                        </div>
                     }
-                </ul>
+                    <p class="has-text-grey is-size-7 mt-1">@_filteredTemplates.Count total</p>
+                }
             </div>
         }
         else
@@ -132,6 +161,20 @@
     private ITemplate CurrentTemplate;
     private string FriendlyName = "";
 
+    private string _searchTerm = "";
+    private string SearchTerm
+    {
+        get => _searchTerm;
+        set { _searchTerm = value; _currentPage = 1; }
+    }
+    private int _currentPage = 1;
+    private int _pageSize = 10;
+    private List<ITemplate> _allTemplates = new();
+    private List<ITemplate> _filteredTemplates = new();
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling((double)_filteredTemplates.Count / _pageSize));
+    private List<ITemplate> PagedTemplates =>
+        _filteredTemplates.Skip((_currentPage - 1) * _pageSize).Take(_pageSize).ToList();
 
     private Type _dynamicEditor;
     private Dictionary<string, object> _editorParams = new();
@@ -180,8 +223,8 @@
 
         UpdateEditorParams();
 
-        var templates = TemplateHelper.GetAll();
-        CurrentTemplate = templates.FirstOrDefault();
+        RefreshTemplateList();
+        CurrentTemplate = _allTemplates.FirstOrDefault();
 
         if (CurrentTemplate != null)
         { TemplateHelper.ListifyProperties(CurrentTemplate); }
@@ -227,8 +270,35 @@
         return new List<TemplateEditorGroup>();
     }
 
-    private List<ITemplate> GetTemplateList()
-    { return TemplateHelper.GetAll().ToList(); }
+    private void RefreshTemplateList()
+    {
+        _allTemplates = TemplateHelper?.GetAll()?.ToList() ?? new List<ITemplate>();
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        _filteredTemplates = string.IsNullOrEmpty(_searchTerm)
+            ? new List<ITemplate>(_allTemplates)
+            : _allTemplates
+                .Where(t => GetAssetCode(t).Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        if (_currentPage > TotalPages) _currentPage = TotalPages;
+    }
+
+    private string GetAssetCode(ITemplate template)
+    {
+        var id = template.GetType().GetProperty("Id")?.GetValue(template) as int? ?? 0;
+        var variables = template.GetType().GetProperty("Variables")?.GetValue(template) as IVariables<object>;
+        return variables?.HasAssetCode() == true
+            ? variables.AssetCode
+            : $"{Descriptor?.AssetCodePrefix ?? "template"}-{id}";
+    }
+
+    private void GoToPage(int page)
+    {
+        _currentPage = Math.Clamp(page, 1, TotalPages);
+    }
 
     private void NavigateToType(string type)
     { NavigationManager.NavigateTo($"/templates/{type}"); }
@@ -247,6 +317,7 @@
         TemplateHelper.GenerateLocaleCodes(newTemplate);
         TemplateHelper.Create(newTemplate, newId);
 
+        RefreshTemplateList();
         CurrentTemplate = newTemplate;
         UpdateEditorParams();
         StateHasChanged();
@@ -267,7 +338,8 @@
         TemplateHelper.Delete(CurrentTemplate);
         await Notifier.ShowNotification($"Deleted {FriendlyName} Template");
 
-        CurrentTemplate = TemplateHelper.GetAll().FirstOrDefault();
+        RefreshTemplateList();
+        CurrentTemplate = _allTemplates.FirstOrDefault();
 
         if (CurrentTemplate == null)
         { AddTemplate(); }
@@ -294,6 +366,7 @@
         
         await Notifier.ShowNotification($"Cloned {FriendlyName} Template");
 
+        RefreshTemplateList();
         CurrentTemplate = clone;
         UpdateEditorParams();
         StateHasChanged();
