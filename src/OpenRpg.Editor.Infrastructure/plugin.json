@@ -134,15 +134,18 @@
         },
         {
           "title": "Abilities",
-          "editorComponent": "AbilitiesEditor"
+          "editorComponent": "AbilitiesEditor",
+          "options": { "hasOwnAccordion": "true" }
         },
         {
           "title": "Loot Table",
-          "editorComponent": "LootTableEditor"
+          "editorComponent": "LootTableEditor",
+          "options": { "hasOwnAccordion": "true" }
         },
         {
           "title": "Starting Equipment",
-          "editorComponent": "EquipmentEditor"
+          "editorComponent": "EquipmentEditor",
+          "options": { "hasOwnAccordion": "true" }
         }
       ]
     }

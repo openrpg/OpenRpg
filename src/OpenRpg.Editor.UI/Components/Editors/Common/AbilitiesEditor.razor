@@ -8,26 +8,28 @@
 
 @inject IRepository Repository
 
-<ListEditor Data="Abilities" TItem="AbilityData">
-    <HeaderTemplate>
-        <th>Ability</th>
-    </HeaderTemplate>
-    <RowTemplate>
-        <td>
-            <div class="control">
-                <div class="select is-fullwidth">
-                    <select @bind="context.TemplateId">
-                        <option value="0">None</option>
-                        @foreach (var abilityTemplate in Repository.GetAll<AbilityTemplate>())
-                        {
-                            <option value="@abilityTemplate.Id">@abilityTemplate.Variables.AssetCode</option>
-                        }
-                    </select>
+<Accordion Title="Abilities" IsExpanded="@(Abilities.Count > 0)" BadgeCount="@Abilities.Count">
+    <ListEditor Data="Abilities" TItem="AbilityData">
+        <HeaderTemplate>
+            <th>Ability</th>
+        </HeaderTemplate>
+        <RowTemplate>
+            <td>
+                <div class="control">
+                    <div class="select is-fullwidth">
+                        <select @bind="context.TemplateId">
+                            <option value="0">None</option>
+                            @foreach (var abilityTemplate in Repository.GetAll<AbilityTemplate>())
+                            {
+                                <option value="@abilityTemplate.Id">@abilityTemplate.Variables.AssetCode</option>
+                            }
+                        </select>
+                    </div>
                 </div>
-            </div>
-        </td>
-    </RowTemplate>
-</ListEditor>
+            </td>
+        </RowTemplate>
+    </ListEditor>
+</Accordion>
 
 @code {
     [Parameter]

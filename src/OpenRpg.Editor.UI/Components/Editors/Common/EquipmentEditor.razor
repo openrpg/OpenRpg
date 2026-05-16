@@ -1,5 +1,6 @@
 @using OpenRpg.Data
 @using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Core.Components
 @using OpenRpg.Entities.Entity.Templates
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Items.Extensions
@@ -13,54 +14,57 @@
 
 @if (entityEquipment != null)
 {
-    <table class="table is-fullwidth is-rounded">
-        <thead>
-            <tr>
-                <th>Slot Type</th>
-                <th>Item</th>
-                <th style="max-width: 6em;"></th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (entityEquipment.Slots.Count == 0)
-            {
+    <Accordion Title="Starting Equipment" IsExpanded="@(entityEquipment.Slots.Count > 0)" BadgeCount="@entityEquipment.Slots.Count">
+        <table class="table is-fullwidth is-rounded">
+            <thead>
                 <tr>
-                    <td colspan="10000" class="has-text-centered">
-                        <p>No equipment defined</p>
-                    </td>
+                    <th>Slot Type</th>
+                    <th>Item</th>
+                    <th style="max-width: 6em;">
+                        <a class="tag is-primary" @onclick="AddEquipmentSlot">Add</a>
+                    </th>
                 </tr>
-            }
-            @foreach (var slotEntry in entityEquipment.Slots.ToList())
-            {
-                var slotKey = slotEntry.Key;
-                var itemData = slotEntry.Value;
-                <tr @key="slotKey">
-                    <td>
-                        <div class="control">
-                            <input class="input" type="text" value="@slotKey" readonly />
-                        </div>
-                    </td>
-                    <td>
-                        <div class="control">
-                            <div class="select is-fullwidth">
-                                <select @bind="itemData.TemplateId">
-                                    <option value="0">None</option>
-                                    @foreach (var itemTemplate in Repository.GetAll<ItemTemplate>())
-                                    {
-                                        <option value="@itemTemplate.Id">@itemTemplate.Variables.AssetCode</option>
-                                    }
-                                </select>
+            </thead>
+            <tbody>
+                @if (entityEquipment.Slots.Count == 0)
+                {
+                    <tr>
+                        <td colspan="10000" class="has-text-centered">
+                            <p>No equipment defined</p>
+                        </td>
+                    </tr>
+                }
+                @foreach (var slotEntry in entityEquipment.Slots.ToList())
+                {
+                    var slotKey = slotEntry.Key;
+                    var itemData = slotEntry.Value;
+                    <tr @key="slotKey">
+                        <td>
+                            <div class="control">
+                                <input class="input" type="text" value="@slotKey" readonly />
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        <button class="button is-danger" @onclick="x => entityEquipment.Slots.Remove(slotKey)">X</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <button class="button is-primary" @onclick="AddEquipmentSlot">Add Equipment Slot</button>
+                        </td>
+                        <td>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select @bind="itemData.TemplateId">
+                                        <option value="0">None</option>
+                                        @foreach (var itemTemplate in Repository.GetAll<ItemTemplate>())
+                                        {
+                                            <option value="@itemTemplate.Id">@itemTemplate.Variables.AssetCode</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="button is-danger" @onclick="x => entityEquipment.Slots.Remove(slotKey)">X</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </Accordion>
 }
 
 @code {

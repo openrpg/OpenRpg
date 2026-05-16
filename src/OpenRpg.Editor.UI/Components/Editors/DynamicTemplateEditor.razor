@@ -33,9 +33,17 @@
     <PrimaryDetailsContent>
         @foreach (var group in Groups)
         {
-            <Accordion Title="@(group.Title)" IsExpanded="@ShouldGroupBeExpanded(group)" BadgeCount="@GetGroupBadgeCount(group)">
+            var groupHasOwnAccordion = group.Options?.GetValueOrDefault("hasOwnAccordion")?.ToLower() == "true";
+            if (groupHasOwnAccordion)
+            {
                 @RenderGroup(group)
-            </Accordion>
+            }
+            else
+            {
+                <Accordion Title="@(group.Title)" IsExpanded="@ShouldGroupBeExpanded(group)" BadgeCount="@GetGroupBadgeCount(group)">
+                    @RenderGroup(group)
+                </Accordion>
+            }
         }
     </PrimaryDetailsContent>
 </GenericTemplateEditor>
