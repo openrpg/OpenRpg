@@ -77,10 +77,11 @@
 @code {
     [Parameter]
     public EntityTemplate Template { get; set; }
+    
+    DefaultLootTable LootTable => (DefaultLootTable)Template.Variables.LootTable;
 
     void AddLootEntry()
     {
-        var lootTable = (DefaultLootTable)Template.Variables.LootTable;
-        lootTable.AvailableLoot.Add(new LootTableEntry { ItemData = new ItemData() });
+        LootTable.AvailableLoot.Add(new LootTableEntry { ItemData = new ItemData() });
     }
 }
