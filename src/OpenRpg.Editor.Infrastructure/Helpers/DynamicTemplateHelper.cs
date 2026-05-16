@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using OpenRpg.Combat.Abilities;
+using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Requirements;
@@ -102,6 +104,7 @@ public class DynamicTemplateHelper
         
         variables.Effects = variables.HasEffects() ? variables.Effects.AsList() : new List<IEffect>();
         variables.Requirements = variables.HasRequirements() ? variables.Requirements.AsList() : new List<Requirement>();
+        variables.Abilities = variables.HasAbilities() ? variables.Abilities.AsList() : new List<AbilityData>();
         
         if (template is ItemTemplate itemTemplate)
         {

@@ -6,6 +6,9 @@
 @using OpenRpg.Entities.Entity.Templates
 @using OpenRpg.Entities.Races.Templates
 
+@inject GenreTypesService GenreTypes
+@inject IRepository Repository
+
 <div class="field is-horizontal">
     <div class="field-label">
         <label class="label">Gender</label>
@@ -69,12 +72,6 @@
 </div>
 
 @code {
-    [Inject]
-    public GenreTypesService GenreTypes { get; set; }
-
-    [Inject]
-    public IRepository Repository { get; set; }
-
     [Parameter]
     public EntityTemplate Template { get; set; }
 }

@@ -77,6 +77,9 @@ namespace OpenRpg.Editor.Modules
                 registry.Register(nameof(RewardsEditor), typeof(RewardsEditor));
                 registry.Register(nameof(ModificationAllowancesEditor), typeof(ModificationAllowancesEditor));
                 registry.Register(nameof(TradeSkillItemEntriesEditor), typeof(TradeSkillItemEntriesEditor));
+                registry.Register(nameof(AbilitiesEditor), typeof(AbilitiesEditor));
+                registry.Register(nameof(LootTableEditor), typeof(LootTableEditor));
+                registry.Register(nameof(EquipmentEditor), typeof(EquipmentEditor));
                 registry.Register(nameof(EffectsEditor), typeof(EffectsEditor));
                 registry.Register(nameof(RequirementsEditor), typeof(RequirementsEditor));
                 return registry;

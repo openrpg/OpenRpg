@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using OpenRpg.Combat.Abilities;
+using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Requirements;
@@ -70,6 +72,11 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
             { variables.Requirements = variables.Requirements.ToList(); }
             else
             { variables.Requirements = new List<Requirement>(); }
+            
+            if(variables.HasAbilities())
+            { variables.Abilities = variables.Abilities.ToList(); }
+            else
+            { variables.Abilities = new List<AbilityData>(); }
             
             if (template is ItemTemplate itemTemplate)
             { itemTemplate.ModificationAllowances = itemTemplate.ModificationAllowances.AsList(); }

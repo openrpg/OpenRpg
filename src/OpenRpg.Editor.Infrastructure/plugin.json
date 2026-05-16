@@ -50,6 +50,12 @@
       "assetCodePrefix": "race",
       "groups": []
     },
+    "ability": {
+      "name": "Ability Template",
+      "templateType": "OpenRpg.Combat.Abilities.AbilityTemplate, OpenRpg.Combat",
+      "assetCodePrefix": "ability",
+      "groups": []
+    },
     "quest": {
       "name": "Quest",
       "templateType": "OpenRpg.Quests.Quest, OpenRpg.Quests",
@@ -125,6 +131,18 @@
         {
           "title": "Entity Details",
           "editorComponent": "EntityTemplateDetailsEditor"
+        },
+        {
+          "title": "Abilities",
+          "editorComponent": "AbilitiesEditor"
+        },
+        {
+          "title": "Loot Table",
+          "editorComponent": "LootTableEditor"
+        },
+        {
+          "title": "Starting Equipment",
+          "editorComponent": "EquipmentEditor"
         }
       ]
     }

@@ -1,0 +1,37 @@
+@using OpenRpg.Combat.Abilities
+@using OpenRpg.Combat.Extensions
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Core.Components
+@using OpenRpg.Entities.Entity.Templates
+@using OpenRpg.Entities.Extensions
+
+@inject IRepository Repository
+
+<ListEditor Data="Abilities" TItem="AbilityData">
+    <HeaderTemplate>
+        <th>Ability</th>
+    </HeaderTemplate>
+    <RowTemplate>
+        <td>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select @bind="context.TemplateId">
+                        <option value="0">None</option>
+                        @foreach (var abilityTemplate in Repository.GetAll<AbilityTemplate>())
+                        {
+                            <option value="@abilityTemplate.Id">@abilityTemplate.Variables.AssetCode</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </td>
+    </RowTemplate>
+</ListEditor>
+
+@code {
+    [Parameter]
+    public EntityTemplate Template { get; set; }
+
+    public List<AbilityData> Abilities => Template.Variables.Abilities as List<AbilityData>;
+}
