@@ -1,6 +1,6 @@
 ﻿@using OpenRpg.Core.Associations
 @using OpenRpg.Core.Utils
-@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Editor.UI.Services
 @using OpenRpg.Quests
 
 <ListEditor Data="Objectives" TItem="Objective">
@@ -13,8 +13,8 @@
         <td>
             <div class="control">
                 <div class="select is-fullwidth">
-                    <select bind="@context.ObjectiveType">
-                        @foreach (var objectiveType in TypesHelper.GetObjectiveTypes)
+                    <select @bind="context.ObjectiveType">
+                        @foreach (var objectiveType in GenreTypes.ObjectiveTypes)
                         {
                             <option value=@objectiveType.Id>@objectiveType.Name</option>
                         }
@@ -24,7 +24,7 @@
         </td>
         <td>
             <div class="control">
-                <input class="input" type="text" @bind:get="@context.Association.AssociatedId" 
+                <input class="input" type="text" @bind:get="@context.Association.AssociatedId"
                        @bind:set="id => context.Association = new Association(id, context.Association.AssociatedValue)" />
             </div>
         </td>
@@ -37,7 +37,10 @@
     </RowTemplate>
 </ListEditor>
 
-@functions {
+@code {
+    [Inject]
+    public GenreTypesService GenreTypes { get; set; }
+
     [Parameter]
     public List<Objective> Objectives { get; set; }
 }

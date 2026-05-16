@@ -144,7 +144,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 DescriptionLocaleId = "Wearing it makes you feel stronger",
                 ItemType = FantasyItemTypes.HeadItem
             };
-            template.Variables.QualityType = FantasyItemQualityTypes.MagicalQuality;
+            template.Variables.QualityType = FantasyItemQualityTypes.RareQuality;
             template.Variables.Value = 50;
             template.Variables.AssetCode = "helm";
             template.Variables.Effects = helmEffects;

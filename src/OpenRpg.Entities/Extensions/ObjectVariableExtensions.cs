@@ -17,7 +17,7 @@ namespace OpenRpg.Entities.Extensions
         {
             public string AssetCode 
             {
-                get =>(string) vars[CoreAnyVariableTypes.AssetCode];
+                get => vars.GetAsOrDefault(CoreAnyVariableTypes.AssetCode, () => string.Empty);
                 set => vars[CoreAnyVariableTypes.AssetCode] = value;
             }
             

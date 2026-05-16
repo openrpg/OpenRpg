@@ -2,6 +2,6 @@ namespace OpenRpg.Projects.Models;
 
 public class PluginDescriptor
 {
-    public string Name { get; set; }
-    public string Version { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string Version { get; set; } = string.Empty;
 }

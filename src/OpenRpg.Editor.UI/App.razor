@@ -2,7 +2,7 @@
 @using OpenRpg.Editor.Core.Components.Modal
 
 <ModalContainer>
-    <Router AppAssembly="@typeof(WebImport).Assembly" PreferExactMatches="@true" AdditionalAssemblies="@(new[] {typeof(EditorImport).Assembly})">
+    <Router AppAssembly="@typeof(EditorImport).Assembly" PreferExactMatches="@true" AdditionalAssemblies="@(new[] {typeof(EditorImport).Assembly})">
         <Found Context="routeData">
             <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
         </Found>

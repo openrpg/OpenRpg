@@ -16,4 +16,8 @@
       <ProjectReference Include="..\OpenRpg.Genres\OpenRpg.Genres.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="plugin.json" />
+    </ItemGroup>
+
 </Project>

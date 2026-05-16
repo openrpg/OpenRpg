@@ -29,8 +29,12 @@ public class FileDataLoader : IDataLoader
     {
         var project = await ProjectLoader.LoadProject(projectFile);
         var projectPath = Path.GetDirectoryName(projectFile);
+        await OnProjectLoaded(project, projectPath);
+        
         await TemplateDatastorePopulator.PopulateDatastore(project, projectPath, Datasource);
         await LocaleDatastorePopulator.PopulateDatastore(project, projectPath, LocaleDatasource);
         return project;
     }
+    
+    public virtual async Task OnProjectLoaded(Project project, string projectPath) { }
 }

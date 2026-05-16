@@ -10,7 +10,7 @@
 
 <div class="container">
     <Accordion Title="Template Asset Details" IsExpanded="true">
-        <BasicDetailsEditor Data="Template">
+        <CommonDetailsEditor Data="Template">
             <AvatarContent>
                 @if (AvatarContent != null)
                 { @AvatarContent(Template) }
@@ -20,7 +20,7 @@
                                  DefaultAssetCode="@($"{AssetCodePrefix}-{Template.Id}")" 
                                  OnAssetCodeChanged="OnAssetCodeChanged"/>
             </AdditionalContent>
-        </BasicDetailsEditor>
+        </CommonDetailsEditor>
     </Accordion>
 
     <Accordion Title="Locale Details" IsExpanded="true">
@@ -32,14 +32,14 @@
     
     @if (Template.Variables.HasEffects())
     {
-        <Accordion Title="Template Effects" IsExpanded="true">
+        <Accordion Title="Template Effects" BadgeCount="@(Template.Variables.Effects.Count)" IsExpanded="@(Template.Variables.Effects.Count > 0)">
             <EffectsEditor Effects="Template.Variables.Effects as List<IEffect>"/>
         </Accordion>
     }
 
     @if (Template.Variables.HasRequirements())
     {
-        <Accordion Title="Template Requirements" IsExpanded="true">
+        <Accordion Title="Template Requirements" BadgeCount="@(Template.Variables.Requirements.Count)" IsExpanded="@(Template.Variables.Requirements.Count > 0)">
             <RequirementsEditor Requirements="Template.Variables.Requirements as List<Requirement>" />
         </Accordion>
     }

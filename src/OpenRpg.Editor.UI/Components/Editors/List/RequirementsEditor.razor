@@ -1,7 +1,7 @@
 ﻿@using OpenRpg.Core.Associations
 @using OpenRpg.Core.Requirements
 @using OpenRpg.Core.Utils
-@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Editor.UI.Services
 @using OpenRpg.Entities.Requirements
 
 <ListEditor Data="Requirements" TItem="Requirement">
@@ -15,7 +15,7 @@
             <div class="control">
                 <div class="select is-fullwidth">
                     <select @bind="context.RequirementType">
-                        @foreach (var requirementType in TypesHelper.GetRequirementTypes)
+                        @foreach (var requirementType in GenreTypes.RequirementTypes)
                         {
                             <option value=@requirementType.Id>@requirementType.Name</option>
                         }
@@ -38,7 +38,10 @@
     </RowTemplate>
 </ListEditor>
 
-@functions {
+@code {
+    [Inject]
+    public GenreTypesService GenreTypes { get; set; }
+
     [Parameter]
     public List<Requirement> Requirements { get; set; }
 }
