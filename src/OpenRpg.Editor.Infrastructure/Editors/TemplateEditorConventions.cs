@@ -51,12 +51,25 @@ public static class TemplateEditorConventions
         ["TimeToAction"] = "Time To Complete (seconds)",
         ["EquipmentSlots.WeaponSlots"] = "Weapon Slots",
         ["EquipmentSlots.MiscSlots"] = "Misc Slots",
+        ["Cooldown"] = "Cooldown",
+        ["Range"] = "Range",
+        ["AttackSize"] = "Attack Size",
+        ["TargetType"] = "Target Type",
+        ["MultiHit"] = "Multi Hit",
+        ["TargetCount"] = "Target Count",
+        ["HealthCost"] = "Health Cost",
+        ["StaminaCost"] = "Stamina Cost",
+        ["ManaCost"] = "Mana Cost",
+        ["Damage.Type"] = "Damage Type",
+        ["Damage.Value"] = "Damage Value",
     };
 
     public static readonly Dictionary<string, string> VariableFieldToTypeSource = new()
     {
         ["QualityType"] = "itemQualityTypes",
         ["SlotType"] = "itemSlotTypes",
+        ["Damage.Type"] = "damageTypes",
+        ["TargetType"] = "targetTypes",
     };
 
     public static readonly Dictionary<string, string> VariableFieldToEditorType = new()

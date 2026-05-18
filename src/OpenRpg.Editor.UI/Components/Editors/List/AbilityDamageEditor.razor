@@ -1,0 +1,61 @@
+@using OpenRpg.Combat.Abilities
+@using OpenRpg.Combat.Extensions
+@using OpenRpg.Editor.UI.Services
+
+@inject GenreTypesService GenreTypes
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Damage Type</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select value="@DamageType" @onchange="OnDamageTypeChanged">
+                        <option value="0">Select...</option>
+                        @foreach (var opt in GenreTypes.DamageTypes)
+                        {
+                            <option value="@opt.Id">@opt.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Damage Value</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="number" step="0.1" placeholder="i.e 25"
+                       value="@DamageValue"
+                       @onchange="OnDamageValueChanged" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public AbilityTemplate Template { get; set; }
+
+    private int DamageType
+    {
+        get => Template.Variables.Damage.Type;
+        set => Template.Variables.Damage.Type = value;
+    }
+
+    private float DamageValue
+    {
+        get => Template.Variables.Damage.Value;
+        set => Template.Variables.Damage.Value = value;
+    }
+
+    private void OnDamageTypeChanged(ChangeEventArgs e) => DamageType = int.Parse(e.Value?.ToString() ?? "0");
+    private void OnDamageValueChanged(ChangeEventArgs e) => DamageValue = float.Parse(e.Value?.ToString() ?? "0");
+}

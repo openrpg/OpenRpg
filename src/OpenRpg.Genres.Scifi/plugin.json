@@ -16,7 +16,8 @@
     "statTypes": "OpenRpg.Genres.Scifi.Types.ScifiEntityStatsVariableTypes, OpenRpg.Genres.Scifi",
     "stateTypes": "OpenRpg.Genres.Scifi.Types.ScifiShipStateVariableTypes, OpenRpg.Genres.Scifi",
     "craftingSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills",
-    "gatheringSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills"
+    "gatheringSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills",
+    "damageTypes": "OpenRpg.Genres.Scifi.Types.ScifiDamageTypes, OpenRpg.Genres.Scifi"
   },
   "templateTypes": {
     "ship": {

@@ -1,0 +1,149 @@
+@using OpenRpg.Combat.Abilities
+@using OpenRpg.Combat.Extensions
+@using OpenRpg.Editor.UI.Services
+
+@inject GenreTypesService GenreTypes
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Cooldown</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="number" step="0.1" placeholder="i.e 2.5"
+                       value="@Cooldown"
+                       @onchange="OnCooldownChanged" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Range</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="number" step="0.1" placeholder="i.e 10"
+                       value="@Range"
+                       @onchange="OnRangeChanged" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Attack Size</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="number" step="0.1" placeholder="i.e 1.5"
+                       value="@AttackSize"
+                       @onchange="OnAttackSizeChanged" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Target Type</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select value="@TargetType" @onchange="OnTargetTypeChanged">
+                        <option value="0">Select...</option>
+                        @foreach (var opt in GenreTypes.TargetTypes)
+                        {
+                            <option value="@opt.Id">@opt.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Multi Hit</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="number" placeholder="i.e 3"
+                       value="@MultiHit"
+                       @onchange="OnMultiHitChanged" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Target Count</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="number" placeholder="i.e 5"
+                       value="@TargetCount"
+                       @onchange="OnTargetCountChanged" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public AbilityTemplate Template { get; set; }
+
+    private float Cooldown
+    {
+        get => Template.Variables.Cooldown;
+        set => Template.Variables.Cooldown = value;
+    }
+
+    private float Range
+    {
+        get => Template.Variables.Range;
+        set => Template.Variables.Range = value;
+    }
+
+    private float AttackSize
+    {
+        get => Template.Variables.AttackSize;
+        set => Template.Variables.AttackSize = value;
+    }
+
+    private int TargetType
+    {
+        get => Template.Variables.TargetType;
+        set => Template.Variables.TargetType = value;
+    }
+
+    private int MultiHit
+    {
+        get => Template.Variables.MultiHit;
+        set => Template.Variables.MultiHit = value;
+    }
+
+    private int TargetCount
+    {
+        get => Template.Variables.TargetCount;
+        set => Template.Variables.TargetCount = value;
+    }
+
+    private void OnCooldownChanged(ChangeEventArgs e) => Cooldown = float.Parse(e.Value?.ToString() ?? "0");
+    private void OnRangeChanged(ChangeEventArgs e) => Range = float.Parse(e.Value?.ToString() ?? "0");
+    private void OnAttackSizeChanged(ChangeEventArgs e) => AttackSize = float.Parse(e.Value?.ToString() ?? "0");
+    private void OnTargetTypeChanged(ChangeEventArgs e) => TargetType = int.Parse(e.Value?.ToString() ?? "0");
+    private void OnMultiHitChanged(ChangeEventArgs e) => MultiHit = int.Parse(e.Value?.ToString() ?? "0");
+    private void OnTargetCountChanged(ChangeEventArgs e) => TargetCount = int.Parse(e.Value?.ToString() ?? "0");
+}

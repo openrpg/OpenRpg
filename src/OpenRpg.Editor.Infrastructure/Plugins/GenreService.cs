@@ -145,4 +145,6 @@ public class EmptyGenreTypesProvider : IGenreTypesProvider
     public OptionData[] StateTypes => Array.Empty<OptionData>();
     public OptionData[] CraftingSkillTypes => Array.Empty<OptionData>();
     public OptionData[] GatheringSkillTypes => Array.Empty<OptionData>();
+    public OptionData[] TargetTypes => Array.Empty<OptionData>();
+    public OptionData[] DamageTypes => Array.Empty<OptionData>();
 }

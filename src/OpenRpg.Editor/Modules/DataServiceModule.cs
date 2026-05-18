@@ -82,6 +82,9 @@ namespace OpenRpg.Editor.Modules
                 registry.Register(nameof(EquipmentEditor), typeof(EquipmentEditor));
                 registry.Register(nameof(EffectsEditor), typeof(EffectsEditor));
                 registry.Register(nameof(RequirementsEditor), typeof(RequirementsEditor));
+                registry.Register(nameof(AbilityDetailsEditor), typeof(AbilityDetailsEditor));
+                registry.Register(nameof(AbilityDamageEditor), typeof(AbilityDamageEditor));
+                registry.Register(nameof(AbilityCostsEditor), typeof(AbilityCostsEditor));
                 return registry;
             });
             services.AddSingleton<IEditorPropertyResolver, EditorPropertyResolver>();

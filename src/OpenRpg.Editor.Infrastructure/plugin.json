@@ -18,7 +18,9 @@
     "statTypes": "OpenRpg.Genres.Types.GenreEntityStatsVariableTypes, OpenRpg.Genres",
     "stateTypes": "OpenRpg.Genres.Types.GenreEntityStateVariableTypes, OpenRpg.Genres",
     "craftingSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills",
-    "gatheringSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills"
+    "gatheringSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills",
+    "targetTypes": "OpenRpg.Combat.Types.CombatTargetTypes, OpenRpg.Combat",
+    "damageTypes": "OpenRpg.Genres.Types.GenreDamageTypes, OpenRpg.Genres"
   },
   "templateTypes": {
     "item": {
@@ -54,7 +56,20 @@
       "name": "Ability Template",
       "templateType": "OpenRpg.Combat.Abilities.AbilityTemplate, OpenRpg.Combat",
       "assetCodePrefix": "ability",
-      "groups": []
+      "groups": [
+        {
+          "title": "Details",
+          "editorComponent": "AbilityDetailsEditor"
+        },
+        {
+          "title": "Damage",
+          "editorComponent": "AbilityDamageEditor"
+        },
+        {
+          "title": "Costs",
+          "editorComponent": "AbilityCostsEditor"
+        }
+      ]
     },
     "quest": {
       "name": "Quest",

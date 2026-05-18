@@ -17,4 +17,6 @@ public interface IGenreTypesProvider
     OptionData[] StateTypes { get; }
     OptionData[] CraftingSkillTypes { get; }
     OptionData[] GatheringSkillTypes { get; }
+    OptionData[] TargetTypes { get; }
+    OptionData[] DamageTypes { get; }
 }
