@@ -12,7 +12,7 @@
     "effectTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEffectTypes, OpenRpg.Genres.Fantasy",
     "rewardTypes": "OpenRpg.Genres.Fantasy.Types.FantasyRewardTypes, OpenRpg.Genres.Fantasy",
     "modificationTypes": "OpenRpg.Genres.Fantasy.Types.FantasyModificationTypes, OpenRpg.Genres.Fantasy",
-    "objectiveTypes": "OpenRpg.Quests.Types.GenresObjectiveTypes, OpenRpg.Quests",
+    "objectiveTypes": "OpenRpg.Genres.Types.GenresObjectiveTypes, OpenRpg.Genres",
     "effectScalingType": "OpenRpg.Entities.Types.CoreEffectScalingTypes, OpenRpg.Entities",
     "statTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEntityStatsVariableTypes, OpenRpg.Genres.Fantasy",
     "stateTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEntityStateVariableTypes, OpenRpg.Genres.Fantasy",

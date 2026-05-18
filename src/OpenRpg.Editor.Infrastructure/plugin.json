@@ -13,7 +13,7 @@
     "genderTypes": "OpenRpg.Genres.Types.GenreGenderTypes, OpenRpg.Genres",
     "rewardTypes": "OpenRpg.Genres.Types.GenreRewardTypes, OpenRpg.Genres",
     "modificationTypes": "OpenRpg.Genres.Types.GenreModificationTypes, OpenRpg.Genres",
-    "objectiveTypes": "OpenRpg.Quests.Types.GenresObjectiveTypes, OpenRpg.Quests",
+    "objectiveTypes": "OpenRpg.Genres.Types.GenresObjectiveTypes, OpenRpg.Genres",
     "effectScalingType": "OpenRpg.Entities.Types.CoreEffectScalingTypes, OpenRpg.Entities",
     "statTypes": "OpenRpg.Genres.Types.GenreEntityStatsVariableTypes, OpenRpg.Genres",
     "stateTypes": "OpenRpg.Genres.Types.GenreEntityStateVariableTypes, OpenRpg.Genres",
