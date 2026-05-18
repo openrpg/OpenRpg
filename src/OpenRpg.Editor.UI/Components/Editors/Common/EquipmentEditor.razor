@@ -1,15 +1,18 @@
 @using OpenRpg.Data
 @using OpenRpg.Data.Conventions.Extensions
 @using OpenRpg.Editor.Core.Components
+@using OpenRpg.Editor.UI.Services
 @using OpenRpg.Entities.Entity.Templates
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 
 @inject IRepository Repository
+@inject GenreTypesService GenreTypes
 
 @{
     var entityEquipment = Template.Variables.Equipment;
+    var slotTypes = GenreTypes.ItemSlotTypes;
 }
 
 @if (entityEquipment != null)
@@ -36,12 +39,21 @@
                 }
                 @foreach (var slotEntry in entityEquipment.Slots.ToList())
                 {
-                    var slotKey = slotEntry.Key;
+                    var currentSlotKey = slotEntry.Key;
                     var itemData = slotEntry.Value;
-                    <tr @key="slotKey">
+                    <tr @key="currentSlotKey">
                         <td>
                             <div class="control">
-                                <input class="input" type="text" value="@slotKey" readonly />
+                                <div class="select is-fullwidth">
+                                    <select value="@currentSlotKey"
+                                            @onchange='e => OnSlotTypeChanged(currentSlotKey, int.Parse(e.Value?.ToString() ?? "0"))'>
+                                        <option value="0">Select...</option>
+                                        @foreach (var slotType in slotTypes)
+                                        {
+                                            <option value="@slotType.Id">@slotType.Name</option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
                         </td>
                         <td>
@@ -58,7 +70,7 @@
                             </div>
                         </td>
                         <td>
-                            <button class="button is-danger" @onclick="x => entityEquipment.Slots.Remove(slotKey)">X</button>
+                            <button class="button is-danger" @onclick="x => entityEquipment.Slots.Remove(currentSlotKey)">X</button>
                         </td>
                     </tr>
                 }
@@ -74,7 +86,27 @@
     void AddEquipmentSlot()
     {
         var equipment = Template.Variables.Equipment;
-        var slotType = equipment.Slots.Count > 0 ? equipment.Slots.Keys.Max() + 1 : 1;
+        var slotTypes = GenreTypes.ItemSlotTypes;
+        var slotType = slotTypes.Length > 0 ? slotTypes[0].Id : 1;
         equipment.Slots[slotType] = new ItemData();
+    }
+
+    void OnSlotTypeChanged(int oldKey, int newKey)
+    {
+        var equipment = Template.Variables.Equipment;
+        if (oldKey == newKey || !equipment.Slots.ContainsKey(oldKey)) return;
+
+        if (equipment.Slots.ContainsKey(newKey))
+        {
+            var existingItem = equipment.Slots[newKey];
+            equipment.Slots[oldKey] = existingItem;
+            equipment.Slots[newKey] = equipment.Slots[oldKey];
+            equipment.Slots.Remove(oldKey);
+            return;
+        }
+
+        var itemData = equipment.Slots[oldKey];
+        equipment.Slots.Remove(oldKey);
+        equipment.Slots[newKey] = itemData;
     }
 }

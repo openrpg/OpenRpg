@@ -18,6 +18,7 @@
     "stateTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEntityStateVariableTypes, OpenRpg.Genres.Fantasy",
     "craftingSkillTypes": "OpenRpg.Genres.Fantasy.Types.FantasyTradeSkillTypes, OpenRpg.Genres.Fantasy",
     "gatheringSkillTypes": "OpenRpg.Genres.Fantasy.Types.FantasyTradeSkillTypes, OpenRpg.Genres.Fantasy",
-    "damageTypes": "OpenRpg.Genres.Fantasy.Types.FantasyDamageTypes, OpenRpg.Genres.Fantasy"
+    "damageTypes": "OpenRpg.Genres.Fantasy.Types.FantasyDamageTypes, OpenRpg.Genres.Fantasy",
+    "itemSlotTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEquipmentSlotTypes, OpenRpg.Genres.Fantasy"
   }
 }

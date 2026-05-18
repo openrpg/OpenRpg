@@ -33,6 +33,7 @@ public class TemplateOptionsResolver : ITemplateOptionsResolver
             "stateTypes" => _genreTypes.StateTypes,
             "targetTypes" => _genreTypes.TargetTypes,
             "damageTypes" => _genreTypes.DamageTypes,
+            "itemSlotTypes" => _genreTypes.ItemSlotTypes,
             _ => System.Array.Empty<OptionData>()
         };
     }

@@ -40,6 +40,7 @@ public class GenreTypesService
     public OptionData[] GatheringSkillTypes => TypesProvider.GatheringSkillTypes;
     public OptionData[] TargetTypes => TypesProvider.TargetTypes;
     public OptionData[] DamageTypes => TypesProvider.DamageTypes;
+    public OptionData[] ItemSlotTypes => TypesProvider.ItemSlotTypes;
 }
 
 public class EmptyTypesProvider : IGenreTypesProvider
@@ -60,4 +61,5 @@ public class EmptyTypesProvider : IGenreTypesProvider
     public OptionData[] GatheringSkillTypes => Array.Empty<OptionData>();
     public OptionData[] TargetTypes => Array.Empty<OptionData>();
     public OptionData[] DamageTypes => Array.Empty<OptionData>();
+    public OptionData[] ItemSlotTypes => Array.Empty<OptionData>();
 }

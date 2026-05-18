@@ -25,6 +25,7 @@ public class GenreTypesProvider : IGenreTypesProvider
     public OptionData[] GatheringSkillTypes { get; }
     public OptionData[] TargetTypes { get; }
     public OptionData[] DamageTypes { get; }
+    public OptionData[] ItemSlotTypes { get; }
 
     public GenreTypesProvider(Assembly assembly, PluginManifest manifest)
     {
@@ -45,6 +46,7 @@ public class GenreTypesProvider : IGenreTypesProvider
         GatheringSkillTypes = GetTypesFromSource(assembly, manifest.TypeSources, "gatheringSkillTypes");
         TargetTypes = GetTypesFromSource(assembly, manifest.TypeSources, "targetTypes");
         DamageTypes = GetTypesFromSource(assembly, manifest.TypeSources, "damageTypes");
+        ItemSlotTypes = GetTypesFromSource(assembly, manifest.TypeSources, "itemSlotTypes");
     }
 
     private static OptionData[] GetTypesFromSource(Assembly assembly, Dictionary<string, string> typeSources, string key)

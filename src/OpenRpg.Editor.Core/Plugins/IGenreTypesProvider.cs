@@ -19,4 +19,5 @@ public interface IGenreTypesProvider
     OptionData[] GatheringSkillTypes { get; }
     OptionData[] TargetTypes { get; }
     OptionData[] DamageTypes { get; }
+    OptionData[] ItemSlotTypes { get; }
 }
