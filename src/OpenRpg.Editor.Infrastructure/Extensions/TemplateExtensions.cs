@@ -1,15 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
-using OpenRpg.Combat.Abilities;
-using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Templates;
 using OpenRpg.Core.Templates.Variables;
-using OpenRpg.Entities.Classes.Templates;
+using OpenRpg.Core.Variables.General;
 using OpenRpg.Entities.Extensions;
-using OpenRpg.Entities.Races.Templates;
+using OpenRpg.Entities.Types;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.TradeSkills.Templates;
 using OpenRpg.Localization.Data.Extensions;
@@ -59,25 +57,15 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
         
         public static void ListifyProperties(this ITemplate template)
         {
-            var templateType = template.GetType();
-            var variableProperty = templateType.GetProperty("Variables");
-            var variables = variableProperty.GetValue(template) as ITemplateVariables;
-                
-            if(variables.HasEffects())
-            { variables.Effects = variables.Effects.AsList(); }
-            else
-            { variables.Effects = new List<IEffect>(); }
-            
-            if(variables.HasRequirements())
-            { variables.Requirements = variables.Requirements.ToList(); }
-            else
-            { variables.Requirements = new List<Requirement>(); }
-            
-            if(variables.HasAbilities())
-            { variables.Abilities = variables.Abilities.ToList(); }
-            else
-            { variables.Abilities = new List<AbilityData>(); }
-            
+            var variables = template is IHasVariables<ITemplateVariables> hasVars ? hasVars.Variables : null;
+            if (variables != null)
+            {
+                if (!variables.ContainsKey(CoreTemplateVariableTypes.Effects))
+                { variables[CoreTemplateVariableTypes.Effects] = new List<IEffect>(); }
+                if (!variables.ContainsKey(CoreTemplateVariableTypes.Requirements))
+                { variables[CoreTemplateVariableTypes.Requirements] = new List<Requirement>(); }
+            }
+
             if (template is ItemTemplate itemTemplate)
             { itemTemplate.ModificationAllowances = itemTemplate.ModificationAllowances.AsList(); }
             else if (template is Quest quest)

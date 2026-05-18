@@ -29,13 +29,13 @@ namespace OpenRpg.Entities.Extensions
         {
             public IReadOnlyCollection<IEffect> Effects
             {
-                get => vars.GetAsOrDefault(CoreTemplateVariableTypes.Effects, IReadOnlyCollection<IEffect>.Empty);
+                get => vars.GetAsOrDefaultAndSet(CoreTemplateVariableTypes.Effects, () => new List<IEffect>());
                 set => vars[CoreTemplateVariableTypes.Effects] = value;
             }
 
             public IReadOnlyCollection<Requirement> Requirements
             {
-                get => vars.GetAsOrDefault(CoreTemplateVariableTypes.Requirements, IReadOnlyCollection<Requirement>.Empty);
+                get => vars.GetAsOrDefaultAndSet(CoreTemplateVariableTypes.Requirements, () => new List<Requirement>());
                 set => vars[CoreTemplateVariableTypes.Requirements] = value;
             }
             

@@ -32,7 +32,7 @@ namespace OpenRpg.Items.Extensions
 
             public IReadOnlyCollection<Requirement> Requirements
             {
-                get => vars.GetAsOrDefault(LootTableEntryVariableTypes.Requirements, IReadOnlyCollection<Requirement>.Empty);
+                get => vars.GetAsOrDefaultAndSet(LootTableEntryVariableTypes.Requirements, () => new List<Requirement>());
                 set => vars[LootTableEntryVariableTypes.Requirements] = value;
             }
         }

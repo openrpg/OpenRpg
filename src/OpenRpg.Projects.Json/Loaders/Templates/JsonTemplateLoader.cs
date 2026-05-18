@@ -15,7 +15,7 @@ public class JsonTemplateLoader : ITemplateLoader
     public JsonSerializer JsonSerializer { get; } = new()
     {
         TypeNameHandling = TypeNameHandling.Auto,
-        Converters = { new VariablesConverter() },
+        Converters = { new VariablesConverter(), new ReadOnlyCollectionConverter() },
         MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead
     };
 

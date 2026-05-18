@@ -15,9 +15,8 @@ namespace OpenRpg.Combat.Extensions
         {
             public IReadOnlyCollection<AbilityData> Abilities
             {
-                get => vars.GetAsOrDefault(CombatTemplateVariableTypes.Abilities, IReadOnlyCollection<AbilityData>.Empty);
+                get => vars.GetAsOrDefaultAndSet(CombatTemplateVariableTypes.Abilities, () => new List<AbilityData>());
                 set => vars[CombatTemplateVariableTypes.Abilities] = value;
-                
             }
         }
         

@@ -1,3 +1,7 @@
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Requirements;
+using OpenRpg.Core.Variables;
+
 namespace OpenRpg.Entities.Types
 {
     // 4000 range
@@ -10,7 +14,10 @@ namespace OpenRpg.Entities.Types
         public static int ProceduralEffects = 4001;
         
         // General
+        [CollectionElementType(typeof(IEffect))]
         public static int Effects = 4002; // replaces IHasEffects
+
+        [CollectionElementType(typeof(Requirement))]
         public static int Requirements = 4003; // replaces IHasRequirements
         
         // Patterns

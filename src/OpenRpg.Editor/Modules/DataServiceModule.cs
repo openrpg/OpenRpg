@@ -1,4 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using OpenRpg.Combat.Abilities;
+using OpenRpg.Combat.Types;
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Requirements;
 using OpenRpg.Data;
 using OpenRpg.Editor.Core.Models;
 using OpenRpg.Editor.Core.Services.Events.Broker;
@@ -17,8 +21,12 @@ using OpenRpg.Editor.Services.FileSystem;
 using OpenRpg.Editor.UI.Components.Editors.Common;
 using OpenRpg.Editor.UI.Components.Editors.List;
 using OpenRpg.Editor.UI.Services;
+using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Types;
+using OpenRpg.Items.Types;
 using OpenRpg.Localization.Data.DataSources;
 using OpenRpg.Localization.Data.Repositories;
+using OpenRpg.Projects.Json.Convertors;
 using OpenRpg.Projects.Json.Loaders;
 using OpenRpg.Projects.Json.Loaders.Locales;
 using OpenRpg.Projects.Json.Loaders.Templates;
@@ -33,6 +41,10 @@ namespace OpenRpg.Editor.Modules
     {
         public static void Setup(IServiceCollection services)
         {
+            VariablesConverter.RegisterKey(CoreTemplateVariableTypes.Effects, typeof(IEffect));
+            VariablesConverter.RegisterKey(CoreTemplateVariableTypes.Requirements, typeof(Requirement));
+            VariablesConverter.RegisterKey(CombatTemplateVariableTypes.Abilities, typeof(AbilityData));
+            VariablesConverter.RegisterKey(LootTableEntryVariableTypes.Requirements, typeof(Requirement));
             services.AddSingleton<ICloner, Cloner>();
             services.AddTransient<IModalService, ModalService>();
             services.AddTransient<INotifier, Notifier>();
