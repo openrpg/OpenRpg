@@ -101,6 +101,7 @@ namespace OpenRpg.Editor.Modules
             });
             services.AddSingleton<IEditorPropertyResolver, EditorPropertyResolver>();
             services.AddSingleton<ITemplateOptionsResolver, TemplateOptionsResolver>();
+            services.AddSingleton<IAssociationIdResolver, AssociationIdResolver>();
         }
     }
 }

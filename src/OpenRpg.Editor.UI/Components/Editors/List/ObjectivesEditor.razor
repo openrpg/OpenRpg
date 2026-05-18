@@ -1,5 +1,4 @@
-﻿@using OpenRpg.Core.Associations
-@using OpenRpg.Core.Utils
+﻿@using OpenRpg.Editor.Infrastructure.Services
 @using OpenRpg.Editor.UI.Services
 @using OpenRpg.Quests
 
@@ -22,24 +21,23 @@
                 </div>
             </div>
         </td>
-        <td>
-            <div class="control">
-                <input class="input" type="text" @bind:get="@context.Association.AssociatedId"
-                       @bind:set="id => context.Association = new Association(id, context.Association.AssociatedValue)" />
-            </div>
-        </td>
-        <td>
-            <div class="control">
-                <input class="input" type="text"  @bind:get="@context.Association.AssociatedValue"
-                       @bind:set="value => context.Association = new Association(context.Association.AssociatedId, value)" />
-            </div>
-        </td>
+        @{
+            var idOptions = Resolver.GetOptionsFor(AssociationIdContexts.Objective, context.ObjectiveType);
+        }
+        <AssociationEditor Association="context.Association"
+                          AssociationChanged="a => context.Association = a"
+                          IdOptions="idOptions.Options"
+                          IdDisabled="idOptions.Disabled"
+                          ShowDropdown="idOptions.IsMapped" />
     </RowTemplate>
 </ListEditor>
 
 @code {
     [Inject]
     public GenreTypesService GenreTypes { get; set; }
+
+    [Inject]
+    public IAssociationIdResolver Resolver { get; set; }
 
     [Parameter]
     public List<Objective> Objectives { get; set; }
