@@ -1,10 +1,10 @@
 @using OpenRpg.Editor.Core.Plugins
 
-<header class="modal-card-head">
-    <p class="modal-card-title">Select Genres</p>
-    <button class="delete" aria-label="close" @onclick="() => OnCancelled.InvokeAsync()"></button>
-</header>
-<section class="modal-card-body">
+<div class="box">
+    <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+        <p class="title is-4 mb-0">Select Genres</p>
+        <button class="delete" aria-label="close" @onclick="() => OnCancelled.InvokeAsync()"></button>
+    </div>
     <p class="content has-text-dark">Choose the genre plugins to enable for this project:</p>
     @if (Genres.Any())
     {
@@ -26,11 +26,11 @@
             <p class="content">You can download genre plugins and place them in the <code>Plugins/</code> folder.</p>
         </div>
     }
-</section>
-<footer class="modal-card-foot">
-    <button class="button is-primary" @onclick="Confirm">Create Project</button>
-    <button class="button" @onclick="() => OnCancelled.InvokeAsync()">Cancel</button>
-</footer>
+    <div class="buttons is-right mt-4">
+        <button class="button is-primary" @onclick="Confirm">Create Project</button>
+        <button class="button" @onclick="() => OnCancelled.InvokeAsync()">Cancel</button>
+    </div>
+</div>
 
 @code {
     [Parameter]

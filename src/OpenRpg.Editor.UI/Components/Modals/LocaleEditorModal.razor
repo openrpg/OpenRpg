@@ -4,6 +4,7 @@
 
 @inject ILocaleRepository Repository;
 
+<div class="box">
 <h3 class="title is-3 has-text-danger">Locale Editor For <code>@LocaleId</code></h3>
 <div class="field">
     <label class="label">Are you sure you wish to do this?</label>
@@ -33,6 +34,7 @@
     <div class="control">
         <button class="button is-link is-light" @onclick="Cancel">Cancel</button>
     </div>
+</div>
 </div>
 
 @functions {
@@ -76,11 +78,16 @@
 
     public LocaleEntry GetLocaleEntries()
     {
-        if (!Repository.Exists(LocaleId))
-        { return new LocaleEntry{LocaleCode = Repository.CurrentLocaleCode, LocaleId = LocaleId, LocaleText = string.Empty, Exists = false}; }
+        foreach (var localeCode in Repository.DataSource.GetLocaleCodes())
+        {
+            if (Repository.DataSource.Exists(localeCode, LocaleId))
+            {
+                var data = Repository.DataSource.Get(localeCode, LocaleId);
+                return new LocaleEntry { LocaleCode = localeCode, LocaleId = LocaleId, LocaleText = data, Exists = true };
+            }
+        }
         
-        var data = Repository.Get(LocaleId);
-        return new LocaleEntry {LocaleCode = Repository.CurrentLocaleCode, LocaleId = LocaleId, LocaleText = data, Exists = true};
+        return new LocaleEntry { LocaleCode = Repository.CurrentLocaleCode, LocaleId = LocaleId, LocaleText = string.Empty, Exists = false };
     }
 
     public void UpdateLocaleText(LocaleEntry localeEntry)
@@ -90,11 +97,11 @@
 
         if (localeEntry.Exists)
         {
-            Repository.Update(LocaleId, localeEntry.LocaleText);
+            Repository.DataSource.Update(localeEntry.LocaleCode, localeEntry.LocaleId, localeEntry.LocaleText);
             return;
         }
         
-        Repository.Create(LocaleId, localeEntry.LocaleText);
+        Repository.DataSource.Create(localeEntry.LocaleCode, localeEntry.LocaleId, localeEntry.LocaleText);
         localeEntry.Exists = true;
     }
 

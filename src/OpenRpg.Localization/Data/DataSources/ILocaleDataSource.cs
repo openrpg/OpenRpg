@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace OpenRpg.Localization.Data.DataSources
 {
     public interface ILocaleDataSource
@@ -9,5 +11,6 @@ namespace OpenRpg.Localization.Data.DataSources
         bool Delete(string localeCode, string id);
         bool Exists(string localeCode, string id);
         LocaleDataset GetLocaleDataset(string localeCode);
+        IEnumerable<string> GetLocaleCodes();
     }
 }

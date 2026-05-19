@@ -18,11 +18,37 @@
     <div class="content">
         <p>Manage locale entries for the current project. Locales are key-value pairs where the key is used in templates and the value is the translated text.</p>
     </div>
+</div>
+
+<div class="box">
+    <h3 class="title is-4 has-text-dark">Locale Code</h3>
+
+    <div class="field has-addons">
+        <div class="control">
+            <div class="select">
+                <select value="@_selectedLocaleCode" @onchange="OnLocaleCodeChanged">
+                    @foreach (var localeCode in _availableLocaleCodes)
+                    {
+                        <option value="@localeCode">@localeCode</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="control">
+            <input class="input" type="text" placeholder="e.g., fr-fr" @bind="_newLocaleCode" />
+        </div>
+        <div class="control">
+            <button class="button is-primary" @onclick="AddNewLocaleCode" disabled="@string.IsNullOrWhiteSpace(_newLocaleCode)">
+                <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+                <span>Add Locale Code</span>
+            </button>
+        </div>
+    </div>
 
     <div class="field">
         <button class="button is-primary" @onclick="() => ShowAddNew = true">
             <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
-            <span>Add New Locale</span>
+            <span>Add Locale Entry to @_selectedLocaleCode</span>
         </button>
     </div>
 </div>
@@ -30,7 +56,7 @@
 @if (ShowAddNew)
 {
     <div class="box">
-        <h3 class="title is-4 has-text-dark">Add New Locale</h3>
+        <h3 class="title is-4 has-text-dark">Add New Locale Entry</h3>
         <div class="field">
             <label class="label">Locale Id</label>
             <div class="control">
@@ -45,7 +71,7 @@
         </div>
         <div class="field is-grouped">
             <div class="control">
-                <button class="button is-success" @onclick="AddNewLocale">Add Locale</button>
+                <button class="button is-success" @onclick="AddNewLocale">Add Entry</button>
             </div>
             <div class="control">
                 <button class="button is-light" @onclick="CancelAddNew">Cancel</button>
@@ -55,8 +81,8 @@
 }
 
 <div class="box">
-    <h2 class="title is-3">All Locales (@Entries.Count entries)</h2>
-    
+    <h2 class="title is-3">@_selectedLocaleCode Entries (@FilteredEntries.Count entries)</h2>
+
     <div class="field">
         <label class="label">Search</label>
         <div class="control">
@@ -64,7 +90,7 @@
         </div>
     </div>
 
-    @if (FilteredEntries.Count == 0)
+    @if (PagedEntries.Count == 0)
     {
         <div class="notification is-warning">
             No locale entries found.
@@ -82,7 +108,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var entry in FilteredEntries)
+                @foreach (var entry in PagedEntries)
                 {
                     <tr>
                         <td><code>@entry.LocaleCode</code></td>
@@ -127,51 +153,141 @@
                 }
             </tbody>
         </table>
+
+        @if (TotalPages > 1)
+        {
+            <div class="is-flex is-justify-content-center is-align-items-center mt-2 is-size-7">
+                <button class="button is-small" disabled="@(_currentPage <= 1)" @onclick="() => GoToPage(1)" title="First page">
+                    <span class="icon is-small"><i class="fas fa-angle-double-left"></i></span>
+                </button>
+                <button class="button is-small" disabled="@(_currentPage <= 1)" @onclick="() => GoToPage(_currentPage - 1)" title="Previous page">
+                    <span class="icon is-small"><i class="fas fa-angle-left"></i></span>
+                </button>
+                <span class="px-2 has-text-weight-medium">@_currentPage / @TotalPages</span>
+                <button class="button is-small" disabled="@(_currentPage >= TotalPages)" @onclick="() => GoToPage(_currentPage + 1)" title="Next page">
+                    <span class="icon is-small"><i class="fas fa-angle-right"></i></span>
+                </button>
+                <button class="button is-small" disabled="@(_currentPage >= TotalPages)" @onclick="() => GoToPage(TotalPages)" title="Last page">
+                    <span class="icon is-small"><i class="fas fa-angle-double-right"></i></span>
+                </button>
+            </div>
+        }
+        <p class="has-text-grey is-size-7 mt-1">@FilteredEntries.Count total</p>
     }
 </div>
 
 @code {
     private IDisposable _subscription;
-    private List<System.Reactive.Disposables.CompositeDisposable> _composites = new();
-    
+    private List<CompositeDisposable> _composites = new();
+
     private List<LocaleEntry> Entries = new();
-    private string SearchTerm = "";
+    private string _searchTerm = "";
+    private string SearchTerm
+    {
+        get => _searchTerm;
+        set { _searchTerm = value; _currentPage = 1; }
+    }
     private bool ShowAddNew = false;
     private string NewLocaleId = "";
     private string NewLocaleText = "";
     private LocaleEntry EditingEntry;
     private string EditingText = "";
 
+    private string _selectedLocaleCode = "en-gb";
+    private List<string> _availableLocaleCodes = new();
+    private string _newLocaleCode = "";
+
+    private int _currentPage = 1;
+    private int _pageSize = 10;
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling((double)FilteredEntries.Count / _pageSize));
+    private List<LocaleEntry> PagedEntries =>
+        FilteredEntries.Skip((_currentPage - 1) * _pageSize).Take(_pageSize).ToList();
+
     private List<LocaleEntry> FilteredEntries => Entries
-        .Where(e => string.IsNullOrEmpty(SearchTerm) ||
-                    e.LocaleId.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    e.LocaleText.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+        .Where(e => string.IsNullOrEmpty(_searchTerm) ||
+                    e.LocaleId.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    e.LocaleText.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
         .ToList();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        _selectedLocaleCode = Repository.CurrentLocaleCode;
+        LoadAvailableLocales();
         LoadEntries();
-        
-        var composite = new System.Reactive.Disposables.CompositeDisposable();
+
+        var composite = new CompositeDisposable();
         _composites.Add(composite);
-        _subscription = EventBus.Receive<ProjectChangedEvent>().Subscribe(_ => InvokeAsync(() => { LoadEntries(); StateHasChanged(); }));
+        _subscription = EventBus.Receive<ProjectChangedEvent>().Subscribe(_ => InvokeAsync(() => { LoadAvailableLocales(); LoadEntries(); StateHasChanged(); }));
         composite.Add(_subscription);
+    }
+
+    public void LoadAvailableLocales()
+    {
+        _availableLocaleCodes = Repository.DataSource.GetLocaleCodes().OrderBy(x => x).ToList();
+        if (!_availableLocaleCodes.Contains(_selectedLocaleCode))
+        {
+            _selectedLocaleCode = _availableLocaleCodes.FirstOrDefault() ?? "en-gb";
+            Repository.ChangeLocale(_selectedLocaleCode);
+        }
     }
 
     public void LoadEntries()
     {
-        var dataset = Repository.DataSource.GetLocaleDataset(Repository.CurrentLocaleCode);
-        Entries = dataset.LocaleData
-            .Select(kvp => new LocaleEntry 
-            { 
-                LocaleCode = Repository.CurrentLocaleCode, 
-                LocaleId = kvp.Key, 
-                LocaleText = kvp.Value, 
-                Exists = true 
+        var dataset = Repository.DataSource.GetLocaleDataset(_selectedLocaleCode);
+        Entries = dataset?.LocaleData
+            .Select(kvp => new LocaleEntry
+            {
+                LocaleCode = _selectedLocaleCode,
+                LocaleId = kvp.Key,
+                LocaleText = kvp.Value,
+                Exists = true
             })
             .OrderBy(e => e.LocaleId)
-            .ToList();
+            .ToList() ?? new List<LocaleEntry>();
+    }
+
+    private void OnLocaleCodeChanged(ChangeEventArgs e)
+    {
+        var newCode = e.Value?.ToString();
+        if (string.IsNullOrEmpty(newCode) || newCode == _selectedLocaleCode)
+            return;
+        SwitchLocale(newCode);
+    }
+
+    private void SwitchLocale(string localeCode)
+    {
+        _selectedLocaleCode = localeCode;
+        Repository.ChangeLocale(localeCode);
+        _currentPage = 1;
+        ShowAddNew = false;
+        CancelEdit();
+        ClearNewLocaleCodeInput();
+        LoadEntries();
+        StateHasChanged();
+    }
+
+    private void AddNewLocaleCode()
+    {
+        if (string.IsNullOrWhiteSpace(_newLocaleCode))
+            return;
+
+        var code = _newLocaleCode.Trim().ToLowerInvariant();
+        if (!Repository.DataSource.GetLocaleCodes().Contains(code))
+        {
+            Repository.DataSource.GetLocaleDataset(code);
+        }
+
+        _newLocaleCode = "";
+        LoadAvailableLocales();
+        SwitchLocale(code);
+    }
+
+    private void ClearNewLocaleCodeInput()
+    {
+        NewLocaleId = "";
+        NewLocaleText = "";
     }
 
     private void CancelAddNew()
@@ -185,8 +301,8 @@
     {
         if (string.IsNullOrEmpty(NewLocaleId))
         { return; }
-        
-        Repository.DataSource.Create(Repository.CurrentLocaleCode, NewLocaleId, NewLocaleText);
+
+        Repository.DataSource.Create(_selectedLocaleCode, NewLocaleId, NewLocaleText);
         CancelAddNew();
         LoadEntries();
         StateHasChanged();
@@ -207,8 +323,8 @@
     private void SaveEdit(LocaleEntry entry)
     {
         if (EditingEntry == null) { return; }
-        
-        Repository.DataSource.Update(Repository.CurrentLocaleCode, entry.LocaleId, EditingText);
+
+        Repository.DataSource.Update(_selectedLocaleCode, entry.LocaleId, EditingText);
         EditingEntry = null;
         EditingText = "";
         LoadEntries();
@@ -217,9 +333,15 @@
 
     private void DeleteLocale(LocaleEntry entry)
     {
-        Repository.DataSource.Delete(Repository.CurrentLocaleCode, entry.LocaleId);
+        Repository.DataSource.Delete(_selectedLocaleCode, entry.LocaleId);
         LoadEntries();
+        if (_currentPage > TotalPages) _currentPage = TotalPages;
         StateHasChanged();
+    }
+
+    private void GoToPage(int page)
+    {
+        _currentPage = Math.Clamp(page, 1, TotalPages);
     }
 
     public void Dispose()
