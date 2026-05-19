@@ -1,5 +1,5 @@
-﻿<div class="block accordion @(IsExpanded ? "is-expanded": "is-collapsed") @ContainerClasses">
-    <a class="button is-flex @(HeaderClasses) has-text-left" @onclick="() => IsExpanded = !IsExpanded">
+﻿<div class="block accordion @(_isExpanded ? "is-expanded": "is-collapsed") @ContainerClasses">
+    <a class="button is-flex @(HeaderClasses) has-text-left" @onclick="Toggle">
         <span class="has-text-weight-semibold is-leveled">
             @((MarkupString)Title)
             @if (BadgeCount.HasValue)
@@ -8,7 +8,7 @@
             }
         </span>
         <span class="icon is-small is-pulled-right">
-          <i class="fa @(IsExpanded ? "fa-circle-chevron-up" : "fa-circle-chevron-down")"></i>
+          <i class="fa @(_isExpanded ? "fa-circle-chevron-up" : "fa-circle-chevron-down")"></i>
         </span>
     </a>
     <div class="box @ContentClasses">
@@ -38,4 +38,24 @@
 
     [Parameter]
     public int? BadgeCount { get; set; }
+
+    private bool _isExpanded;
+    private bool _initialized;
+
+    protected override void OnInitialized()
+    {
+        _isExpanded = IsExpanded;
+        _initialized = true;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!_initialized)
+            _isExpanded = IsExpanded;
+    }
+
+    private void Toggle()
+    {
+        _isExpanded = !_isExpanded;
+    }
 }
