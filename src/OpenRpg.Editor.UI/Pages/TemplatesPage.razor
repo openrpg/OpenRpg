@@ -324,6 +324,13 @@
         TemplateHelper.SetId(newTemplate, newId);
         TemplateHelper.ListifyProperties(newTemplate);
         TemplateHelper.GenerateLocaleCodes(newTemplate);
+
+        var localeCode = LocaleRepository.CurrentLocaleCode;
+        if (!string.IsNullOrEmpty(newTemplate.NameLocaleId) && !LocaleRepository.DataSource.Exists(localeCode, newTemplate.NameLocaleId))
+        { LocaleRepository.DataSource.Create(localeCode, newTemplate.NameLocaleId, ""); }
+        if (!string.IsNullOrEmpty(newTemplate.DescriptionLocaleId) && !LocaleRepository.DataSource.Exists(localeCode, newTemplate.DescriptionLocaleId))
+        { LocaleRepository.DataSource.Create(localeCode, newTemplate.DescriptionLocaleId, ""); }
+
         TemplateHelper.Create(newTemplate, newId);
 
         RefreshTemplateList();
@@ -373,13 +380,21 @@
         var rawClone = Cloner.Clone(CurrentTemplate);
         var clone = rawClone as ITemplate;
         var newId = TemplateHelper.GetNewId();
-        
+
+        var oldNameLocaleId = clone.NameLocaleId;
+        var oldDescriptionLocaleId = clone.DescriptionLocaleId;
+
         var variables = TemplateHelper.GetVariables(clone);
         variables.AssetCode = $"{variables.AssetCode}-clone";
         
         TemplateHelper.SetId(clone, newId);
         TemplateHelper.ListifyProperties(clone);
         TemplateHelper.GenerateLocaleCodes(clone);
+
+        var localeCode = LocaleRepository.CurrentLocaleCode;
+        CopyLocaleEntry(localeCode, oldNameLocaleId, clone.NameLocaleId);
+        CopyLocaleEntry(localeCode, oldDescriptionLocaleId, clone.DescriptionLocaleId);
+
         TemplateHelper.Create(clone, newId);
         
         await Notifier.ShowNotification($"Cloned {FriendlyName} Template");
@@ -388,5 +403,16 @@
         CurrentTemplate = clone;
         UpdateEditorParams();
         StateHasChanged();
+    }
+
+    private void CopyLocaleEntry(string localeCode, string oldLocaleId, string newLocaleId)
+    {
+        if (string.IsNullOrEmpty(oldLocaleId) || string.IsNullOrEmpty(newLocaleId))
+            return;
+        if (!LocaleRepository.DataSource.Exists(localeCode, oldLocaleId))
+            return;
+        var text = LocaleRepository.DataSource.Get(localeCode, oldLocaleId);
+        if (!LocaleRepository.DataSource.Exists(localeCode, newLocaleId))
+        { LocaleRepository.DataSource.Create(localeCode, newLocaleId, text); }
     }
 }

@@ -7,7 +7,7 @@
     "IsRepeatable": false,
     "Objectives": [
       {
-        "ObjectiveType": 8,
+        "ObjectiveType": 31,
         "AssociatedId": 1,
         "AssociatedValue": 1
       }
@@ -40,7 +40,7 @@
     "IsRepeatable": false,
     "Objectives": [
       {
-        "ObjectiveType": 8,
+        "ObjectiveType": 31,
         "AssociatedId": 2,
         "AssociatedValue": 4
       }
@@ -79,7 +79,7 @@
     "IsRepeatable": false,
     "Objectives": [
       {
-        "ObjectiveType": 8,
+        "ObjectiveType": 31,
         "AssociatedId": 3,
         "AssociatedValue": 1
       }

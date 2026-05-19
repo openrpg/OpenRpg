@@ -1,4 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
+using OpenRpg.Combat.Abilities;
+using OpenRpg.Combat.Types;
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Requirements;
 using OpenRpg.Data;
 using OpenRpg.Editor.Core.Models;
 using OpenRpg.Editor.Core.Services.Events.Broker;
@@ -17,8 +21,12 @@ using OpenRpg.Editor.Services.FileSystem;
 using OpenRpg.Editor.UI.Components.Editors.Common;
 using OpenRpg.Editor.UI.Components.Editors.List;
 using OpenRpg.Editor.UI.Services;
+using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Types;
+using OpenRpg.Items.Types;
 using OpenRpg.Localization.Data.DataSources;
 using OpenRpg.Localization.Data.Repositories;
+using OpenRpg.Projects.Json.Convertors;
 using OpenRpg.Projects.Json.Loaders;
 using OpenRpg.Projects.Json.Loaders.Locales;
 using OpenRpg.Projects.Json.Loaders.Templates;
@@ -33,6 +41,10 @@ namespace OpenRpg.Editor.Modules
     {
         public static void Setup(IServiceCollection services)
         {
+            VariablesConverter.RegisterKey(CoreTemplateVariableTypes.Effects, typeof(IEffect));
+            VariablesConverter.RegisterKey(CoreTemplateVariableTypes.Requirements, typeof(Requirement));
+            VariablesConverter.RegisterKey(CombatTemplateVariableTypes.Abilities, typeof(AbilityData));
+            VariablesConverter.RegisterKey(LootTableEntryVariableTypes.Requirements, typeof(Requirement));
             services.AddSingleton<ICloner, Cloner>();
             services.AddTransient<IModalService, ModalService>();
             services.AddTransient<INotifier, Notifier>();
@@ -61,6 +73,7 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<EditorLocaleDatasource>();
             services.AddSingleton<ILocaleDataSource>(x => x.GetService<EditorLocaleDatasource>());
             services.AddSingleton<ILocaleRepository>(x => new LocaleRepository(x.GetService<EditorLocaleDatasource>(), "en-gb"));
+            services.AddSingleton<ILocaleComparisonService, LocaleComparisonService>();
             
             services.AddSingleton<ManifestPluginLoader>();
             services.AddSingleton<GenreService>();
@@ -82,10 +95,14 @@ namespace OpenRpg.Editor.Modules
                 registry.Register(nameof(EquipmentEditor), typeof(EquipmentEditor));
                 registry.Register(nameof(EffectsEditor), typeof(EffectsEditor));
                 registry.Register(nameof(RequirementsEditor), typeof(RequirementsEditor));
+                registry.Register(nameof(AbilityDetailsEditor), typeof(AbilityDetailsEditor));
+                registry.Register(nameof(AbilityDamageEditor), typeof(AbilityDamageEditor));
+                registry.Register(nameof(AbilityCostsEditor), typeof(AbilityCostsEditor));
                 return registry;
             });
             services.AddSingleton<IEditorPropertyResolver, EditorPropertyResolver>();
             services.AddSingleton<ITemplateOptionsResolver, TemplateOptionsResolver>();
+            services.AddSingleton<IAssociationIdResolver, AssociationIdResolver>();
         }
     }
 }

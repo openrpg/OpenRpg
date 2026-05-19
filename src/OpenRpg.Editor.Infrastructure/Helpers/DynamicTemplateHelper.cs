@@ -2,17 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using OpenRpg.Combat.Abilities;
-using OpenRpg.Combat.Extensions;
-using OpenRpg.Core.Common;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Templates;
 using OpenRpg.Core.Templates.Variables;
+using OpenRpg.Core.Variables.General;
 using OpenRpg.Data;
 using OpenRpg.Data.Conventions.Extensions;
 using OpenRpg.Editor.Infrastructure.Extensions;
 using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Types;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.TradeSkills.Templates;
 using OpenRpg.Quests;
@@ -100,41 +99,34 @@ public class DynamicTemplateHelper
 
     public void ListifyProperties(ITemplate template)
     {
-        var variables = GetVariables(template);
-        
-        variables.Effects = variables.HasEffects() ? variables.Effects.AsList() : new List<IEffect>();
-        variables.Requirements = variables.HasRequirements() ? variables.Requirements.AsList() : new List<Requirement>();
-        variables.Abilities = variables.HasAbilities() ? variables.Abilities.AsList() : new List<AbilityData>();
-        
-        if (template is ItemTemplate itemTemplate)
+        if (template is IHasVariables<ITemplateVariables> hasVars)
         {
-            itemTemplate.ModificationAllowances = itemTemplate.ModificationAllowances.AsList();
-            return;
+            var variables = hasVars.Variables;
+            if (!variables.ContainsKey(CoreTemplateVariableTypes.Effects))
+            { variables[CoreTemplateVariableTypes.Effects] = new List<IEffect>(); }
+            if (!variables.ContainsKey(CoreTemplateVariableTypes.Requirements))
+            { variables[CoreTemplateVariableTypes.Requirements] = new List<Requirement>(); }
         }
-        
-        if (template is Quest quest)
+
+        if (template is ItemTemplate itemTemplate)
+        { itemTemplate.ModificationAllowances = itemTemplate.ModificationAllowances.AsList(); }
+        else if (template is Quest quest)
         {
             quest.Gifts = quest.Gifts.AsList();
             quest.Objectives = quest.Objectives.AsList();
             quest.Rewards = quest.Rewards.AsList();
-            quest.Variables.Requirements = quest.Variables.Requirements.AsList();
-            return;
         }
-
-        if (template is ItemCraftingTemplate craftingTemplate)
+        else if (template is ItemCraftingTemplate craftingTemplate)
         {
             craftingTemplate.InputItems = craftingTemplate.InputItems.AsList();
             craftingTemplate.OutputItems = craftingTemplate.OutputItems.AsList();
-            return;
         }
-
-        if (template is ItemGatheringTemplate gatheringTemplate)
+        else if (template is ItemGatheringTemplate gatheringTemplate)
         {
             gatheringTemplate.OutputItems = gatheringTemplate.OutputItems.AsList();
-            return;
         }
     }
-    
+
     public void GenerateLocaleCodes(ITemplate template)
     {
         if(template.GetType() != TemplateType) 

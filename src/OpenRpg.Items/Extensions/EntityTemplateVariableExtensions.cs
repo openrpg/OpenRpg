@@ -15,7 +15,7 @@ public static class EntityTemplateVariableExtensions
     {
         public Equipment Equipment
         {
-            get => vars.GetAsOrDefault(ItemEntityTemplateVariableTypes.Equipment, () => new Equipment());
+            get => vars.GetAsOrDefaultAndSet(ItemEntityTemplateVariableTypes.Equipment, () => new Equipment());
             set => vars[ItemEntityTemplateVariableTypes.Equipment] = value;
         }
     }
@@ -27,7 +27,7 @@ public static class EntityTemplateVariableExtensions
     {
         public ILootTable LootTable
         {
-            get => vars.GetAsOrDefault(ItemEntityTemplateVariableTypes.LootTable, () => new DefaultLootTable());
+            get => vars.GetAsOrDefaultAndSet(ItemEntityTemplateVariableTypes.LootTable, () => new DefaultLootTable());
             set => vars[ItemEntityTemplateVariableTypes.LootTable] = value;
         }
     }

@@ -116,36 +116,65 @@ public class EditorPropertyResolver : IEditorPropertyResolver
 
     public object GetOrCreateNestedContainer(ITemplateVariables variables, string containerName)
     {
-        try
+        var variablesType = variables.GetType();
+        var containsKeyMethod = variablesType.GetMethod("ContainsKey");
+        if (containsKeyMethod == null) return null;
+
+        var addVariableMethod = variablesType.GetMethod("AddVariable");
+        if (addVariableMethod == null) return null;
+
+        var containerKey = GetContainerKey(containerName);
+        if (containerKey == null) return null;
+
+        var containsKey = (bool)containsKeyMethod.Invoke(variables, new object[] { containerKey.Value });
+        if (containsKey)
         {
-            var variablesType = variables.GetType();
-            var containsKeyMethod = variablesType.GetMethod("ContainsKey");
-            if (containsKeyMethod == null) return null;
+            var indexer = variablesType.GetProperty("Item");
+            var existingValue = indexer?.GetValue(variables, new object[] { containerKey.Value });
 
-            var addVariableMethod = variablesType.GetMethod("AddVariable");
-            if (addVariableMethod == null) return null;
+            if (existingValue is System.Collections.IDictionary rawDict && rawDict.GetType().IsGenericType)
+                {
+                    var containerType = FindContainerTypeForVariables(variablesType, containerName);
+                    if (containerType != null)
+                    {
+                        var converted = ConvertDictionaryToContainer(rawDict, containerType, containerName);
+                        if (converted != null)
+                        {
+                            variables[containerKey.Value] = converted;
+                            return converted;
+                        }
+                    }
+                }
 
-            var containerKey = GetContainerKey(containerName);
-            if (containerKey == null) return null;
+            return existingValue;
+        }
 
-            var containsKey = (bool)containsKeyMethod.Invoke(variables, new object[] { containerKey.Value });
-            if (containsKey)
+        var typeToCreate = FindContainerTypeForVariables(variablesType, containerName);
+        if (typeToCreate == null) return null;
+
+        var container = Activator.CreateInstance(typeToCreate);
+        addVariableMethod.Invoke(variables, new object[] { containerKey.Value, container });
+        return container;
+    }
+
+    private static object ConvertDictionaryToContainer(System.Collections.IDictionary dict, Type containerType, string containerName)
+    {
+        var expectedProperties = GetContainerProperties(containerName);
+        var container = Activator.CreateInstance(containerType);
+        foreach (var propName in expectedProperties)
+        {
+            var prop = containerType.GetProperty(propName);
+            if (prop != null && dict.Contains(propName))
             {
-                var indexer = variablesType.GetProperty("Item");
-                return indexer?.GetValue(variables, new object[] { containerKey.Value });
+                var dictVal = dict[propName];
+                if (dictVal != null)
+                {
+                    var converted = Convert.ChangeType(dictVal, prop.PropertyType);
+                    prop.SetValue(container, converted);
+                }
             }
-
-            var containerType = FindContainerType(containerName);
-            if (containerType == null) return null;
-
-            var container = Activator.CreateInstance(containerType);
-            addVariableMethod.Invoke(variables, new object[] { containerKey.Value, container });
-            return container;
         }
-        catch
-        {
-            return null;
-        }
+        return container;
     }
 
     private static int? GetContainerKey(string containerName)
@@ -166,13 +195,17 @@ public class EditorPropertyResolver : IEditorPropertyResolver
         };
     }
 
-    private static Type FindContainerType(string containerName)
+    private Type FindContainerTypeForVariables(Type variablesType, string containerName)
     {
         var expectedProperties = GetContainerProperties(containerName);
         if (expectedProperties.Count == 0) return null;
 
+        var typeInAssembly = GetLoadableTypes(variablesType.Assembly)
+            .FirstOrDefault(t => expectedProperties.All(p => t.GetProperty(p) != null));
+        if (typeInAssembly != null) return typeInAssembly;
+
         return AppDomain.CurrentDomain.GetAssemblies()
-            .Where(a => !a.IsDynamic && !a.ReflectionOnly)
+            .Where(a => a != variablesType.Assembly && !a.IsDynamic && !a.ReflectionOnly)
             .SelectMany(GetLoadableTypes)
             .FirstOrDefault(t => expectedProperties.All(p => t.GetProperty(p) != null));
     }

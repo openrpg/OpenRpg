@@ -1,0 +1,77 @@
+@using OpenRpg.Combat.Abilities
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Health Cost</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="number" placeholder="i.e 10"
+                       value="@HealthCost"
+                       @onchange="OnHealthCostChanged" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Stamina Cost</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="number" placeholder="i.e 15"
+                       value="@StaminaCost"
+                       @onchange="OnStaminaCostChanged" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Mana Cost</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <input class="input" type="number" placeholder="i.e 20"
+                       value="@ManaCost"
+                       @onchange="OnManaCostChanged" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public AbilityTemplate Template { get; set; }
+
+    private static readonly int HealthCostKey = 20;
+    private static readonly int StaminaCostKey = 21;
+    private static readonly int ManaCostKey = 40;
+
+    private int HealthCost
+    {
+        get => Template.Variables.ContainsKey(HealthCostKey) ? (int)Template.Variables[HealthCostKey] : 0;
+        set => Template.Variables[HealthCostKey] = value;
+    }
+
+    private int StaminaCost
+    {
+        get => Template.Variables.ContainsKey(StaminaCostKey) ? (int)Template.Variables[StaminaCostKey] : 0;
+        set => Template.Variables[StaminaCostKey] = value;
+    }
+
+    private int ManaCost
+    {
+        get => Template.Variables.ContainsKey(ManaCostKey) ? (int)Template.Variables[ManaCostKey] : 0;
+        set => Template.Variables[ManaCostKey] = value;
+    }
+
+    private void OnHealthCostChanged(ChangeEventArgs e) => HealthCost = int.Parse(e.Value?.ToString() ?? "0");
+    private void OnStaminaCostChanged(ChangeEventArgs e) => StaminaCost = int.Parse(e.Value?.ToString() ?? "0");
+    private void OnManaCostChanged(ChangeEventArgs e) => ManaCost = int.Parse(e.Value?.ToString() ?? "0");
+}

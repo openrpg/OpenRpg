@@ -12,11 +12,13 @@
     "effectTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEffectTypes, OpenRpg.Genres.Fantasy",
     "rewardTypes": "OpenRpg.Genres.Fantasy.Types.FantasyRewardTypes, OpenRpg.Genres.Fantasy",
     "modificationTypes": "OpenRpg.Genres.Fantasy.Types.FantasyModificationTypes, OpenRpg.Genres.Fantasy",
-    "objectiveTypes": "OpenRpg.Quests.Types.GenresObjectiveTypes, OpenRpg.Quests",
+    "objectiveTypes": "OpenRpg.Genres.Types.GenresObjectiveTypes, OpenRpg.Genres",
     "effectScalingType": "OpenRpg.Entities.Types.CoreEffectScalingTypes, OpenRpg.Entities",
     "statTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEntityStatsVariableTypes, OpenRpg.Genres.Fantasy",
     "stateTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEntityStateVariableTypes, OpenRpg.Genres.Fantasy",
     "craftingSkillTypes": "OpenRpg.Genres.Fantasy.Types.FantasyTradeSkillTypes, OpenRpg.Genres.Fantasy",
-    "gatheringSkillTypes": "OpenRpg.Genres.Fantasy.Types.FantasyTradeSkillTypes, OpenRpg.Genres.Fantasy"
+    "gatheringSkillTypes": "OpenRpg.Genres.Fantasy.Types.FantasyTradeSkillTypes, OpenRpg.Genres.Fantasy",
+    "damageTypes": "OpenRpg.Genres.Fantasy.Types.FantasyDamageTypes, OpenRpg.Genres.Fantasy",
+    "itemSlotTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEquipmentSlotTypes, OpenRpg.Genres.Fantasy"
   }
 }

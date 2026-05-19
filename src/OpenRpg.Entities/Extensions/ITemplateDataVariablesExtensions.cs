@@ -28,7 +28,7 @@ namespace OpenRpg.Entities.Extensions
         {
             public IReadOnlyCollection<Association> ProceduralAssociation
             {
-                get => vars.GetAsOrDefault(CoreTemplateDataVariableTypes.ProceduralAssociations, IReadOnlyCollection<Association>.Empty);
+                get => vars.GetAsOrDefaultAndSet(CoreTemplateDataVariableTypes.ProceduralAssociations, () => new List<Association>());
                 set => vars[CoreTemplateDataVariableTypes.ProceduralAssociations] = value;
             }
         }

@@ -31,6 +31,9 @@ public class TemplateOptionsResolver : ITemplateOptionsResolver
             "effectScalingType" => _genreTypes.EffectScalingType,
             "statTypes" => _genreTypes.StatTypes,
             "stateTypes" => _genreTypes.StateTypes,
+            "targetTypes" => _genreTypes.TargetTypes,
+            "damageTypes" => _genreTypes.DamageTypes,
+            "itemSlotTypes" => _genreTypes.ItemSlotTypes,
             _ => System.Array.Empty<OptionData>()
         };
     }

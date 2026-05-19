@@ -1,3 +1,6 @@
+using OpenRpg.Core.Associations;
+using OpenRpg.Core.Variables;
+
 namespace OpenRpg.Entities.Types
 {
     // 4000 Range (wont conflict with template)
@@ -10,6 +13,7 @@ namespace OpenRpg.Entities.Types
         public static int Level = 4001;
         
         // For adding the procedural associations
+        [CollectionElementType(typeof(Association))]
         public static int ProceduralAssociations = 4002;
     }
 }

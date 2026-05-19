@@ -22,6 +22,9 @@ public class CombinedGenreTypesProvider : IGenreTypesProvider
     public OptionData[] StateTypes => _providers.SelectMany(p => p.StateTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
     public OptionData[] CraftingSkillTypes => _providers.SelectMany(p => p.CraftingSkillTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
     public OptionData[] GatheringSkillTypes => _providers.SelectMany(p => p.GatheringSkillTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
+    public OptionData[] TargetTypes => _providers.SelectMany(p => p.TargetTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
+    public OptionData[] DamageTypes => _providers.SelectMany(p => p.DamageTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
+    public OptionData[] ItemSlotTypes => _providers.SelectMany(p => p.ItemSlotTypes).GroupBy(o => o.Id).Select(g => g.First()).ToArray();
 
     private readonly List<IGenreTypesProvider> _providers;
 

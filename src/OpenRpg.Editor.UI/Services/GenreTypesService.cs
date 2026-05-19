@@ -38,6 +38,9 @@ public class GenreTypesService
     public OptionData[] StateTypes => TypesProvider.StateTypes;
     public OptionData[] CraftingSkillTypes => TypesProvider.CraftingSkillTypes;
     public OptionData[] GatheringSkillTypes => TypesProvider.GatheringSkillTypes;
+    public OptionData[] TargetTypes => TypesProvider.TargetTypes;
+    public OptionData[] DamageTypes => TypesProvider.DamageTypes;
+    public OptionData[] ItemSlotTypes => TypesProvider.ItemSlotTypes;
 }
 
 public class EmptyTypesProvider : IGenreTypesProvider
@@ -56,4 +59,7 @@ public class EmptyTypesProvider : IGenreTypesProvider
     public OptionData[] StateTypes => Array.Empty<OptionData>();
     public OptionData[] CraftingSkillTypes => Array.Empty<OptionData>();
     public OptionData[] GatheringSkillTypes => Array.Empty<OptionData>();
+    public OptionData[] TargetTypes => Array.Empty<OptionData>();
+    public OptionData[] DamageTypes => Array.Empty<OptionData>();
+    public OptionData[] ItemSlotTypes => Array.Empty<OptionData>();
 }

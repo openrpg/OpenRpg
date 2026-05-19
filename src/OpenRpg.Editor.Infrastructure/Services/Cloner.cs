@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenRpg.Projects.Json.Convertors;
+using OpenRpg.Projects.Json.Resolvers;
 
 namespace OpenRpg.Editor.Infrastructure.Services
 {
@@ -8,7 +9,8 @@ namespace OpenRpg.Editor.Infrastructure.Services
     {
         public JsonSerializerSettings SerializationSettings { get; } = new() { 
             TypeNameHandling = TypeNameHandling.Auto,
-            Converters = [new VariablesConverter()],
+            Converters = [new VariablesConverter(), new ReadOnlyCollectionConverter()],
+            ContractResolver = new NoTypeForReadOnlyCollectionsResolver(),
             MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead
         };
         

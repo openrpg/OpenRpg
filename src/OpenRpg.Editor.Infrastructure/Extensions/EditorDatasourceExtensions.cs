@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using OpenRpg.Core.Templates;
 using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Projects.Json.Convertors;
+using OpenRpg.Projects.Json.Resolvers;
 
 namespace OpenRpg.Editor.Infrastructure.Extensions;
 
@@ -15,7 +16,8 @@ public static class EditorDatasourceExtensions
         {
             TypeNameHandling = TypeNameHandling.Auto, 
             Formatting = Formatting.Indented,
-            Converters = { new VariablesConverter() },
+            Converters = { new VariablesConverter(), new ReadOnlyCollectionConverter() },
+            ContractResolver = new NoTypeForReadOnlyCollectionsResolver(),
             MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead
         });
     }

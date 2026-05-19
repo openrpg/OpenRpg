@@ -1,16 +1,4 @@
 @page "/locales"
-@using System.Reactive.Disposables
-@using OpenRpg.Editor.Core.Services.Events.Bus
-@using OpenRpg.Editor.Infrastructure.Events
-@using OpenRpg.Editor.Infrastructure.Models
-@using OpenRpg.Localization.Data.DataSources
-@using OpenRpg.Localization.Data.Queries.Conventions
-@using OpenRpg.Localization.Data.Repositories
-
-@implements IDisposable
-
-@inject ILocaleRepository Repository
-@inject IEventBus EventBus
 
 <h1 class="title is-1">Locale Editor</h1>
 
@@ -18,216 +6,31 @@
     <div class="content">
         <p>Manage locale entries for the current project. Locales are key-value pairs where the key is used in templates and the value is the translated text.</p>
     </div>
-
-    <div class="field">
-        <button class="button is-primary" @onclick="() => ShowAddNew = true">
-            <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
-            <span>Add New Locale</span>
-        </button>
-    </div>
 </div>
 
-@if (ShowAddNew)
-{
-    <div class="box">
-        <h3 class="title is-4 has-text-dark">Add New Locale</h3>
-        <div class="field">
-            <label class="label">Locale Id</label>
-            <div class="control">
-                <input class="input" type="text" placeholder="e.g., item.sword.name" @bind="NewLocaleId"/>
-            </div>
-        </div>
-        <div class="field">
-            <label class="label">Locale Text</label>
-            <div class="control">
-                <input class="input" type="text" placeholder="The display text" @bind="NewLocaleText"/>
-            </div>
-        </div>
-        <div class="field is-grouped">
-            <div class="control">
-                <button class="button is-success" @onclick="AddNewLocale">Add Locale</button>
-            </div>
-            <div class="control">
-                <button class="button is-light" @onclick="CancelAddNew">Cancel</button>
-            </div>
-        </div>
-    </div>
-}
-
-<div class="box">
-    <h2 class="title is-3">All Locales (@Entries.Count entries)</h2>
-    
-    <div class="field">
-        <label class="label">Search</label>
-        <div class="control">
-            <input class="input" type="text" placeholder="Filter by ID or text..." @bind="SearchTerm" @bind:event="oninput"/>
-        </div>
-    </div>
-
-    @if (FilteredEntries.Count == 0)
-    {
-        <div class="notification is-warning">
-            No locale entries found.
-        </div>
-    }
-    else
-    {
-        <table class="table is-fullwidth is-striped">
-            <thead>
-                <tr>
-                    <th>Locale Code</th>
-                    <th>Locale Id</th>
-                    <th>Locale Text</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var entry in FilteredEntries)
-                {
-                    <tr>
-                        <td><code>@entry.LocaleCode</code></td>
-                        <td><code>@entry.LocaleId</code></td>
-                        <td>
-                            @if (EditingEntry?.LocaleId == entry.LocaleId)
-                            {
-                                <input class="input is-small" type="text" @bind="EditingText"/>
-                            }
-                            else
-                            {
-                                @entry.LocaleText
-                            }
-                        </td>
-                        <td>
-                            <div class="buttons are-small">
-                                @if (EditingEntry?.LocaleId == entry.LocaleId)
-                                {
-                                    <button class="button is-success is-small" @onclick="() => SaveEdit(entry)">
-                                        <span class="icon"><i class="fas fa-check" aria-hidden="true"></i></span>
-                                        <span>Save</span>
-                                    </button>
-                                    <button class="button is-light is-small" @onclick="CancelEdit">
-                                        <span class="icon"><i class="fas fa-times" aria-hidden="true"></i></span>
-                                        <span>Cancel</span>
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button class="button is-warning is-small" @onclick="() => StartEdit(entry)">
-                                        <span class="icon"><i class="fas fa-edit" aria-hidden="true"></i></span>
-                                        <span>Edit</span>
-                                    </button>
-                                    <button class="button is-danger is-small" @onclick="() => DeleteLocale(entry)">
-                                        <span class="icon"><i class="fas fa-trash" aria-hidden="true"></i></span>
-                                        <span>Delete</span>
-                                    </button>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+<div class="tabs is-boxed">
+    <ul>
+        <li class="@(_activeTab == "browse" ? "is-active" : "")">
+            <a @onclick='() => SwitchTab("browse")'>Browse</a>
+        </li>
+        <li class="@(_activeTab == "compare" ? "is-active" : "")">
+            <a @onclick='() => SwitchTab("compare")'>Compare</a>
+        </li>
+        <li class="@(_activeTab == "missing" ? "is-active" : "")">
+            <a @onclick='() => SwitchTab("missing")'>Missing</a>
+        </li>
+    </ul>
 </div>
+
+@if (_activeTab == "browse") { <LocalesBrowseTab /> }
+else if (_activeTab == "compare") { <LocalesCompareTab /> }
+else if (_activeTab == "missing") { <LocalesMissingTab /> }
 
 @code {
-    private IDisposable _subscription;
-    private List<System.Reactive.Disposables.CompositeDisposable> _composites = new();
-    
-    private List<LocaleEntry> Entries = new();
-    private string SearchTerm = "";
-    private bool ShowAddNew = false;
-    private string NewLocaleId = "";
-    private string NewLocaleText = "";
-    private LocaleEntry EditingEntry;
-    private string EditingText = "";
+    private string _activeTab = "browse";
 
-    private List<LocaleEntry> FilteredEntries => Entries
-        .Where(e => string.IsNullOrEmpty(SearchTerm) ||
-                    e.LocaleId.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    e.LocaleText.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
-        .ToList();
-
-    protected override async Task OnInitializedAsync()
+    private void SwitchTab(string tab)
     {
-        await base.OnInitializedAsync();
-        LoadEntries();
-        
-        var composite = new System.Reactive.Disposables.CompositeDisposable();
-        _composites.Add(composite);
-        _subscription = EventBus.Receive<ProjectChangedEvent>().Subscribe(_ => InvokeAsync(() => { LoadEntries(); StateHasChanged(); }));
-        composite.Add(_subscription);
-    }
-
-    public void LoadEntries()
-    {
-        var dataset = Repository.DataSource.GetLocaleDataset(Repository.CurrentLocaleCode);
-        Entries = dataset.LocaleData
-            .Select(kvp => new LocaleEntry 
-            { 
-                LocaleCode = Repository.CurrentLocaleCode, 
-                LocaleId = kvp.Key, 
-                LocaleText = kvp.Value, 
-                Exists = true 
-            })
-            .OrderBy(e => e.LocaleId)
-            .ToList();
-    }
-
-    private void CancelAddNew()
-    {
-        ShowAddNew = false;
-        NewLocaleId = "";
-        NewLocaleText = "";
-    }
-
-    private void AddNewLocale()
-    {
-        if (string.IsNullOrEmpty(NewLocaleId))
-        { return; }
-        
-        Repository.DataSource.Create(Repository.CurrentLocaleCode, NewLocaleId, NewLocaleText);
-        CancelAddNew();
-        LoadEntries();
-        StateHasChanged();
-    }
-
-    private void StartEdit(LocaleEntry entry)
-    {
-        EditingEntry = entry;
-        EditingText = entry.LocaleText;
-    }
-
-    private void CancelEdit()
-    {
-        EditingEntry = null;
-        EditingText = "";
-    }
-
-    private void SaveEdit(LocaleEntry entry)
-    {
-        if (EditingEntry == null) { return; }
-        
-        Repository.DataSource.Update(Repository.CurrentLocaleCode, entry.LocaleId, EditingText);
-        EditingEntry = null;
-        EditingText = "";
-        LoadEntries();
-        StateHasChanged();
-    }
-
-    private void DeleteLocale(LocaleEntry entry)
-    {
-        Repository.DataSource.Delete(Repository.CurrentLocaleCode, entry.LocaleId);
-        LoadEntries();
-        StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        foreach (var composite in _composites)
-        {
-            composite.Dispose();
-        }
-        _composites.Clear();
+        _activeTab = tab;
     }
 }

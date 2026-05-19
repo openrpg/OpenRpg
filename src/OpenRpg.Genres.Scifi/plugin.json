@@ -11,12 +11,14 @@
     "effectTypes": "OpenRpg.Genres.Scifi.Types.ScifiEffectTypes, OpenRpg.Genres.Scifi",
     "rewardTypes": "OpenRpg.Genres.Scifi.Types.ScifiRewardTypes, OpenRpg.Genres.Scifi",
     "modificationTypes": "OpenRpg.Genres.Scifi.Types.ScifiModificationTypes, OpenRpg.Genres.Scifi",
-    "objectiveTypes": "OpenRpg.Quests.Types.GenresObjectiveTypes, OpenRpg.Quests",
+    "objectiveTypes": "OpenRpg.Genres.Types.GenresObjectiveTypes, OpenRpg.Genres",
     "effectScalingType": "OpenRpg.Entities.Types.CoreEffectScalingTypes, OpenRpg.Entities",
     "statTypes": "OpenRpg.Genres.Scifi.Types.ScifiEntityStatsVariableTypes, OpenRpg.Genres.Scifi",
     "stateTypes": "OpenRpg.Genres.Scifi.Types.ScifiShipStateVariableTypes, OpenRpg.Genres.Scifi",
     "craftingSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills",
-    "gatheringSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills"
+    "gatheringSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills",
+    "damageTypes": "OpenRpg.Genres.Scifi.Types.ScifiDamageTypes, OpenRpg.Genres.Scifi",
+    "itemSlotTypes": "OpenRpg.Genres.Scifi.Types.ScifiEntityEquipmentSlotTypes, OpenRpg.Genres.Scifi"
   },
   "templateTypes": {
     "ship": {

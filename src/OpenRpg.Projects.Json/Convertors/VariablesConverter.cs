@@ -1,54 +1,100 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenRpg.Core.Variables;
 
 namespace OpenRpg.Projects.Json.Convertors;
 
-public class VariablesConverter : JsonConverter<Dictionary<int, object?>>
+public class VariablesConverter : JsonConverter
 {
-    public override Dictionary<int, object?>? ReadJson(JsonReader reader, Type objectType,
-        Dictionary<int, object?>? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    private static readonly Dictionary<int, Type> _collectionElementTypes = new();
+
+    public static void RegisterKey(int key, Type elementType)
+    {
+        _collectionElementTypes[key] = elementType;
+    }
+
+    public static void Initialize(IDictionary<int, Type> collectionElementTypes)
+    {
+        foreach (var kvp in collectionElementTypes)
+        { _collectionElementTypes[kvp.Key] = kvp.Value; }
+    }
+
+    public override bool CanConvert(Type objectType)
+    {
+        return typeof(KeyedVariables<int, object>).IsAssignableFrom(objectType);
+    }
+
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         var obj = JObject.Load(reader);
 
-        return obj.Properties()
-            .ToDictionary(p => int.Parse(p.Name), p => ReadToken(p.Value, serializer));
+        var dict = obj.Properties()
+            .ToDictionary(
+                p => int.Parse(p.Name),
+                p => ReadToken(p.Value, serializer, int.Parse(p.Name)));
+
+        var instance = existingValue as KeyedVariables<int, object>
+                       ?? Activator.CreateInstance(objectType, true) as KeyedVariables<int, object>;
+
+        if (instance == null)
+        { return new KeyedVariables<int, object> { InternalVariables = dict }; }
+
+        instance.InternalVariables = dict;
+        return instance;
     }
 
-    private object? ReadToken(JToken token, JsonSerializer serializer)
+    private object? ReadToken(JToken token, JsonSerializer serializer, int? currentKey = null)
     {
         switch (token.Type)
         {
             case JTokenType.Object:
             {
                 var jobject = (JObject)token;
-                
+
                 if (jobject.Property("$type") != null)
                 {
-                    var typeName =
-                        jobject["$type"]!.Value<string>()!;
+                    var typeName = jobject["$type"]!.Value<string>()!;
+                    var resolvedType = Type.GetType(typeName, throwOnError: true);
 
-                    var resolvedType = Type.GetType(
-                        typeName,
-                        throwOnError: true);
-
-                    using var subReader =
-                        jobject.CreateReader();
-
-                    return serializer.Deserialize(
-                        subReader,
-                        resolvedType!);
+                    using var subReader = jobject.CreateReader();
+                    return serializer.Deserialize(subReader, resolvedType!);
                 }
 
-                // Plain object without $type
                 return jobject.Properties()
                     .ToDictionary(
                         p => p.Name,
-                        p => ReadToken(p.Value, serializer)
-                    );
+                        p => ReadToken(p.Value, serializer));
             }
 
             case JTokenType.Array:
             {
+                if (currentKey.HasValue && _collectionElementTypes.TryGetValue(currentKey.Value, out var elementType))
+                {
+                    var listType = typeof(List<>).MakeGenericType(elementType);
+                    var list = (IList)Activator.CreateInstance(listType)!;
+
+                    foreach (var child in token.Children())
+                    {
+                        if (child is JObject jo && jo.Property("$type") != null)
+                        {
+                            var typeName = jo["$type"]!.Value<string>()!;
+                            var resolvedType = Type.GetType(typeName, throwOnError: true);
+                            using var subReader = jo.CreateReader();
+                            list.Add(serializer.Deserialize(subReader, resolvedType!));
+                        }
+                        else
+                        {
+                            list.Add(child.ToObject(elementType, serializer));
+                        }
+                    }
+
+                    return list;
+                }
+
                 return token.Children()
                     .Select(t => ReadToken(t, serializer))
                     .ToList();
@@ -78,6 +124,55 @@ public class VariablesConverter : JsonConverter<Dictionary<int, object?>>
         }
     }
 
-    public override void WriteJson(JsonWriter writer, Dictionary<int, object?>? value, JsonSerializer serializer)
-    { serializer.Serialize(writer, value); }
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    {
+        var variables = value as KeyedVariables<int, object>;
+        if (variables == null)
+        {
+            writer.WriteNull();
+            return;
+        }
+
+        writer.WriteStartObject();
+        if (variables.InternalVariables == null)
+        {
+            writer.WriteEndObject();
+            return;
+        }
+
+        foreach (var kvp in variables.InternalVariables)
+        {
+            writer.WritePropertyName(kvp.Key.ToString());
+
+            if (kvp.Value is IList list && _collectionElementTypes.TryGetValue(kvp.Key, out var elementType))
+            {
+                writer.WriteStartArray();
+                foreach (var item in list)
+                {
+                    if (item == null)
+                    { serializer.Serialize(writer, null); }
+                    else if (elementType.IsInterface || elementType.IsAbstract)
+                    {
+                        var typeName = $"{item.GetType().FullName}, {item.GetType().Assembly.GetName().Name}";
+                        var content = JObject.FromObject(item);
+                        writer.WriteStartObject();
+                        writer.WritePropertyName("$type");
+                        writer.WriteValue(typeName);
+                        foreach (var prop in content.Properties())
+                        { prop.WriteTo(writer); }
+                        writer.WriteEndObject();
+                    }
+                    else
+                    { serializer.Serialize(writer, item, item.GetType()); }
+                }
+                writer.WriteEndArray();
+            }
+            else
+            {
+                serializer.Serialize(writer, kvp.Value);
+            }
+        }
+
+        writer.WriteEndObject();
+    }
 }
