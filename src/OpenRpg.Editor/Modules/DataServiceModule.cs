@@ -73,6 +73,7 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<EditorLocaleDatasource>();
             services.AddSingleton<ILocaleDataSource>(x => x.GetService<EditorLocaleDatasource>());
             services.AddSingleton<ILocaleRepository>(x => new LocaleRepository(x.GetService<EditorLocaleDatasource>(), "en-gb"));
+            services.AddSingleton<ILocaleComparisonService, LocaleComparisonService>();
             
             services.AddSingleton<ManifestPluginLoader>();
             services.AddSingleton<GenreService>();

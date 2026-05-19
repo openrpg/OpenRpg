@@ -14,6 +14,7 @@ namespace OpenRpg.Quests
         public IReadOnlyCollection<Objective> Objectives { get; set; } = [];
         public IReadOnlyCollection<Reward> Rewards { get; set; } = [];
         public IReadOnlyCollection<Reward> Gifts { get; set; } = [];
+        
         public QuestVariables Variables { get; set; } = new();
     }
 }
