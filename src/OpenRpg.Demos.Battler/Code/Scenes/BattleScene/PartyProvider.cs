@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using OpenRpg.Combat.Extensions;
+using OpenRpg.Combat.Types;
 using OpenRpg.Data;
 using OpenRpg.Demos.Battler.Code.Builders;
 using OpenRpg.Demos.Battler.Code.Types;
@@ -26,8 +29,9 @@ public class PartyProvider : IPartyProvider
     {
         var entities = new List<BattleEntity>();
         var slotIndex = 0;
+        var partyIds = ClassLookups.GetRandomPartyIds();
 
-        foreach (var classId in ClassLookups.PartyIds)
+        foreach (var classId in partyIds)
         {
             var template = _dataSource.Get<ClassTemplate>(classId);
             if (template == null) continue;
@@ -43,6 +47,10 @@ public class PartyProvider : IPartyProvider
 
             character.NameLocaleId = template.NameLocaleId;
             var assetCode = character.Variables.AssetCode;
+
+            if (template.Variables.HasAbilities())
+                character.Variables[CombatTemplateVariableTypes.Abilities] = template.Variables.Abilities.ToList();
+
             var row = slotIndex < 2 ? 0 : 1;
 
             entities.Add(new BattleEntity

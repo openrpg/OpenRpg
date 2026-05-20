@@ -6,7 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using OpenRpg.Data;
 using OpenRpg.Demos.Battler.Code.Services.Game;
+using OpenRpg.Genres.Requirements;
+using OpenRpg.Localization.Data.DataSources;
 
 namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
 
@@ -17,7 +20,10 @@ public class BattleScene : IScene
     private readonly IGameServices _gameServices;
     private readonly ISceneManager _sceneManager;
     private readonly IServiceProvider _serviceProvider;
-    private readonly TurnManager _turnManager = new();
+    private readonly IDataSource _dataSource;
+    private readonly ICharacterRequirementChecker _requirementChecker;
+    private readonly ILocaleDataSource _localeDataSource;
+    private readonly TurnManager _turnManager;
     private readonly SpriteCache _spriteCache = new();
     private readonly EntityRenderer _entityRenderer = new();
 
@@ -36,13 +42,20 @@ public class BattleScene : IScene
         IEnemyFormationProvider enemyFormationProvider,
         IGameServices gameServices,
         ISceneManager sceneManager,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IDataSource dataSource,
+        ICharacterRequirementChecker requirementChecker,
+        ILocaleDataSource localeDataSource)
     {
         _partyProvider = partyProvider;
         _enemyFormationProvider = enemyFormationProvider;
         _gameServices = gameServices;
         _sceneManager = sceneManager;
         _serviceProvider = serviceProvider;
+        _dataSource = dataSource;
+        _requirementChecker = requirementChecker;
+        _localeDataSource = localeDataSource;
+        _turnManager = new TurnManager(_dataSource, _requirementChecker, _localeDataSource);
     }
 
     public async Task LoadAsync()

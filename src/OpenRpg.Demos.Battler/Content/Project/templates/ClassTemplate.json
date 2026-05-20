@@ -12,9 +12,14 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 5.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 5.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 50.0, "Requirements": [] },
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 3.0, "Requirements": [] }
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 3.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 234, "Potency": 10.0, "Requirements": [] }
       ],
-      "4003": []
+      "4003": [],
+      "6000": [
+        { "TemplateId": 1, "Variables": {} },
+        { "TemplateId": 2, "Variables": {} }
+      ]
     }
   },
   {
@@ -30,29 +35,18 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 263, "Potency": 8.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 3.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 30.0, "Requirements": [] },
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 6.0, "Requirements": [] }
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 6.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 234, "Potency": 15.0, "Requirements": [] }
       ],
-      "4003": []
+      "4003": [],
+      "6000": [
+        { "TemplateId": 3, "Variables": {} },
+        { "TemplateId": 4, "Variables": {} }
+      ]
     }
   },
   {
     "Id": 3,
-    "NameLocaleId": "class-thief-name",
-    "DescriptionLocaleId": "class-thief-description",
-    "Variables": {
-      "9000": "class-thief",
-      "4002": [
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 222, "Potency": 3.0, "Requirements": [] },
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 2.0, "Requirements": [] },
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 220, "Potency": 1.0, "Requirements": [] },
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 4.0, "Requirements": [] },
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 3, "Potency": 5.0, "Requirements": [] }
-      ],
-      "4003": []
-    }
-  },
-  {
-    "Id": 4,
     "NameLocaleId": "class-white-mage-name",
     "DescriptionLocaleId": "class-white-mage-description",
     "Variables": {
@@ -65,7 +59,32 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 62, "Potency": 10.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 2.0, "Requirements": [] }
       ],
-      "4003": []
+      "4003": [],
+      "6000": [
+        { "TemplateId": 9, "Variables": {} },
+        { "TemplateId": 10, "Variables": {} }
+      ]
+    }
+  },
+  {
+    "Id": 4,
+    "NameLocaleId": "class-thief-name",
+    "DescriptionLocaleId": "class-thief-description",
+    "Variables": {
+      "9000": "class-thief",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 222, "Potency": 3.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 2.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 220, "Potency": 1.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 4.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 3, "Potency": 5.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 234, "Potency": 5.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "6000": [
+        { "TemplateId": 5, "Variables": {} },
+        { "TemplateId": 6, "Variables": {} }
+      ]
     }
   },
   {
@@ -82,7 +101,11 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 234, "Potency": 30.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 2.0, "Requirements": [] }
       ],
-      "4003": []
+      "4003": [],
+      "6000": [
+        { "TemplateId": 7, "Variables": {} },
+        { "TemplateId": 8, "Variables": {} }
+      ]
     }
   }
 ]

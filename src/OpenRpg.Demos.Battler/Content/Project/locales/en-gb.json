@@ -63,6 +63,27 @@
     "item-ether-name": "Ether",
     "item-ether-description": "A blue liquid that restores 30 MP.",
     "item-phoenix-down-name": "Phoenix Down",
-    "item-phoenix-down-description": "A blessed feather said to hold the power of revival."
+    "item-phoenix-down-description": "A blessed feather said to hold the power of revival.",
+
+    "ability-slash": "Slash",
+    "ability-slash-desc": "A sweeping strike that hits multiple front-row enemies.",
+    "ability-power-strike": "Power Strike",
+    "ability-power-strike-desc": "A powerful overhand strike that deals heavy damage.",
+    "ability-chi-blast": "Chi Blast",
+    "ability-chi-blast-desc": "A burst of inner energy that strikes all enemies.",
+    "ability-focus-strike": "Focus Strike",
+    "ability-focus-strike-desc": "A precise, focused blow that deals massive damage.",
+    "ability-backstab": "Backstab",
+    "ability-backstab-desc": "A vicious strike from the shadows.",
+    "ability-poison-blade": "Poison Blade",
+    "ability-poison-blade-desc": "A venomous slash that poisons the target.",
+    "ability-fire-bolt": "Fire Bolt",
+    "ability-fire-bolt-desc": "A bolt of searing fire.",
+    "ability-ice-storm": "Ice Storm",
+    "ability-ice-storm-desc": "A freezing storm that assails all enemies.",
+    "ability-smite": "Smite",
+    "ability-smite-desc": "A blast of holy light.",
+    "ability-holy": "Holy",
+    "ability-holy-desc": "A powerful beam of sacred radiance."
   }
 }

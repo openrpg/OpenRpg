@@ -23,6 +23,8 @@ public class BattleBottomPanelUi
     private readonly List<string> _partyNames = [];
     private readonly List<int> _partyHps = [];
     private readonly List<int> _partyMaxHps = [];
+    private readonly List<int> _partyManas = [];
+    private readonly List<int> _partyMaxManas = [];
     private readonly List<bool> _partyAlive = [];
 
     private const int MaxEnemyRows = 6;
@@ -99,6 +101,8 @@ public class BattleBottomPanelUi
         _partyNames.Clear();
         _partyHps.Clear();
         _partyMaxHps.Clear();
+        _partyManas.Clear();
+        _partyMaxManas.Clear();
         _partyAlive.Clear();
 
         for (var i = 0; i < MaxPartyRows; i++)
@@ -113,6 +117,8 @@ public class BattleBottomPanelUi
                 _partyNames.Add(e.Name);
                 _partyHps.Add(e.Hp);
                 _partyMaxHps.Add(e.MaxHp);
+                _partyManas.Add(e.Mana);
+                _partyMaxManas.Add(e.MaxMana);
                 _partyAlive.Add(e.IsAlive);
                 var ratio = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0f;
                 _partyHpBarFills[i].Width = ratio * 100;
@@ -123,6 +129,8 @@ public class BattleBottomPanelUi
                 _partyNames.Add("");
                 _partyHps.Add(0);
                 _partyMaxHps.Add(0);
+                _partyManas.Add(0);
+                _partyMaxManas.Add(0);
                 _partyAlive.Add(false);
             }
         }
@@ -152,6 +160,11 @@ public class BattleBottomPanelUi
             TextHelper.DrawStringWithSpacing(sb, font, NormalizeName(_partyNames[i]), new Vector2(404, y), _partyAlive[i] ? PartyNameColor : Color.Gray);
             var hpText = $"{_partyHps[i]}/{_partyMaxHps[i]}";
             TextHelper.DrawStringWithSpacing(sb, font, hpText, new Vector2(652, y), HpTextColor);
+            if (_partyMaxManas[i] > 0)
+            {
+                var mpText = $"MP:{_partyManas[i]}/{_partyMaxManas[i]}";
+                TextHelper.DrawStringWithSpacing(sb, font, mpText, new Vector2(652, y + 12), new Color(100, 160, 255));
+            }
         }
     }
 

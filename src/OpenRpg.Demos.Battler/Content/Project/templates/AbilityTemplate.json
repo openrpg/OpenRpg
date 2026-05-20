@@ -1,0 +1,142 @@
+[
+  {
+    "Id": 1,
+    "NameLocaleId": "ability-slash",
+    "DescriptionLocaleId": "ability-slash-desc",
+    "Variables": {
+      "2": { "Type": 50, "Value": 10.0 },
+      "5": 2,
+      "7": 3,
+      "40": 4,
+      "4003": [
+        { "RequirementType": 2, "Association": { "AssociatedId": 1, "AssociatedValue": 0 } }
+      ]
+    }
+  },
+  {
+    "Id": 2,
+    "NameLocaleId": "ability-power-strike",
+    "DescriptionLocaleId": "ability-power-strike-desc",
+    "Variables": {
+      "2": { "Type": 50, "Value": 22.0 },
+      "5": 1,
+      "7": 1,
+      "40": 8,
+      "4003": [
+        { "RequirementType": 2, "Association": { "AssociatedId": 1, "AssociatedValue": 0 } }
+      ]
+    }
+  },
+  {
+    "Id": 3,
+    "NameLocaleId": "ability-chi-blast",
+    "DescriptionLocaleId": "ability-chi-blast-desc",
+    "Variables": {
+      "2": { "Type": 51, "Value": 8.0 },
+      "5": 2,
+      "7": 6,
+      "40": 5,
+      "4003": [
+        { "RequirementType": 2, "Association": { "AssociatedId": 2, "AssociatedValue": 0 } }
+      ]
+    }
+  },
+  {
+    "Id": 4,
+    "NameLocaleId": "ability-focus-strike",
+    "DescriptionLocaleId": "ability-focus-strike-desc",
+    "Variables": {
+      "2": { "Type": 51, "Value": 28.0 },
+      "5": 1,
+      "7": 1,
+      "40": 10,
+      "4003": [
+        { "RequirementType": 2, "Association": { "AssociatedId": 2, "AssociatedValue": 0 } }
+      ]
+    }
+  },
+  {
+    "Id": 5,
+    "NameLocaleId": "ability-backstab",
+    "DescriptionLocaleId": "ability-backstab-desc",
+    "Variables": {
+      "2": { "Type": 52, "Value": 25.0 },
+      "5": 1,
+      "7": 1,
+      "40": 4,
+      "4003": [
+        { "RequirementType": 2, "Association": { "AssociatedId": 4, "AssociatedValue": 0 } }
+      ]
+    }
+  },
+  {
+    "Id": 6,
+    "NameLocaleId": "ability-poison-blade",
+    "DescriptionLocaleId": "ability-poison-blade-desc",
+    "Variables": {
+      "2": { "Type": 52, "Value": 12.0 },
+      "5": 1,
+      "7": 1,
+      "40": 3,
+      "4003": [
+        { "RequirementType": 2, "Association": { "AssociatedId": 4, "AssociatedValue": 0 } }
+      ]
+    }
+  },
+  {
+    "Id": 7,
+    "NameLocaleId": "ability-fire-bolt",
+    "DescriptionLocaleId": "ability-fire-bolt-desc",
+    "Variables": {
+      "2": { "Type": 80, "Value": 22.0 },
+      "5": 1,
+      "7": 1,
+      "40": 15,
+      "4003": [
+        { "RequirementType": 2, "Association": { "AssociatedId": 5, "AssociatedValue": 0 } }
+      ]
+    }
+  },
+  {
+    "Id": 8,
+    "NameLocaleId": "ability-ice-storm",
+    "DescriptionLocaleId": "ability-ice-storm-desc",
+    "Variables": {
+      "2": { "Type": 81, "Value": 12.0 },
+      "5": 2,
+      "7": 6,
+      "40": 22,
+      "4003": [
+        { "RequirementType": 2, "Association": { "AssociatedId": 5, "AssociatedValue": 0 } }
+      ]
+    }
+  },
+  {
+    "Id": 9,
+    "NameLocaleId": "ability-smite",
+    "DescriptionLocaleId": "ability-smite-desc",
+    "Variables": {
+      "2": { "Type": 84, "Value": 15.0 },
+      "5": 1,
+      "7": 1,
+      "40": 6,
+      "4003": [
+        { "RequirementType": 2, "Association": { "AssociatedId": 3, "AssociatedValue": 0 } }
+      ]
+    }
+  },
+  {
+    "Id": 10,
+    "NameLocaleId": "ability-holy",
+    "DescriptionLocaleId": "ability-holy-desc",
+    "Variables": {
+      "2": { "Type": 84, "Value": 22.0 },
+      "5": 1,
+      "7": 1,
+      "40": 12,
+      "4003": [
+        { "RequirementType": 2, "Association": { "AssociatedId": 3, "AssociatedValue": 0 } }
+      ]
+    }
+  }
+]

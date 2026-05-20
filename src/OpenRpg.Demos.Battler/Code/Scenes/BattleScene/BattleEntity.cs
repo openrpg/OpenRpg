@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Extensions;
+using OpenRpg.Genres.Fantasy.Extensions;
 
 namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
 
@@ -21,6 +22,8 @@ public class BattleEntity
     public int MaxHp => Entity.Stats.MaxHealth;
     public int Initiative => (int)Entity.Stats.MovementSpeed;
     public int AttackDamage => (int)Entity.Stats.Damage;
+    public int Mana => (int)Entity.State.Mana;
+    public int MaxMana => (int)Entity.Stats.MaxMana;
     public bool IsAlive => !Entity.State.IsDead;
     public Texture2D Sprite { get; set; }
 }
