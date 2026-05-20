@@ -1,7 +1,9 @@
+using OpenRpg.Combat.Abilities;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Templates;
 using OpenRpg.Data;
 using OpenRpg.Entities.Classes.Templates;
+using OpenRpg.Entities.Entity.Templates;
 using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.TradeSkills.Templates;
@@ -32,6 +34,8 @@ public class JsonTemplateDatastorePopulator : ITemplateDatastorePopulator
         await ProcessTemplates<Quest>(project, absoluteTemplateFolderPath, dataSource);
         await ProcessTemplates<ItemCraftingTemplate>(project, absoluteTemplateFolderPath, dataSource);
         await ProcessTemplates<ItemGatheringTemplate>(project, absoluteTemplateFolderPath, dataSource);
+        await ProcessTemplates<AbilityTemplate>(project, absoluteTemplateFolderPath, dataSource);
+        await ProcessTemplates<EntityTemplate>(project, absoluteTemplateFolderPath, dataSource);
     }
     
     public async Task PopulateDatastore(Project project, string projectPath, IDataSource dataSource)
@@ -44,11 +48,16 @@ public class JsonTemplateDatastorePopulator : ITemplateDatastorePopulator
         await ProcessTemplateTypes(project, absoluteTemplateFolderPath, dataSource);
     }
 
-    protected async Task ProcessTemplates<T>(Project project, string templateFolderPath, IDataSource dataSource) where T : ITemplate
+    protected async Task ProcessTemplates<T>(Project project, string templateFolderPath, IDataSource dataSource, bool throwOnMissing = false) where T : ITemplate
     {
         var itemTemplatePath = Path.Combine(templateFolderPath, $"{typeof(T).Name}.json");
         var templatePathExists = await FileService.Exists(itemTemplatePath);
-        if(!templatePathExists) { throw new Exception($"Template file [{itemTemplatePath}] cannot be found"); }
+        if (!templatePathExists)
+        {
+            if(throwOnMissing)
+            { throw new Exception($"Template file [{itemTemplatePath}] cannot be found"); }
+            return;
+        }
         
         var templates = await TemplateLoader.LoadTemplates<T>(project, itemTemplatePath);
         templates.ForEach(x => dataSource.Update(x, x.Id));

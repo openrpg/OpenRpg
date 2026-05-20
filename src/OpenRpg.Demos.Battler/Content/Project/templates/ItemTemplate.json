@@ -1,0 +1,311 @@
+[
+  {
+    "Id": 1,
+    "ItemType": 2,
+    "NameLocaleId": "item-bronze-sword-name",
+    "DescriptionLocaleId": "item-bronze-sword-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 50,
+      "3": 5,
+      "9000": "bronze-sword",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 6.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 2,
+    "ItemType": 2,
+    "NameLocaleId": "item-iron-sword-name",
+    "DescriptionLocaleId": "item-iron-sword-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 120,
+      "3": 6,
+      "9000": "iron-sword",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 10.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 3,
+    "ItemType": 2,
+    "NameLocaleId": "item-mythril-sword-name",
+    "DescriptionLocaleId": "item-mythril-sword-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 3,
+      "2": 300,
+      "3": 4,
+      "9000": "mythril-sword",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 16.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 4,
+    "ItemType": 2,
+    "NameLocaleId": "item-staff-name",
+    "DescriptionLocaleId": "item-staff-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 80,
+      "3": 3,
+      "9000": "staff",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 4.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 226, "Potency": 2.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 5,
+    "ItemType": 2,
+    "NameLocaleId": "item-knuckles-name",
+    "DescriptionLocaleId": "item-knuckles-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 100,
+      "3": 2,
+      "9000": "knuckles",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 263, "Potency": 8.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 6,
+    "ItemType": 2,
+    "NameLocaleId": "item-short-bow-name",
+    "DescriptionLocaleId": "item-short-bow-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 110,
+      "3": 3,
+      "9000": "short-bow",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 7.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 90, "Potency": 2.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 10,
+    "ItemType": 30,
+    "NameLocaleId": "item-leather-cap-name",
+    "DescriptionLocaleId": "item-leather-cap-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 30,
+      "3": 1,
+      "9000": "leather-cap",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 2.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 11,
+    "ItemType": 30,
+    "NameLocaleId": "item-bronze-helm-name",
+    "DescriptionLocaleId": "item-bronze-helm-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 80,
+      "3": 3,
+      "9000": "bronze-helm",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 4.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 12,
+    "ItemType": 30,
+    "NameLocaleId": "item-iron-helm-name",
+    "DescriptionLocaleId": "item-iron-helm-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 3,
+      "2": 180,
+      "3": 4,
+      "9000": "iron-helm",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 6.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 13,
+    "ItemType": 31,
+    "NameLocaleId": "item-leather-armor-name",
+    "DescriptionLocaleId": "item-leather-armor-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 60,
+      "3": 3,
+      "9000": "leather-armor",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 5.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 14,
+    "ItemType": 31,
+    "NameLocaleId": "item-chain-mail-name",
+    "DescriptionLocaleId": "item-chain-mail-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 150,
+      "3": 6,
+      "9000": "chain-mail",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 8.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 15,
+    "ItemType": 31,
+    "NameLocaleId": "item-plate-armor-name",
+    "DescriptionLocaleId": "item-plate-armor-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 3,
+      "2": 350,
+      "3": 10,
+      "9000": "plate-armor",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 12.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 16,
+    "ItemType": 35,
+    "NameLocaleId": "item-leather-gloves-name",
+    "DescriptionLocaleId": "item-leather-gloves-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 20,
+      "3": 1,
+      "9000": "leather-gloves",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 1.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 17,
+    "ItemType": 34,
+    "NameLocaleId": "item-leather-boots-name",
+    "DescriptionLocaleId": "item-leather-boots-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 25,
+      "3": 1,
+      "9000": "leather-boots",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 1.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 1.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 20,
+    "ItemType": 60,
+    "NameLocaleId": "item-potion-name",
+    "DescriptionLocaleId": "item-potion-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 2,
+      "2": 50,
+      "3": 1,
+      "9000": "potion",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 62, "Potency": 30.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 21,
+    "ItemType": 60,
+    "NameLocaleId": "item-hi-potion-name",
+    "DescriptionLocaleId": "item-hi-potion-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 3,
+      "2": 150,
+      "3": 1,
+      "9000": "hi-potion",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 62, "Potency": 80.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 22,
+    "ItemType": 60,
+    "NameLocaleId": "item-ether-name",
+    "DescriptionLocaleId": "item-ether-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 3,
+      "2": 100,
+      "3": 1,
+      "9000": "ether",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 236, "Potency": 30.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  },
+  {
+    "Id": 23,
+    "ItemType": 60,
+    "NameLocaleId": "item-phoenix-down-name",
+    "DescriptionLocaleId": "item-phoenix-down-description",
+    "ModificationAllowances": [],
+    "Variables": {
+      "1": 4,
+      "2": 200,
+      "3": 1,
+      "9000": "phoenix-down",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 62, "Potency": 100.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  }
+]
