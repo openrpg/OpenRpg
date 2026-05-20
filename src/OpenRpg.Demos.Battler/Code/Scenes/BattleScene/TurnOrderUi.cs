@@ -162,7 +162,7 @@ public class TurnOrderUi
             else
                 color = FutureTextColor;
 
-            sb.DrawString(_font, label, new Vector2(x, y), color);
+            TextHelper.DrawStringWithSpacing(sb, _font, label, new Vector2(x, y), color);
         }
     }
 

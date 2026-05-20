@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using OpenRpg.Demos.Battler.Code.Scenes;
 using OpenRpg.Demos.Battler.Code.Services.Game;
 
 namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
@@ -19,23 +18,16 @@ public class BattleScene : IScene
     private readonly IGameServices _gameServices;
     private readonly ISceneManager _sceneManager;
     private readonly IServiceProvider _serviceProvider;
+    private readonly TurnManager _turnManager = new();
+
     private Texture2D _pixel;
     private Texture2D _hpBarBg;
     private readonly Dictionary<string, Texture2D> _spriteCache = [];
     private BattleBottomPanelUi _bottomPanel;
     private TurnOrderUi _turnOrderUi;
-    private List<BattleEntity> _turnOrder;
-    private int _currentTurnIndex;
+    private CombatLogUi _combatLogUi;
     private double _totalTime;
     private SpriteFont _font;
-    private static readonly Random _rng = new();
-
-    private enum TurnPhase { Idle, TurnDwell, TargetFlash, GameOver }
-    private TurnPhase _currentPhase = TurnPhase.Idle;
-    private double _phaseTimer;
-    private BattleEntity _currentAttacker;
-    private BattleEntity _currentTarget;
-    private Team _winningTeam;
 
     public List<BattleEntity> Party { get; private set; } = [];
     public List<BattleEntity> Enemies { get; private set; } = [];
@@ -69,25 +61,25 @@ public class BattleScene : IScene
         Party = await _partyProvider.BuildPartyAsync();
         Enemies = await _enemyFormationProvider.GenerateFormationAsync();
         LayoutEntities();
+
         foreach (var e in Party.Concat(Enemies))
             e.OriginPosition = e.Position;
+
         LoadSprites();
-        _turnOrder = Party.Concat(Enemies).OrderByDescending(e => e.Initiative).ToList();
-        _currentTurnIndex = -1;
-        _currentPhase = TurnPhase.Idle;
-        _phaseTimer = 0;
-        _totalTime = 0;
+        _turnManager.Start(Party, Enemies);
 
         var content = _gameServices.GetContentManager;
         _font = content.Load<SpriteFont>("Fonts/KenneyPixel");
         _turnOrderUi = new TurnOrderUi(_font);
         _bottomPanel = new BattleBottomPanelUi();
+        _combatLogUi = new CombatLogUi();
     }
 
     public void Unload()
     {
         _turnOrderUi.Unload();
         _bottomPanel.Unload();
+        _combatLogUi.Unload();
         _pixel?.Dispose();
         _hpBarBg?.Dispose();
         _font = null;
@@ -100,7 +92,7 @@ public class BattleScene : IScene
     {
         _totalTime += gameTime.ElapsedGameTime.TotalSeconds;
 
-        if (_currentPhase == TurnPhase.GameOver)
+        if (_turnManager.CurrentPhase == TurnManager.Phase.GameOver)
         {
             var kstate = Keyboard.GetState();
             if (kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter))
@@ -111,6 +103,61 @@ public class BattleScene : IScene
             return;
         }
 
+        AnimateEntities();
+        _turnManager.Update(gameTime.ElapsedGameTime.TotalSeconds);
+
+        _bottomPanel.Update(Party, Enemies);
+        _turnOrderUi.Update(_turnManager.TurnOrder, _turnManager.CurrentTurnIndex, GetPulseBrightness());
+        _combatLogUi.Update(_turnManager.LastActionMessage);
+    }
+
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+        EnsureTextures(spriteBatch.GraphicsDevice);
+
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+
+        spriteBatch.Draw(_pixel, new Rectangle(0, 0, 800, 600), BackgroundColor);
+        DrawDivider(spriteBatch);
+
+        foreach (var entity in Enemies)
+            DrawEntity(spriteBatch, entity);
+        foreach (var entity in Party)
+            DrawEntity(spriteBatch, entity);
+
+        spriteBatch.End();
+    }
+
+    public void DrawUI(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+        _combatLogUi.Draw(spriteBatch, _font);
+        _turnOrderUi.Draw(spriteBatch);
+        _bottomPanel.Draw(spriteBatch, _font);
+
+        if (_turnManager.CurrentPhase == TurnManager.Phase.GameOver)
+        {
+            spriteBatch.Draw(_pixel, new Rectangle(0, 0, 800, 600), Color.Black * 0.6f);
+
+            var winText = _turnManager.WinningTeam == Team.Player ? "Player Wins!" : "Monsters Win!";
+            var winSize = _font.MeasureString(winText);
+            spriteBatch.DrawString(_font, winText,
+                new Vector2(400 - winSize.X / 2, 250), Color.Gold);
+
+            var restartText = "Press SPACE to try again";
+            var restartSize = _font.MeasureString(restartText);
+            spriteBatch.DrawString(_font, restartText,
+                new Vector2(400 - restartSize.X / 2, 300), Color.White);
+        }
+    }
+
+    private float GetPulseBrightness()
+    {
+        if (_turnManager.CurrentPhase != TurnManager.Phase.TurnDwell) return 0;
+        return (float)(0.5 + Math.Sin(_totalTime * 10) * 0.5);
+    }
+
+    private void AnimateEntities()
+    {
         for (var i = 0; i < Enemies.Count; i++)
         {
             var e = Enemies[i];
@@ -130,131 +177,6 @@ public class BattleScene : IScene
             var offY = Math.Cos(_totalTime * 1.1 + phase) * 1.5;
             e.Position = e.OriginPosition + new Vector2((float)offX, (float)offY);
         }
-
-        _phaseTimer += gameTime.ElapsedGameTime.TotalSeconds;
-
-        switch (_currentPhase)
-        {
-            case TurnPhase.Idle:
-                if (AdvanceTurn())
-                {
-                    _currentPhase = TurnPhase.TurnDwell;
-                    _phaseTimer = 0;
-                }
-                break;
-
-            case TurnPhase.TurnDwell:
-                if (_phaseTimer >= 0.8)
-                {
-                    ApplyDamage();
-                    _currentPhase = TurnPhase.TargetFlash;
-                    _phaseTimer = 0;
-                }
-                break;
-
-            case TurnPhase.TargetFlash:
-                if (_phaseTimer >= 0.3)
-                {
-                    if (CheckGameOver())
-                        _currentPhase = TurnPhase.GameOver;
-                    else
-                    {
-                        _currentPhase = TurnPhase.Idle;
-                        _phaseTimer = 0;
-                    }
-                }
-                break;
-        }
-
-        _bottomPanel.Update(Party, Enemies);
-        _turnOrderUi.Update(_turnOrder, _currentTurnIndex, GetPulseBrightness());
-    }
-
-    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-        EnsureTextures(spriteBatch.GraphicsDevice);
-
-        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-
-        spriteBatch.Draw(_pixel, new Rectangle(0, 0, 800, 600), BackgroundColor);
-
-        DrawDivider(spriteBatch);
-
-        foreach (var entity in Enemies)
-            DrawEntity(spriteBatch, entity);
-        foreach (var entity in Party)
-            DrawEntity(spriteBatch, entity);
-
-        spriteBatch.End();
-    }
-
-    public void DrawUI(GameTime gameTime, SpriteBatch spriteBatch)
-    {
-        _turnOrderUi.Draw(spriteBatch);
-        _bottomPanel.Draw(spriteBatch, _font);
-
-        if (_currentPhase == TurnPhase.GameOver)
-        {
-            spriteBatch.Draw(_pixel, new Rectangle(0, 0, 800, 600), Color.Black * 0.6f);
-
-            var winText = _winningTeam == Team.Player ? "Player Wins!" : "Monsters Win!";
-            var winSize = _font.MeasureString(winText);
-            spriteBatch.DrawString(_font, winText,
-                new Vector2(400 - winSize.X / 2, 250), Color.Gold);
-
-            var restartText = "Press SPACE to try again";
-            var restartSize = _font.MeasureString(restartText);
-            spriteBatch.DrawString(_font, restartText,
-                new Vector2(400 - restartSize.X / 2, 300), Color.White);
-        }
-    }
-
-    private float GetPulseBrightness()
-    {
-        if (_currentPhase != TurnPhase.TurnDwell) return 0;
-        return (float)(0.5 + Math.Sin(_totalTime * 10) * 0.5);
-    }
-
-    private bool AdvanceTurn()
-    {
-        var count = _turnOrder.Count;
-        for (var i = 0; i < count; i++)
-        {
-            _currentTurnIndex = (_currentTurnIndex + 1) % count;
-            _currentAttacker = _turnOrder[_currentTurnIndex];
-            if (_currentAttacker.IsAlive)
-            {
-                var targets = _currentAttacker.Team == Team.Player ? Enemies : Party;
-                var aliveTargets = targets.Where(e => e.IsAlive).ToList();
-                if (aliveTargets.Count == 0) continue;
-                _currentTarget = aliveTargets[_rng.Next(aliveTargets.Count)];
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void ApplyDamage()
-    {
-        var damage = _currentAttacker.AttackDamage > 0
-            ? _currentAttacker.AttackDamage
-            : _rng.Next(5, 15);
-        _currentTarget.Hp = Math.Max(0, _currentTarget.Hp - damage);
-    }
-
-    private bool CheckGameOver()
-    {
-        if (Party.All(e => !e.IsAlive))
-        {
-            _winningTeam = Team.Enemy;
-            return true;
-        }
-        if (Enemies.All(e => !e.IsAlive))
-        {
-            _winningTeam = Team.Player;
-            return true;
-        }
-        return false;
     }
 
     private void EnsureTextures(GraphicsDevice gd)
@@ -318,7 +240,7 @@ public class BattleScene : IScene
         if (entity.IsAlive)
             DrawHpBar(sb, entity);
 
-        if (_currentPhase == TurnPhase.TurnDwell && entity == _currentAttacker)
+        if (_turnManager.CurrentPhase == TurnManager.Phase.TurnDwell && entity == _turnManager.CurrentAttacker)
             DrawTurnArrow(sb, entity);
     }
 
@@ -337,7 +259,7 @@ public class BattleScene : IScene
         var color = entity.IsAlive ? Color.White : Color.Gray * 0.35f;
         sb.Draw(tex, new Rectangle(x, y, w, h), null, color, 0f, Vector2.Zero, effects, 0f);
 
-        if (_currentPhase == TurnPhase.TargetFlash && entity == _currentTarget)
+        if (_turnManager.CurrentPhase == TurnManager.Phase.TargetFlash && entity == _turnManager.CurrentTarget)
             sb.Draw(tex, new Rectangle(x, y, w, h), null, Color.Red * 0.5f, 0f, Vector2.Zero, effects, 0f);
     }
 

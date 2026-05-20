@@ -131,17 +131,17 @@ public class BattleBottomPanelUi
     public void Draw(SpriteBatch sb, SpriteFont font)
     {
         var headerY = 392;
-        sb.DrawString(font, "ENEMIES", new Vector2(6, headerY), Color.White);
-        sb.DrawString(font, "PARTY", new Vector2(404, headerY), Color.White);
+        TextHelper.DrawStringWithSpacing(sb, font, "ENEMIES", new Vector2(6, headerY), Color.White);
+        TextHelper.DrawStringWithSpacing(sb, font, "PARTY", new Vector2(404, headerY), Color.White);
 
         for (var i = 0; i < MaxEnemyRows; i++)
         {
             if (!_enemyHpBarBgs[i].Visible) continue;
 
             var y = RowStartY + i * RowSpacing;
-            sb.DrawString(font, NormalizeName(_enemyNames[i]), new Vector2(6, y), _enemyAlive[i] ? EnemyNameColor : Color.Gray);
+            TextHelper.DrawStringWithSpacing(sb, font, NormalizeName(_enemyNames[i]), new Vector2(6, y), _enemyAlive[i] ? EnemyNameColor : Color.Gray);
             var hpText = $"{_enemyHps[i]}/{_enemyMaxHps[i]}";
-            sb.DrawString(font, hpText, new Vector2(254, y), HpTextColor);
+            TextHelper.DrawStringWithSpacing(sb, font, hpText, new Vector2(254, y), HpTextColor);
         }
 
         for (var i = 0; i < MaxPartyRows; i++)
@@ -149,9 +149,9 @@ public class BattleBottomPanelUi
             if (!_partyHpBarBgs[i].Visible) continue;
 
             var y = RowStartY + i * RowSpacing;
-            sb.DrawString(font, NormalizeName(_partyNames[i]), new Vector2(404, y), _partyAlive[i] ? PartyNameColor : Color.Gray);
+            TextHelper.DrawStringWithSpacing(sb, font, NormalizeName(_partyNames[i]), new Vector2(404, y), _partyAlive[i] ? PartyNameColor : Color.Gray);
             var hpText = $"{_partyHps[i]}/{_partyMaxHps[i]}";
-            sb.DrawString(font, hpText, new Vector2(652, y), HpTextColor);
+            TextHelper.DrawStringWithSpacing(sb, font, hpText, new Vector2(652, y), HpTextColor);
         }
     }
 
