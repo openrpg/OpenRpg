@@ -3,6 +3,7 @@ using OpenRpg.Demos.Battler.Code;
 using OpenRpg.Demos.Battler.Code.Extensions;
 
 var provider = new ServiceCollection()
+    .WithOpenRpgFramework()
     .WithOpenRpgProject()
     .WithMonoGameServices()
     .WithSceneServices()

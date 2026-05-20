@@ -18,6 +18,7 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.*" />
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" />
         <ProjectReference Include="..\OpenRpg.Projects.Json\OpenRpg.Projects.Json.csproj" />
         <ProjectReference Include="..\OpenRpg.Entities\OpenRpg.Entities.csproj" />
         <ProjectReference Include="..\OpenRpg.Data.InMemory\OpenRpg.Data.InMemory.csproj" />
