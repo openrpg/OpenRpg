@@ -26,6 +26,7 @@ public class BattleScene : IScene
     private CombatLogUi _combatLogUi;
     private double _totalTime;
     private SpriteFont _font;
+    private bool _loaded;
 
     public List<BattleEntity> Party { get; private set; } = [];
     public List<BattleEntity> Enemies { get; private set; } = [];
@@ -46,21 +47,36 @@ public class BattleScene : IScene
 
     public async Task LoadAsync()
     {
-        Party = await _partyProvider.BuildPartyAsync();
-        Enemies = await _enemyFormationProvider.GenerateFormationAsync();
-        LayoutEntities();
+        try
+        {
+            _loaded = false;
 
-        foreach (var e in Party.Concat(Enemies))
-            e.OriginPosition = e.Position;
+            Party = await _partyProvider.BuildPartyAsync();
+            Enemies = await _enemyFormationProvider.GenerateFormationAsync();
+            LayoutEntities();
 
-        var content = _gameServices.GetContentManager;
-        _spriteCache.LoadSprites(Party.Concat(Enemies), content);
-        _turnManager.Start(Party, Enemies);
+            foreach (var e in Party.Concat(Enemies))
+                e.OriginPosition = e.Position;
 
-        _font = content.Load<SpriteFont>("Fonts/KenneyPixel");
-        _turnOrderUi = new TurnOrderUi(_font);
-        _bottomPanel = new BattleBottomPanelUi();
-        _combatLogUi = new CombatLogUi();
+            var content = _gameServices.GetContentManager;
+            _spriteCache.LoadSprites(Party.Concat(Enemies), content);
+            _turnManager.Start(Party, Enemies);
+
+            _font = content.Load<SpriteFont>("Fonts/KenneyPixel");
+            _turnOrderUi = new TurnOrderUi(_font);
+            _bottomPanel = new BattleBottomPanelUi();
+            _bottomPanel.Update(Party, Enemies);
+            _turnOrderUi.Update(_turnManager.TurnOrder, _turnManager.CurrentTurnIndex);
+            _combatLogUi = new CombatLogUi();
+            _combatLogUi.Update("");
+
+            _loaded = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BattleScene] FAILED TO LOAD: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
+        }
     }
 
     public void Unload()
@@ -68,13 +84,13 @@ public class BattleScene : IScene
         _turnOrderUi.Unload();
         _bottomPanel.Unload();
         _combatLogUi.Unload();
-        _spriteCache.Dispose();
         _entityRenderer.Dispose();
         _font = null;
     }
 
     public void Update(GameTime gameTime)
     {
+        if (!_loaded) return;
         _totalTime += gameTime.ElapsedGameTime.TotalSeconds;
 
         if (_turnManager.CurrentPhase == TurnManager.Phase.GameOver)
@@ -98,6 +114,7 @@ public class BattleScene : IScene
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
+        if (!_loaded) return;
         _entityRenderer.EnsureTextures(spriteBatch.GraphicsDevice);
         spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
@@ -110,6 +127,7 @@ public class BattleScene : IScene
 
     public void DrawUI(GameTime gameTime, SpriteBatch spriteBatch)
     {
+        if (!_loaded) return;
         _combatLogUi.Draw(spriteBatch, _font);
         _turnOrderUi.Draw(spriteBatch);
         _bottomPanel.Draw(spriteBatch, _font);

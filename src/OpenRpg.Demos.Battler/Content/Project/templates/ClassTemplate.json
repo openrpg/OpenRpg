@@ -11,7 +11,8 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 222, "Potency": 1.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 5.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 5.0, "Requirements": [] },
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 50.0, "Requirements": [] }
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 50.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 3.0, "Requirements": [] }
       ],
       "4003": []
     }
@@ -28,7 +29,8 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 224, "Potency": 1.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 263, "Potency": 8.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 3.0, "Requirements": [] },
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 30.0, "Requirements": [] }
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 30.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 6.0, "Requirements": [] }
       ],
       "4003": []
     }
@@ -60,7 +62,8 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 228, "Potency": 3.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 224, "Potency": 1.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 234, "Potency": 40.0, "Requirements": [] },
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 62, "Potency": 10.0, "Requirements": [] }
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 62, "Potency": 10.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 2.0, "Requirements": [] }
       ],
       "4003": []
     }
@@ -76,7 +79,8 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 228, "Potency": 2.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 222, "Potency": 1.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 350, "Potency": 8.0, "Requirements": [] },
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 234, "Potency": 30.0, "Requirements": [] }
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 234, "Potency": 30.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 2.0, "Requirements": [] }
       ],
       "4003": []
     }

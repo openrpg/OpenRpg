@@ -1,6 +1,13 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Processors.Attacks.Entity;
+using OpenRpg.Combat.Types;
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Requirements;
+using OpenRpg.Entities.Types;
+using OpenRpg.Items.Types;
+using OpenRpg.Projects.Json.Convertors;
 using OpenRpg.Core.Templates;
 using OpenRpg.Core.Utils;
 using OpenRpg.Data;
@@ -12,7 +19,6 @@ using OpenRpg.Demos.Battler.Code.Services.Game;
 using OpenRpg.Entities.Entity.Populators.State;
 using OpenRpg.Entities.Entity.Populators.Stats;
 using OpenRpg.Genres.Effects;
-using OpenRpg.Genres.Fantasy.Builders;
 using OpenRpg.Genres.Fantasy.Combat;
 using OpenRpg.Genres.Fantasy.Equippables.Validators;
 using OpenRpg.Genres.Fantasy.State.Populators;
@@ -21,7 +27,6 @@ using OpenRpg.Genres.Populators.Entity;
 using OpenRpg.Genres.Requirements;
 using OpenRpg.Items.Equippables.Slots;
 using OpenRpg.Localization.Data.DataSources;
-using OpenRpg.Localization.Data.Repositories;
 using OpenRpg.Projects.Json.Loaders;
 using OpenRpg.Projects.Json.Loaders.Locales;
 using OpenRpg.Projects.Json.Loaders.Templates;
@@ -49,13 +54,19 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<ICharacterRequirementChecker, DefaultCharacterRequirementChecker>();
         services.AddSingleton<IEquipmentSlotValidator, FantasyCharacterEquipmentSlotValidator>();
 
-        services.AddSingleton<FantasyCharacterBuilder>();
+        services.AddSingleton<ITemplateAccessor, TemplateAccessor>();
+        services.AddSingleton<Builders.GameCharacterBuilder>();
         
         return services;
     }
     
     public static IServiceCollection WithOpenRpgProject(this IServiceCollection services)
     {
+        VariablesConverter.RegisterKey(CoreTemplateVariableTypes.Effects, typeof(IEffect));
+        VariablesConverter.RegisterKey(CoreTemplateVariableTypes.Requirements, typeof(Requirement));
+        VariablesConverter.RegisterKey(CombatTemplateVariableTypes.Abilities, typeof(AbilityData));
+        VariablesConverter.RegisterKey(LootTableEntryVariableTypes.Requirements, typeof(Requirement));
+
         services.AddSingleton<IFileService, DefaultFileService>();
         services.AddSingleton<IProjectLoader, JsonProjectLoader>();
         services.AddSingleton<ITemplateLoader, JsonTemplateLoader>();

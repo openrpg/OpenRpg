@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using OpenRpg.Genres.Extensions;
 
 namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
 
@@ -93,7 +94,7 @@ public class TurnManager
         var damage = CurrentAttacker.AttackDamage > 0
             ? CurrentAttacker.AttackDamage
             : _rng.Next(5, 15);
-        CurrentTarget.Hp = Math.Max(0, CurrentTarget.Hp - damage);
+        CurrentTarget.Entity.State.DeductHealth(damage);
         LastActionMessage = $"{NormalizeName(CurrentAttacker.Name)} attacks {NormalizeName(CurrentTarget.Name)} for {damage} damage";
     }
 
