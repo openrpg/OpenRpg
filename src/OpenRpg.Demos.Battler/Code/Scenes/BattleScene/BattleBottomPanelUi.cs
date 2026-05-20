@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGameGum;
 using MonoGameGum.GueDeriving;
 
@@ -8,20 +11,22 @@ namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
 public class BattleBottomPanelUi
 {
     private readonly ColoredRectangleRuntime _panelBg;
-    private readonly List<TextRuntime> _enemyNameTexts = [];
     private readonly List<ColoredRectangleRuntime> _enemyHpBarBgs = [];
     private readonly List<ColoredRectangleRuntime> _enemyHpBarFills = [];
-    private readonly List<TextRuntime> _enemyHpTexts = [];
-
-    private readonly List<TextRuntime> _partyNameTexts = [];
     private readonly List<ColoredRectangleRuntime> _partyHpBarBgs = [];
     private readonly List<ColoredRectangleRuntime> _partyHpBarFills = [];
-    private readonly List<TextRuntime> _partyHpTexts = [];
+
+    private readonly List<string> _enemyNames = [];
+    private readonly List<int> _enemyHps = [];
+    private readonly List<int> _enemyMaxHps = [];
+    private readonly List<string> _partyNames = [];
+    private readonly List<int> _partyHps = [];
+    private readonly List<int> _partyMaxHps = [];
 
     private const int MaxEnemyRows = 6;
     private const int MaxPartyRows = 4;
-    private const int RowStartY = 418;
-    private const int RowSpacing = 22;
+    private const int RowStartY = 414;
+    private const int RowSpacing = 24;
 
     private static readonly Color HpGreen = new(80, 200, 60);
     private static readonly Color HpYellow = new(220, 200, 40);
@@ -41,70 +46,119 @@ public class BattleBottomPanelUi
         SetRectColor(_panelBg, new Color(10, 10, 25) * 0.9f);
         _panelBg.AddToRoot();
 
-        var enemyHeader = new TextRuntime();
-        enemyHeader.Text = "ENEMIES";
-        enemyHeader.X = 6;
-        enemyHeader.Y = 392;
-        enemyHeader.Width = 390;
-        enemyHeader.Height = 24;
-        enemyHeader.FontScale = 1.0f;
-        enemyHeader.AddToRoot();
-
-        var partyHeader = new TextRuntime();
-        partyHeader.Text = "PARTY";
-        partyHeader.X = 404;
-        partyHeader.Y = 392;
-        partyHeader.Width = 390;
-        partyHeader.Height = 24;
-        partyHeader.FontScale = 1.0f;
-        partyHeader.AddToRoot();
-
         for (var i = 0; i < MaxEnemyRows; i++)
         {
             var y = RowStartY + i * RowSpacing;
-
-            var nameText = CreateRowText(6, y, 140, EnemyNameColor);
-            _enemyNameTexts.Add(nameText);
-
-            var hpBg = CreateHpBarBg(150, y);
-            _enemyHpBarBgs.Add(hpBg);
-
-            var hpFill = CreateHpBarFill(150, y);
-            _enemyHpBarFills.Add(hpFill);
-
-            var hpText = CreateRowText(254, y, 55, HpTextColor);
-            _enemyHpTexts.Add(hpText);
+            _enemyHpBarBgs.Add(CreateHpBarBg(150, y));
+            _enemyHpBarFills.Add(CreateHpBarFill(150, y));
         }
 
         for (var i = 0; i < MaxPartyRows; i++)
         {
             var y = RowStartY + i * RowSpacing;
-
-            var nameText = CreateRowText(404, y, 140, PartyNameColor);
-            _partyNameTexts.Add(nameText);
-
-            var hpBg = CreateHpBarBg(548, y);
-            _partyHpBarBgs.Add(hpBg);
-
-            var hpFill = CreateHpBarFill(548, y);
-            _partyHpBarFills.Add(hpFill);
-
-            var hpText = CreateRowText(652, y, 55, HpTextColor);
-            _partyHpTexts.Add(hpText);
+            _partyHpBarBgs.Add(CreateHpBarBg(548, y));
+            _partyHpBarFills.Add(CreateHpBarFill(548, y));
         }
     }
 
-    private static TextRuntime CreateRowText(int x, int y, int width, Color color)
+    public void Update(List<BattleEntity> party, List<BattleEntity> enemies)
     {
-        var text = new TextRuntime();
-        text.X = x;
-        text.Y = y;
-        text.Width = width;
-        text.Height = 18;
-        text.FontScale = 0.82f;
-        text.Color = color;
-        text.AddToRoot();
-        return text;
+        _enemyNames.Clear();
+        _enemyHps.Clear();
+        _enemyMaxHps.Clear();
+
+        for (var i = 0; i < MaxEnemyRows; i++)
+        {
+            var visible = i < enemies.Count;
+            _enemyHpBarBgs[i].Visible = visible;
+            _enemyHpBarFills[i].Visible = visible;
+
+            if (visible)
+            {
+                var e = enemies[i];
+                _enemyNames.Add(e.Name);
+                _enemyHps.Add(e.Hp);
+                _enemyMaxHps.Add(e.MaxHp);
+                var ratio = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0f;
+                _enemyHpBarFills[i].Width = ratio * 100;
+                SetRectColor(_enemyHpBarFills[i], RatioToColor(ratio));
+            }
+            else
+            {
+                _enemyNames.Add("");
+                _enemyHps.Add(0);
+                _enemyMaxHps.Add(0);
+            }
+        }
+
+        _partyNames.Clear();
+        _partyHps.Clear();
+        _partyMaxHps.Clear();
+
+        for (var i = 0; i < MaxPartyRows; i++)
+        {
+            var visible = i < party.Count;
+            _partyHpBarBgs[i].Visible = visible;
+            _partyHpBarFills[i].Visible = visible;
+
+            if (visible)
+            {
+                var e = party[i];
+                _partyNames.Add(e.Name);
+                _partyHps.Add(e.Hp);
+                _partyMaxHps.Add(e.MaxHp);
+                var ratio = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0f;
+                _partyHpBarFills[i].Width = ratio * 100;
+                SetRectColor(_partyHpBarFills[i], RatioToColor(ratio));
+            }
+            else
+            {
+                _partyNames.Add("");
+                _partyHps.Add(0);
+                _partyMaxHps.Add(0);
+            }
+        }
+    }
+
+    public void Draw(SpriteBatch sb, SpriteFont font)
+    {
+        var headerY = 392;
+        sb.DrawString(font, "ENEMIES", new Vector2(6, headerY), Color.White);
+        sb.DrawString(font, "PARTY", new Vector2(404, headerY), Color.White);
+
+        for (var i = 0; i < MaxEnemyRows; i++)
+        {
+            if (!_enemyHpBarBgs[i].Visible) continue;
+
+            var y = RowStartY + i * RowSpacing;
+            sb.DrawString(font, NormalizeName(_enemyNames[i]), new Vector2(6, y), EnemyNameColor);
+            var hpText = $"{_enemyHps[i]}/{_enemyMaxHps[i]}";
+            sb.DrawString(font, hpText, new Vector2(254, y), HpTextColor);
+        }
+
+        for (var i = 0; i < MaxPartyRows; i++)
+        {
+            if (!_partyHpBarBgs[i].Visible) continue;
+
+            var y = RowStartY + i * RowSpacing;
+            sb.DrawString(font, NormalizeName(_partyNames[i]), new Vector2(404, y), PartyNameColor);
+            var hpText = $"{_partyHps[i]}/{_partyMaxHps[i]}";
+            sb.DrawString(font, hpText, new Vector2(652, y), HpTextColor);
+        }
+    }
+
+    private static string NormalizeName(string name)
+    {
+        return Regex.Replace(name, "(?<=[a-z])(?=[A-Z])", " ");
+    }
+
+    public void Unload()
+    {
+        _panelBg.RemoveFromRoot();
+        foreach (var r in _enemyHpBarBgs) r.RemoveFromRoot();
+        foreach (var r in _enemyHpBarFills) r.RemoveFromRoot();
+        foreach (var r in _partyHpBarBgs) r.RemoveFromRoot();
+        foreach (var r in _partyHpBarFills) r.RemoveFromRoot();
     }
 
     private static ColoredRectangleRuntime CreateHpBarBg(int x, int y)
@@ -139,73 +193,10 @@ public class BattleBottomPanelUi
         rect.Alpha = color.A;
     }
 
-    public void Update(List<BattleEntity> party, List<BattleEntity> enemies)
-    {
-        for (var i = 0; i < MaxEnemyRows; i++)
-        {
-            var visible = i < enemies.Count;
-            SetRowVisible(i, visible, false);
-
-            if (visible)
-            {
-                var e = enemies[i];
-                _enemyNameTexts[i].Text = e.Name;
-                var ratio = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0f;
-                _enemyHpBarFills[i].Width = ratio * 100;
-                SetRectColor(_enemyHpBarFills[i], RatioToColor(ratio));
-                _enemyHpTexts[i].Text = $"{e.Hp}/{e.MaxHp}";
-            }
-        }
-
-        for (var i = 0; i < MaxPartyRows; i++)
-        {
-            var visible = i < party.Count;
-            SetRowVisible(i, visible, true);
-
-            if (visible)
-            {
-                var e = party[i];
-                _partyNameTexts[i].Text = e.Name;
-                var ratio = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0f;
-                _partyHpBarFills[i].Width = ratio * 100;
-                SetRectColor(_partyHpBarFills[i], RatioToColor(ratio));
-                _partyHpTexts[i].Text = $"{e.Hp}/{e.MaxHp}";
-            }
-        }
-    }
-
-    private void SetRowVisible(int index, bool visible, bool isParty)
-    {
-        var names = isParty ? _partyNameTexts : _enemyNameTexts;
-        var hpBgs = isParty ? _partyHpBarBgs : _enemyHpBarBgs;
-        var hpFills = isParty ? _partyHpBarFills : _enemyHpBarFills;
-        var hpTexts = isParty ? _partyHpTexts : _enemyHpTexts;
-
-        names[index].Visible = visible;
-        hpBgs[index].Visible = visible;
-        hpFills[index].Visible = visible;
-        hpTexts[index].Visible = visible;
-    }
-
     private static Color RatioToColor(float ratio)
     {
         if (ratio > 0.5f) return HpGreen;
         if (ratio > 0.25f) return HpYellow;
         return HpRed;
-    }
-
-    public void Unload()
-    {
-        _panelBg.RemoveFromRoot();
-
-        foreach (var t in _enemyNameTexts) t.RemoveFromRoot();
-        foreach (var r in _enemyHpBarBgs) r.RemoveFromRoot();
-        foreach (var r in _enemyHpBarFills) r.RemoveFromRoot();
-        foreach (var t in _enemyHpTexts) t.RemoveFromRoot();
-
-        foreach (var t in _partyNameTexts) t.RemoveFromRoot();
-        foreach (var r in _partyHpBarBgs) r.RemoveFromRoot();
-        foreach (var r in _partyHpBarFills) r.RemoveFromRoot();
-        foreach (var t in _partyHpTexts) t.RemoveFromRoot();
     }
 }

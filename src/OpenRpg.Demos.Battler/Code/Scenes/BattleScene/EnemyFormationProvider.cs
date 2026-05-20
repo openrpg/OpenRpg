@@ -27,7 +27,7 @@ public class EnemyFormationProvider : IEnemyFormationProvider
     {
         var allMonsters = _dataSource.GetAll<EntityTemplate>().ToList();
 
-        var count = _random.Next(1, Math.Min(7, allMonsters.Count + 1));
+        var count = 6;
         var entities = new List<BattleEntity>();
 
         for (var i = 0; i < count; i++)
@@ -38,6 +38,8 @@ public class EnemyFormationProvider : IEnemyFormationProvider
                 ? code?.ToString() ?? "" : "";
             var hp = (int?)(template.Variables.Effects?.FirstOrDefault(e => e.EffectType == 60) as StaticEffect)
                 ?.Potency ?? 20;
+            var initiative = (int?)(template.Variables.Effects?.FirstOrDefault(e => e.EffectType == 44) as StaticEffect)
+                ?.Potency ?? 1;
             var row = count <= 2 ? 0 : i / 2;
 
             entities.Add(new BattleEntity
@@ -48,7 +50,8 @@ public class EnemyFormationProvider : IEnemyFormationProvider
                 Row = row,
                 SlotInRow = i % 2,
                 Hp = hp,
-                MaxHp = hp
+                MaxHp = hp,
+                Initiative = initiative
             });
         }
 

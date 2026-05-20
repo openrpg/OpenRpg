@@ -118,3 +118,8 @@ Sprites/Enemies/monster-slime.png
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
+
+#begin Fonts/KenneyPixel.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+#end

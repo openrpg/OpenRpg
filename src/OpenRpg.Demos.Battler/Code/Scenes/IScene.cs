@@ -10,4 +10,5 @@ public interface IScene
     void Unload();
     void Update(GameTime gameTime);
     void Draw(GameTime gameTime, SpriteBatch spriteBatch);
+    void DrawUI(GameTime gameTime, SpriteBatch spriteBatch);
 }

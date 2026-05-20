@@ -90,6 +90,14 @@ public class BattlerGame : Game
             _sceneManager.Draw(gameTime, _spriteBatch);
 
         RenderingLibrary.SystemManagers.Default.Draw();
+
+        if (_projectLoaded)
+        {
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            _sceneManager.DrawUI(gameTime, _spriteBatch);
+            _spriteBatch.End();
+        }
+
         base.Draw(gameTime);
     }
 

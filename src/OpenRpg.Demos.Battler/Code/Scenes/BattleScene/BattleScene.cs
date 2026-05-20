@@ -19,6 +19,11 @@ public class BattleScene : IScene
     private Texture2D _hpBarBg;
     private readonly Dictionary<string, Texture2D> _spriteCache = [];
     private BattleBottomPanelUi _bottomPanel;
+    private TurnOrderUi _turnOrderUi;
+    private List<BattleEntity> _turnOrder;
+    private int _currentTurnIndex;
+    private double _totalTime;
+    private SpriteFont _font;
 
     public List<BattleEntity> Party { get; private set; } = [];
     public List<BattleEntity> Enemies { get; private set; } = [];
@@ -44,15 +49,25 @@ public class BattleScene : IScene
         Party = await _partyProvider.BuildPartyAsync();
         Enemies = await _enemyFormationProvider.GenerateFormationAsync();
         LayoutEntities();
+        foreach (var e in Party.Concat(Enemies))
+            e.OriginPosition = e.Position;
         LoadSprites();
+        _turnOrder = Party.Concat(Enemies).OrderByDescending(e => e.Initiative).ToList();
+        _currentTurnIndex = 0;
+
+        var content = _gameServices.GetContentManager;
+        _font = content.Load<SpriteFont>("Fonts/KenneyPixel");
+        _turnOrderUi = new TurnOrderUi(_font);
         _bottomPanel = new BattleBottomPanelUi();
     }
 
     public void Unload()
     {
+        _turnOrderUi.Unload();
         _bottomPanel.Unload();
         _pixel?.Dispose();
         _hpBarBg?.Dispose();
+        _font = null;
         foreach (var tex in _spriteCache.Values)
             tex.Dispose();
         _spriteCache.Clear();
@@ -60,7 +75,28 @@ public class BattleScene : IScene
 
     public void Update(GameTime gameTime)
     {
+        _totalTime += gameTime.ElapsedGameTime.TotalSeconds;
+
+        for (var i = 0; i < Enemies.Count; i++)
+        {
+            var e = Enemies[i];
+            var phase = i * 1.3;
+            var offX = Math.Sin(_totalTime * 1.2 + phase) * 2.0;
+            var offY = Math.Cos(_totalTime * 0.9 + phase) * 1.5;
+            e.Position = e.OriginPosition + new Vector2((float)offX, (float)offY);
+        }
+
+        for (var i = 0; i < Party.Count; i++)
+        {
+            var e = Party[i];
+            var phase = i * 1.7 + 3.0;
+            var offX = Math.Sin(_totalTime * 1.0 + phase) * 2.0;
+            var offY = Math.Cos(_totalTime * 1.1 + phase) * 1.5;
+            e.Position = e.OriginPosition + new Vector2((float)offX, (float)offY);
+        }
+
         _bottomPanel.Update(Party, Enemies);
+        _turnOrderUi.Update(_turnOrder, _currentTurnIndex);
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -79,6 +115,12 @@ public class BattleScene : IScene
             DrawEntity(spriteBatch, entity);
 
         spriteBatch.End();
+    }
+
+    public void DrawUI(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+        _turnOrderUi.Draw(spriteBatch);
+        _bottomPanel.Draw(spriteBatch, _font);
     }
 
     private void EnsureTextures(GraphicsDevice gd)
@@ -121,15 +163,15 @@ public class BattleScene : IScene
     private void LayoutEntities()
     {
         foreach (var entity in Enemies)
-            entity.Position = new Vector2(30 + entity.SlotInRow * 90, 30 + entity.Row * 130);
+            entity.Position = new Vector2(30 + entity.SlotInRow * 90, 30 + entity.Row * 100);
 
         foreach (var entity in Party)
-            entity.Position = new Vector2(600 + entity.SlotInRow * 100, 30 + entity.Row * 130);
+            entity.Position = new Vector2(600 + entity.SlotInRow * 100, 30 + entity.Row * 100);
     }
 
     private void DrawDivider(SpriteBatch sb)
     {
-        sb.Draw(_pixel, new Rectangle(399, 0, 2, 380), new Color(60, 60, 80));
+        sb.Draw(_pixel, new Rectangle(399, 0, 2, 344), new Color(60, 60, 80));
     }
 
     private void DrawTeamLabel(SpriteBatch sb, string text, int x, int y, Color color)

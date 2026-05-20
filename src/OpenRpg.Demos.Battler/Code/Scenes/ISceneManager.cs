@@ -11,4 +11,5 @@ public interface ISceneManager
     Task SetScene(IScene scene);
     void Update(GameTime gameTime);
     void Draw(GameTime gameTime, SpriteBatch spriteBatch);
+    void DrawUI(GameTime gameTime, SpriteBatch spriteBatch);
 }

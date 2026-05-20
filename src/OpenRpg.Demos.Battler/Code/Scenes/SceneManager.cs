@@ -18,4 +18,5 @@ public class SceneManager : ISceneManager
 
     public void Update(GameTime gameTime) => ActiveScene?.Update(gameTime);
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch) => ActiveScene?.Draw(gameTime, spriteBatch);
+    public void DrawUI(GameTime gameTime, SpriteBatch spriteBatch) => ActiveScene?.DrawUI(gameTime, spriteBatch);
 }

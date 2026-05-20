@@ -14,7 +14,9 @@ public class BattleEntity
     public int Row { get; set; }
     public int SlotInRow { get; set; }
     public Vector2 Position { get; set; }
+    public Vector2 OriginPosition { get; set; }
     public int Hp { get; set; }
+    public int Initiative { get; set; }
     public int MaxHp { get; set; }
     public bool IsAlive => Hp > 0;
     public Texture2D? Sprite { get; set; }
