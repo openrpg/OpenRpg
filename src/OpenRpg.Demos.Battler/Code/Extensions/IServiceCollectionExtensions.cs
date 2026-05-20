@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Data;
 using OpenRpg.Data.InMemory;
+using OpenRpg.Demos.Battler.Code.Scenes;
+using OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
 using OpenRpg.Demos.Battler.Code.Services;
 using OpenRpg.Demos.Battler.Code.Services.Game;
 using OpenRpg.Localization.Data.DataSources;
@@ -35,6 +37,16 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection WithMonoGameServices(this IServiceCollection services)
     {
         services.AddSingleton<IGameServices, GameServices>();
+
+        return services;
+    }
+
+    public static IServiceCollection WithSceneServices(this IServiceCollection services)
+    {
+        services.AddSingleton<ISceneManager, SceneManager>();
+        services.AddSingleton<IPartyProvider, PartyProvider>();
+        services.AddSingleton<IEnemyFormationProvider, EnemyFormationProvider>();
+        services.AddTransient<BattleScene>();
 
         return services;
     }

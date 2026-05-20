@@ -2,11 +2,15 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Gum.Wireframe;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGameGum;
 using OpenRpg.Data;
+using OpenRpg.Demos.Battler.Code.Scenes;
+using OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
 using OpenRpg.Demos.Battler.Code.Services.Game;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Entity.Templates;
@@ -20,19 +24,24 @@ namespace OpenRpg.Demos.Battler.Code;
 public class BattlerGame : Game
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly ISceneManager _sceneManager;
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private GameServices _gameServices;
-
-    public EventHandler OnGameInitialized;
+    private volatile bool _projectLoaded;
 
     public BattlerGame(IServiceProvider serviceProvider)
     {
         _graphics = new GraphicsDeviceManager(this);
+        _graphics.PreferredBackBufferWidth = 800;
+        _graphics.PreferredBackBufferHeight = 600;
+        _graphics.ApplyChanges();
         _serviceProvider = serviceProvider;
         _gameServices = serviceProvider.GetRequiredService<IGameServices>() as GameServices;
+        _sceneManager = serviceProvider.GetRequiredService<ISceneManager>();
         
         Content.RootDirectory = "Content";
+        _gameServices.GetContentManager = Content;
         IsMouseVisible = true;
     }
 
@@ -44,12 +53,16 @@ public class BattlerGame : Game
         _gameServices.GetGraphicsDeviceManager = _graphics;
         
         Task.Run(LoadProjectData);
-
     }
     
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        _gameServices.GetSpriteBatch = _spriteBatch;
+
+        GumService.Default.Initialize(this);
+        GraphicalUiElement.CanvasWidth = 800;
+        GraphicalUiElement.CanvasHeight = 600;
     }
 
     protected override void Update(GameTime gameTime)
@@ -57,12 +70,26 @@ public class BattlerGame : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+
+        if (_projectLoaded && _sceneManager.ActiveScene == null)
+        {
+            var battleScene = _serviceProvider.GetRequiredService<BattleScene>();
+            _ = _sceneManager.SetScene(battleScene);
+        }
+
+        _sceneManager.Update(gameTime);
+        GumService.Default.Update(gameTime);
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
+
+        if (_projectLoaded)
+            _sceneManager.Draw(gameTime, _spriteBatch);
+
+        RenderingLibrary.SystemManagers.Default.Draw();
         base.Draw(gameTime);
     }
 
@@ -102,5 +129,7 @@ public class BattlerGame : Game
             Console.WriteLine($"Stack: {ex.StackTrace}");
             Console.WriteLine("");
         }
+
+        _projectLoaded = true;
     }
 }
