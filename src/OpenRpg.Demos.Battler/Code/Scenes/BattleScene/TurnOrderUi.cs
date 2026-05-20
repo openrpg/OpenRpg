@@ -15,6 +15,7 @@ public class TurnOrderUi
     private readonly List<string> _chipLabels = [];
     private readonly SpriteFont _font;
     private int _currentIndex;
+    private float _pulseBrightness;
 
     private const int StripHeight = 36;
     private const int StripY = 344;
@@ -63,9 +64,10 @@ public class TurnOrderUi
         }
     }
 
-    public void Update(List<BattleEntity> allEntities, int currentTurnIndex)
+    public void Update(List<BattleEntity> allEntities, int currentTurnIndex, float pulseBrightness = 0)
     {
         _currentIndex = currentTurnIndex;
+        _pulseBrightness = pulseBrightness;
         _chipLabels.Clear();
 
         var totalGapWidth = ChipGap * (Math.Min(allEntities.Count, MaxSlots) - 1);
@@ -95,7 +97,17 @@ public class TurnOrderUi
             if (visible)
                 totalTextWidth += labelWidths[i];
 
-            if (isCurrent)
+            if (isCurrent && pulseBrightness > 0)
+            {
+                var factor = pulseBrightness * 0.5f;
+                var r = (byte)(CurrentChipColor.R + (255 - CurrentChipColor.R) * factor);
+                var g = (byte)(CurrentChipColor.G + (255 - CurrentChipColor.G) * factor);
+                var b = (byte)(CurrentChipColor.B + (255 - CurrentChipColor.B) * factor);
+                _chipBgs[i].Red = r;
+                _chipBgs[i].Green = g;
+                _chipBgs[i].Blue = b;
+            }
+            else if (isCurrent)
                 SetRectColor(_chipBgs[i], CurrentChipColor);
             else if (i < currentTurnIndex)
                 SetRectColor(_chipBgs[i], PastChipColor);
@@ -133,9 +145,22 @@ public class TurnOrderUi
 
             var x = _chipBgs[i].X + ChipPaddingX;
             var y = TextY;
-            var color = i == _currentIndex ? CurrentTextColor
-                : i < _currentIndex ? PastTextColor
-                : FutureTextColor;
+
+            Color color;
+            if (i == _currentIndex && _pulseBrightness > 0)
+            {
+                var t = _pulseBrightness * 0.75f;
+                color = new Color(
+                    (byte)(CurrentTextColor.R + (255 - CurrentTextColor.R) * t),
+                    (byte)(CurrentTextColor.G + (255 - CurrentTextColor.G) * t),
+                    (byte)(CurrentTextColor.B + (255 - CurrentTextColor.B) * t));
+            }
+            else if (i == _currentIndex)
+                color = CurrentTextColor;
+            else if (i < _currentIndex)
+                color = PastTextColor;
+            else
+                color = FutureTextColor;
 
             sb.DrawString(_font, label, new Vector2(x, y), color);
         }

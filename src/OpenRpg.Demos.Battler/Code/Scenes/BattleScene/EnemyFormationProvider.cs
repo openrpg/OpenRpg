@@ -40,6 +40,8 @@ public class EnemyFormationProvider : IEnemyFormationProvider
                 ?.Potency ?? 20;
             var initiative = (int?)(template.Variables.Effects?.FirstOrDefault(e => e.EffectType == 44) as StaticEffect)
                 ?.Potency ?? 1;
+            var attackDamage = (int?)(template.Variables.Effects?.FirstOrDefault(e => e.EffectType == 1) as StaticEffect)
+                ?.Potency ?? 10;
             var row = count <= 2 ? 0 : i / 2;
 
             entities.Add(new BattleEntity
@@ -51,7 +53,8 @@ public class EnemyFormationProvider : IEnemyFormationProvider
                 SlotInRow = i % 2,
                 Hp = hp,
                 MaxHp = hp,
-                Initiative = initiative
+                Initiative = initiative,
+                AttackDamage = attackDamage
             });
         }
 

@@ -19,9 +19,11 @@ public class BattleBottomPanelUi
     private readonly List<string> _enemyNames = [];
     private readonly List<int> _enemyHps = [];
     private readonly List<int> _enemyMaxHps = [];
+    private readonly List<bool> _enemyAlive = [];
     private readonly List<string> _partyNames = [];
     private readonly List<int> _partyHps = [];
     private readonly List<int> _partyMaxHps = [];
+    private readonly List<bool> _partyAlive = [];
 
     private const int MaxEnemyRows = 6;
     private const int MaxPartyRows = 4;
@@ -66,6 +68,7 @@ public class BattleBottomPanelUi
         _enemyNames.Clear();
         _enemyHps.Clear();
         _enemyMaxHps.Clear();
+        _enemyAlive.Clear();
 
         for (var i = 0; i < MaxEnemyRows; i++)
         {
@@ -79,6 +82,7 @@ public class BattleBottomPanelUi
                 _enemyNames.Add(e.Name);
                 _enemyHps.Add(e.Hp);
                 _enemyMaxHps.Add(e.MaxHp);
+                _enemyAlive.Add(e.IsAlive);
                 var ratio = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0f;
                 _enemyHpBarFills[i].Width = ratio * 100;
                 SetRectColor(_enemyHpBarFills[i], RatioToColor(ratio));
@@ -88,12 +92,14 @@ public class BattleBottomPanelUi
                 _enemyNames.Add("");
                 _enemyHps.Add(0);
                 _enemyMaxHps.Add(0);
+                _enemyAlive.Add(false);
             }
         }
 
         _partyNames.Clear();
         _partyHps.Clear();
         _partyMaxHps.Clear();
+        _partyAlive.Clear();
 
         for (var i = 0; i < MaxPartyRows; i++)
         {
@@ -107,6 +113,7 @@ public class BattleBottomPanelUi
                 _partyNames.Add(e.Name);
                 _partyHps.Add(e.Hp);
                 _partyMaxHps.Add(e.MaxHp);
+                _partyAlive.Add(e.IsAlive);
                 var ratio = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0f;
                 _partyHpBarFills[i].Width = ratio * 100;
                 SetRectColor(_partyHpBarFills[i], RatioToColor(ratio));
@@ -116,6 +123,7 @@ public class BattleBottomPanelUi
                 _partyNames.Add("");
                 _partyHps.Add(0);
                 _partyMaxHps.Add(0);
+                _partyAlive.Add(false);
             }
         }
     }
@@ -131,7 +139,7 @@ public class BattleBottomPanelUi
             if (!_enemyHpBarBgs[i].Visible) continue;
 
             var y = RowStartY + i * RowSpacing;
-            sb.DrawString(font, NormalizeName(_enemyNames[i]), new Vector2(6, y), EnemyNameColor);
+            sb.DrawString(font, NormalizeName(_enemyNames[i]), new Vector2(6, y), _enemyAlive[i] ? EnemyNameColor : Color.Gray);
             var hpText = $"{_enemyHps[i]}/{_enemyMaxHps[i]}";
             sb.DrawString(font, hpText, new Vector2(254, y), HpTextColor);
         }
@@ -141,7 +149,7 @@ public class BattleBottomPanelUi
             if (!_partyHpBarBgs[i].Visible) continue;
 
             var y = RowStartY + i * RowSpacing;
-            sb.DrawString(font, NormalizeName(_partyNames[i]), new Vector2(404, y), PartyNameColor);
+            sb.DrawString(font, NormalizeName(_partyNames[i]), new Vector2(404, y), _partyAlive[i] ? PartyNameColor : Color.Gray);
             var hpText = $"{_partyHps[i]}/{_partyMaxHps[i]}";
             sb.DrawString(font, hpText, new Vector2(652, y), HpTextColor);
         }

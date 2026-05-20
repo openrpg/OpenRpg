@@ -42,6 +42,8 @@ public class PartyProvider : IPartyProvider
                 ?.Potency ?? 30;
             var initiative = (int?)(template.Variables.Effects?.FirstOrDefault(e => e.EffectType == 44) as StaticEffect)
                 ?.Potency ?? 1;
+            var attackDamage = (int?)(template.Variables.Effects?.FirstOrDefault(e => e.EffectType == 1) as StaticEffect)
+                ?.Potency ?? 10;
             var row = slotIndex < 2 ? 0 : 1;
 
             entities.Add(new BattleEntity
@@ -53,7 +55,8 @@ public class PartyProvider : IPartyProvider
                 SlotInRow = slotIndex % 2,
                 Hp = hp,
                 MaxHp = hp,
-                Initiative = initiative
+                Initiative = initiative,
+                AttackDamage = attackDamage
             });
 
             slotIndex++;
