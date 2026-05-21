@@ -19,6 +19,7 @@ using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Genres.Populators.Entity;
+using OpenRpg.Genres.Types;
 using OpenRpg.Items.Equippables.Slots;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Templates;
@@ -28,7 +29,7 @@ namespace OpenRpg.Demos.Battler.Code.Scenes.CharacterMenu;
 
 public class CharacterMenuScene : IScene
 {
-    private enum Screen { PartySelect, CharacterDetail, EquipmentSelect, Inventory }
+    private enum Screen { PartySelect, CharacterDetail, EquipmentSelect, Inventory, ItemTargetSelect }
 
     private Screen _currentScreen = Screen.PartySelect;
     private int _selectedIndex;
@@ -54,6 +55,10 @@ public class CharacterMenuScene : IScene
     // For EquipmentSelect: the items available for the current slot
     private int _browsingSlotType;
     private List<(ItemData Data, ItemTemplate Template)> _candidateItems = [];
+
+    // For ItemTargetSelect: the item being used on a party member
+    private ItemData _itemToUseData;
+    private ItemTemplate _itemToUseTemplate;
 
     // Equipment slot definitions
     private static readonly int[] SlotOrder =
@@ -194,6 +199,7 @@ public class CharacterMenuScene : IScene
             case Screen.CharacterDetail: DrawCharacterDetail(spriteBatch); break;
             case Screen.EquipmentSelect: DrawEquipmentSelect(spriteBatch); break;
             case Screen.Inventory: DrawInventory(spriteBatch); break;
+            case Screen.ItemTargetSelect: DrawItemTargetSelect(spriteBatch); break;
         }
 
         // Help text at bottom
@@ -215,6 +221,7 @@ public class CharacterMenuScene : IScene
             Screen.CharacterDetail => SlotOrder.Length + 1, // equipment slots + Back
             Screen.EquipmentSelect => GetEquipmentItemCount(),
             Screen.Inventory => _gameState.SharedInventory.Count + 1, // items + Back
+            Screen.ItemTargetSelect => _gameState.Party.Count(e => e.IsAlive) + 1, // alive party members + Back
             _ => 0
         };
     }
@@ -663,6 +670,59 @@ public class CharacterMenuScene : IScene
     }
 
     // ========================================================================
+    // Item Target Select (item usage in character menu)
+    // ========================================================================
+
+    private void DrawItemTargetSelect(SpriteBatch sb)
+    {
+        var itemName = _itemToUseTemplate != null
+            ? _localeDataSource.Get("en-gb", _itemToUseTemplate.NameLocaleId)
+            : "Item";
+
+        TextHelper.DrawStringWithSpacing(sb, _font,
+            $"USE {itemName.ToUpper()} ON WHICH MEMBER?",
+            new Vector2(400, 8), Color.White, centered: true);
+
+        var panelX = 120;
+        var panelY = 40;
+        var panelW = 560;
+        var panelH = 400;
+
+        DrawRect(sb, panelX, panelY, panelW, panelH, new Color(10, 10, 25) * 0.92f);
+
+        var y = panelY + 16;
+        var idx = 0;
+
+        foreach (var member in _gameState.Party)
+        {
+            if (!member.IsAlive)
+            {
+                idx++;
+                continue;
+            }
+
+            var isSelected = _selectedIndex == idx;
+            if (isSelected)
+                DrawRect(sb, panelX + 6, y - 2, panelW - 12, 24, new Color(60, 60, 90));
+
+            TextHelper.DrawStringWithSpacing(sb, _font,
+                $"{member.Name}  (HP: {member.Hp}/{member.MaxHp}  MP: {member.Mana}/{member.MaxMana})",
+                new Vector2(panelX + 20, y),
+                isSelected ? Color.White : new Color(180, 180, 190));
+
+            y += 28;
+            idx++;
+        }
+
+        // Back
+        var backY = panelY + panelH - 28;
+        var isBack = _selectedIndex == idx;
+        TextHelper.DrawStringWithSpacing(sb, _font, "[ Back ]",
+            new Vector2(panelX + 20, backY),
+            isBack ? Color.White : Palette.MenuBackColor);
+    }
+
+    // ========================================================================
     // Input Handlers
     // ========================================================================
 
@@ -681,6 +741,9 @@ public class CharacterMenuScene : IScene
                 break;
             case Screen.Inventory:
                 HandleInventoryConfirm();
+                break;
+            case Screen.ItemTargetSelect:
+                HandleItemTargetConfirm();
                 break;
         }
     }
@@ -781,8 +844,78 @@ public class CharacterMenuScene : IScene
             // Back to party select
             _selectedIndex = _gameState.Party.Count;
             _currentScreen = Screen.PartySelect;
+            return;
         }
-        // Selecting an individual item is just viewing info (no action needed)
+
+        // Selecting a consumable item -> choose a target to use it on
+        var itemData = _gameState.SharedInventory[_selectedIndex];
+        var template = _dataSource.Get<ItemTemplate>(itemData.TemplateId);
+        if (template != null && template.ItemType == 60) // Consumable
+        {
+            _itemToUseData = itemData;
+            _itemToUseTemplate = template;
+            _selectedIndex = 0;
+            _currentScreen = Screen.ItemTargetSelect;
+        }
+        // Non-consumable items are just viewing info (no action needed)
+    }
+
+    private void HandleItemTargetConfirm()
+    {
+        // Count only alive party members
+        var aliveMembers = _gameState.Party.Where(e => e.IsAlive).ToList();
+        if (_selectedIndex >= aliveMembers.Count)
+        {
+            // Back to inventory
+            _selectedIndex = _gameState.SharedInventory.IndexOf(_itemToUseData);
+            if (_selectedIndex < 0) _selectedIndex = 0;
+            _currentScreen = Screen.Inventory;
+            return;
+        }
+
+        if (_itemToUseData == null || _itemToUseTemplate == null) return;
+
+        var target = aliveMembers[_selectedIndex];
+
+        // Apply item effects to the target
+        ApplyItemToTarget(target);
+
+        // Remove the item from inventory
+        var invIndex = _gameState.SharedInventory.FindIndex(i => i.TemplateId == _itemToUseData.TemplateId);
+        if (invIndex >= 0)
+            _gameState.SharedInventory.RemoveAt(invIndex);
+
+        // Return to inventory
+        _selectedIndex = Math.Min(invIndex >= 0 ? invIndex : 0, _gameState.SharedInventory.Count);
+        _currentScreen = Screen.Inventory;
+        _itemToUseData = null;
+        _itemToUseTemplate = null;
+    }
+
+    private void ApplyItemToTarget(BattleEntity target)
+    {
+        if (_itemToUseTemplate?.Variables.Effects == null) return;
+
+        foreach (var effect in _itemToUseTemplate.Variables.Effects)
+        {
+            if (effect is not StaticEffect se) continue;
+
+            if (se.EffectType == GenreEffectTypes.HealthRestoreAmount)
+            {
+                var healAmount = (int)se.Potency;
+                target.Hp = Math.Min(target.Hp + healAmount, target.MaxHp);
+            }
+            else if (se.EffectType == GenreEffectTypes.HealthRestorePercentage)
+            {
+                var healAmount = (int)(target.MaxHp * se.Potency);
+                target.Hp = Math.Min(target.Hp + healAmount, target.MaxHp);
+            }
+            else if (se.EffectType == FantasyEffectTypes.ManaRestoreAmount)
+            {
+                var restoreAmount = (int)se.Potency;
+                target.Entity.State.Mana = (int)Math.Min(target.Mana + restoreAmount, target.MaxMana);
+            }
+        }
     }
 
     private void GoBack()
@@ -803,6 +936,13 @@ public class CharacterMenuScene : IScene
             case Screen.Inventory:
                 _selectedIndex = _gameState.Party.Count;
                 _currentScreen = Screen.PartySelect;
+                break;
+            case Screen.ItemTargetSelect:
+                _selectedIndex = _gameState.SharedInventory.IndexOf(_itemToUseData);
+                if (_selectedIndex < 0) _selectedIndex = 0;
+                _currentScreen = Screen.Inventory;
+                _itemToUseData = null;
+                _itemToUseTemplate = null;
                 break;
         }
     }

@@ -157,9 +157,6 @@ public class TurnManager
                         return;
                     }
                     break;
-                case ActionType.Flee:
-                    LastActionMessage = "Can't flee!";
-                    return;
             }
         }
 
@@ -330,6 +327,14 @@ public class TurnManager
                 if (se.EffectType == GenreEffectTypes.HealthRestoreAmount)
                 {
                     healAmount = (int)se.Potency;
+                    var newHp = Math.Min(target.Hp + healAmount, target.MaxHp);
+                    var actualHeal = newHp - target.Hp;
+                    target.Hp = newHp;
+                    OnDamageDealt?.Invoke(target, -actualHeal, false);
+                }
+                else if (se.EffectType == GenreEffectTypes.HealthRestorePercentage)
+                {
+                    healAmount = (int)(target.MaxHp * se.Potency);
                     var newHp = Math.Min(target.Hp + healAmount, target.MaxHp);
                     var actualHeal = newHp - target.Hp;
                     target.Hp = newHp;

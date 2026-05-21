@@ -117,7 +117,7 @@ public class CommandMenuUi
     private string[] BuildMainMenuItems()
     {
         var itemCount = _inventoryItems?.Count ?? 0;
-        return [$"Attack", $"Ability", $"Items ({itemCount})", "Flee"];
+        return [$"Attack", $"Ability", $"Items ({itemCount})"];
     }
 
     private string[] BuildAbilityItems()
@@ -352,9 +352,6 @@ public class CommandMenuUi
                     return; // No items to use
                 _selectedIndex = 0;
                 SwitchToScreen(MenuScreen.ItemSelect, BuildItemItems());
-                break;
-            case 3:
-                FireAction(new PlayerAction { Type = ActionType.Flee });
                 break;
         }
     }

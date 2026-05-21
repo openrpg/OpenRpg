@@ -252,7 +252,7 @@
       "3": 1,
       "9000": "potion",
       "4002": [
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 62, "Potency": 30.0, "Requirements": [] }
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 63, "Potency": 0.3, "Requirements": [] }
       ],
       "4003": []
     }
