@@ -13,8 +13,10 @@ using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Providers;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
+using OpenRpg.Demos.Battler.Code.Services;
 using OpenRpg.Demos.Battler.Code.Services.Game;
 using OpenRpg.Genres.Requirements;
+using OpenRpg.Items.Templates;
 using OpenRpg.Localization.Data.DataSources;
 
 namespace OpenRpg.Demos.Battler.Code.Scenes.Battle;
@@ -31,6 +33,7 @@ public class BattleScene : IScene
     private readonly ILocaleDataSource _localeDataSource;
     private readonly IEntityAttackGenerator _attackGenerator;
     private readonly IEntityAttackProcessor _attackProcessor;
+    private readonly ILootService _lootService;
     private readonly TurnManager _turnManager;
     private readonly SpriteCache _spriteCache = new();
     private readonly EntityRenderer _entityRenderer = new();
@@ -45,6 +48,10 @@ public class BattleScene : IScene
     private SpriteFont _font;
     private bool _loaded;
 
+    // State for post-battle results
+    private List<ItemData> _lootItems = [];
+    private string _victoryMessage = "";
+
     public List<BattleEntity> Party { get; private set; } = [];
     public List<BattleEntity> Enemies { get; private set; } = [];
 
@@ -58,7 +65,8 @@ public class BattleScene : IScene
         ICharacterRequirementChecker requirementChecker,
         ILocaleDataSource localeDataSource,
         IEntityAttackGenerator attackGenerator,
-        IEntityAttackProcessor attackProcessor)
+        IEntityAttackProcessor attackProcessor,
+        ILootService lootService)
     {
         _gameState = gameState;
         _enemyFormationProvider = enemyFormationProvider;
@@ -70,6 +78,7 @@ public class BattleScene : IScene
         _localeDataSource = localeDataSource;
         _attackGenerator = attackGenerator;
         _attackProcessor = attackProcessor;
+        _lootService = lootService;
         _turnManager = new TurnManager(_dataSource, _requirementChecker, _localeDataSource, _attackGenerator, _attackProcessor);
     }
 
@@ -129,7 +138,7 @@ public class BattleScene : IScene
         var cx = target.Position.X + slotW / 2;
         var cy = target.Position.Y - 10;
         _floatingNumbers.Add(new FloatingDamageNumber(
-            new Vector2(cx, cy), damage, isCrit));
+            new Vector2(cx, cy), damage, isCrit, isHealing: damage < 0));
     }
 
     public void Update(GameTime gameTime)
@@ -139,12 +148,27 @@ public class BattleScene : IScene
 
         if (_turnManager.CurrentPhase == TurnManager.Phase.GameOver)
         {
-            var kstate = Keyboard.GetState();
-            if (kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter))
+            // On first frame of game over, collect loot if player won
+            if (_lootItems.Count == 0 && _turnManager.WinningTeam == Team.Player)
             {
+                var deadEnemies = Enemies.Where(e => !e.IsAlive).ToList();
+                _lootItems = _lootService.GenerateLoot(deadEnemies);
+                _gameState.SharedInventory.AddRange(_lootItems);
+                _victoryMessage = BuildLootMessage();
+            }
+
+            var kstate = Keyboard.GetState();
+            if (InputHelper.IsKeyJustPressed(kstate, _previousKeyboard, Keys.Space) ||
+                InputHelper.IsKeyJustPressed(kstate, _previousKeyboard, Keys.Enter))
+            {
+                // On loss, reset the party so a fresh one is created next time
+                if (_turnManager.WinningTeam == Team.Enemy)
+                    _gameState.ResetParty();
+
                 var menuScene = _serviceProvider.GetRequiredService<CharacterMenu.CharacterMenuScene>();
                 _ = _sceneManager.SetScene(menuScene);
             }
+            _previousKeyboard = kstate;
             return;
         }
 
@@ -164,11 +188,13 @@ public class BattleScene : IScene
             var currentKeyboard = Keyboard.GetState();
 
             if (_commandMenu.IsHidden)
-            {
-                var aliveEnemies = Enemies.Where(e => e.IsAlive).ToList();
-                var abilities = _turnManager.GetAvailableAbilities(_turnManager.CurrentAttacker);
-                _commandMenu.Show(_turnManager.CurrentAttacker, aliveEnemies, abilities, _localeDataSource);
-            }
+                {
+                    var aliveEnemies = Enemies.Where(e => e.IsAlive).ToList();
+                    var aliveParty = Party.Where(e => e.IsAlive).ToList();
+                    var abilities = _turnManager.GetAvailableAbilities(_turnManager.CurrentAttacker);
+                    _commandMenu.Show(_turnManager.CurrentAttacker, aliveEnemies, abilities, _localeDataSource,
+                        _gameState.SharedInventory, aliveParty, _dataSource);
+                }
 
             _commandMenu.HandleInput(currentKeyboard, _previousKeyboard);
             _previousKeyboard = currentKeyboard;
@@ -188,6 +214,14 @@ public class BattleScene : IScene
 
     private void OnPlayerActionConfirmed(PlayerAction action)
     {
+        // Deduct used items from shared inventory immediately
+        if (action.Type == ActionType.UseItem && action.UsedItem != null)
+        {
+            var index = _gameState.SharedInventory.FindIndex(i => i.TemplateId == action.UsedItem.TemplateId);
+            if (index >= 0)
+                _gameState.SharedInventory.RemoveAt(index);
+        }
+
         _turnManager.SubmitPlayerAction(action);
     }
 
@@ -210,7 +244,7 @@ public class BattleScene : IScene
 
         foreach (var fn in _floatingNumbers)
         {
-            var text = fn.IsCrit ? $"CRIT! {fn.Damage}" : fn.Damage.ToString();
+            var text = fn.IsCrit ? $"CRIT! {fn.Damage}" : (fn.IsHealing ? $"+{fn.Damage}" : fn.Damage.ToString());
             var size = _font.MeasureString(text);
             var pos = new Vector2(fn.Position.X - size.X / 2, fn.Position.Y);
             var color = fn.Color * fn.Opacity;
@@ -224,7 +258,7 @@ public class BattleScene : IScene
         _commandMenu.Draw(spriteBatch, _font);
 
         if (_turnManager.CurrentPhase == TurnManager.Phase.GameOver)
-            _entityRenderer.DrawGameOver(spriteBatch, _font, _turnManager.WinningTeam);
+            DrawResultsOverlay(spriteBatch);
     }
 
     private float GetPulseBrightness()
@@ -255,6 +289,72 @@ public class BattleScene : IScene
             var offY = Math.Cos(_totalTime * 1.1 + phase) * 1.5;
             e.Position = e.OriginPosition + new Vector2((float)offX, (float)offY);
         }
+    }
+
+    private string BuildLootMessage()
+    {
+        if (_lootItems.Count == 0)
+            return "No items were dropped.";
+
+        var itemNames = new List<string>();
+        foreach (var item in _lootItems)
+        {
+            var template = _dataSource.Get<ItemTemplate>(item.TemplateId);
+            var name = template != null
+                ? _localeDataSource.Get("en-gb", template.NameLocaleId)
+                : $"Item #{item.TemplateId}";
+            itemNames.Add(name);
+        }
+
+        return $"Loot collected: {string.Join(", ", itemNames)}";
+    }
+
+    private void DrawResultsOverlay(SpriteBatch sb)
+    {
+        var isVictory = _turnManager.WinningTeam == Team.Player;
+
+        // Full-screen dark overlay
+        _entityRenderer.DrawOverlay(sb);
+
+        // Title
+        var title = isVictory ? "VICTORY!" : "DEFEATED";
+        var titleColor = isVictory ? Color.LightGreen : Color.OrangeRed;
+
+        TextHelper.DrawStringWithSpacing(sb, _font, title,
+            new Vector2(400, 140), titleColor, centered: true);
+
+        if (isVictory && _lootItems.Count > 0)
+        {
+            // Subtitle
+            TextHelper.DrawStringWithSpacing(sb, _font, "LOOT COLLECTED:",
+                new Vector2(400, 190), new Color(200, 200, 150), centered: true);
+
+            var lootY = 220;
+            foreach (var item in _lootItems)
+            {
+                var template = _dataSource.Get<ItemTemplate>(item.TemplateId);
+                var name = template != null
+                    ? _localeDataSource.Get("en-gb", template.NameLocaleId)
+                    : $"Item #{item.TemplateId}";
+                TextHelper.DrawStringWithSpacing(sb, _font, $"- {name}",
+                    new Vector2(400, lootY), Color.White, centered: true);
+                lootY += 22;
+            }
+        }
+        else if (isVictory)
+        {
+            TextHelper.DrawStringWithSpacing(sb, _font, "No items were dropped.",
+                new Vector2(400, 200), new Color(140, 140, 150), centered: true);
+        }
+        else
+        {
+            TextHelper.DrawStringWithSpacing(sb, _font, "Your party has fallen...",
+                new Vector2(400, 200), new Color(180, 120, 120), centered: true);
+        }
+
+        // Continue prompt
+        TextHelper.DrawStringWithSpacing(sb, _font, "Press Enter to continue",
+            new Vector2(400, 480), new Color(180, 180, 200), centered: true);
     }
 
     private void LayoutEntities()

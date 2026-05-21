@@ -7,6 +7,7 @@ using OpenRpg.Combat.Extensions;
 using OpenRpg.Combat.Processors.Attacks;
 using OpenRpg.Combat.Processors.Attacks.Entity;
 using OpenRpg.Combat.Types;
+using OpenRpg.Core.Effects;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Data;
@@ -17,6 +18,8 @@ using OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
+using OpenRpg.Genres.Types;
+using OpenRpg.Items.Templates;
 using OpenRpg.Genres.Requirements;
 using OpenRpg.Localization.Data.DataSources;
 
@@ -144,6 +147,13 @@ public class TurnManager
                     if (action.Ability != null)
                     {
                         ExecuteAbility(CurrentAttacker, action.Ability, action.Targets);
+                        return;
+                    }
+                    break;
+                case ActionType.UseItem:
+                    if (action.UsedItem != null && action.Targets?.Count > 0)
+                    {
+                        UseItemOnTarget(action.UsedItem, action.Targets[0]);
                         return;
                     }
                     break;
@@ -294,6 +304,52 @@ public class TurnManager
         OnDamageDealt?.Invoke(target, totalDamage, attack.IsCritical);
         var critSuffix = attack.IsCritical ? " (CRIT!)" : "";
         LastActionMessage = $"{NameHelper.NormalizeName(CurrentAttacker.Name)} attacks {NameHelper.NormalizeName(target.Name)} for {totalDamage} damage{critSuffix}";
+    }
+
+    private void UseItemOnTarget(ItemData itemData, BattleEntity target)
+    {
+        var template = _dataSource.Get<ItemTemplate>(itemData.TemplateId);
+        if (template == null)
+        {
+            LastActionMessage = "Item not found!";
+            return;
+        }
+
+        var itemName = _localeDataSource.Get("en-gb", template.NameLocaleId);
+        var attackerName = NameHelper.NormalizeName(CurrentAttacker.Name);
+        var targetName = NameHelper.NormalizeName(target.Name);
+        var healAmount = 0;
+        var manaAmount = 0;
+
+        if (template.Variables.Effects != null)
+        {
+            foreach (var effect in template.Variables.Effects)
+            {
+                if (effect is not StaticEffect se) continue;
+
+                if (se.EffectType == GenreEffectTypes.HealthRestoreAmount)
+                {
+                    healAmount = (int)se.Potency;
+                    var newHp = Math.Min(target.Hp + healAmount, target.MaxHp);
+                    var actualHeal = newHp - target.Hp;
+                    target.Hp = newHp;
+                    OnDamageDealt?.Invoke(target, -actualHeal, false);
+                }
+                else if (se.EffectType == FantasyEffectTypes.ManaRestoreAmount)
+                {
+                    manaAmount = (int)se.Potency;
+                    var newMp = (int)Math.Min(target.Mana + manaAmount, target.MaxMana);
+                    target.Entity.State.Mana = newMp;
+                }
+            }
+        }
+
+        if (healAmount > 0)
+            LastActionMessage = $"{attackerName} uses {itemName} on {targetName}, healing {healAmount} HP!";
+        else if (manaAmount > 0)
+            LastActionMessage = $"{attackerName} uses {itemName} on {targetName}, restoring {manaAmount} MP!";
+        else
+            LastActionMessage = $"{attackerName} uses {itemName} on {targetName}.";
     }
 
     private bool CheckGameOver()

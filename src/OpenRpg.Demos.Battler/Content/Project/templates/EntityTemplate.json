@@ -11,7 +11,12 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 5.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 3.0, "Requirements": [] }
       ],
-      "4003": []
+      "4003": [],
+      "100": [
+        { "ItemTemplateId": 20, "DropRate": 0.3 },
+        { "ItemTemplateId": 1, "DropRate": 0.1 },
+        { "ItemTemplateId": 10, "DropRate": 0.1 }
+      ]
     }
   },
   {
@@ -26,7 +31,11 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 2.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 8.0, "Requirements": [] }
       ],
-      "4003": []
+      "4003": [],
+      "100": [
+        { "ItemTemplateId": 20, "DropRate": 0.2 },
+        { "ItemTemplateId": 17, "DropRate": 0.1 }
+      ]
     }
   },
   {
@@ -41,7 +50,12 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 4.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 6.0, "Requirements": [] }
       ],
-      "4003": []
+      "4003": [],
+      "100": [
+        { "ItemTemplateId": 20, "DropRate": 0.3 },
+        { "ItemTemplateId": 16, "DropRate": 0.1 },
+        { "ItemTemplateId": 6, "DropRate": 0.05 }
+      ]
     }
   },
   {
@@ -56,7 +70,13 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 8.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 3.0, "Requirements": [] }
       ],
-      "4003": []
+      "4003": [],
+      "100": [
+        { "ItemTemplateId": 21, "DropRate": 0.2 },
+        { "ItemTemplateId": 11, "DropRate": 0.15 },
+        { "ItemTemplateId": 2, "DropRate": 0.08 },
+        { "ItemTemplateId": 14, "DropRate": 0.1 }
+      ]
     }
   },
   {
@@ -71,7 +91,10 @@
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 1.0, "Requirements": [] },
         { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 2.0, "Requirements": [] }
       ],
-      "4003": []
+      "4003": [],
+      "100": [
+        { "ItemTemplateId": 20, "DropRate": 0.5 }
+      ]
     }
   }
 ]

@@ -10,24 +10,33 @@ using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Combat.Types;
 using OpenRpg.Core.Extensions;
+using OpenRpg.Data;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
+using OpenRpg.Items.Templates;
 using OpenRpg.Localization.Data.DataSources;
 
 namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
 
 public class CommandMenuUi
 {
-    public enum MenuScreen { Hidden, MainMenu, AbilitySelect, TargetSelect }
+    public enum MenuScreen { Hidden, MainMenu, AbilitySelect, TargetSelect, ItemSelect, ItemTargetSelect }
 
     private MenuScreen _currentScreen = MenuScreen.Hidden;
     private int _selectedIndex;
     private BattleEntity _currentAttacker;
     private List<BattleEntity> _aliveEnemies;
+    private List<BattleEntity> _aliveParty;
     private List<(AbilityTemplate Template, int ManaCost, bool CanAfford)> _availableAbilities;
     private AbilityTemplate _selectedAbility;
     private ILocaleDataSource _localeDataSource;
+    private IDataSource _dataSource;
     private string[] _currentItems = [];
+
+    // Item usage state
+    private List<ItemData> _inventoryItems;
+    private ItemData _selectedItemData;
+    private ItemTemplate _selectedItemTemplate;
 
     private ColoredRectangleRuntime _menuBg;
     private ColoredRectangleRuntime _tooltipBg;
@@ -80,13 +89,19 @@ public class CommandMenuUi
         BattleEntity attacker,
         List<BattleEntity> aliveEnemies,
         List<(AbilityTemplate Template, int ManaCost, bool CanAfford)> abilities,
-        ILocaleDataSource localeDataSource)
+        ILocaleDataSource localeDataSource,
+        List<ItemData> inventoryItems = null,
+        List<BattleEntity> aliveParty = null,
+        IDataSource dataSource = null)
     {
         _currentAttacker = attacker;
         _aliveEnemies = aliveEnemies;
         _availableAbilities = abilities;
         _selectedAbility = null;
         _localeDataSource = localeDataSource;
+        _inventoryItems = inventoryItems;
+        _aliveParty = aliveParty;
+        _dataSource = dataSource;
 
         SwitchToScreen(MenuScreen.MainMenu, BuildMainMenuItems());
     }
@@ -99,9 +114,10 @@ public class CommandMenuUi
         BuildGumElements();
     }
 
-    private static string[] BuildMainMenuItems()
+    private string[] BuildMainMenuItems()
     {
-        return ["Attack", "Ability", "Items", "Flee"];
+        var itemCount = _inventoryItems?.Count ?? 0;
+        return [$"Attack", $"Ability", $"Items ({itemCount})", "Flee"];
     }
 
     private string[] BuildAbilityItems()
@@ -119,6 +135,34 @@ public class CommandMenuUi
     private string[] BuildTargetItems()
     {
         var items = _aliveEnemies.Select(e => e.Name).ToList();
+        items.Add("Back");
+        return [.. items];
+    }
+
+    private string[] BuildItemItems()
+    {
+        var items = new List<string>();
+        if (_inventoryItems != null)
+        {
+            foreach (var itemData in _inventoryItems)
+            {
+                var template = _dataSource?.Get<ItemTemplate>(itemData.TemplateId);
+                var name = template != null
+                    ? _localeDataSource?.Get("en-gb", template.NameLocaleId) ?? $"Item #{itemData.TemplateId}"
+                    : $"Item #{itemData.TemplateId}";
+                items.Add(name);
+            }
+        }
+        items.Add("Back");
+        return [.. items];
+    }
+
+    private string[] BuildItemTargetItems()
+    {
+        // For items, target is always a party member
+        var items = _aliveParty?.Select(e => e.Name).ToList() ?? [];
+        if (items.Count == 0)
+            items.Add("(No valid targets)");
         items.Add("Back");
         return [.. items];
     }
@@ -222,6 +266,22 @@ public class CommandMenuUi
         if (_currentScreen == MenuScreen.TargetSelect && _selectedAbility == null)
             return "Choose target for Attack";
 
+        if (_currentScreen == MenuScreen.ItemSelect && _selectedIndex < (_inventoryItems?.Count ?? 0))
+        {
+            var template = _dataSource?.Get<ItemTemplate>(_inventoryItems[_selectedIndex].TemplateId);
+            if (template != null)
+                return _localeDataSource?.Get("en-gb", template.DescriptionLocaleId) ?? "";
+            return "";
+        }
+
+        if (_currentScreen == MenuScreen.ItemTargetSelect)
+        {
+            var itemName = _selectedItemTemplate != null
+                ? _localeDataSource?.Get("en-gb", _selectedItemTemplate.NameLocaleId) ?? "Item"
+                : "Item";
+            return $"Use {itemName} on which party member?";
+        }
+
         return "";
     }
 
@@ -266,6 +326,12 @@ public class CommandMenuUi
             case MenuScreen.TargetSelect:
                 HandleTargetConfirm();
                 break;
+            case MenuScreen.ItemSelect:
+                HandleItemConfirm();
+                break;
+            case MenuScreen.ItemTargetSelect:
+                HandleItemTargetConfirm();
+                break;
         }
     }
 
@@ -281,7 +347,11 @@ public class CommandMenuUi
                 SwitchToScreen(MenuScreen.AbilitySelect, BuildAbilityItems());
                 break;
             case 2:
-                FireAction(new PlayerAction { Type = ActionType.UseItem });
+                // Items - show inventory
+                if (_inventoryItems == null || _inventoryItems.Count == 0)
+                    return; // No items to use
+                _selectedIndex = 0;
+                SwitchToScreen(MenuScreen.ItemSelect, BuildItemItems());
                 break;
             case 3:
                 FireAction(new PlayerAction { Type = ActionType.Flee });
@@ -340,6 +410,50 @@ public class CommandMenuUi
             : new PlayerAction { Type = ActionType.BasicAttack, Targets = [target] });
     }
 
+    private void HandleItemConfirm()
+    {
+        var itemCount = _inventoryItems?.Count ?? 0;
+        if (_selectedIndex == itemCount)
+        {
+            SwitchToScreen(MenuScreen.MainMenu, BuildMainMenuItems());
+            return;
+        }
+
+        if (_inventoryItems == null || _selectedIndex >= _inventoryItems.Count) return;
+
+        _selectedItemData = _inventoryItems[_selectedIndex];
+        _selectedItemTemplate = _dataSource?.Get<ItemTemplate>(_selectedItemData.TemplateId);
+
+        if (_selectedItemTemplate == null) return;
+
+        _selectedIndex = 0;
+        SwitchToScreen(MenuScreen.ItemTargetSelect, BuildItemTargetItems());
+    }
+
+    private void HandleItemTargetConfirm()
+    {
+        var targetCount = _aliveParty?.Count ?? 0;
+        if (_aliveParty == null || _selectedIndex >= targetCount)
+        {
+            // Back to item select
+            _selectedIndex = 0;
+            SwitchToScreen(MenuScreen.ItemSelect, BuildItemItems());
+            return;
+        }
+
+        if (_selectedItemData == null) return;
+
+        var target = _aliveParty[_selectedIndex];
+        var itemCopy = new ItemData { TemplateId = _selectedItemData.TemplateId };
+
+        FireAction(new PlayerAction
+        {
+            Type = ActionType.UseItem,
+            Targets = [target],
+            UsedItem = itemCopy
+        });
+    }
+
     private void GoBack()
     {
         switch (_currentScreen)
@@ -356,6 +470,13 @@ public class CommandMenuUi
                     SwitchToScreen(MenuScreen.AbilitySelect, BuildAbilityItems());
                 else
                     SwitchToScreen(MenuScreen.MainMenu, BuildMainMenuItems());
+                break;
+            case MenuScreen.ItemSelect:
+                SwitchToScreen(MenuScreen.MainMenu, BuildMainMenuItems());
+                break;
+            case MenuScreen.ItemTargetSelect:
+                _selectedIndex = 0;
+                SwitchToScreen(MenuScreen.ItemSelect, BuildItemItems());
                 break;
         }
     }
@@ -416,6 +537,8 @@ public class CommandMenuUi
     {
         if (_currentScreen == MenuScreen.AbilitySelect && index == _availableAbilities.Count) return true;
         if (_currentScreen == MenuScreen.TargetSelect && index == _aliveEnemies.Count) return true;
+        if (_currentScreen == MenuScreen.ItemSelect && index == (_inventoryItems?.Count ?? 0)) return true;
+        if (_currentScreen == MenuScreen.ItemTargetSelect && index == (_aliveParty?.Count ?? 0)) return true;
         return false;
     }
 }

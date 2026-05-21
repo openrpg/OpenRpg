@@ -32,19 +32,9 @@ public class EntityRenderer
             DrawEntity(sb, entity, turnManager, totalTime);
     }
 
-    public void DrawGameOver(SpriteBatch sb, SpriteFont font, Team winningTeam)
+    public void DrawOverlay(SpriteBatch sb)
     {
         sb.Draw(_pixel, new Rectangle(0, 0, 800, 600), Palette.GameOverOverlay);
-
-        var winText = winningTeam == Team.Player ? "Player Wins!" : "Monsters Win!";
-        var winSize = font.MeasureString(winText);
-        TextHelper.DrawStringWithSpacing(sb, font, winText,
-            new Vector2(400 - winSize.X / 2, 250), Color.Gold);
-
-        var restartText = "Press SPACE to try again";
-        var restartSize = font.MeasureString(restartText);
-        TextHelper.DrawStringWithSpacing(sb, font, restartText,
-            new Vector2(400 - restartSize.X / 2, 300), Color.White);
     }
 
     public void Dispose()

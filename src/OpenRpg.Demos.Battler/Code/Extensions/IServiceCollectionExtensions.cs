@@ -15,10 +15,12 @@ using OpenRpg.Data;
 using OpenRpg.Data.InMemory;
 using OpenRpg.Demos.Battler.Code.Scenes;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Scenes.CharacterMenu;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Providers;
 using OpenRpg.Demos.Battler.Code.Services;
 using OpenRpg.Demos.Battler.Code.Services.Game;
+using OpenRpg.Demos.Battler.Code.Types;
 using OpenRpg.Entities.Entity.Populators.State;
 using OpenRpg.Entities.Entity.Populators.Stats;
 using OpenRpg.Genres.Effects;
@@ -35,8 +37,8 @@ using OpenRpg.Projects.Json.Loaders.Locales;
 using OpenRpg.Projects.Json.Loaders.Templates;
 using OpenRpg.Projects.Loaders;
 using OpenRpg.Projects.Loaders.Locales;
-using OpenRpg.Projects.Loaders.Projects;
 using OpenRpg.Projects.Loaders.Templates;
+using OpenRpg.Projects.Loaders.Projects;
 using OpenRpg.Projects.Services;
 
 namespace OpenRpg.Demos.Battler.Code.Extensions;
@@ -70,6 +72,7 @@ public static class IServiceCollectionExtensions
         VariablesConverter.RegisterKey(CombatAbilityTemplateVariableTypes.Damage, typeof(Damage));
         VariablesConverter.RegisterKey(CombatTemplateVariableTypes.Abilities, typeof(AbilityData));
         VariablesConverter.RegisterKey(LootTableEntryVariableTypes.Requirements, typeof(Requirement));
+        VariablesConverter.RegisterKey(DemoEntityVariableTypes.LootTable, typeof(SimpleLootEntry));
 
         services.AddSingleton<IFileService, DefaultFileService>();
         services.AddSingleton<IProjectLoader, JsonProjectLoader>();
@@ -97,6 +100,7 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<IPersistentGameState, PersistentGameState>();
         services.AddSingleton<IPartyProvider, PartyProvider>();
         services.AddSingleton<IEnemyFormationProvider, EnemyFormationProvider>();
+        services.AddSingleton<ILootService, LootService>();
         services.AddTransient<BattleScene>();
         services.AddTransient<CharacterMenuScene>();
 

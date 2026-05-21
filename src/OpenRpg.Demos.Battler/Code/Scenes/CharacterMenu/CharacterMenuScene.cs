@@ -18,6 +18,7 @@ using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
+using OpenRpg.Genres.Populators.Entity;
 using OpenRpg.Items.Equippables.Slots;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Templates;
@@ -27,7 +28,7 @@ namespace OpenRpg.Demos.Battler.Code.Scenes.CharacterMenu;
 
 public class CharacterMenuScene : IScene
 {
-    private enum Screen { PartySelect, CharacterDetail, EquipmentSelect }
+    private enum Screen { PartySelect, CharacterDetail, EquipmentSelect, Inventory }
 
     private Screen _currentScreen = Screen.PartySelect;
     private int _selectedIndex;
@@ -43,6 +44,7 @@ public class CharacterMenuScene : IScene
     private readonly IDataSource _dataSource;
     private readonly ILocaleDataSource _localeDataSource;
     private readonly IEquipmentSlotValidator _slotValidator;
+    private readonly ICharacterPopulator _characterPopulator;
 
     private bool _loaded;
     private SpriteFont _font;
@@ -91,7 +93,8 @@ public class CharacterMenuScene : IScene
         IGameServices gameServices,
         IDataSource dataSource,
         ILocaleDataSource localeDataSource,
-        IEquipmentSlotValidator slotValidator)
+        IEquipmentSlotValidator slotValidator,
+        ICharacterPopulator characterPopulator)
     {
         _gameState = gameState;
         _sceneManager = sceneManager;
@@ -100,6 +103,7 @@ public class CharacterMenuScene : IScene
         _dataSource = dataSource;
         _localeDataSource = localeDataSource;
         _slotValidator = slotValidator;
+        _characterPopulator = characterPopulator;
     }
 
     public Task LoadAsync()
@@ -189,6 +193,7 @@ public class CharacterMenuScene : IScene
             case Screen.PartySelect: DrawPartySelect(spriteBatch); break;
             case Screen.CharacterDetail: DrawCharacterDetail(spriteBatch); break;
             case Screen.EquipmentSelect: DrawEquipmentSelect(spriteBatch); break;
+            case Screen.Inventory: DrawInventory(spriteBatch); break;
         }
 
         // Help text at bottom
@@ -206,9 +211,10 @@ public class CharacterMenuScene : IScene
     {
         return _currentScreen switch
         {
-            Screen.PartySelect => _gameState.Party.Count + 1, // party members + Proceed to Battle
+            Screen.PartySelect => _gameState.Party.Count + 2, // party members + Inventory + Proceed to Battle
             Screen.CharacterDetail => SlotOrder.Length + 1, // equipment slots + Back
             Screen.EquipmentSelect => GetEquipmentItemCount(),
+            Screen.Inventory => _gameState.SharedInventory.Count + 1, // items + Back
             _ => 0
         };
     }
@@ -304,9 +310,23 @@ public class CharacterMenuScene : IScene
                 new Vector2(barX, mpBarY + barH + 1), Palette.MpText);
         }
 
+        // Inventory button
+        var invY = startY + _gameState.Party.Count * itemH + 10;
+        var isInvSelected = _selectedIndex == _gameState.Party.Count;
+
+        if (isInvSelected)
+            DrawRect(sb, panelX + 180, invY - 4, panelW - 360, 28, new Color(40, 50, 70));
+        else
+            DrawRect(sb, panelX + 180, invY - 4, panelW - 360, 28, new Color(20, 25, 35));
+
+        var invCount = _gameState.SharedInventory.Count;
+        TextHelper.DrawStringWithSpacing(sb, _font, $">>> INVENTORY ({invCount}) <<<",
+            new Vector2(400, invY + 4),
+            isInvSelected ? Color.LightBlue : new Color(120, 160, 200), centered: true);
+
         // Proceed to Battle button
-        var proceedY = startY + _gameState.Party.Count * itemH + 16;
-        var isProceedSelected = _selectedIndex == _gameState.Party.Count;
+        var proceedY = invY + 36;
+        var isProceedSelected = _selectedIndex == _gameState.Party.Count + 1;
 
         if (isProceedSelected)
             DrawRect(sb, panelX + 180, proceedY - 4, panelW - 360, 34, new Color(40, 80, 40));
@@ -539,6 +559,110 @@ public class CharacterMenuScene : IScene
     }
 
     // ========================================================================
+    // Inventory Screen
+    // ========================================================================
+
+    private void DrawInventory(SpriteBatch sb)
+    {
+        TextHelper.DrawStringWithSpacing(sb, _font, "SHARED INVENTORY",
+            new Vector2(400, 8), Color.White, centered: true);
+
+        var panelX = 40;
+        var panelY = 36;
+        var panelW = 720;
+        var panelH = 440;
+
+        DrawRect(sb, panelX, panelY, panelW, panelH, new Color(10, 10, 25) * 0.92f);
+
+        var items = _gameState.SharedInventory;
+        if (items.Count == 0)
+        {
+            TextHelper.DrawStringWithSpacing(sb, _font, "(No items in inventory)",
+                new Vector2(panelX + 20, panelY + 20), new Color(100, 100, 110));
+        }
+        else
+        {
+            var y = panelY + 12;
+            for (var i = 0; i < items.Count; i++)
+            {
+                var itemData = items[i];
+                var template = _dataSource.Get<ItemTemplate>(itemData.TemplateId);
+                var name = template != null
+                    ? _localeDataSource.Get("en-gb", template.NameLocaleId)
+                    : $"Item #{itemData.TemplateId}";
+
+                var isSelected = i == _selectedIndex;
+                if (isSelected)
+                    DrawRect(sb, panelX + 4, y - 2, panelW - 8, 22, new Color(60, 60, 90));
+
+                var baseColor = isSelected ? Color.White : new Color(180, 180, 190);
+
+                // Determine item type label
+                var typeLabel = template != null ? GetItemTypeLabel(template.ItemType) : "";
+
+                TextHelper.DrawStringWithSpacing(sb, _font, name,
+                    new Vector2(panelX + 16, y), baseColor);
+
+                if (!string.IsNullOrEmpty(typeLabel))
+                {
+                    TextHelper.DrawStringWithSpacing(sb, _font, typeLabel,
+                        new Vector2(panelX + panelW - 140, y), new Color(140, 140, 150));
+                }
+
+                y += 24;
+            }
+
+            // Show selected item's stats/bonuses at bottom
+            if (_selectedIndex < items.Count)
+            {
+                var template = _dataSource.Get<ItemTemplate>(items[_selectedIndex].TemplateId);
+                if (template != null)
+                {
+                    var bonusText = GetItemBonusText(template);
+                    var desc = _localeDataSource.Get("en-gb", template.DescriptionLocaleId);
+                    if (!string.IsNullOrEmpty(desc))
+                    {
+                        TextHelper.DrawStringWithSpacing(sb, _font, desc,
+                            new Vector2(panelX + 16, panelY + panelH - 48), new Color(160, 160, 170));
+                    }
+
+                    if (!string.IsNullOrEmpty(bonusText))
+                    {
+                        TextHelper.DrawStringWithSpacing(sb, _font, bonusText,
+                            new Vector2(panelX + 16, panelY + panelH - 28), new Color(200, 200, 150));
+                    }
+                }
+            }
+        }
+
+        // Back
+        var backY = panelY + panelH - 8;
+        var isBack = _selectedIndex == items.Count;
+        TextHelper.DrawStringWithSpacing(sb, _font, "[ Back ]",
+            new Vector2(panelX + 16, backY),
+            isBack ? Color.White : Palette.MenuBackColor);
+    }
+
+    private static string GetItemTypeLabel(int itemType)
+    {
+        return itemType switch
+        {
+            2 => "Weapon",
+            30 => "Head",
+            31 => "Body",
+            32 => "Legs",
+            33 => "Back",
+            34 => "Feet",
+            35 => "Wrist",
+            36 => "Neck",
+            37 => "Ring",
+            50 => "Off Hand",
+            60 => "Consumable",
+            _ => ""
+        };
+    }
+
+    // ========================================================================
     // Input Handlers
     // ========================================================================
 
@@ -555,6 +679,9 @@ public class CharacterMenuScene : IScene
             case Screen.EquipmentSelect:
                 HandleEquipmentConfirm();
                 break;
+            case Screen.Inventory:
+                HandleInventoryConfirm();
+                break;
         }
     }
 
@@ -565,6 +692,12 @@ public class CharacterMenuScene : IScene
             _selectedCharacter = _selectedIndex;
             _selectedIndex = 0;
             _currentScreen = Screen.CharacterDetail;
+        }
+        else if (_selectedIndex == _gameState.Party.Count)
+        {
+            // Inventory button
+            _selectedIndex = 0;
+            _currentScreen = Screen.Inventory;
         }
         else
         {
@@ -608,6 +741,7 @@ public class CharacterMenuScene : IScene
             {
                 _gameState.SharedInventory.Add(currentItem);
                 slots[_browsingSlotType] = null;
+                _characterPopulator.Populate(entity.Entity, refreshState: false);
                 _selectedIndex = 0;
                 RefreshCandidates();
                 return;
@@ -626,6 +760,7 @@ public class CharacterMenuScene : IScene
                 _gameState.SharedInventory.Add(currentItem);
 
             slots[_browsingSlotType] = itemData;
+            _characterPopulator.Populate(entity.Entity, refreshState: false);
 
             // Return to character detail after equipping
             _selectedIndex = _selectedSlotIndex;
@@ -636,6 +771,18 @@ public class CharacterMenuScene : IScene
         // Back to character detail
         _selectedIndex = _selectedSlotIndex;
         _currentScreen = Screen.CharacterDetail;
+    }
+
+    private void HandleInventoryConfirm()
+    {
+        var itemCount = _gameState.SharedInventory.Count;
+        if (_selectedIndex == itemCount)
+        {
+            // Back to party select
+            _selectedIndex = _gameState.Party.Count;
+            _currentScreen = Screen.PartySelect;
+        }
+        // Selecting an individual item is just viewing info (no action needed)
     }
 
     private void GoBack()
@@ -652,6 +799,10 @@ public class CharacterMenuScene : IScene
             case Screen.EquipmentSelect:
                 _selectedIndex = _selectedSlotIndex;
                 _currentScreen = Screen.CharacterDetail;
+                break;
+            case Screen.Inventory:
+                _selectedIndex = _gameState.Party.Count;
+                _currentScreen = Screen.PartySelect;
                 break;
         }
     }

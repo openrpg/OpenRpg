@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 
 namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
@@ -9,17 +10,19 @@ public class FloatingDamageNumber
     public float Lifetime { get; set; }
     public float MaxLifetime { get; set; }
     public bool IsCrit { get; set; }
+    public bool IsHealing { get; set; }
     public Color Color { get; set; }
     public float Opacity => MathHelper.Clamp(Lifetime / MaxLifetime, 0, 1);
 
-    public FloatingDamageNumber(Vector2 position, int damage, bool isCrit)
+    public FloatingDamageNumber(Vector2 position, int damage, bool isCrit, bool isHealing = false)
     {
         Position = position;
-        Damage = damage;
+        Damage = Math.Abs(damage);
         IsCrit = isCrit;
+        IsHealing = isHealing;
         MaxLifetime = isCrit ? 1.2f : 1.0f;
         Lifetime = MaxLifetime;
-        Color = isCrit ? Color.Gold : Color.Red;
+        Color = isHealing ? Color.LightGreen : (isCrit ? Color.Gold : Color.Red);
     }
 
     public void Update(float dt)

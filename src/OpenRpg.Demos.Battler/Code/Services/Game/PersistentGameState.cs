@@ -8,6 +8,7 @@ using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Types;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Extensions;
+using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Localization.Data.DataSources;
 using OpenRpg.Items.Templates;
 
@@ -56,6 +57,10 @@ public class PersistentGameState : IPersistentGameState
 
     public void InitializeParty()
     {
+        // Idempotent — only initializes once. This preserves loot and party state
+        // between battles. Call ReinitializeParty() to force a full reset.
+        if (_party != null) return;
+
         var entities = new List<BattleEntity>();
         var slotIndex = 0;
         var partyIds = ClassLookups.GetRandomPartyIds();
@@ -96,6 +101,22 @@ public class PersistentGameState : IPersistentGameState
         _party = entities;
         _sharedInventory = new List<ItemData>();
         AddStarterItems();
+    }
+
+    public void FullHealParty()
+    {
+        if (_party == null) return;
+        foreach (var entity in _party)
+        {
+            entity.Hp = entity.MaxHp;
+            entity.Entity.State.Mana = entity.MaxMana;
+        }
+    }
+
+    public void ResetParty()
+    {
+        _party = null;
+        _sharedInventory = null;
     }
 
     private void AddStarterItems()

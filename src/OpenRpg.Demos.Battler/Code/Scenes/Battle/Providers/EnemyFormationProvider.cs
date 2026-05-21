@@ -51,8 +51,10 @@ public class EnemyFormationProvider : IEnemyFormationProvider
                 Name = name,
                 AssetCode = assetCode,
                 Team = Team.Enemy,
-                Row = i / 2,
-                SlotInRow = i % 2
+                // 2 columns × 3 rows: first 3 = front column (Slot=1, closer to party), last 3 = back column (Slot=0)
+                // Within each column: top (Row=0) → middle (Row=1) → bottom (Row=2)
+                SlotInRow = i < 3 ? 1 : 0,
+                Row = i % 3
             });
         }
 
