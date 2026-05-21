@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Combat.Abilities;
+using OpenRpg.Combat.Attacks;
 using OpenRpg.Combat.Processors.Attacks.Entity;
 using OpenRpg.Combat.Types;
 using OpenRpg.Core.Effects;
@@ -64,6 +65,7 @@ public static class IServiceCollectionExtensions
     {
         VariablesConverter.RegisterKey(CoreTemplateVariableTypes.Effects, typeof(IEffect));
         VariablesConverter.RegisterKey(CoreTemplateVariableTypes.Requirements, typeof(Requirement));
+        VariablesConverter.RegisterKey(CombatAbilityTemplateVariableTypes.Damage, typeof(Damage));
         VariablesConverter.RegisterKey(CombatTemplateVariableTypes.Abilities, typeof(AbilityData));
         VariablesConverter.RegisterKey(LootTableEntryVariableTypes.Requirements, typeof(Requirement));
 

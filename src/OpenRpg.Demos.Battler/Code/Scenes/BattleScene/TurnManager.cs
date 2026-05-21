@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Attacks;
 using OpenRpg.Combat.Extensions;
+using OpenRpg.Combat.Processors.Attacks;
+using OpenRpg.Combat.Processors.Attacks.Entity;
 using OpenRpg.Combat.Types;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Requirements;
@@ -25,6 +27,8 @@ public class TurnManager
     private readonly IDataSource _dataSource;
     private readonly ICharacterRequirementChecker _requirementChecker;
     private readonly ILocaleDataSource _localeDataSource;
+    private readonly IEntityAttackGenerator _attackGenerator;
+    private readonly IEntityAttackProcessor _attackProcessor;
     private List<BattleEntity> _party;
     private List<BattleEntity> _enemies;
     private double _phaseTimer;
@@ -32,7 +36,7 @@ public class TurnManager
     public enum Phase { Idle, TurnDwell, TargetFlash, GameOver, PlayerInput }
     public Phase CurrentPhase { get; private set; } = Phase.Idle;
     public BattleEntity CurrentAttacker { get; private set; }
-    public BattleEntity CurrentTarget { get; private set; }
+    public List<BattleEntity> CurrentTargets { get; private set; } = [];
     public Team WinningTeam { get; private set; }
     public int CurrentTurnIndex { get; private set; } = -1;
     public string LastActionMessage { get; private set; } = "";
@@ -41,11 +45,13 @@ public class TurnManager
     public bool IsInPlayerInput => CurrentPhase == Phase.PlayerInput;
     public List<BattleEntity> HighlightedTargets { get; set; } = [];
 
-    public TurnManager(IDataSource dataSource, ICharacterRequirementChecker requirementChecker, ILocaleDataSource localeDataSource)
+    public TurnManager(IDataSource dataSource, ICharacterRequirementChecker requirementChecker, ILocaleDataSource localeDataSource, IEntityAttackGenerator attackGenerator, IEntityAttackProcessor attackProcessor)
     {
         _dataSource = dataSource;
         _requirementChecker = requirementChecker;
         _localeDataSource = localeDataSource;
+        _attackGenerator = attackGenerator;
+        _attackProcessor = attackProcessor;
     }
 
     public void Start(List<BattleEntity> party, List<BattleEntity> enemies)
@@ -229,7 +235,7 @@ public class TurnManager
 
     private void ExecuteAbility(BattleEntity attacker, AbilityTemplate template, List<BattleEntity> specificTargets = null)
     {
-        var damage = template.Variables.GetAsOrDefault<Damage>(CombatAbilityTemplateVariableTypes.Damage, () => new Damage(0, 0));
+        var baseDamage = template.Variables.GetAsOrDefault<Damage>(CombatAbilityTemplateVariableTypes.Damage, () => new Damage(0, 0));
         var targetType = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetType, 1);
         var targetCount = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetCount, 1);
         var manaCost = template.Variables.GetIntOrDefault(FantasyAbilityTemplateVariableTypes.ManaCost, 0);
@@ -252,18 +258,31 @@ public class TurnManager
             selected = aliveTargets.OrderBy(_ => _rng.Next()).Take(actualTargetCount).ToList();
         }
 
+        CurrentTargets = selected;
+
+        // Clone the template damage to avoid mutation from the pipeline
+        var damageCopy = new Damage(baseDamage.Type, baseDamage.Value);
+        var attack = _attackGenerator.GenerateAttack(damageCopy, attacker.Entity.Stats);
+
         var abilityName = _localeDataSource.Get("en-gb", template.NameLocaleId);
         var attackerName = NormalizeName(attacker.Name);
-        var damageVal = (int)Math.Max(1, damage.Value);
+        int totalDamageDealt = 0;
 
         foreach (var target in selected)
-            target.Entity.State.DeductHealth(damageVal);
+        {
+            var processed = _attackProcessor.ProcessAttack(attack, target.Entity.Stats);
+            var dmg = (int)Math.Max(1, processed.DamageDone.Sum(d => d.Value));
+            target.Entity.State.DeductHealth(dmg);
+            totalDamageDealt += dmg;
+        }
 
+        var avgDamage = selected.Count > 0 ? totalDamageDealt / selected.Count : 0;
         var targetNames = selected.Select(t => NormalizeName(t.Name)).ToList();
+        var critSuffix = attack.IsCritical ? " (CRIT!)" : "";
         if (selected.Count == 1)
-            LastActionMessage = $"{attackerName} uses {abilityName} on {targetNames[0]} for {damageVal} damage";
+            LastActionMessage = $"{attackerName} uses {abilityName} on {targetNames[0]} for {avgDamage} damage{critSuffix}";
         else
-            LastActionMessage = $"{attackerName} uses {abilityName} on {string.Join(", ", targetNames)} for {damageVal} damage each";
+            LastActionMessage = $"{attackerName} uses {abilityName} on {string.Join(", ", targetNames)} for {avgDamage} damage each{critSuffix}";
     }
 
     private void ExecuteBasicAttack(BattleEntity specificTarget = null)
@@ -271,16 +290,20 @@ public class TurnManager
         var targets = CurrentAttacker.Team == Team.Player ? _enemies : _party;
         var aliveTargets = targets.Where(e => e.IsAlive).ToList();
 
+        BattleEntity target;
         if (specificTarget != null && specificTarget.IsAlive)
-            CurrentTarget = specificTarget;
+            target = specificTarget;
         else
-            CurrentTarget = aliveTargets[_rng.Next(aliveTargets.Count)];
+            target = aliveTargets[_rng.Next(aliveTargets.Count)];
+        CurrentTargets = [target];
 
-        var damage = CurrentAttacker.AttackDamage > 0
-            ? CurrentAttacker.AttackDamage
-            : _rng.Next(5, 15);
-        CurrentTarget.Entity.State.DeductHealth(damage);
-        LastActionMessage = $"{NormalizeName(CurrentAttacker.Name)} attacks {NormalizeName(CurrentTarget.Name)} for {damage} damage";
+        var attack = _attackGenerator.GenerateAttack(CurrentAttacker.Entity.Stats);
+        var processed = _attackProcessor.ProcessAttack(attack, target.Entity.Stats);
+        var totalDamage = (int)Math.Max(1, processed.DamageDone.Sum(d => d.Value));
+
+        target.Entity.State.DeductHealth(totalDamage);
+        var critSuffix = attack.IsCritical ? " (CRIT!)" : "";
+        LastActionMessage = $"{NormalizeName(CurrentAttacker.Name)} attacks {NormalizeName(target.Name)} for {totalDamage} damage{critSuffix}";
     }
 
     private bool CheckGameOver()

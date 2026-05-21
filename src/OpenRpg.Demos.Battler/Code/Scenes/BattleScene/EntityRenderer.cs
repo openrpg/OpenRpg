@@ -95,7 +95,7 @@ public class EntityRenderer
         var color = entity.IsAlive ? Color.White : Color.Gray * 0.35f;
         sb.Draw(tex, new Rectangle(x, y, w, h), null, color, 0f, Vector2.Zero, effects, 0f);
 
-        if (turnManager.CurrentPhase == TurnManager.Phase.TargetFlash && entity == turnManager.CurrentTarget)
+        if (turnManager.CurrentPhase == TurnManager.Phase.TargetFlash && turnManager.CurrentTargets?.Contains(entity) == true)
             sb.Draw(tex, new Rectangle(x, y, w, h), null, Color.Red * 0.5f, 0f, Vector2.Zero, effects, 0f);
     }
 
