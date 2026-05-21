@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,4 +13,5 @@ public interface ISceneManager
     void Update(GameTime gameTime);
     void Draw(GameTime gameTime, SpriteBatch spriteBatch);
     void DrawUI(GameTime gameTime, SpriteBatch spriteBatch);
+    Action? RequestExit { get; set; }
 }

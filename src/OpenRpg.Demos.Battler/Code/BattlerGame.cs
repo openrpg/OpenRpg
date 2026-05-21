@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGameGum;
 using OpenRpg.Data;
 using OpenRpg.Demos.Battler.Code.Scenes;
-using OpenRpg.Demos.Battler.Code.Scenes.Battle;
+using OpenRpg.Demos.Battler.Code.Scenes.CharacterMenu;
 using OpenRpg.Demos.Battler.Code.Services.Game;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Entity.Templates;
@@ -39,6 +39,7 @@ public class BattlerGame : Game
         _serviceProvider = serviceProvider;
         _gameServices = serviceProvider.GetRequiredService<IGameServices>() as GameServices;
         _sceneManager = serviceProvider.GetRequiredService<ISceneManager>();
+        _sceneManager.RequestExit = Exit;
         
         Content.RootDirectory = "Content";
         _gameServices.GetContentManager = Content;
@@ -67,14 +68,11 @@ public class BattlerGame : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-            Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
+        // Exit is now handled per-scene (Escape on top-level screen only)
         if (_projectLoaded && _sceneManager.ActiveScene == null)
         {
-            var battleScene = _serviceProvider.GetRequiredService<BattleScene>();
-            _ = _sceneManager.SetScene(battleScene);
+            var menuScene = _serviceProvider.GetRequiredService<CharacterMenuScene>();
+            _ = _sceneManager.SetScene(menuScene);
         }
 
         _sceneManager.Update(gameTime);

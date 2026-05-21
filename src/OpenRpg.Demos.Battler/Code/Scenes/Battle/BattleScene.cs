@@ -21,7 +21,7 @@ namespace OpenRpg.Demos.Battler.Code.Scenes.Battle;
 
 public class BattleScene : IScene
 {
-    private readonly IPartyProvider _partyProvider;
+    private readonly IPersistentGameState _gameState;
     private readonly IEnemyFormationProvider _enemyFormationProvider;
     private readonly IGameServices _gameServices;
     private readonly ISceneManager _sceneManager;
@@ -49,7 +49,7 @@ public class BattleScene : IScene
     public List<BattleEntity> Enemies { get; private set; } = [];
 
     public BattleScene(
-        IPartyProvider partyProvider,
+        IPersistentGameState gameState,
         IEnemyFormationProvider enemyFormationProvider,
         IGameServices gameServices,
         ISceneManager sceneManager,
@@ -60,7 +60,7 @@ public class BattleScene : IScene
         IEntityAttackGenerator attackGenerator,
         IEntityAttackProcessor attackProcessor)
     {
-        _partyProvider = partyProvider;
+        _gameState = gameState;
         _enemyFormationProvider = enemyFormationProvider;
         _gameServices = gameServices;
         _sceneManager = sceneManager;
@@ -80,7 +80,7 @@ public class BattleScene : IScene
             _loaded = false;
             _floatingNumbers.Clear();
 
-            Party = await _partyProvider.BuildPartyAsync();
+            Party = _gameState.Party;
             Enemies = await _enemyFormationProvider.GenerateFormationAsync();
             LayoutEntities();
 
@@ -142,8 +142,8 @@ public class BattleScene : IScene
             var kstate = Keyboard.GetState();
             if (kstate.IsKeyDown(Keys.Space) || kstate.IsKeyDown(Keys.Enter))
             {
-                var newScene = _serviceProvider.GetRequiredService<BattleScene>();
-                _ = _sceneManager.SetScene(newScene);
+                var menuScene = _serviceProvider.GetRequiredService<CharacterMenu.CharacterMenuScene>();
+                _ = _sceneManager.SetScene(menuScene);
             }
             return;
         }

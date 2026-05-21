@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,6 +9,7 @@ namespace OpenRpg.Demos.Battler.Code.Scenes;
 public class SceneManager : ISceneManager
 {
     public IScene? ActiveScene { get; private set; }
+    public Action? RequestExit { get; set; }
 
     public async Task SetScene(IScene scene)
     {
