@@ -29,7 +29,7 @@ public class TurnManager
     private List<BattleEntity> _enemies;
     private double _phaseTimer;
 
-    public enum Phase { Idle, TurnDwell, TargetFlash, GameOver }
+    public enum Phase { Idle, TurnDwell, TargetFlash, GameOver, PlayerInput }
     public Phase CurrentPhase { get; private set; } = Phase.Idle;
     public BattleEntity CurrentAttacker { get; private set; }
     public BattleEntity CurrentTarget { get; private set; }
@@ -37,6 +37,9 @@ public class TurnManager
     public int CurrentTurnIndex { get; private set; } = -1;
     public string LastActionMessage { get; private set; } = "";
     public List<BattleEntity> TurnOrder { get; private set; } = [];
+    public PlayerAction PendingAction { get; set; }
+    public bool IsInPlayerInput => CurrentPhase == Phase.PlayerInput;
+    public List<BattleEntity> HighlightedTargets { get; set; } = [];
 
     public TurnManager(IDataSource dataSource, ICharacterRequirementChecker requirementChecker, ILocaleDataSource localeDataSource)
     {
@@ -61,9 +64,10 @@ public class TurnManager
         switch (CurrentPhase)
         {
             case Phase.Idle:
-                if (AdvanceTurn())
+                var nextPhase = AdvanceTurn();
+                if (nextPhase != Phase.Idle)
                 {
-                    CurrentPhase = Phase.TurnDwell;
+                    CurrentPhase = nextPhase;
                     _phaseTimer = 0;
                 }
                 break;
@@ -76,6 +80,10 @@ public class TurnManager
                     CurrentPhase = Phase.TargetFlash;
                     _phaseTimer = 0;
                 }
+                break;
+
+            case Phase.PlayerInput:
+                // Waiting for BattleScene to call SubmitPlayerAction
                 break;
 
             case Phase.TargetFlash:
@@ -94,7 +102,7 @@ public class TurnManager
         }
     }
 
-    private bool AdvanceTurn()
+    private Phase AdvanceTurn()
     {
         var count = TurnOrder.Count;
         for (var i = 0; i < count; i++)
@@ -104,13 +112,40 @@ public class TurnManager
             if (!CurrentAttacker.IsAlive) continue;
 
             var targets = CurrentAttacker.Team == Team.Player ? _enemies : _party;
-            if (targets.Any(e => e.IsAlive)) return true;
+            if (!targets.Any(e => e.IsAlive)) continue;
+
+            return CurrentAttacker.Team == Team.Player
+                ? Phase.PlayerInput
+                : Phase.TurnDwell;
         }
-        return false;
+        return Phase.Idle;
     }
 
     private void ExecuteAction()
     {
+        if (CurrentAttacker.Team == Team.Player && PendingAction != null)
+        {
+            var action = PendingAction;
+            PendingAction = null;
+            switch (action.Type)
+            {
+                case ActionType.BasicAttack:
+                    ExecuteBasicAttack(action.Targets?.FirstOrDefault());
+                    return;
+                case ActionType.Ability:
+                    if (action.Ability != null)
+                    {
+                        ExecuteAbility(CurrentAttacker, action.Ability, action.Targets);
+                        return;
+                    }
+                    break;
+                case ActionType.Flee:
+                    LastActionMessage = "Can't flee!";
+                    return;
+            }
+        }
+
+        // Fallback auto logic for enemies or if player didn't provide a valid action
         if (CurrentAttacker.Team == Team.Player)
         {
             if (TryExecuteAbility(CurrentAttacker))
@@ -118,6 +153,44 @@ public class TurnManager
         }
 
         ExecuteBasicAttack();
+    }
+
+    public void SubmitPlayerAction(PlayerAction action)
+    {
+        if (CurrentPhase != Phase.PlayerInput) return;
+        PendingAction = action;
+        ExecuteAction();
+        CurrentPhase = Phase.TargetFlash;
+        _phaseTimer = 0;
+    }
+
+    public List<(AbilityTemplate Template, int ManaCost, bool CanAfford)> GetAvailableAbilities(BattleEntity entity)
+    {
+        var result = new List<(AbilityTemplate, int, bool)>();
+
+        if (!entity.Entity.Variables.ContainsKey(CombatTemplateVariableTypes.Abilities))
+            return result;
+
+        var abilities = entity.Entity.Variables.GetAs<List<AbilityData>>(CombatTemplateVariableTypes.Abilities);
+        if (abilities == null || abilities.Count == 0)
+            return result;
+
+        foreach (var abilityData in abilities)
+        {
+            var template = _dataSource.Get<AbilityTemplate>(abilityData.TemplateId);
+            if (template == null) continue;
+
+            var requirements = template.Variables.GetAsOrDefault<IReadOnlyCollection<Requirement>>(
+                CoreTemplateVariableTypes.Requirements, () => Array.Empty<Requirement>());
+            if (!_requirementChecker.AreRequirementsMet(entity.Entity, requirements))
+                continue;
+
+            var manaCost = template.Variables.GetIntOrDefault(FantasyAbilityTemplateVariableTypes.ManaCost, 0);
+            var canAfford = entity.Mana >= manaCost;
+            result.Add((template, manaCost, canAfford));
+        }
+
+        return result;
     }
 
     private bool TryExecuteAbility(BattleEntity entity)
@@ -154,7 +227,7 @@ public class TurnManager
         return true;
     }
 
-    private void ExecuteAbility(BattleEntity attacker, AbilityTemplate template)
+    private void ExecuteAbility(BattleEntity attacker, AbilityTemplate template, List<BattleEntity> specificTargets = null)
     {
         var damage = template.Variables.GetAsOrDefault<Damage>(CombatAbilityTemplateVariableTypes.Damage, () => new Damage(0, 0));
         var targetType = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetType, 1);
@@ -163,14 +236,22 @@ public class TurnManager
 
         attacker.Entity.State.DeductMana(manaCost, attacker.MaxMana);
 
-        var targets = attacker.Team == Team.Player ? _enemies : _party;
-        var aliveTargets = targets.Where(e => e.IsAlive).ToList();
+        List<BattleEntity> selected;
+        if (specificTargets != null && specificTargets.Count > 0)
+        {
+            selected = specificTargets.Where(t => t.IsAlive).ToList();
+            if (selected.Count == 0) return;
+        }
+        else
+        {
+            var targets = attacker.Team == Team.Player ? _enemies : _party;
+            var aliveTargets = targets.Where(e => e.IsAlive).ToList();
+            var actualTargetCount = targetType == CombatTargetTypes.MultipleTarget
+                ? Math.Min(targetCount, aliveTargets.Count) : 1;
+            if (actualTargetCount == 0) return;
+            selected = aliveTargets.OrderBy(_ => _rng.Next()).Take(actualTargetCount).ToList();
+        }
 
-        var actualTargetCount = targetType == CombatTargetTypes.MultipleTarget
-            ? Math.Min(targetCount, aliveTargets.Count) : 1;
-        if (actualTargetCount == 0) return;
-
-        var selected = aliveTargets.OrderBy(_ => _rng.Next()).Take(actualTargetCount).ToList();
         var abilityName = _localeDataSource.Get("en-gb", template.NameLocaleId);
         var attackerName = NormalizeName(attacker.Name);
         var damageVal = (int)Math.Max(1, damage.Value);
@@ -185,11 +266,15 @@ public class TurnManager
             LastActionMessage = $"{attackerName} uses {abilityName} on {string.Join(", ", targetNames)} for {damageVal} damage each";
     }
 
-    private void ExecuteBasicAttack()
+    private void ExecuteBasicAttack(BattleEntity specificTarget = null)
     {
         var targets = CurrentAttacker.Team == Team.Player ? _enemies : _party;
         var aliveTargets = targets.Where(e => e.IsAlive).ToList();
-        CurrentTarget = aliveTargets[_rng.Next(aliveTargets.Count)];
+
+        if (specificTarget != null && specificTarget.IsAlive)
+            CurrentTarget = specificTarget;
+        else
+            CurrentTarget = aliveTargets[_rng.Next(aliveTargets.Count)];
 
         var damage = CurrentAttacker.AttackDamage > 0
             ? CurrentAttacker.AttackDamage

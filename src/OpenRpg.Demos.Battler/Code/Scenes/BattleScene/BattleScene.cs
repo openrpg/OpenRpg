@@ -30,6 +30,8 @@ public class BattleScene : IScene
     private BattleBottomPanelUi _bottomPanel;
     private TurnOrderUi _turnOrderUi;
     private CombatLogUi _combatLogUi;
+    private CommandMenuUi _commandMenu;
+    private KeyboardState _previousKeyboard;
     private double _totalTime;
     private SpriteFont _font;
     private bool _loaded;
@@ -83,6 +85,9 @@ public class BattleScene : IScene
             _combatLogUi = new CombatLogUi();
             _combatLogUi.Update("");
 
+            _commandMenu = new CommandMenuUi();
+            _commandMenu.OnActionConfirmed += OnPlayerActionConfirmed;
+
             _loaded = true;
         }
         catch (Exception ex)
@@ -94,6 +99,7 @@ public class BattleScene : IScene
 
     public void Unload()
     {
+        _commandMenu?.Hide();
         _turnOrderUi.Unload();
         _bottomPanel.Unload();
         _combatLogUi.Unload();
@@ -120,9 +126,37 @@ public class BattleScene : IScene
         AnimateEntities();
         _turnManager.Update(gameTime.ElapsedGameTime.TotalSeconds);
 
+        if (_turnManager.IsInPlayerInput)
+        {
+            var currentKeyboard = Keyboard.GetState();
+
+            if (_commandMenu.IsHidden)
+            {
+                var aliveEnemies = Enemies.Where(e => e.IsAlive).ToList();
+                var abilities = _turnManager.GetAvailableAbilities(_turnManager.CurrentAttacker);
+                _commandMenu.Show(_turnManager.CurrentAttacker, aliveEnemies, abilities, _localeDataSource);
+            }
+
+            _commandMenu.HandleInput(currentKeyboard, _previousKeyboard);
+            _previousKeyboard = currentKeyboard;
+
+            // Sync highlighted targets from menu selection to turn manager for visual feedback
+            _turnManager.HighlightedTargets = _commandMenu.PreviewTargets;
+        }
+        else if (!_commandMenu.IsHidden)
+        {
+            _commandMenu.Hide();
+            _turnManager.HighlightedTargets = [];
+        }
+
         _bottomPanel.Update(Party, Enemies);
         _turnOrderUi.Update(_turnManager.TurnOrder, _turnManager.CurrentTurnIndex, GetPulseBrightness());
         _combatLogUi.Update(_turnManager.LastActionMessage);
+    }
+
+    private void OnPlayerActionConfirmed(PlayerAction action)
+    {
+        _turnManager.SubmitPlayerAction(action);
     }
 
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -145,13 +179,16 @@ public class BattleScene : IScene
         _turnOrderUi.Draw(spriteBatch);
         _bottomPanel.Draw(spriteBatch, _font);
 
+        _commandMenu.Draw(spriteBatch, _font);
+
         if (_turnManager.CurrentPhase == TurnManager.Phase.GameOver)
             _entityRenderer.DrawGameOver(spriteBatch, _font, _turnManager.WinningTeam);
     }
 
     private float GetPulseBrightness()
     {
-        if (_turnManager.CurrentPhase != TurnManager.Phase.TurnDwell) return 0;
+        if (_turnManager.CurrentPhase != TurnManager.Phase.TurnDwell &&
+            _turnManager.CurrentPhase != TurnManager.Phase.PlayerInput) return 0;
         return (float)(0.5 + Math.Sin(_totalTime * 10) * 0.5);
     }
 

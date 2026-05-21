@@ -65,18 +65,22 @@ public class EntityRenderer
     private void DrawEntity(SpriteBatch sb, BattleEntity entity, TurnManager turnManager, double totalTime)
     {
         if (entity.Sprite != null)
-            DrawSprite(sb, entity, turnManager);
+            DrawSprite(sb, entity, turnManager, totalTime);
         else
             DrawFallbackRect(sb, entity);
 
         if (entity.IsAlive)
             DrawHpBar(sb, entity);
 
-        if (turnManager.CurrentPhase == TurnManager.Phase.TurnDwell && entity == turnManager.CurrentAttacker)
-            DrawTurnArrow(sb, entity, totalTime);
+        if ((turnManager.CurrentPhase == TurnManager.Phase.TurnDwell || turnManager.CurrentPhase == TurnManager.Phase.PlayerInput) && entity == turnManager.CurrentAttacker)
+            DrawTurnArrow(sb, entity, totalTime, Color.Gold);
+
+        // Red arrow on highlighted preview targets during player input
+        if (turnManager.HighlightedTargets?.Contains(entity) == true)
+            DrawTurnArrow(sb, entity, totalTime, Color.Red);
     }
 
-    private void DrawSprite(SpriteBatch sb, BattleEntity entity, TurnManager turnManager)
+    private void DrawSprite(SpriteBatch sb, BattleEntity entity, TurnManager turnManager, double totalTime)
     {
         var tex = entity.Sprite;
         var slotW = 80;
@@ -126,16 +130,16 @@ public class EntityRenderer
         }
     }
 
-    private void DrawTurnArrow(SpriteBatch sb, BattleEntity entity, double totalTime)
+    private void DrawTurnArrow(SpriteBatch sb, BattleEntity entity, double totalTime, Color color)
     {
         var slotW = 80;
         var tweenY = Math.Sin(totalTime * 6) * 4;
         var cx = (int)(entity.Position.X + slotW / 2);
         var baseY = (int)(entity.Position.Y - 18 + tweenY);
 
-        sb.Draw(_pixel, new Rectangle(cx - 4, baseY, 9, 2), Color.Gold);
-        sb.Draw(_pixel, new Rectangle(cx - 3, baseY + 3, 7, 2), Color.Gold);
-        sb.Draw(_pixel, new Rectangle(cx - 2, baseY + 6, 5, 2), Color.Gold);
-        sb.Draw(_pixel, new Rectangle(cx - 1, baseY + 9, 3, 2), Color.Gold);
+        sb.Draw(_pixel, new Rectangle(cx - 4, baseY, 9, 2), color);
+        sb.Draw(_pixel, new Rectangle(cx - 3, baseY + 3, 7, 2), color);
+        sb.Draw(_pixel, new Rectangle(cx - 2, baseY + 6, 5, 2), color);
+        sb.Draw(_pixel, new Rectangle(cx - 1, baseY + 9, 3, 2), color);
     }
 }
