@@ -64,6 +64,12 @@ public class VariablesConverter : JsonConverter
                     return serializer.Deserialize(subReader, resolvedType!);
                 }
 
+                if (currentKey.HasValue && _collectionElementTypes.TryGetValue(currentKey.Value, out var elementType))
+                {
+                    using var subReader = jobject.CreateReader();
+                    return serializer.Deserialize(subReader, elementType);
+                }
+
                 return jobject.Properties()
                     .ToDictionary(
                         p => p.Name,

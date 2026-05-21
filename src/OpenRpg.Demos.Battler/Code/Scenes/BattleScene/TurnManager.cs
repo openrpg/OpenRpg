@@ -45,6 +45,8 @@ public class TurnManager
     public bool IsInPlayerInput => CurrentPhase == Phase.PlayerInput;
     public List<BattleEntity> HighlightedTargets { get; set; } = [];
 
+    public event Action<BattleEntity, int, bool> OnDamageDealt;
+
     public TurnManager(IDataSource dataSource, ICharacterRequirementChecker requirementChecker, ILocaleDataSource localeDataSource, IEntityAttackGenerator attackGenerator, IEntityAttackProcessor attackProcessor)
     {
         _dataSource = dataSource;
@@ -273,6 +275,7 @@ public class TurnManager
             var processed = _attackProcessor.ProcessAttack(attack, target.Entity.Stats);
             var dmg = (int)Math.Max(1, processed.DamageDone.Sum(d => d.Value));
             target.Entity.State.DeductHealth(dmg);
+            OnDamageDealt?.Invoke(target, dmg, attack.IsCritical);
             totalDamageDealt += dmg;
         }
 
@@ -302,6 +305,7 @@ public class TurnManager
         var totalDamage = (int)Math.Max(1, processed.DamageDone.Sum(d => d.Value));
 
         target.Entity.State.DeductHealth(totalDamage);
+        OnDamageDealt?.Invoke(target, totalDamage, attack.IsCritical);
         var critSuffix = attack.IsCritical ? " (CRIT!)" : "";
         LastActionMessage = $"{NormalizeName(CurrentAttacker.Name)} attacks {NormalizeName(target.Name)} for {totalDamage} damage{critSuffix}";
     }

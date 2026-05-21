@@ -38,6 +38,7 @@ public class BattleScene : IScene
     private double _totalTime;
     private SpriteFont _font;
     private bool _loaded;
+    private readonly List<FloatingDamageNumber> _floatingNumbers = [];
 
     public List<BattleEntity> Party { get; private set; } = [];
     public List<BattleEntity> Enemies { get; private set; } = [];
@@ -72,6 +73,7 @@ public class BattleScene : IScene
         try
         {
             _loaded = false;
+            _floatingNumbers.Clear();
 
             Party = await _partyProvider.BuildPartyAsync();
             Enemies = await _enemyFormationProvider.GenerateFormationAsync();
@@ -82,6 +84,7 @@ public class BattleScene : IScene
 
             var content = _gameServices.GetContentManager;
             _spriteCache.LoadSprites(Party.Concat(Enemies), content);
+            _turnManager.OnDamageDealt += OnDamageDealt;
             _turnManager.Start(Party, Enemies);
 
             _font = content.Load<SpriteFont>("Fonts/KenneyPixel");
@@ -106,12 +109,22 @@ public class BattleScene : IScene
 
     public void Unload()
     {
+        _turnManager.OnDamageDealt -= OnDamageDealt;
         _commandMenu?.Hide();
         _turnOrderUi.Unload();
         _bottomPanel.Unload();
         _combatLogUi.Unload();
         _entityRenderer.Dispose();
         _font = null;
+    }
+
+    private void OnDamageDealt(BattleEntity target, int damage, bool isCrit)
+    {
+        var slotW = 80;
+        var cx = target.Position.X + slotW / 2;
+        var cy = target.Position.Y - 10;
+        _floatingNumbers.Add(new FloatingDamageNumber(
+            new Vector2(cx, cy), damage, isCrit));
     }
 
     public void Update(GameTime gameTime)
@@ -132,6 +145,14 @@ public class BattleScene : IScene
 
         AnimateEntities();
         _turnManager.Update(gameTime.ElapsedGameTime.TotalSeconds);
+
+        var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        for (var i = _floatingNumbers.Count - 1; i >= 0; i--)
+        {
+            _floatingNumbers[i].Update(dt);
+            if (_floatingNumbers[i].IsExpired)
+                _floatingNumbers.RemoveAt(i);
+        }
 
         if (_turnManager.IsInPlayerInput)
         {
@@ -182,6 +203,17 @@ public class BattleScene : IScene
     public void DrawUI(GameTime gameTime, SpriteBatch spriteBatch)
     {
         if (!_loaded) return;
+
+        // Draw floating damage numbers
+        foreach (var fn in _floatingNumbers)
+        {
+            var text = fn.IsCrit ? $"CRIT! {fn.Damage}" : fn.Damage.ToString();
+            var size = _font.MeasureString(text);
+            var pos = new Vector2(fn.Position.X - size.X / 2, fn.Position.Y);
+            var color = fn.Color * fn.Opacity;
+            TextHelper.DrawStringWithSpacing(spriteBatch, _font, text, pos, color);
+        }
+
         _combatLogUi.Draw(spriteBatch, _font);
         _turnOrderUi.Draw(spriteBatch);
         _bottomPanel.Draw(spriteBatch, _font);
