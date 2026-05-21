@@ -303,7 +303,7 @@
       "3": 1,
       "9000": "phoenix-down",
       "4002": [
-        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 62, "Potency": 100.0, "Requirements": [] }
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 77, "Potency": 0.5, "Requirements": [] }
       ],
       "4003": []
     }

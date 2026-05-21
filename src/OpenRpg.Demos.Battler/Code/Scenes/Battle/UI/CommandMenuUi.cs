@@ -11,9 +11,12 @@ using OpenRpg.Combat.Attacks;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Combat.Types;
 using OpenRpg.Core.Extensions;
+using OpenRpg.Core.Requirements;
 using OpenRpg.Data;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
+using OpenRpg.Entities.Types;
+using OpenRpg.Genres.Types;
 using OpenRpg.Items.Templates;
 using OpenRpg.Localization.Data.DataSources;
 
@@ -28,6 +31,7 @@ public class CommandMenuUi
     private BattleEntity _currentAttacker;
     private List<BattleEntity> _aliveEnemies;
     private List<BattleEntity> _aliveParty;
+    private List<BattleEntity> _allParty;
     private List<(AbilityTemplate Template, int ManaCost, bool CanAfford)> _availableAbilities;
     private AbilityTemplate _selectedAbility;
     private ILocaleDataSource _localeDataSource;
@@ -99,7 +103,8 @@ public class CommandMenuUi
         ILocaleDataSource localeDataSource,
         List<ItemData> inventoryItems = null,
         List<BattleEntity> aliveParty = null,
-        IDataSource dataSource = null)
+        IDataSource dataSource = null,
+        List<BattleEntity> allParty = null)
     {
         _currentAttacker = attacker;
         _aliveEnemies = aliveEnemies;
@@ -110,6 +115,7 @@ public class CommandMenuUi
         _inventoryItems = inventoryItems;
         _aliveParty = aliveParty;
         _dataSource = dataSource;
+        _allParty = allParty;
 
         SwitchToScreen(MenuScreen.MainMenu, BuildMainMenuItems());
     }
@@ -124,8 +130,7 @@ public class CommandMenuUi
 
     private string[] BuildMainMenuItems()
     {
-        var itemCount = _inventoryItems?.Count ?? 0;
-        return [$"Attack", $"Ability", $"Items ({itemCount})"];
+        return [$"Attack", $"Ability", $"Items"];
     }
 
     private string[] BuildAbilityItems()
@@ -168,12 +173,43 @@ public class CommandMenuUi
 
     private string[] BuildItemTargetItems()
     {
-        // For items, target is always a party member
-        var items = _aliveParty?.Select(e => e.Name).ToList() ?? [];
+        if (_selectedItemTemplate == null)
+        {
+            var fallback = _aliveParty?.Select(e => e.Name).ToList() ?? [];
+            if (fallback.Count == 0) fallback.Add("(No valid targets)");
+            fallback.Add("Back");
+            return [.. fallback];
+        }
+
+        var isLifeRestore = HasLifeRestoreEffect(_selectedItemTemplate);
+        var pool = isLifeRestore ? _allParty?.Where(e => !e.IsAlive).ToList() : _aliveParty;
+
+        var items = (pool ?? []).Select(e =>
+        {
+            var name = e.Name;
+            if (!e.IsAlive) name += " (Dead)";
+            return name;
+        }).ToList();
+
         if (items.Count == 0)
-            items.Add("(No valid targets)");
+            items.Add(isLifeRestore ? "(No dead members)" : "(No valid targets)");
         items.Add("Back");
         return [.. items];
+    }
+
+    private static bool HasLifeRestoreEffect(ItemTemplate template)
+    {
+        if (!template.Variables.ContainsKey(CoreTemplateVariableTypes.Effects)) return false;
+        var effects = template.Variables[CoreTemplateVariableTypes.Effects];
+        if (effects is not System.Collections.IEnumerable enumerable) return false;
+        foreach (var effect in enumerable)
+        {
+            if (effect is OpenRpg.Core.Effects.StaticEffect se &&
+                (se.EffectType == GenreEffectTypes.LifeRestoreAmount ||
+                 se.EffectType == GenreEffectTypes.LifeRestorePercentage))
+                return true;
+        }
+        return false;
     }
 
     private void BuildGumElements()
@@ -448,8 +484,11 @@ public class CommandMenuUi
 
     private void HandleItemTargetConfirm()
     {
-        var targetCount = _aliveParty?.Count ?? 0;
-        if (_aliveParty == null || _selectedIndex >= targetCount)
+        var isLifeRestore = _selectedItemTemplate != null && HasLifeRestoreEffect(_selectedItemTemplate);
+        var pool = isLifeRestore ? _allParty?.Where(e => !e.IsAlive).ToList() : _aliveParty;
+        var targetCount = pool?.Count ?? 0;
+
+        if (pool == null || _selectedIndex >= targetCount)
         {
             // Back to item select
             _selectedIndex = 0;
@@ -459,7 +498,7 @@ public class CommandMenuUi
 
         if (_selectedItemData == null) return;
 
-        var target = _aliveParty[_selectedIndex];
+        var target = pool[_selectedIndex];
         var itemCopy = new ItemData { TemplateId = _selectedItemData.TemplateId };
 
         FireAction(new PlayerAction
@@ -559,7 +598,12 @@ public class CommandMenuUi
             if (index == poolCount) return true;
         }
         if (_currentScreen == MenuScreen.ItemSelect && index == (_inventoryItems?.Count ?? 0)) return true;
-        if (_currentScreen == MenuScreen.ItemTargetSelect && index == (_aliveParty?.Count ?? 0)) return true;
+        if (_currentScreen == MenuScreen.ItemTargetSelect)
+        {
+            var isLifeRestore = _selectedItemTemplate != null && HasLifeRestoreEffect(_selectedItemTemplate);
+            var pool = isLifeRestore ? _allParty?.Where(e => !e.IsAlive).ToList() : _aliveParty;
+            if (index == (pool?.Count ?? 0)) return true;
+        }
         return false;
     }
 }

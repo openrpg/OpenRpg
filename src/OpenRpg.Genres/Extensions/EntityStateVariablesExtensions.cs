@@ -44,6 +44,9 @@ namespace OpenRpg.Genres.Extensions
             { state.AddValue(GenreEntityStateVariableTypes.Health, -change, 0, maxHealth.Value); }
         }
         
+        public static void RestoreLife(this EntityStateVariables state, int amount, int? maxHealth = null)
+        { state.Health = Math.Max(1, maxHealth.HasValue ? Math.Min(amount, maxHealth.Value) : amount); }
+        
         public static void ApplyDamageToTarget(this EntityStateVariables state, ProcessedAttack attack)
         {
             var summedAttack = attack.DamageDone.Sum(x => x.Value);
@@ -72,7 +75,7 @@ namespace OpenRpg.Genres.Extensions
             else
             { state.AddValue(GenreEntityStateVariableTypes.Stamina, change, 0, maxStamina.Value); }
         }
-
+        
         public static void DeductStamina(this EntityStateVariables state, int change, int? maxStamina = null)
         {
             if (maxStamina == null)

@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using OpenRpg.Core.Effects;
+using OpenRpg.Core.Extensions;
 using OpenRpg.Data;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle;
@@ -221,7 +222,7 @@ public class CharacterMenuScene : IScene
             Screen.CharacterDetail => SlotOrder.Length + 1, // equipment slots + Back
             Screen.EquipmentSelect => GetEquipmentItemCount(),
             Screen.Inventory => _gameState.SharedInventory.Count + 1, // items + Back
-            Screen.ItemTargetSelect => _gameState.Party.Count(e => e.IsAlive) + 1, // alive party members + Back
+            Screen.ItemTargetSelect => GetItemTargetSelectCount(),
             _ => 0
         };
     }
@@ -679,6 +680,8 @@ public class CharacterMenuScene : IScene
             ? _localeDataSource.Get("en-gb", _itemToUseTemplate.NameLocaleId)
             : "Item";
 
+        var isLifeRestore = _itemToUseTemplate != null && HasLifeRestoreEffect(_itemToUseTemplate);
+
         TextHelper.DrawStringWithSpacing(sb, _font,
             $"USE {itemName.ToUpper()} ON WHICH MEMBER?",
             new Vector2(400, 8), Color.White, centered: true);
@@ -695,9 +698,9 @@ public class CharacterMenuScene : IScene
 
         foreach (var member in _gameState.Party)
         {
-            if (!member.IsAlive)
+            if (!isLifeRestore && !member.IsAlive)
             {
-                idx++;
+                // For heal items, skip dead members entirely
                 continue;
             }
 
@@ -705,10 +708,20 @@ public class CharacterMenuScene : IScene
             if (isSelected)
                 DrawRect(sb, panelX + 6, y - 2, panelW - 12, 24, new Color(60, 60, 90));
 
+            var displayName = member.Name;
+            var hpMpText = !member.IsAlive
+                ? "(Dead)"
+                : $"(HP: {member.Hp}/{member.MaxHp}  MP: {member.Mana}/{member.MaxMana})";
+
+            var color = isSelected
+                ? Color.White
+                : member.IsAlive
+                    ? new Color(180, 180, 190)
+                    : Color.Gray;
+
             TextHelper.DrawStringWithSpacing(sb, _font,
-                $"{member.Name}  (HP: {member.Hp}/{member.MaxHp}  MP: {member.Mana}/{member.MaxMana})",
-                new Vector2(panelX + 20, y),
-                isSelected ? Color.White : new Color(180, 180, 190));
+                $"{displayName}  {hpMpText}",
+                new Vector2(panelX + 20, y), color);
 
             y += 28;
             idx++;
@@ -862,9 +875,12 @@ public class CharacterMenuScene : IScene
 
     private void HandleItemTargetConfirm()
     {
-        // Count only alive party members
-        var aliveMembers = _gameState.Party.Where(e => e.IsAlive).ToList();
-        if (_selectedIndex >= aliveMembers.Count)
+        var isLifeRestore = _itemToUseTemplate != null && HasLifeRestoreEffect(_itemToUseTemplate);
+        var targetPool = isLifeRestore
+            ? _gameState.Party.Where(e => !e.IsAlive).ToList()
+            : _gameState.Party.Where(e => e.IsAlive).ToList();
+
+        if (_selectedIndex >= targetPool.Count)
         {
             // Back to inventory
             _selectedIndex = _gameState.SharedInventory.IndexOf(_itemToUseData);
@@ -875,7 +891,7 @@ public class CharacterMenuScene : IScene
 
         if (_itemToUseData == null || _itemToUseTemplate == null) return;
 
-        var target = aliveMembers[_selectedIndex];
+        var target = targetPool[_selectedIndex];
 
         // Apply item effects to the target
         ApplyItemToTarget(target);
@@ -915,7 +931,38 @@ public class CharacterMenuScene : IScene
                 var restoreAmount = (int)se.Potency;
                 target.Entity.State.Mana = (int)Math.Min(target.Mana + restoreAmount, target.MaxMana);
             }
+            else if (se.EffectType == GenreEffectTypes.LifeRestoreAmount)
+            {
+                var reviveHp = (int)se.Potency;
+                target.Entity.State.RestoreLife(reviveHp, target.MaxHp);
+            }
+            else if (se.EffectType == GenreEffectTypes.LifeRestorePercentage)
+            {
+                var reviveHp = (int)(target.MaxHp * se.Potency);
+                target.Entity.State.RestoreLife(reviveHp, target.MaxHp);
+            }
         }
+    }
+
+    private static bool HasLifeRestoreEffect(ItemTemplate template)
+    {
+        if (template.Variables.Effects == null) return false;
+        foreach (var effect in template.Variables.Effects)
+        {
+            if (effect is StaticEffect se &&
+                (se.EffectType == GenreEffectTypes.LifeRestoreAmount ||
+                 se.EffectType == GenreEffectTypes.LifeRestorePercentage))
+                return true;
+        }
+        return false;
+    }
+
+    private int GetItemTargetSelectCount()
+    {
+        var isLifeRestore = _itemToUseTemplate != null && HasLifeRestoreEffect(_itemToUseTemplate);
+        if (isLifeRestore)
+            return _gameState.Party.Count(e => !e.IsAlive) + 1; // dead members + Back
+        return _gameState.Party.Count(e => e.IsAlive) + 1; // alive members + Back
     }
 
     private void GoBack()

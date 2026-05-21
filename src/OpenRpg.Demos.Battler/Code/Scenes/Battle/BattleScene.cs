@@ -193,7 +193,7 @@ public class BattleScene : IScene
                     var aliveParty = Party.Where(e => e.IsAlive).ToList();
                     var abilities = _turnManager.GetAvailableAbilities(_turnManager.CurrentAttacker);
                     _commandMenu.Show(_turnManager.CurrentAttacker, aliveEnemies, abilities, _localeDataSource,
-                        _gameState.SharedInventory, aliveParty, _dataSource);
+                        _gameState.SharedInventory, aliveParty, _dataSource, Party);
                 }
 
             _commandMenu.HandleInput(currentKeyboard, _previousKeyboard);

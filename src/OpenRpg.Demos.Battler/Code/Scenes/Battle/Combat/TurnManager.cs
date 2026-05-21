@@ -343,6 +343,7 @@ public class TurnManager
         var targetName = NameHelper.NormalizeName(target.Name);
         var healAmount = 0;
         var manaAmount = 0;
+        var reviveAmount = 0;
 
         if (template.Variables.Effects != null)
         {
@@ -372,6 +373,20 @@ public class TurnManager
                     var newMp = (int)Math.Min(target.Mana + manaAmount, target.MaxMana);
                     target.Entity.State.Mana = newMp;
                 }
+                else if (se.EffectType == GenreEffectTypes.LifeRestoreAmount)
+                {
+                    var reviveHp = (int)se.Potency;
+                    target.Entity.State.RestoreLife(reviveHp, target.MaxHp);
+                    reviveAmount = target.Hp;
+                    OnDamageDealt?.Invoke(target, -target.Hp, false);
+                }
+                else if (se.EffectType == GenreEffectTypes.LifeRestorePercentage)
+                {
+                    var reviveHp = (int)(target.MaxHp * se.Potency);
+                    target.Entity.State.RestoreLife(reviveHp, target.MaxHp);
+                    reviveAmount = target.Hp;
+                    OnDamageDealt?.Invoke(target, -target.Hp, false);
+                }
             }
         }
 
@@ -379,6 +394,8 @@ public class TurnManager
             LastActionMessage = $"{attackerName} uses {itemName} on {targetName}, healing {healAmount} HP!";
         else if (manaAmount > 0)
             LastActionMessage = $"{attackerName} uses {itemName} on {targetName}, restoring {manaAmount} MP!";
+        else if (reviveAmount > 0)
+            LastActionMessage = $"{attackerName} uses {itemName} on {targetName}, reviving with {reviveAmount} HP!";
         else
             LastActionMessage = $"{attackerName} uses {itemName} on {targetName}.";
     }
