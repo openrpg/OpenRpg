@@ -113,13 +113,13 @@
   },
   {
     "Id": 9,
-    "NameLocaleId": "ability-smite",
-    "DescriptionLocaleId": "ability-smite-desc",
+    "NameLocaleId": "ability-cure",
+    "DescriptionLocaleId": "ability-cure-desc",
     "Variables": {
-      "2": { "Type": 84, "Value": 15.0 },
+      "2": { "Type": 90, "Value": 45.0 },
       "5": 1,
       "7": 1,
-      "40": 6,
+      "40": 8,
       "4003": [
         { "RequirementType": 2, "Association": { "AssociatedId": 3, "AssociatedValue": 0 } }
       ]
@@ -127,13 +127,13 @@
   },
   {
     "Id": 10,
-    "NameLocaleId": "ability-holy",
-    "DescriptionLocaleId": "ability-holy-desc",
+    "NameLocaleId": "ability-cura",
+    "DescriptionLocaleId": "ability-cura-desc",
     "Variables": {
-      "2": { "Type": 84, "Value": 22.0 },
-      "5": 1,
-      "7": 1,
-      "40": 12,
+      "2": { "Type": 90, "Value": 18.0 },
+      "5": 2,
+      "7": 4,
+      "40": 14,
       "4003": [
         { "RequirementType": 2, "Association": { "AssociatedId": 3, "AssociatedValue": 0 } }
       ]

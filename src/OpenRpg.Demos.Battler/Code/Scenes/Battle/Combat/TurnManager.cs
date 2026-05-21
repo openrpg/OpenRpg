@@ -233,6 +233,7 @@ public class TurnManager
     private void ExecuteAbility(BattleEntity attacker, AbilityTemplate template, List<BattleEntity> specificTargets = null)
     {
         var baseDamage = template.Variables.GetAsOrDefault<Damage>(CombatAbilityTemplateVariableTypes.Damage, () => new Damage(0, 0));
+        var isHealing = baseDamage.Type >= 90;
         var targetType = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetType, 1);
         var targetCount = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetCount, 1);
         var manaCost = template.Variables.GetIntOrDefault(FantasyAbilityTemplateVariableTypes.ManaCost, 0);
@@ -247,8 +248,11 @@ public class TurnManager
         }
         else
         {
-            var targets = attacker.Team == Team.Player ? _enemies : _party;
-            var aliveTargets = targets.Where(e => e.IsAlive).ToList();
+            // Healing abilities target allies; damage abilities target enemies
+            var pool = isHealing
+                ? (attacker.Team == Team.Player ? _party : _enemies)
+                : (attacker.Team == Team.Player ? _enemies : _party);
+            var aliveTargets = pool.Where(e => e.IsAlive).ToList();
             var actualTargetCount = targetType == CombatTargetTypes.MultipleTarget
                 ? Math.Min(targetCount, aliveTargets.Count) : 1;
             if (actualTargetCount == 0) return;
@@ -257,28 +261,50 @@ public class TurnManager
 
         CurrentTargets = selected;
 
-        var damageCopy = new Damage(baseDamage.Type, baseDamage.Value);
-        var attack = _attackGenerator.GenerateAttack(damageCopy, attacker.Entity.Stats);
-
         var abilityName = _localeDataSource.Get("en-gb", template.NameLocaleId);
         var attackerName = NameHelper.NormalizeName(attacker.Name);
-        var totalDamage = 0;
 
-        foreach (var target in selected)
+        if (isHealing)
         {
-            var processed = _attackProcessor.ProcessAttack(attack, target.Entity.Stats);
-            var dmg = (int)Math.Max(1, processed.DamageDone.Sum(d => d.Value));
-            target.Entity.State.DeductHealth(dmg);
-            OnDamageDealt?.Invoke(target, dmg, attack.IsCritical);
-            totalDamage += dmg;
-        }
+            var totalHeal = 0;
+            foreach (var target in selected)
+            {
+                var healValue = (int)Math.Max(1, baseDamage.Value);
+                var newHp = Math.Min(target.Hp + healValue, target.MaxHp);
+                var actualHeal = newHp - target.Hp;
+                target.Hp = newHp;
+                OnDamageDealt?.Invoke(target, -actualHeal, false);
+                totalHeal += actualHeal;
+            }
 
-        var avgDamage = selected.Count > 0 ? totalDamage / selected.Count : 0;
-        var targetNames = selected.Select(t => NameHelper.NormalizeName(t.Name)).ToList();
-        var critSuffix = attack.IsCritical ? " (CRIT!)" : "";
-        LastActionMessage = selected.Count == 1
-            ? $"{attackerName} uses {abilityName} on {targetNames[0]} for {avgDamage} damage{critSuffix}"
-            : $"{attackerName} uses {abilityName} on {string.Join(", ", targetNames)} for {avgDamage} damage each{critSuffix}";
+            var avgHeal = selected.Count > 0 ? totalHeal / selected.Count : 0;
+            var targetNames = selected.Select(t => NameHelper.NormalizeName(t.Name)).ToList();
+            LastActionMessage = selected.Count == 1
+                ? $"{attackerName} uses {abilityName} on {targetNames[0]}, healing {avgHeal} HP!"
+                : $"{attackerName} uses {abilityName} on {string.Join(", ", targetNames)}, healing {avgHeal} HP each!";
+        }
+        else
+        {
+            var damageCopy = new Damage(baseDamage.Type, baseDamage.Value);
+            var attack = _attackGenerator.GenerateAttack(damageCopy, attacker.Entity.Stats);
+
+            var totalDamage = 0;
+            foreach (var target in selected)
+            {
+                var processed = _attackProcessor.ProcessAttack(attack, target.Entity.Stats);
+                var dmg = (int)Math.Max(1, processed.DamageDone.Sum(d => d.Value));
+                target.Entity.State.DeductHealth(dmg);
+                OnDamageDealt?.Invoke(target, dmg, attack.IsCritical);
+                totalDamage += dmg;
+            }
+
+            var avgDamage = selected.Count > 0 ? totalDamage / selected.Count : 0;
+            var targetNames = selected.Select(t => NameHelper.NormalizeName(t.Name)).ToList();
+            var critSuffix = attack.IsCritical ? " (CRIT!)" : "";
+            LastActionMessage = selected.Count == 1
+                ? $"{attackerName} uses {abilityName} on {targetNames[0]} for {avgDamage} damage{critSuffix}"
+                : $"{attackerName} uses {abilityName} on {string.Join(", ", targetNames)} for {avgDamage} damage each{critSuffix}";
+        }
     }
 
     private void ExecuteBasicAttack(BattleEntity specificTarget = null)

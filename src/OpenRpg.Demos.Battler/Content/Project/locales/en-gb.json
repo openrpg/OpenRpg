@@ -81,9 +81,9 @@
     "ability-fire-bolt-desc": "A bolt of searing fire.",
     "ability-ice-storm": "Ice Storm",
     "ability-ice-storm-desc": "A freezing storm that assails all enemies.",
-    "ability-smite": "Smite",
-    "ability-smite-desc": "A blast of holy light.",
-    "ability-holy": "Holy",
-    "ability-holy-desc": "A powerful beam of sacred radiance."
+    "ability-cure": "Cure",
+    "ability-cure-desc": "Heals a single ally for a moderate amount of HP.",
+    "ability-cura": "Cura",
+    "ability-cura-desc": "Heals the entire party for a small amount of HP."
   }
 }

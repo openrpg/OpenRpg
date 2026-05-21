@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGameGum;
 using MonoGameGum.GueDeriving;
 using OpenRpg.Combat.Abilities;
+using OpenRpg.Combat.Attacks;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Combat.Types;
 using OpenRpg.Core.Extensions;
@@ -37,6 +38,7 @@ public class CommandMenuUi
     private List<ItemData> _inventoryItems;
     private ItemData _selectedItemData;
     private ItemTemplate _selectedItemTemplate;
+    private bool _targetingParty;
 
     private ColoredRectangleRuntime _menuBg;
     private ColoredRectangleRuntime _tooltipBg;
@@ -62,8 +64,9 @@ public class CommandMenuUi
         {
             if (_currentScreen == MenuScreen.TargetSelect)
             {
-                if (_selectedIndex < _aliveEnemies.Count)
-                    return [_aliveEnemies[_selectedIndex]];
+                var pool = _targetingParty ? _aliveParty : _aliveEnemies;
+                if (pool != null && _selectedIndex < pool.Count)
+                    return [pool[_selectedIndex]];
                 return [];
             }
 
@@ -72,12 +75,16 @@ public class CommandMenuUi
                 var (template, _, canAfford) = _availableAbilities[_selectedIndex];
                 if (!canAfford) return [];
 
+                var damage = template.Variables.GetAsOrDefault<Damage>(CombatAbilityTemplateVariableTypes.Damage, () => new Damage(0, 0));
+                var isHealing = damage.Type >= 90;
                 var targetType = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetType, 1);
                 if (targetType == CombatTargetTypes.MultipleTarget)
                 {
+                    var pool = isHealing ? _aliveParty : _aliveEnemies;
+                    if (pool == null) return [];
                     var targetCount = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetCount, 1);
-                    var actualCount = Math.Min(targetCount, _aliveEnemies.Count);
-                    return _aliveEnemies.Take(actualCount).ToList();
+                    var actualCount = Math.Min(targetCount, pool.Count);
+                    return pool.Take(actualCount).ToList();
                 }
             }
 
@@ -98,6 +105,7 @@ public class CommandMenuUi
         _aliveEnemies = aliveEnemies;
         _availableAbilities = abilities;
         _selectedAbility = null;
+        _targetingParty = false;
         _localeDataSource = localeDataSource;
         _inventoryItems = inventoryItems;
         _aliveParty = aliveParty;
@@ -134,7 +142,8 @@ public class CommandMenuUi
 
     private string[] BuildTargetItems()
     {
-        var items = _aliveEnemies.Select(e => e.Name).ToList();
+        var pool = _targetingParty ? _aliveParty : _aliveEnemies;
+        var items = (pool ?? []).Select(e => e.Name).ToList();
         items.Add("Back");
         return [.. items];
     }
@@ -341,6 +350,7 @@ public class CommandMenuUi
         {
             case 0:
                 _selectedAbility = null;
+                _targetingParty = false;
                 SwitchToScreen(MenuScreen.TargetSelect, BuildTargetItems());
                 break;
             case 1:
@@ -370,13 +380,17 @@ public class CommandMenuUi
 
         _selectedAbility = template;
 
+        var damage = template.Variables.GetAsOrDefault<Damage>(CombatAbilityTemplateVariableTypes.Damage, () => new Damage(0, 0));
+        var isHealing = damage.Type >= 90;
         var targetType = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetType, 1);
         var targetCount = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetCount, 1);
 
         if (targetType == CombatTargetTypes.MultipleTarget)
         {
-            var actualCount = Math.Min(targetCount, _aliveEnemies.Count);
-            var targets = _aliveEnemies.Take(actualCount).ToList();
+            var pool = isHealing ? _aliveParty : _aliveEnemies;
+            if (pool == null || pool.Count == 0) return;
+            var actualCount = Math.Min(targetCount, pool.Count);
+            var targets = pool.Take(actualCount).ToList();
             FireAction(new PlayerAction
             {
                 Type = ActionType.Ability,
@@ -386,21 +400,26 @@ public class CommandMenuUi
         }
         else
         {
+            _targetingParty = isHealing;
             SwitchToScreen(MenuScreen.TargetSelect, BuildTargetItems());
         }
     }
 
     private void HandleTargetConfirm()
     {
-        if (_selectedIndex == _aliveEnemies.Count)
+        var pool = _targetingParty ? _aliveParty : _aliveEnemies;
+        var poolCount = pool?.Count ?? 0;
+
+        if (_selectedIndex == poolCount)
         {
             var backScreen = _selectedAbility != null ? MenuScreen.AbilitySelect : MenuScreen.MainMenu;
             var backItems = _selectedAbility != null ? BuildAbilityItems() : BuildMainMenuItems();
+            _targetingParty = false;
             SwitchToScreen(backScreen, backItems);
             return;
         }
 
-        var target = _aliveEnemies[_selectedIndex];
+        var target = pool![_selectedIndex];
 
         FireAction(_selectedAbility != null
             ? new PlayerAction { Type = ActionType.Ability, Ability = _selectedAbility, Targets = [target] }
@@ -463,6 +482,7 @@ public class CommandMenuUi
                 SwitchToScreen(MenuScreen.MainMenu, BuildMainMenuItems());
                 break;
             case MenuScreen.TargetSelect:
+                _targetingParty = false;
                 if (_selectedAbility != null)
                     SwitchToScreen(MenuScreen.AbilitySelect, BuildAbilityItems());
                 else
@@ -533,7 +553,11 @@ public class CommandMenuUi
     private bool IsBackItem(int index)
     {
         if (_currentScreen == MenuScreen.AbilitySelect && index == _availableAbilities.Count) return true;
-        if (_currentScreen == MenuScreen.TargetSelect && index == _aliveEnemies.Count) return true;
+        if (_currentScreen == MenuScreen.TargetSelect)
+        {
+            var poolCount = _targetingParty ? (_aliveParty?.Count ?? 0) : (_aliveEnemies?.Count ?? 0);
+            if (index == poolCount) return true;
+        }
         if (_currentScreen == MenuScreen.ItemSelect && index == (_inventoryItems?.Count ?? 0)) return true;
         if (_currentScreen == MenuScreen.ItemTargetSelect && index == (_aliveParty?.Count ?? 0)) return true;
         return false;
