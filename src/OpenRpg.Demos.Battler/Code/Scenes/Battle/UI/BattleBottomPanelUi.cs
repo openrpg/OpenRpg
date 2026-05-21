@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGameGum;
 using MonoGameGum.GueDeriving;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
 
 public class BattleBottomPanelUi
 {
@@ -32,14 +33,6 @@ public class BattleBottomPanelUi
     private const int RowStartY = 414;
     private const int RowSpacing = 24;
 
-    private static readonly Color HpGreen = new(80, 200, 60);
-    private static readonly Color HpYellow = new(220, 200, 40);
-    private static readonly Color HpRed = new(200, 40, 40);
-    private static readonly Color HpBarBgColor = new(40, 40, 50);
-    private static readonly Color EnemyNameColor = new(220, 150, 150);
-    private static readonly Color PartyNameColor = new(150, 180, 220);
-    private static readonly Color HpTextColor = new(200, 200, 200);
-
     public BattleBottomPanelUi()
     {
         _panelBg = new ColoredRectangleRuntime();
@@ -47,7 +40,7 @@ public class BattleBottomPanelUi
         _panelBg.Height = 220;
         _panelBg.X = 0;
         _panelBg.Y = 380;
-        SetRectColor(_panelBg, new Color(10, 10, 25) * 0.9f);
+        _panelBg.SetRectColor(Palette.PanelBg * 0.9f);
         _panelBg.AddToRoot();
 
         for (var i = 0; i < MaxEnemyRows; i++)
@@ -67,6 +60,12 @@ public class BattleBottomPanelUi
 
     public void Update(List<BattleEntity> party, List<BattleEntity> enemies)
     {
+        UpdateEnemyRows(enemies);
+        UpdatePartyRows(party);
+    }
+
+    private void UpdateEnemyRows(List<BattleEntity> enemies)
+    {
         _enemyNames.Clear();
         _enemyHps.Clear();
         _enemyMaxHps.Clear();
@@ -85,9 +84,7 @@ public class BattleBottomPanelUi
                 _enemyHps.Add(e.Hp);
                 _enemyMaxHps.Add(e.MaxHp);
                 _enemyAlive.Add(e.IsAlive);
-                var ratio = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0f;
-                _enemyHpBarFills[i].Width = ratio * 100;
-                SetRectColor(_enemyHpBarFills[i], RatioToColor(ratio));
+                UpdateHpBarFill(_enemyHpBarFills[i], e);
             }
             else
             {
@@ -97,7 +94,10 @@ public class BattleBottomPanelUi
                 _enemyAlive.Add(false);
             }
         }
+    }
 
+    private void UpdatePartyRows(List<BattleEntity> party)
+    {
         _partyNames.Clear();
         _partyHps.Clear();
         _partyMaxHps.Clear();
@@ -120,9 +120,7 @@ public class BattleBottomPanelUi
                 _partyManas.Add(e.Mana);
                 _partyMaxManas.Add(e.MaxMana);
                 _partyAlive.Add(e.IsAlive);
-                var ratio = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0f;
-                _partyHpBarFills[i].Width = ratio * 100;
-                SetRectColor(_partyHpBarFills[i], RatioToColor(ratio));
+                UpdateHpBarFill(_partyHpBarFills[i], e);
             }
             else
             {
@@ -136,6 +134,13 @@ public class BattleBottomPanelUi
         }
     }
 
+    private static void UpdateHpBarFill(ColoredRectangleRuntime fill, BattleEntity e)
+    {
+        var ratio = e.MaxHp > 0 ? (float)e.Hp / e.MaxHp : 0f;
+        fill.Width = ratio * 100;
+        fill.SetRectColor(Palette.RatioToColor(ratio));
+    }
+
     public void Draw(SpriteBatch sb, SpriteFont font)
     {
         var headerY = 392;
@@ -147,9 +152,10 @@ public class BattleBottomPanelUi
             if (!_enemyHpBarBgs[i].Visible) continue;
 
             var y = RowStartY + i * RowSpacing;
-            TextHelper.DrawStringWithSpacing(sb, font, NormalizeName(_enemyNames[i]), new Vector2(6, y), _enemyAlive[i] ? EnemyNameColor : Color.Gray);
+            TextHelper.DrawStringWithSpacing(sb, font, NameHelper.NormalizeName(_enemyNames[i]),
+                new Vector2(6, y), _enemyAlive[i] ? Palette.EnemyName : Color.Gray);
             var hpText = $"{_enemyHps[i]}/{_enemyMaxHps[i]}";
-            TextHelper.DrawStringWithSpacing(sb, font, hpText, new Vector2(254, y), HpTextColor);
+            TextHelper.DrawStringWithSpacing(sb, font, hpText, new Vector2(254, y), Palette.HpText);
         }
 
         for (var i = 0; i < MaxPartyRows; i++)
@@ -157,20 +163,16 @@ public class BattleBottomPanelUi
             if (!_partyHpBarBgs[i].Visible) continue;
 
             var y = RowStartY + i * RowSpacing;
-            TextHelper.DrawStringWithSpacing(sb, font, NormalizeName(_partyNames[i]), new Vector2(404, y), _partyAlive[i] ? PartyNameColor : Color.Gray);
+            TextHelper.DrawStringWithSpacing(sb, font, NameHelper.NormalizeName(_partyNames[i]),
+                new Vector2(404, y), _partyAlive[i] ? Palette.PartyName : Color.Gray);
             var hpText = $"{_partyHps[i]}/{_partyMaxHps[i]}";
-            TextHelper.DrawStringWithSpacing(sb, font, hpText, new Vector2(652, y), HpTextColor);
+            TextHelper.DrawStringWithSpacing(sb, font, hpText, new Vector2(652, y), Palette.HpText);
             if (_partyMaxManas[i] > 0)
             {
                 var mpText = $"MP:{_partyManas[i]}/{_partyMaxManas[i]}";
-                TextHelper.DrawStringWithSpacing(sb, font, mpText, new Vector2(652, y + 12), new Color(100, 160, 255));
+                TextHelper.DrawStringWithSpacing(sb, font, mpText, new Vector2(652, y + 12), Palette.MpText);
             }
         }
-    }
-
-    private static string NormalizeName(string name)
-    {
-        return Regex.Replace(name, "(?<=[a-z])(?=[A-Z])", " ");
     }
 
     public void Unload()
@@ -189,7 +191,7 @@ public class BattleBottomPanelUi
         rect.Y = y + 2;
         rect.Width = 100;
         rect.Height = 14;
-        SetRectColor(rect, HpBarBgColor);
+        rect.SetRectColor(Palette.PanelHpBarBg);
         rect.AddToRoot();
         return rect;
     }
@@ -201,23 +203,8 @@ public class BattleBottomPanelUi
         rect.Y = y + 2;
         rect.Width = 100;
         rect.Height = 14;
-        SetRectColor(rect, HpGreen);
+        rect.SetRectColor(Palette.HpGreen);
         rect.AddToRoot();
         return rect;
-    }
-
-    private static void SetRectColor(ColoredRectangleRuntime rect, Color color)
-    {
-        rect.Red = color.R;
-        rect.Green = color.G;
-        rect.Blue = color.B;
-        rect.Alpha = color.A;
-    }
-
-    private static Color RatioToColor(float ratio)
-    {
-        if (ratio > 0.5f) return HpGreen;
-        if (ratio > 0.25f) return HpYellow;
-        return HpRed;
     }
 }

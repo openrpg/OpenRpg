@@ -4,9 +4,7 @@ using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
-
-public enum Team { Player, Enemy }
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 
 public class BattleEntity
 {

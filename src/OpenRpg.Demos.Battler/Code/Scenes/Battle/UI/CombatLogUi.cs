@@ -2,8 +2,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGameGum;
 using MonoGameGum.GueDeriving;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
 
 public class CombatLogUi
 {
@@ -15,8 +16,6 @@ public class CombatLogUi
     private const int TextX = 6;
     private const int TextY = 316;
 
-    private static readonly Color BarColor = new(10, 10, 25);
-
     public CombatLogUi()
     {
         _bg = new ColoredRectangleRuntime
@@ -26,7 +25,7 @@ public class CombatLogUi
             Width = 800,
             Height = BarH
         };
-        SetRectColor(_bg, BarColor * 0.85f);
+        _bg.SetRectColor(Palette.CombatLogBg);
         _bg.AddToRoot();
     }
 
@@ -43,13 +42,5 @@ public class CombatLogUi
     public void Unload()
     {
         _bg.RemoveFromRoot();
-    }
-
-    private static void SetRectColor(ColoredRectangleRuntime rect, Color color)
-    {
-        rect.Red = color.R;
-        rect.Green = color.G;
-        rect.Blue = color.B;
-        rect.Alpha = color.A;
     }
 }

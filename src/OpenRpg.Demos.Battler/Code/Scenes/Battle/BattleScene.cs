@@ -8,11 +8,16 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using OpenRpg.Combat.Processors.Attacks.Entity;
 using OpenRpg.Data;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Combat;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Providers;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
 using OpenRpg.Demos.Battler.Code.Services.Game;
 using OpenRpg.Genres.Requirements;
 using OpenRpg.Localization.Data.DataSources;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle;
 
 public class BattleScene : IScene
 {
@@ -29,6 +34,7 @@ public class BattleScene : IScene
     private readonly TurnManager _turnManager;
     private readonly SpriteCache _spriteCache = new();
     private readonly EntityRenderer _entityRenderer = new();
+    private readonly List<FloatingDamageNumber> _floatingNumbers = [];
 
     private BattleBottomPanelUi _bottomPanel;
     private TurnOrderUi _turnOrderUi;
@@ -38,7 +44,6 @@ public class BattleScene : IScene
     private double _totalTime;
     private SpriteFont _font;
     private bool _loaded;
-    private readonly List<FloatingDamageNumber> _floatingNumbers = [];
 
     public List<BattleEntity> Party { get; private set; } = [];
     public List<BattleEntity> Enemies { get; private set; } = [];
@@ -168,7 +173,6 @@ public class BattleScene : IScene
             _commandMenu.HandleInput(currentKeyboard, _previousKeyboard);
             _previousKeyboard = currentKeyboard;
 
-            // Sync highlighted targets from menu selection to turn manager for visual feedback
             _turnManager.HighlightedTargets = _commandMenu.PreviewTargets;
         }
         else if (!_commandMenu.IsHidden)
@@ -204,7 +208,6 @@ public class BattleScene : IScene
     {
         if (!_loaded) return;
 
-        // Draw floating damage numbers
         foreach (var fn in _floatingNumbers)
         {
             var text = fn.IsCrit ? $"CRIT! {fn.Damage}" : fn.Damage.ToString();

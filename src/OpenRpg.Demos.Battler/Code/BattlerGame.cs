@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGameGum;
 using OpenRpg.Data;
 using OpenRpg.Demos.Battler.Code.Scenes;
-using OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle;
 using OpenRpg.Demos.Battler.Code.Services.Game;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Entity.Templates;

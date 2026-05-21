@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenRpg.Data;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Entities.Entity.Templates;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Genres.Characters;
@@ -10,7 +11,7 @@ using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Populators.Entity;
 using OpenRpg.Localization.Data.DataSources;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Providers;
 
 public class EnemyFormationProvider : IEnemyFormationProvider
 {

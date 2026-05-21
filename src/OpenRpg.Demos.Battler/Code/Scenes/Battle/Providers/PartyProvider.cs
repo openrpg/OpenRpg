@@ -5,12 +5,13 @@ using OpenRpg.Combat.Extensions;
 using OpenRpg.Combat.Types;
 using OpenRpg.Data;
 using OpenRpg.Demos.Battler.Code.Builders;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Types;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Localization.Data.DataSources;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Providers;
 
 public class PartyProvider : IPartyProvider
 {

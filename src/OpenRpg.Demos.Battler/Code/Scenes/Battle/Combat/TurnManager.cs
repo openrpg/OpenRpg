@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Attacks;
 using OpenRpg.Combat.Extensions;
@@ -13,13 +12,15 @@ using OpenRpg.Core.Requirements;
 using OpenRpg.Data;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Types;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Genres.Requirements;
 using OpenRpg.Localization.Data.DataSources;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Combat;
 
 public class TurnManager
 {
@@ -36,7 +37,7 @@ public class TurnManager
     public enum Phase { Idle, TurnDwell, TargetFlash, GameOver, PlayerInput }
     public Phase CurrentPhase { get; private set; } = Phase.Idle;
     public BattleEntity CurrentAttacker { get; private set; }
-    public List<BattleEntity> CurrentTargets { get; private set; } = [];
+    public IReadOnlyList<BattleEntity> CurrentTargets { get; private set; } = [];
     public Team WinningTeam { get; private set; }
     public int CurrentTurnIndex { get; private set; } = -1;
     public string LastActionMessage { get; private set; } = "";
@@ -47,7 +48,12 @@ public class TurnManager
 
     public event Action<BattleEntity, int, bool> OnDamageDealt;
 
-    public TurnManager(IDataSource dataSource, ICharacterRequirementChecker requirementChecker, ILocaleDataSource localeDataSource, IEntityAttackGenerator attackGenerator, IEntityAttackProcessor attackProcessor)
+    public TurnManager(
+        IDataSource dataSource,
+        ICharacterRequirementChecker requirementChecker,
+        ILocaleDataSource localeDataSource,
+        IEntityAttackGenerator attackGenerator,
+        IEntityAttackProcessor attackProcessor)
     {
         _dataSource = dataSource;
         _requirementChecker = requirementChecker;
@@ -91,20 +97,14 @@ public class TurnManager
                 break;
 
             case Phase.PlayerInput:
-                // Waiting for BattleScene to call SubmitPlayerAction
                 break;
 
             case Phase.TargetFlash:
                 _phaseTimer += dt;
                 if (_phaseTimer >= 0.3)
                 {
-                    if (CheckGameOver())
-                        CurrentPhase = Phase.GameOver;
-                    else
-                    {
-                        CurrentPhase = Phase.Idle;
-                        _phaseTimer = 0;
-                    }
+                    CurrentPhase = CheckGameOver() ? Phase.GameOver : Phase.Idle;
+                    _phaseTimer = 0;
                 }
                 break;
         }
@@ -153,10 +153,9 @@ public class TurnManager
             }
         }
 
-        // Fallback auto logic for enemies or if player didn't provide a valid action
         if (CurrentAttacker.Team == Team.Player)
         {
-            if (TryExecuteAbility(CurrentAttacker))
+            if (TryPickAndExecuteAbility(CurrentAttacker))
                 return;
         }
 
@@ -175,13 +174,24 @@ public class TurnManager
     public List<(AbilityTemplate Template, int ManaCost, bool CanAfford)> GetAvailableAbilities(BattleEntity entity)
     {
         var result = new List<(AbilityTemplate, int, bool)>();
+        foreach (var (template, manaCost) in GetValidAbilities(entity))
+        {
+            var canAfford = entity.Mana >= manaCost;
+            result.Add((template, manaCost, canAfford));
+        }
+        return result;
+    }
 
+    private List<(AbilityTemplate Template, int ManaCost)> GetValidAbilities(BattleEntity entity)
+    {
         if (!entity.Entity.Variables.ContainsKey(CombatTemplateVariableTypes.Abilities))
-            return result;
+            return [];
 
         var abilities = entity.Entity.Variables.GetAs<List<AbilityData>>(CombatTemplateVariableTypes.Abilities);
         if (abilities == null || abilities.Count == 0)
-            return result;
+            return [];
+
+        var valid = new List<(AbilityTemplate, int)>();
 
         foreach (var abilityData in abilities)
         {
@@ -194,43 +204,21 @@ public class TurnManager
                 continue;
 
             var manaCost = template.Variables.GetIntOrDefault(FantasyAbilityTemplateVariableTypes.ManaCost, 0);
-            var canAfford = entity.Mana >= manaCost;
-            result.Add((template, manaCost, canAfford));
+            valid.Add((template, manaCost));
         }
 
-        return result;
+        return valid;
     }
 
-    private bool TryExecuteAbility(BattleEntity entity)
+    private bool TryPickAndExecuteAbility(BattleEntity entity)
     {
-        if (!entity.Entity.Variables.ContainsKey(CombatTemplateVariableTypes.Abilities))
-            return false;
+        var affordable = GetValidAbilities(entity)
+            .Where(x => entity.Mana >= x.ManaCost)
+            .ToList();
 
-        var abilities = entity.Entity.Variables.GetAs<List<AbilityData>>(CombatTemplateVariableTypes.Abilities);
-        if (abilities == null || abilities.Count == 0)
-            return false;
+        if (affordable.Count == 0) return false;
 
-        var validAbilities = new List<(AbilityData Data, AbilityTemplate Template)>();
-
-        foreach (var abilityData in abilities)
-        {
-            var template = _dataSource.Get<AbilityTemplate>(abilityData.TemplateId);
-            if (template == null) continue;
-
-            var requirements = template.Variables.GetAsOrDefault<IReadOnlyCollection<Requirement>>(CoreTemplateVariableTypes.Requirements, () => Array.Empty<Requirement>());
-            if (!_requirementChecker.AreRequirementsMet(entity.Entity, requirements))
-                continue;
-
-            var manaCost = template.Variables.GetIntOrDefault(FantasyAbilityTemplateVariableTypes.ManaCost, 0);
-            if (entity.Mana < manaCost)
-                continue;
-
-            validAbilities.Add((abilityData, template));
-        }
-
-        if (validAbilities.Count == 0) return false;
-
-        var pick = validAbilities[_rng.Next(validAbilities.Count)];
+        var pick = affordable[_rng.Next(affordable.Count)];
         ExecuteAbility(entity, pick.Template);
         return true;
     }
@@ -262,13 +250,12 @@ public class TurnManager
 
         CurrentTargets = selected;
 
-        // Clone the template damage to avoid mutation from the pipeline
         var damageCopy = new Damage(baseDamage.Type, baseDamage.Value);
         var attack = _attackGenerator.GenerateAttack(damageCopy, attacker.Entity.Stats);
 
         var abilityName = _localeDataSource.Get("en-gb", template.NameLocaleId);
-        var attackerName = NormalizeName(attacker.Name);
-        int totalDamageDealt = 0;
+        var attackerName = NameHelper.NormalizeName(attacker.Name);
+        var totalDamage = 0;
 
         foreach (var target in selected)
         {
@@ -276,16 +263,15 @@ public class TurnManager
             var dmg = (int)Math.Max(1, processed.DamageDone.Sum(d => d.Value));
             target.Entity.State.DeductHealth(dmg);
             OnDamageDealt?.Invoke(target, dmg, attack.IsCritical);
-            totalDamageDealt += dmg;
+            totalDamage += dmg;
         }
 
-        var avgDamage = selected.Count > 0 ? totalDamageDealt / selected.Count : 0;
-        var targetNames = selected.Select(t => NormalizeName(t.Name)).ToList();
+        var avgDamage = selected.Count > 0 ? totalDamage / selected.Count : 0;
+        var targetNames = selected.Select(t => NameHelper.NormalizeName(t.Name)).ToList();
         var critSuffix = attack.IsCritical ? " (CRIT!)" : "";
-        if (selected.Count == 1)
-            LastActionMessage = $"{attackerName} uses {abilityName} on {targetNames[0]} for {avgDamage} damage{critSuffix}";
-        else
-            LastActionMessage = $"{attackerName} uses {abilityName} on {string.Join(", ", targetNames)} for {avgDamage} damage each{critSuffix}";
+        LastActionMessage = selected.Count == 1
+            ? $"{attackerName} uses {abilityName} on {targetNames[0]} for {avgDamage} damage{critSuffix}"
+            : $"{attackerName} uses {abilityName} on {string.Join(", ", targetNames)} for {avgDamage} damage each{critSuffix}";
     }
 
     private void ExecuteBasicAttack(BattleEntity specificTarget = null)
@@ -307,7 +293,7 @@ public class TurnManager
         target.Entity.State.DeductHealth(totalDamage);
         OnDamageDealt?.Invoke(target, totalDamage, attack.IsCritical);
         var critSuffix = attack.IsCritical ? " (CRIT!)" : "";
-        LastActionMessage = $"{NormalizeName(CurrentAttacker.Name)} attacks {NormalizeName(target.Name)} for {totalDamage} damage{critSuffix}";
+        LastActionMessage = $"{NameHelper.NormalizeName(CurrentAttacker.Name)} attacks {NameHelper.NormalizeName(target.Name)} for {totalDamage} damage{critSuffix}";
     }
 
     private bool CheckGameOver()
@@ -323,10 +309,5 @@ public class TurnManager
             return true;
         }
         return false;
-    }
-
-    private static string NormalizeName(string name)
-    {
-        return Regex.Replace(name, "(?<=[a-z])(?=[A-Z])", " ");
     }
 }

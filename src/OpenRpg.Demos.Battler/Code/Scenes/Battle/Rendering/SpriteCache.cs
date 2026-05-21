@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
 
 public class SpriteCache
 {
@@ -32,12 +33,5 @@ public class SpriteCache
                 System.Diagnostics.Debug.WriteLine($"Missing sprite: {assetPath}");
             }
         }
-    }
-
-    public void Dispose()
-    {
-        foreach (var tex in _cache.Values)
-            tex.Dispose();
-        _cache.Clear();
     }
 }

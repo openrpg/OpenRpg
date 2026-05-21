@@ -1,38 +1,29 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Combat;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
 
 public class EntityRenderer
 {
     private Texture2D _pixel;
-    private Texture2D _hpBarBg;
-
-    private static readonly Color BackgroundColor = new(20, 20, 30);
-    private static readonly Color PlayerRectColor = new(30, 60, 140);
-    private static readonly Color PlayerRectDeadColor = new(20, 25, 40);
-    private static readonly Color EnemyRectColor = new(140, 30, 30);
-    private static readonly Color EnemyRectDeadColor = new(40, 20, 20);
-    private static readonly Color HpGreen = new(80, 200, 60);
-    private static readonly Color HpYellow = new(220, 200, 40);
-    private static readonly Color HpRed = new(200, 40, 40);
-    private static readonly Color HpBgColor = new(30, 30, 30);
 
     public void EnsureTextures(GraphicsDevice gd)
     {
         if (_pixel != null) return;
         _pixel = new Texture2D(gd, 1, 1);
         _pixel.SetData([Color.White]);
-        _hpBarBg = new Texture2D(gd, 1, 1);
-        _hpBarBg.SetData([Color.White]);
     }
 
     public void DrawBackground(SpriteBatch sb)
     {
-        sb.Draw(_pixel, new Rectangle(0, 0, 800, 600), BackgroundColor);
-        sb.Draw(_pixel, new Rectangle(399, 0, 2, 344), new Color(60, 60, 80));
+        sb.Draw(_pixel, new Rectangle(0, 0, 800, 600), Palette.Background);
+        sb.Draw(_pixel, new Rectangle(399, 0, 2, 344), Palette.Divider);
     }
 
     public void DrawEntities(SpriteBatch sb, List<BattleEntity> entities, TurnManager turnManager, double totalTime)
@@ -43,7 +34,7 @@ public class EntityRenderer
 
     public void DrawGameOver(SpriteBatch sb, SpriteFont font, Team winningTeam)
     {
-        sb.Draw(_pixel, new Rectangle(0, 0, 800, 600), Color.Black * 0.6f);
+        sb.Draw(_pixel, new Rectangle(0, 0, 800, 600), Palette.GameOverOverlay);
 
         var winText = winningTeam == Team.Player ? "Player Wins!" : "Monsters Win!";
         var winSize = font.MeasureString(winText);
@@ -59,7 +50,6 @@ public class EntityRenderer
     public void Dispose()
     {
         _pixel?.Dispose();
-        _hpBarBg?.Dispose();
     }
 
     private void DrawEntity(SpriteBatch sb, BattleEntity entity, TurnManager turnManager, double totalTime)
@@ -75,12 +65,11 @@ public class EntityRenderer
         if ((turnManager.CurrentPhase == TurnManager.Phase.TurnDwell || turnManager.CurrentPhase == TurnManager.Phase.PlayerInput) && entity == turnManager.CurrentAttacker)
             DrawTurnArrow(sb, entity, totalTime, Color.Gold);
 
-        // Red arrow on highlighted preview targets during player input
         if (turnManager.HighlightedTargets?.Contains(entity) == true)
             DrawTurnArrow(sb, entity, totalTime, Color.Red);
     }
 
-    private void DrawSprite(SpriteBatch sb, BattleEntity entity, TurnManager turnManager, double totalTime)
+    private static void DrawSprite(SpriteBatch sb, BattleEntity entity, TurnManager turnManager, double totalTime)
     {
         var tex = entity.Sprite;
         var slotW = 80;
@@ -103,13 +92,13 @@ public class EntityRenderer
     {
         var rect = new Rectangle((int)entity.Position.X, (int)entity.Position.Y, 80, 60);
         var color = entity.IsAlive
-            ? (entity.Team == Team.Player ? PlayerRectColor : EnemyRectColor)
-            : (entity.Team == Team.Player ? PlayerRectDeadColor : EnemyRectDeadColor);
+            ? (entity.Team == Team.Player ? Palette.PlayerRect : Palette.EnemyRect)
+            : (entity.Team == Team.Player ? Palette.PlayerRectDead : Palette.EnemyRectDead);
 
         sb.Draw(_pixel, rect, color);
 
         if (entity.IsAlive)
-            sb.Draw(_pixel, new Rectangle(rect.X, rect.Y, rect.Width, 2), Color.White * 0.2f);
+            sb.Draw(_pixel, new Rectangle(rect.X, rect.Y, rect.Width, 2), Palette.SpriteHighlight);
     }
 
     private void DrawHpBar(SpriteBatch sb, BattleEntity entity)
@@ -119,15 +108,12 @@ public class EntityRenderer
         var barWidth = 80;
         var barHeight = 5;
 
-        sb.Draw(_hpBarBg, new Rectangle(barX, barY, barWidth, barHeight), HpBgColor);
+        sb.Draw(_pixel, new Rectangle(barX, barY, barWidth, barHeight), Palette.HpBarBg);
 
         var ratio = (float)entity.Hp / entity.MaxHp;
         var fillWidth = (int)(barWidth * ratio);
         if (fillWidth > 0)
-        {
-            var fillColor = ratio > 0.5f ? HpGreen : (ratio > 0.25f ? HpYellow : HpRed);
-            sb.Draw(_pixel, new Rectangle(barX, barY, fillWidth, barHeight), fillColor);
-        }
+            sb.Draw(_pixel, new Rectangle(barX, barY, fillWidth, barHeight), Palette.RatioToColor(ratio));
     }
 
     private void DrawTurnArrow(SpriteBatch sb, BattleEntity entity, double totalTime, Color color)

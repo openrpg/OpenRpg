@@ -10,9 +10,11 @@ using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Combat.Types;
 using OpenRpg.Core.Extensions;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
 using OpenRpg.Localization.Data.DataSources;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
 
 public class CommandMenuUi
 {
@@ -25,15 +27,12 @@ public class CommandMenuUi
     private List<(AbilityTemplate Template, int ManaCost, bool CanAfford)> _availableAbilities;
     private AbilityTemplate _selectedAbility;
     private ILocaleDataSource _localeDataSource;
-
     private string[] _currentItems = [];
 
-    // Gum elements
     private ColoredRectangleRuntime _menuBg;
     private ColoredRectangleRuntime _tooltipBg;
     private readonly List<ColoredRectangleRuntime> _itemRects = [];
 
-    // Layout
     private const int MenuX = 290;
     private const int MenuW = 220;
     private const int MenuItemH = 24;
@@ -41,19 +40,13 @@ public class CommandMenuUi
     private const int TooltipH = 22;
     private const int TooltipGap = 4;
 
-    private int _menuY; // computed per menu based on item count
+    private int _menuY;
     private string _tooltipText = "";
 
     public event Action<PlayerAction> OnActionConfirmed;
     public MenuScreen CurrentScreen => _currentScreen;
     public bool IsHidden => _currentScreen == MenuScreen.Hidden;
 
-    /// <summary>
-    /// Returns the list of enemy targets to visually highlight based on current menu state.
-    /// - TargetSelect: highlights the currently selected enemy
-    /// - AbilitySelect (multi-target): highlights enemies that would be hit
-    /// - Otherwise: empty list
-    /// </summary>
     public List<BattleEntity> PreviewTargets
     {
         get
@@ -106,7 +99,7 @@ public class CommandMenuUi
         BuildGumElements();
     }
 
-    private string[] BuildMainMenuItems()
+    private static string[] BuildMainMenuItems()
     {
         return ["Attack", "Ability", "Items", "Flee"];
     }
@@ -136,7 +129,7 @@ public class CommandMenuUi
 
         var itemCount = _currentItems.Length;
         var menuH = itemCount * MenuItemH + MenuPadding * 2;
-        _menuY = (310 - menuH) / 2 + 30; // center in battlefield area (Y=30-310)
+        _menuY = (310 - menuH) / 2 + 30;
 
         _tooltipText = GetCurrentDescription();
         var hasTooltip = !string.IsNullOrEmpty(_tooltipText);
@@ -151,7 +144,7 @@ public class CommandMenuUi
                 Width = MenuW,
                 Height = TooltipH
             };
-            SetRectColor(_tooltipBg, new Color(10, 10, 25) * 0.92f);
+            _tooltipBg.SetRectColor(Palette.MenuBg);
             _tooltipBg.AddToRoot();
         }
 
@@ -162,7 +155,7 @@ public class CommandMenuUi
             Width = MenuW,
             Height = menuH
         };
-        SetRectColor(_menuBg, new Color(10, 10, 25) * 0.92f);
+        _menuBg.SetRectColor(Palette.MenuBg);
         _menuBg.AddToRoot();
 
         for (var i = 0; i < itemCount; i++)
@@ -174,7 +167,7 @@ public class CommandMenuUi
                 Width = MenuW - 6,
                 Height = MenuItemH - 2
             };
-            SetRectColor(rect, new Color(20, 20, 40) * 0.5f);
+            rect.SetRectColor(Palette.MenuItemBg);
             rect.AddToRoot();
             _itemRects.Add(rect);
         }
@@ -186,10 +179,10 @@ public class CommandMenuUi
     {
         for (var i = 0; i < _itemRects.Count; i++)
         {
-            SetRectColor(_itemRects[i],
+            _itemRects[i].SetRectColor(
                 i == _selectedIndex
-                    ? new Color(60, 60, 90)
-                    : new Color(20, 20, 40) * 0.5f);
+                    ? Palette.MenuItemSelected
+                    : Palette.MenuItemBg);
         }
     }
 
@@ -236,25 +229,25 @@ public class CommandMenuUi
     {
         if (IsHidden) return;
 
-        if (IsKeyJustPressed(current, previous, Keys.Up))
+        if (InputHelper.IsKeyJustPressed(current, previous, Keys.Up))
         {
             _selectedIndex = _selectedIndex > 0 ? _selectedIndex - 1 : _currentItems.Length - 1;
             UpdateSelectionHighlight();
             _tooltipText = GetCurrentDescription();
         }
-        else if (IsKeyJustPressed(current, previous, Keys.Down))
+        else if (InputHelper.IsKeyJustPressed(current, previous, Keys.Down))
         {
             _selectedIndex = (_selectedIndex + 1) % _currentItems.Length;
             UpdateSelectionHighlight();
             _tooltipText = GetCurrentDescription();
         }
-        else if (IsKeyJustPressed(current, previous, Keys.Enter) ||
-                 IsKeyJustPressed(current, previous, Keys.Space))
+        else if (InputHelper.IsKeyJustPressed(current, previous, Keys.Enter) ||
+                 InputHelper.IsKeyJustPressed(current, previous, Keys.Space))
         {
             ConfirmSelection();
         }
-        else if (IsKeyJustPressed(current, previous, Keys.Escape) ||
-                 IsKeyJustPressed(current, previous, Keys.Back))
+        else if (InputHelper.IsKeyJustPressed(current, previous, Keys.Escape) ||
+                 InputHelper.IsKeyJustPressed(current, previous, Keys.Back))
         {
             GoBack();
         }
@@ -280,17 +273,17 @@ public class CommandMenuUi
     {
         switch (_selectedIndex)
         {
-            case 0: // Attack
+            case 0:
                 _selectedAbility = null;
                 SwitchToScreen(MenuScreen.TargetSelect, BuildTargetItems());
                 break;
-            case 1: // Ability
+            case 1:
                 SwitchToScreen(MenuScreen.AbilitySelect, BuildAbilityItems());
                 break;
-            case 2: // Items
+            case 2:
                 FireAction(new PlayerAction { Type = ActionType.UseItem });
                 break;
-            case 3: // Flee
+            case 3:
                 FireAction(new PlayerAction { Type = ActionType.Flee });
                 break;
         }
@@ -301,7 +294,6 @@ public class CommandMenuUi
         var abilityCount = _availableAbilities.Count;
         if (_selectedIndex == abilityCount)
         {
-            // Back
             SwitchToScreen(MenuScreen.MainMenu, BuildMainMenuItems());
             return;
         }
@@ -316,7 +308,6 @@ public class CommandMenuUi
 
         if (targetType == CombatTargetTypes.MultipleTarget)
         {
-            // Auto-target for multi-target abilities
             var actualCount = Math.Min(targetCount, _aliveEnemies.Count);
             var targets = _aliveEnemies.Take(actualCount).ToList();
             FireAction(new PlayerAction
@@ -328,7 +319,6 @@ public class CommandMenuUi
         }
         else
         {
-            // Single-target: go to target selection
             SwitchToScreen(MenuScreen.TargetSelect, BuildTargetItems());
         }
     }
@@ -337,7 +327,6 @@ public class CommandMenuUi
     {
         if (_selectedIndex == _aliveEnemies.Count)
         {
-            // Back
             var backScreen = _selectedAbility != null ? MenuScreen.AbilitySelect : MenuScreen.MainMenu;
             var backItems = _selectedAbility != null ? BuildAbilityItems() : BuildMainMenuItems();
             SwitchToScreen(backScreen, backItems);
@@ -356,7 +345,6 @@ public class CommandMenuUi
         switch (_currentScreen)
         {
             case MenuScreen.MainMenu:
-                // Escape on main menu → basic attack on first enemy as default
                 if (_aliveEnemies.Count > 0)
                     FireAction(new PlayerAction { Type = ActionType.BasicAttack, Targets = [_aliveEnemies[0]] });
                 break;
@@ -382,12 +370,11 @@ public class CommandMenuUi
     {
         if (IsHidden) return;
 
-        // Draw tooltip description above the menu
         if (!string.IsNullOrEmpty(_tooltipText))
         {
             var tooltipY = _menuY - TooltipH - TooltipGap;
             TextHelper.DrawStringWithSpacing(sb, font, _tooltipText,
-                new Vector2(MenuX + MenuPadding, tooltipY + 3), new Color(200, 200, 180));
+                new Vector2(MenuX + MenuPadding, tooltipY + 3), Palette.MenuTooltip);
         }
 
         var x = MenuX + MenuPadding;
@@ -402,15 +389,15 @@ public class CommandMenuUi
             if (_currentScreen == MenuScreen.AbilitySelect && i < _availableAbilities.Count)
             {
                 if (!_availableAbilities[i].CanAfford)
-                    color = new Color(120, 60, 60);
+                    color = Palette.MenuCannotAfford;
                 else if (isSelected)
                     color = Color.White;
                 else
-                    color = new Color(180, 180, 190);
+                    color = Palette.MenuItemNormal;
             }
             else if (IsBackItem(i))
             {
-                color = new Color(180, 180, 100);
+                color = Palette.MenuBackColor;
             }
             else if (isSelected)
             {
@@ -418,7 +405,7 @@ public class CommandMenuUi
             }
             else
             {
-                color = new Color(180, 180, 190);
+                color = Palette.MenuItemNormal;
             }
 
             TextHelper.DrawStringWithSpacing(sb, font, _currentItems[i], new Vector2(x, y), color);
@@ -430,18 +417,5 @@ public class CommandMenuUi
         if (_currentScreen == MenuScreen.AbilitySelect && index == _availableAbilities.Count) return true;
         if (_currentScreen == MenuScreen.TargetSelect && index == _aliveEnemies.Count) return true;
         return false;
-    }
-
-    private static bool IsKeyJustPressed(KeyboardState current, KeyboardState previous, Keys key)
-    {
-        return current.IsKeyDown(key) && !previous.IsKeyDown(key);
-    }
-
-    private static void SetRectColor(ColoredRectangleRuntime rect, Color color)
-    {
-        rect.Red = color.R;
-        rect.Green = color.G;
-        rect.Blue = color.B;
-        rect.Alpha = color.A;
     }
 }

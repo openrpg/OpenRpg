@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 
 public class FloatingDamageNumber
 {

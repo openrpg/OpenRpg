@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using OpenRpg.Combat.Abilities;
 
-namespace OpenRpg.Demos.Battler.Code.Scenes.BattleScene;
-
-public enum ActionType { BasicAttack, Ability, UseItem, Flee }
+namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 
 public class PlayerAction
 {
