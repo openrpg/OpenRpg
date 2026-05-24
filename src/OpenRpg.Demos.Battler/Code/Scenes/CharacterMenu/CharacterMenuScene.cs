@@ -10,6 +10,7 @@ using OpenRpg.Core.Effects;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Data;
 using OpenRpg.Entities.Extensions;
+using OpenRpg.Demos.Battler.Code.Scenes;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
@@ -204,10 +205,9 @@ public class CharacterMenuScene : IScene
         }
 
         // Help text at bottom
-        var helpColor = new Color(140, 140, 150);
         TextHelper.DrawStringWithSpacing(spriteBatch, _font,
             "Up/Down Navigate  |  Enter Select  |  Esc Back",
-            new Vector2(400, 575), helpColor, centered: true);
+            new Vector2(400, 575), Palette.UiHelpText, centered: true);
     }
 
     // ========================================================================
@@ -258,7 +258,7 @@ public class CharacterMenuScene : IScene
         var startY = 40;
         var itemH = 70;
 
-        DrawRect(sb, panelX, startY, panelW, _gameState.Party.Count * itemH + 60, new Color(10, 10, 25) * 0.85f);
+        UiHelper.DrawPanel(sb, _pixel, panelX, startY, panelW, _gameState.Party.Count * itemH + 60, Palette.PanelBg);
 
         for (var i = 0; i < _gameState.Party.Count; i++)
         {
@@ -267,7 +267,7 @@ public class CharacterMenuScene : IScene
             var isSelected = i == _selectedIndex;
 
             if (isSelected)
-                DrawRect(sb, panelX + 4, y - 2, panelW - 8, itemH - 4, new Color(60, 60, 90));
+                UiHelper.DrawSelectionHighlight(sb, _pixel, panelX + 4, y - 2, panelW - 8, itemH - 4);
 
             // Sprite
             if (entity.Sprite != null)
@@ -322,10 +322,11 @@ public class CharacterMenuScene : IScene
         var invY = startY + _gameState.Party.Count * itemH + 10;
         var isInvSelected = _selectedIndex == _gameState.Party.Count;
 
-        if (isInvSelected)
-            DrawRect(sb, panelX + 180, invY - 4, panelW - 360, 28, new Color(40, 50, 70));
-        else
-            DrawRect(sb, panelX + 180, invY - 4, panelW - 360, 28, new Color(20, 25, 35));
+        UiHelper.DrawButton(sb, _pixel,
+            panelX + 180, invY - 4, panelW - 360, 28,
+            isInvSelected,
+            fillColor: new Color(20, 25, 40),
+            selectedFillColor: new Color(40, 55, 80));
 
         TextHelper.DrawStringWithSpacing(sb, _font, $">>> INVENTORY <<<",
             new Vector2(400, invY + 4),
@@ -335,10 +336,13 @@ public class CharacterMenuScene : IScene
         var proceedY = invY + 36;
         var isProceedSelected = _selectedIndex == _gameState.Party.Count + 1;
 
-        if (isProceedSelected)
-            DrawRect(sb, panelX + 180, proceedY - 4, panelW - 360, 34, new Color(40, 80, 40));
-        else
-            DrawRect(sb, panelX + 180, proceedY - 4, panelW - 360, 34, new Color(20, 40, 20));
+        UiHelper.DrawButton(sb, _pixel,
+            panelX + 180, proceedY - 4, panelW - 360, 34,
+            isProceedSelected,
+            fillColor: new Color(20, 45, 25),
+            selectedFillColor: new Color(40, 90, 50),
+            borderColor: new Color(30, 60, 35),
+            selectedBorderColor: new Color(80, 160, 100));
 
         TextHelper.DrawStringWithSpacing(sb, _font, ">>> PROCEED TO BATTLE <<<",
             new Vector2(400, proceedY + 4),
@@ -363,7 +367,7 @@ public class CharacterMenuScene : IScene
         var panelW = 760;
         var panelH = 420;
 
-        DrawRect(sb, panelX, panelY, panelW, panelH, new Color(10, 10, 25) * 0.85f);
+        UiHelper.DrawPanel(sb, _pixel, panelX, panelY, panelW, panelH, Palette.PanelBg);
 
         // Left: sprite + basic info
         var lx = panelX + 20;
@@ -401,8 +405,8 @@ public class CharacterMenuScene : IScene
 
         // Attributes
         var attrY = panelY + 100;
-        TextHelper.DrawStringWithSpacing(sb, _font, "-- Attributes --",
-            new Vector2(lx, attrY), new Color(200, 200, 180));
+        TextHelper.DrawStringWithSpacing(sb, _font, "ATTRIBUTES",
+            new Vector2(lx, attrY), Palette.UiSectionTitle);
         DrawStat(sb, lx, attrY + 20, "STR", ((int)entity.Entity.Stats.Strength).ToString(), new Color(240, 180, 80));
         DrawStat(sb, lx + 140, attrY + 20, "DEX", ((int)entity.Entity.Stats.Dexterity).ToString(), new Color(80, 200, 80));
         DrawStat(sb, lx + 280, attrY + 20, "CON", ((int)entity.Entity.Stats.Constitution).ToString(), new Color(180, 120, 80));
@@ -412,8 +416,8 @@ public class CharacterMenuScene : IScene
 
         // Equipment section (interactive items)
         var equipY = panelY + 192;
-        TextHelper.DrawStringWithSpacing(sb, _font, "-- Equipment (select to change) --",
-            new Vector2(lx, equipY), new Color(200, 200, 150));
+        TextHelper.DrawStringWithSpacing(sb, _font, "EQUIPMENT (select to change)",
+            new Vector2(lx, equipY), Palette.UiSectionTitle);
 
         var slots = entity.Entity.Variables.Equipment?.Slots;
         for (var i = 0; i < SlotOrder.Length; i++)
@@ -481,11 +485,12 @@ public class CharacterMenuScene : IScene
         var panelW = 640;
         var panelH = 440;
 
-        DrawRect(sb, panelX, panelY, panelW, panelH, new Color(10, 10, 25) * 0.92f);
+        UiHelper.DrawPanel(sb, _pixel, panelX, panelY, panelW, panelH, Palette.PanelBg);
+        UiHelper.DrawTitleBar(sb, _pixel, panelX + 1, panelY + 1, panelW - 2, 20);
 
         TextHelper.DrawStringWithSpacing(sb, _font,
             "Select an item to equip:",
-            new Vector2(panelX + 20, panelY + 12), new Color(180, 180, 190));
+            new Vector2(panelX + 20, panelY + 24), Palette.UiTextBody);
 
         var slots = entity.Entity.Variables.Equipment?.Slots;
         var currentItem = slots?.Get(_browsingSlotType);
@@ -579,7 +584,8 @@ public class CharacterMenuScene : IScene
         var panelW = 720;
         var panelH = 440;
 
-        DrawRect(sb, panelX, panelY, panelW, panelH, new Color(10, 10, 25) * 0.92f);
+        UiHelper.DrawPanel(sb, _pixel, panelX, panelY, panelW, panelH, Palette.PanelBg);
+        UiHelper.DrawTitleBar(sb, _pixel, panelX + 1, panelY + 1, panelW - 2, 20);
 
         var items = _gameState.SharedInventory;
         if (items.Count == 0)
@@ -600,7 +606,7 @@ public class CharacterMenuScene : IScene
 
                 var isSelected = i == _selectedIndex;
                 if (isSelected)
-                    DrawRect(sb, panelX + 4, y - 2, panelW - 8, 22, new Color(60, 60, 90));
+                    UiHelper.DrawSelectionHighlight(sb, _pixel, panelX + 4, y - 2, panelW - 8, 22);
 
                 var baseColor = isSelected ? Color.White : new Color(180, 180, 190);
 
@@ -690,7 +696,8 @@ public class CharacterMenuScene : IScene
         var panelW = 560;
         var panelH = 400;
 
-        DrawRect(sb, panelX, panelY, panelW, panelH, new Color(10, 10, 25) * 0.92f);
+        UiHelper.DrawPanel(sb, _pixel, panelX, panelY, panelW, panelH, Palette.PanelBg);
+        UiHelper.DrawTitleBar(sb, _pixel, panelX + 1, panelY + 1, panelW - 2, 20);
 
         var y = panelY + 16;
         var idx = 0;
@@ -705,7 +712,7 @@ public class CharacterMenuScene : IScene
 
             var isSelected = _selectedIndex == idx;
             if (isSelected)
-                DrawRect(sb, panelX + 6, y - 2, panelW - 12, 24, new Color(60, 60, 90));
+                UiHelper.DrawSelectionHighlight(sb, _pixel, panelX + 6, y - 2, panelW - 12, 24);
 
             var displayName = member.Name;
             var hpMpText = !member.IsAlive
@@ -999,10 +1006,7 @@ public class CharacterMenuScene : IScene
         _ = _sceneManager.SetScene(battleScene);
     }
 
-    // ========================================================================
-    // Drawing Helpers
-    // ========================================================================
-
+    // Simple filled rect for HP/MP bars and small elements
     private void DrawRect(SpriteBatch sb, int x, int y, int w, int h, Color color)
     {
         if (_pixel != null)
@@ -1012,7 +1016,7 @@ public class CharacterMenuScene : IScene
     private void DrawStat(SpriteBatch sb, int x, int y, string label, string value, Color valueColor)
     {
         TextHelper.DrawStringWithSpacing(sb, _font, $"{label}:",
-            new Vector2(x, y), new Color(140, 140, 150));
+            new Vector2(x, y), Palette.UiTextLabel);
         var labelW = TextHelper.MeasureStringWidth(_font, $"{label}:");
         TextHelper.DrawStringWithSpacing(sb, _font, value,
             new Vector2(x + labelW + 6, y), valueColor);

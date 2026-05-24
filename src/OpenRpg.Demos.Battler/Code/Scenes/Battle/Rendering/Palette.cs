@@ -51,6 +51,23 @@ public static class Palette
     // Divider
     public static readonly Color Divider = new(60, 60, 80);
 
+    // Panel borders
+    public static readonly Color PanelBorder = new(55, 60, 90);
+    public static readonly Color PanelBorderSelected = new(100, 120, 160);
+    public static readonly Color PanelTitleBar = new(25, 30, 50);
+    public static readonly Color PanelTitleBorder = new(55, 60, 90);
+
+    // General UI
+    public static readonly Color UiTitle = new(220, 200, 120);
+    public static readonly Color UiAccent = new(140, 160, 220);
+    public static readonly Color UiButtonBg = new(20, 25, 35);
+    public static readonly Color UiButtonSelected = new(60, 60, 90);
+    public static readonly Color UiTextBody = new(180, 180, 190);
+    public static readonly Color UiTextLabel = new(140, 140, 150);
+    public static readonly Color UiTextBright = new(210, 210, 220);
+    public static readonly Color UiHelpText = new(140, 140, 150);
+    public static readonly Color UiSectionTitle = new(160, 180, 200);
+
     // Game over
     public static readonly Color GameOverOverlay = Color.Black * 0.6f;
 

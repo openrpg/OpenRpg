@@ -7,8 +7,10 @@ namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
 public static class TextHelper
 {
     private const int SpaceGap = 4;
+    private const int ShadowOffset = 1;
+    private static readonly Color ShadowColor = Color.Black * 0.55f;
 
-    public static void DrawStringWithSpacing(SpriteBatch sb, SpriteFont font, string text, Vector2 position, Color color, bool centered = false)
+    public static void DrawStringWithSpacing(SpriteBatch sb, SpriteFont font, string text, Vector2 position, Color color, bool centered = false, bool drawShadow = true)
     {
         if (string.IsNullOrEmpty(text)) return;
 
@@ -22,6 +24,18 @@ public static class TextHelper
         }
 
         var words = text.Split(' ');
+
+        if (drawShadow)
+        {
+            var sx = x + ShadowOffset;
+            var sy = y + ShadowOffset;
+            foreach (var word in words)
+            {
+                if (word.Length == 0) continue;
+                sb.DrawString(font, word, new Vector2(sx, sy), ShadowColor);
+                sx += (int)font.MeasureString(word).X + SpaceGap;
+            }
+        }
 
         foreach (var word in words)
         {
