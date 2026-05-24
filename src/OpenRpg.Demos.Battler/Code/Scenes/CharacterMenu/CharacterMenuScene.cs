@@ -327,8 +327,7 @@ public class CharacterMenuScene : IScene
         else
             DrawRect(sb, panelX + 180, invY - 4, panelW - 360, 28, new Color(20, 25, 35));
 
-        var invCount = _gameState.SharedInventory.Count;
-        TextHelper.DrawStringWithSpacing(sb, _font, $">>> INVENTORY ({invCount}) <<<",
+        TextHelper.DrawStringWithSpacing(sb, _font, $">>> INVENTORY <<<",
             new Vector2(400, invY + 4),
             isInvSelected ? Color.LightBlue : new Color(120, 160, 200), centered: true);
 
