@@ -19,8 +19,11 @@ namespace OpenRpg.Genres.Fantasy.Combat.Modifiers
 
         public Attack ModifyValue(Attack attack)
         {
-            attack.Damages = attack.Damages.Where(x => x.Type != DamageType).ToArray();
-            return attack;
+            var includedDamages = attack.Damages
+                .Where(x => x.Type != DamageType)
+                .ToArray();
+            
+            return attack with { Damages = includedDamages };
         }
     }
 }

@@ -47,13 +47,13 @@
     private int DamageType
     {
         get => Template.Variables.Damage.Type;
-        set => Template.Variables.Damage.Type = value;
+        set => Template.Variables.Damage = Template.Variables.Damage with { Type = value };
     }
 
     private float DamageValue
     {
         get => Template.Variables.Damage.Value;
-        set => Template.Variables.Damage.Value = value;
+        set => Template.Variables.Damage = Template.Variables.Damage with { Value = value };
     }
 
     private void OnDamageTypeChanged(ChangeEventArgs e) => DamageType = int.Parse(e.Value?.ToString() ?? "0");
