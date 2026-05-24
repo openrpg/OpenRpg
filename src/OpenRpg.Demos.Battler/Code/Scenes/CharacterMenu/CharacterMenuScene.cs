@@ -697,9 +697,9 @@ public class CharacterMenuScene : IScene
 
         foreach (var member in _gameState.Party)
         {
-            if (!isLifeRestore && !member.IsAlive)
+            if (isLifeRestore ? member.IsAlive : !member.IsAlive)
             {
-                // For heal items, skip dead members entirely
+                // For heal items: skip dead members; for life-restore: skip alive members
                 continue;
             }
 
