@@ -161,12 +161,19 @@ public class BattleScene : IScene
             if (InputHelper.IsKeyJustPressed(kstate, _previousKeyboard, Keys.Space) ||
                 InputHelper.IsKeyJustPressed(kstate, _previousKeyboard, Keys.Enter))
             {
-                // On loss, reset the party so a fresh one is created next time
                 if (_turnManager.WinningTeam == Team.Enemy)
+                {
+                    // On loss, return to party creation for a fresh start
                     _gameState.ResetParty();
-
-                var menuScene = _serviceProvider.GetRequiredService<CharacterMenu.CharacterMenuScene>();
-                _ = _sceneManager.SetScene(menuScene);
+                    var partyCreateScene = _serviceProvider.GetRequiredService<PartyCreate.PartyCreateScene>();
+                    _ = _sceneManager.SetScene(partyCreateScene);
+                }
+                else
+                {
+                    // On victory, return to character menu with preserved party and loot
+                    var menuScene = _serviceProvider.GetRequiredService<CharacterMenu.CharacterMenuScene>();
+                    _ = _sceneManager.SetScene(menuScene);
+                }
             }
             _previousKeyboard = kstate;
             return;

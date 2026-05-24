@@ -9,6 +9,7 @@ public interface IPersistentGameState
     List<BattleEntity> Party { get; }
     List<ItemData> SharedInventory { get; }
     void InitializeParty();
+    void InitializeParty(int[] classIds);
     void FullHealParty();
     void ResetParty();
     bool IsInitialized { get; }

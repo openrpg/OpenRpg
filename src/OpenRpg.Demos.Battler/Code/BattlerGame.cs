@@ -11,6 +11,7 @@ using MonoGameGum;
 using OpenRpg.Data;
 using OpenRpg.Demos.Battler.Code.Scenes;
 using OpenRpg.Demos.Battler.Code.Scenes.CharacterMenu;
+using OpenRpg.Demos.Battler.Code.Scenes.PartyCreate;
 using OpenRpg.Demos.Battler.Code.Services.Game;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Entity.Templates;
@@ -71,8 +72,8 @@ public class BattlerGame : Game
         // Exit is now handled per-scene (Escape on top-level screen only)
         if (_projectLoaded && _sceneManager.ActiveScene == null)
         {
-            var menuScene = _serviceProvider.GetRequiredService<CharacterMenuScene>();
-            _ = _sceneManager.SetScene(menuScene);
+            var partyCreateScene = _serviceProvider.GetRequiredService<PartyCreateScene>();
+            _ = _sceneManager.SetScene(partyCreateScene);
         }
 
         _sceneManager.Update(gameTime);

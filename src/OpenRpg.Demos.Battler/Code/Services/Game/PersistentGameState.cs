@@ -61,11 +61,24 @@ public class PersistentGameState : IPersistentGameState
         // between battles. Call ReinitializeParty() to force a full reset.
         if (_party != null) return;
 
+        var partyIds = ClassLookups.GetRandomPartyIds();
+        BuildPartyFromIds(partyIds);
+    }
+
+    public void InitializeParty(int[] classIds)
+    {
+        // Allows the party creation scene to specify exact class composition.
+        // Always resets — no idempotent guard, because this is called fresh from the creation scene.
+        ResetParty();
+        BuildPartyFromIds(classIds);
+    }
+
+    private void BuildPartyFromIds(int[] classIds)
+    {
         var entities = new List<BattleEntity>();
         var slotIndex = 0;
-        var partyIds = ClassLookups.GetRandomPartyIds();
 
-        foreach (var classId in partyIds)
+        foreach (var classId in classIds)
         {
             var template = _dataSource.Get<ClassTemplate>(classId);
             if (template == null) continue;

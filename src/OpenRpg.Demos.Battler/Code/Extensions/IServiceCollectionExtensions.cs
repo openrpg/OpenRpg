@@ -17,6 +17,7 @@ using OpenRpg.Demos.Battler.Code.Scenes;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Scenes.CharacterMenu;
+using OpenRpg.Demos.Battler.Code.Scenes.PartyCreate;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Providers;
 using OpenRpg.Demos.Battler.Code.Services;
 using OpenRpg.Demos.Battler.Code.Services.Game;
@@ -101,6 +102,7 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<IPartyProvider, PartyProvider>();
         services.AddSingleton<IEnemyFormationProvider, EnemyFormationProvider>();
         services.AddSingleton<ILootService, LootService>();
+        services.AddTransient<PartyCreateScene>();
         services.AddTransient<BattleScene>();
         services.AddTransient<CharacterMenuScene>();
 

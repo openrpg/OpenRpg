@@ -256,7 +256,7 @@ public class CharacterMenuScene : IScene
             new Vector2(400, titleY), Color.White, centered: true);
 
         var startY = 40;
-        var itemH = 58;
+        var itemH = 70;
 
         DrawRect(sb, panelX, startY, panelW, _gameState.Party.Count * itemH + 60, new Color(10, 10, 25) * 0.85f);
 
@@ -302,20 +302,20 @@ public class CharacterMenuScene : IScene
             var barW = 130f;
             var barH = 8f;
             var barX = panelW - 190;
-            var barY = y + 8;
+            var barY = y + 6;
 
             DrawRect(sb, (int)barX, (int)barY, (int)barW, (int)barH, Palette.HpBarBg);
             DrawRect(sb, (int)barX, (int)barY, (int)(barW * hpRatio), (int)barH, hpColor);
             TextHelper.DrawStringWithSpacing(sb, _font, $"HP {entity.Hp}/{entity.MaxHp}",
-                new Vector2(barX, barY + barH + 1), hpColor);
+                new Vector2(barX, barY + barH + 2), hpColor);
 
             // MP
             var mpRatio = entity.MaxMana > 0 ? (float)entity.Mana / entity.MaxMana : 0;
-            var mpBarY = barY + barH + 12;
+            var mpBarY = barY + barH + 28;
             DrawRect(sb, (int)barX, (int)mpBarY, (int)barW, (int)barH, Palette.HpBarBg);
             DrawRect(sb, (int)barX, (int)mpBarY, (int)(barW * mpRatio), (int)barH, Palette.MpText);
             TextHelper.DrawStringWithSpacing(sb, _font, $"MP {entity.Mana}/{entity.MaxMana}",
-                new Vector2(barX, mpBarY + barH + 1), Palette.MpText);
+                new Vector2(barX, mpBarY + barH + 2), Palette.MpText);
         }
 
         // Inventory button
