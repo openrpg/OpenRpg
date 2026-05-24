@@ -27,7 +27,7 @@ namespace OpenRpg.Entities.Extensions
         {
             public RaceData Race
             {
-                get => vars.GetAsOrDefault(CoreEntityVariableTypes.Race, () => new RaceData());
+                get => vars.GetAsOrDefaultAndSet(CoreEntityVariableTypes.Race, () => new RaceData());
                 set => vars[CoreEntityVariableTypes.Race] = value;
             }
         }
@@ -39,7 +39,7 @@ namespace OpenRpg.Entities.Extensions
         {
             public ClassData Class
             {
-                get => vars.GetAsOrDefault(CoreEntityVariableTypes.Class, () => new ClassData());
+                get => vars.GetAsOrDefaultAndSet(CoreEntityVariableTypes.Class, () => new ClassData());
                 set => vars[CoreEntityVariableTypes.Class] = value;
             }
         }
@@ -51,7 +51,7 @@ namespace OpenRpg.Entities.Extensions
         {
             public MultiClasses MultiClass
             {
-                get => vars.GetAsOrDefault(CoreEntityVariableTypes.MultiClasses,  () => new MultiClasses());
+                get => vars.GetAsOrDefaultAndSet(CoreEntityVariableTypes.MultiClasses,  () => new MultiClasses());
                 set => vars[CoreEntityVariableTypes.MultiClasses] = value;
             }
         }

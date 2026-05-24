@@ -19,7 +19,7 @@ namespace OpenRpg.Items.Extensions
         {
             public Equipment Equipment
             {
-                get => vars.GetAsOrDefault(ItemEntityVariableTypes.Equipment, () => new Equipment());
+                get => vars.GetAsOrDefaultAndSet(ItemEntityVariableTypes.Equipment, () => new Equipment());
                 set => vars[ItemEntityVariableTypes.Equipment] = value;
             }
         }
@@ -31,7 +31,7 @@ namespace OpenRpg.Items.Extensions
         {
             public Inventory Inventory
             {
-                get => vars.GetAsOrDefault(ItemEntityVariableTypes.Inventory, () => new Inventory());
+                get => vars.GetAsOrDefaultAndSet(ItemEntityVariableTypes.Inventory, () => new Inventory());
                 set => vars[ItemEntityVariableTypes.Inventory] = value;
             }
         }

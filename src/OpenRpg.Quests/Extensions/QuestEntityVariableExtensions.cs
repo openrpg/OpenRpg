@@ -15,7 +15,7 @@ namespace OpenRpg.Quests.Extensions
         {
             public FactionReputation FactionReputation
             {
-                get => vars.GetAsOrDefault(QuestEntityVariableTypes.FactionReputation, () => new FactionReputation());
+                get => vars.GetAsOrDefaultAndSet(QuestEntityVariableTypes.FactionReputation, () => new FactionReputation());
                 set =>  vars[QuestEntityVariableTypes.FactionReputation] = value;
             }
         }
@@ -27,7 +27,7 @@ namespace OpenRpg.Quests.Extensions
         {
             public IQuestState QuestState
             {
-                get => vars.GetAsOrDefault(QuestEntityVariableTypes.QuestState, () => new QuestState());
+                get => vars.GetAsOrDefaultAndSet(QuestEntityVariableTypes.QuestState, () => new QuestState());
                 set =>  vars[QuestEntityVariableTypes.QuestState] = value;
             }
         }
@@ -39,7 +39,7 @@ namespace OpenRpg.Quests.Extensions
         {
             public ITriggerState TriggerState
             {
-                get => vars.GetAsOrDefault(QuestEntityVariableTypes.TriggerState, () => new TriggerState());
+                get => vars.GetAsOrDefaultAndSet(QuestEntityVariableTypes.TriggerState, () => new TriggerState());
                 set =>  vars[QuestEntityVariableTypes.TriggerState] = value;
             }
         }

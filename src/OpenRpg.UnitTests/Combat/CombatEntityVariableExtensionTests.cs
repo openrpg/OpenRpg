@@ -18,4 +18,13 @@ public class CombatEntityVariableExtensionTests
         Assert.True(entityVars.HasActiveEffects());
         Assert.Equal(entityVars.ActiveEffects, dummyActiveEffects);
     }
+
+    [Fact]
+    public void should_use_same_active_effects_instance_on_subsequent_access()
+    {
+        var entityVars = new EntityVariables();
+        var effects = entityVars.ActiveEffects;
+        effects.AddEffect(new TimedStaticEffect { Id = 1, Duration = 10 });
+        Assert.True(entityVars.ActiveEffects.HasEffect(1));
+    }
 }
