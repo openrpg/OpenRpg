@@ -34,6 +34,50 @@ namespace OpenRpg.UnitTests.Genres.Extensions
         }
         
         [Fact]
+        public void should_correctly_add_health_with_maxhealth()
+        {
+            var entityState = new EntityStateVariables();
+            entityState.Health = 50;
+            entityState.AddHealth(30, 100);
+
+            var actualHealth = entityState.Health;
+            Assert.Equal(80, actualHealth);
+        }
+
+        [Fact]
+        public void should_correctly_add_health_with_maxhealth_clamped()
+        {
+            var entityState = new EntityStateVariables();
+            entityState.Health = 85;
+            entityState.AddHealth(30, 100);
+
+            var actualHealth = entityState.Health;
+            Assert.Equal(100, actualHealth);
+        }
+
+        [Fact]
+        public void should_correctly_deduct_health_with_maxhealth()
+        {
+            var entityState = new EntityStateVariables();
+            entityState.Health = 80;
+            entityState.DeductHealth(30, 100);
+
+            var actualHealth = entityState.Health;
+            Assert.Equal(50, actualHealth);
+        }
+
+        [Fact]
+        public void should_correctly_deduct_health_with_maxhealth_clamped()
+        {
+            var entityState = new EntityStateVariables();
+            entityState.Health = 20;
+            entityState.DeductHealth(50, 100);
+
+            var actualHealth = entityState.Health;
+            Assert.Equal(0, actualHealth);
+        }
+        
+        [Fact]
         public void should_correctly_deduct_health()
         {
             var expectedHealth = 100;
