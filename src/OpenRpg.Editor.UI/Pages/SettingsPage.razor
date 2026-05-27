@@ -1,8 +1,10 @@
 @page "/settings"
+@using System.IO
 @using System.Reactive.Disposables
 @using OpenRpg.Editor.Core.Extensions
 @using OpenRpg.Editor.Core.Models
 @using OpenRpg.Editor.Core.Services.Events.Bus
+@using OpenRpg.Editor.Core.Services.FileSystem
 @using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Events
 @using OpenRpg.Editor.Infrastructure.Persistence
@@ -15,6 +17,7 @@
 @inject GenreService GenreService
 @inject INotifier Notifier
 @inject IEventBus EventBus
+@inject IFileBrowser FileBrowser
 
 <h1 class="title is-1">Project Settings</h1>
 
@@ -72,8 +75,32 @@ else
                     <input type="checkbox" checked="@_generateTypeFiles" @onchange="OnGenerateTypeFilesChanged" />
                     Generate Type Classes
                 </label>
-                <p class="help">Type classes will be generated to: <code>@EditorState.ProjectContext.Project.GeneratedFilePath</code></p>
             </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Output Path</label>
+            <div class="field has-addons">
+                <div class="control is-expanded">
+                    <input class="input" type="text" value="@_generatedFilePath" @onchange="OnGeneratedFilePathChanged" />
+                </div>
+                <div class="control">
+                    <button class="button" @onclick="BrowseGeneratedFilePath">
+                        <span class="icon"><i class="fas fa-folder-open" aria-hidden="true"></i></span>
+                        <span>Browse</span>
+                    </button>
+                </div>
+            </div>
+            <p class="help">
+                @if (Path.IsPathFullyQualified(_generatedFilePath))
+                {
+                    <span>Absolute path: <code>@_generatedFilePath</code></span>
+                }
+                else
+                {
+                    <span>Relative to project: <code>@EditorState.ProjectContext.ProjectPath/@_generatedFilePath</code></span>
+                }
+            </p>
         </div>
 
         <div class="buttons is-right">
@@ -87,6 +114,7 @@ else
 
 @code {
     private bool _generateTypeFiles;
+    private string _generatedFilePath = "types";
     private bool _hasChanges;
     private CompositeDisposable _subs = new();
 
@@ -105,6 +133,7 @@ else
         if (EditorState.ProjectContext?.Project != null)
         {
             _generateTypeFiles = EditorState.ProjectContext.Project.GenerateTypeFiles;
+            _generatedFilePath = EditorState.ProjectContext.Project.GeneratedFilePath;
             _hasChanges = false;
         }
     }
@@ -114,6 +143,7 @@ else
         if (EditorState.ProjectContext?.Project == null) { return; }
 
         EditorState.ProjectContext.Project.GenerateTypeFiles = _generateTypeFiles;
+        EditorState.ProjectContext.Project.GeneratedFilePath = _generatedFilePath;
 
         await EditorProjectSaver.SaveProject();
         _hasChanges = false;
@@ -124,7 +154,37 @@ else
     private void OnGenerateTypeFilesChanged(ChangeEventArgs e)
     {
         _generateTypeFiles = (bool)(e.Value ?? false);
-        _hasChanges = _generateTypeFiles != EditorState.ProjectContext?.Project?.GenerateTypeFiles;
+        UpdateHasChanges();
+    }
+
+    private void OnGeneratedFilePathChanged(ChangeEventArgs e)
+    {
+        _generatedFilePath = e.Value?.ToString() ?? "types";
+        UpdateHasChanges();
+    }
+
+    private async Task BrowseGeneratedFilePath()
+    {
+        var startingPath = Path.IsPathFullyQualified(_generatedFilePath)
+            ? _generatedFilePath
+            : EditorState.ProjectContext != null
+                ? Path.Combine(EditorState.ProjectContext.ProjectPath, _generatedFilePath)
+                : null;
+
+        var folder = FileBrowser.BrowseToFolder(startingPath);
+        if (!string.IsNullOrEmpty(folder))
+        {
+            _generatedFilePath = folder;
+            UpdateHasChanges();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void UpdateHasChanges()
+    {
+        if (EditorState.ProjectContext?.Project == null) { return; }
+        _hasChanges = _generateTypeFiles != EditorState.ProjectContext.Project.GenerateTypeFiles
+                      || _generatedFilePath != EditorState.ProjectContext.Project.GeneratedFilePath;
     }
 
     public void Dispose()
