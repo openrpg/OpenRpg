@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Templates;
@@ -20,6 +21,8 @@ namespace OpenRpg.Editor.Infrastructure.Helpers;
 
 public class DynamicTemplateHelper
 {
+    private readonly ILogger<DynamicTemplateHelper> _logger;
+
     public Type TemplateType { get; set; }
     public IRepository Repository { get; set; }
 
@@ -27,16 +30,17 @@ public class DynamicTemplateHelper
     private PropertyInfo _templateNameLocaleIdPropertyAccessor;
     private PropertyInfo _templateDescriptionLocaleIdPropertyAccessor;
     private PropertyInfo _variablesPropertyAccessor;
-    
+
     private MethodInfo _getAllMethod;
     private MethodInfo _createMethod;
     private MethodInfo _deleteMethod;
     private MethodInfo _existsMethod;
-    
-    public DynamicTemplateHelper(Type templateType, IRepository repository)
+
+    public DynamicTemplateHelper(Type templateType, IRepository repository, ILogger<DynamicTemplateHelper> logger)
     {
         TemplateType = templateType;
         Repository = repository;
+        _logger = logger;
 
         _templateIdPropertyAccessor = TemplateType.GetProperty(nameof(ITemplate.Id));
         if(_templateIdPropertyAccessor?.CanWrite == false)
@@ -63,14 +67,24 @@ public class DynamicTemplateHelper
     }
     
     public IEnumerable<ITemplate> GetAll()
-    { return (IEnumerable<ITemplate>) _getAllMethod.Invoke(null, [Repository]); }
-    
+    {
+        var results = (IEnumerable<ITemplate>) _getAllMethod.Invoke(null, [Repository]);
+        _logger.LogDebug("GetAll for {TemplateType} returned {Count} result(s)", TemplateType.Name, results.Count());
+        return results;
+    }
+
     public ITemplate Create(ITemplate template, object id)
-    { return (ITemplate) _createMethod.Invoke(null, [Repository, template, id]); }
-    
+    {
+        _logger.LogDebug("Creating {TemplateType} with Id {Id}", TemplateType.Name, id);
+        return (ITemplate) _createMethod.Invoke(null, [Repository, template, id]);
+    }
+
     public void Delete(ITemplate template)
-    { _deleteMethod.Invoke(null, [Repository, template.Id]); }
-    
+    {
+        _logger.LogDebug("Deleting {TemplateType} Id {Id}", TemplateType.Name, template.Id);
+        _deleteMethod.Invoke(null, [Repository, template.Id]);
+    }
+
     public void Exists(object id)
     { _existsMethod.Invoke(null, [Repository, id]); }
 
@@ -129,13 +143,23 @@ public class DynamicTemplateHelper
 
     public void GenerateLocaleCodes(ITemplate template)
     {
-        if(template.GetType() != TemplateType) 
+        if(template.GetType() != TemplateType)
         { throw new ArgumentException("Template type does not match helper internal type"); }
-            
+
         var variables = GetVariables(template);
         var assetCode = variables.AssetCode;
-        
+
+        if (string.IsNullOrEmpty(assetCode))
+        {
+            _logger.LogWarning("Could not generate locale codes for {TemplateType} Id {Id} - no asset code set",
+                TemplateType.Name, template.Id);
+            return;
+        }
+
         _templateNameLocaleIdPropertyAccessor.SetValue(template, $"{assetCode}-name");
         _templateDescriptionLocaleIdPropertyAccessor.SetValue(template, $"{assetCode}-description");
+
+        _logger.LogDebug("Generated locale codes '{NameLocale}' and '{DescLocale}' for {TemplateType} Id {Id}",
+            $"{assetCode}-name", $"{assetCode}-description", TemplateType.Name, template.Id);
     }
 }

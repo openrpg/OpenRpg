@@ -81,6 +81,7 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<ManifestPluginLoader>();
             services.AddSingleton<GenreService>();
             services.AddSingleton<GenreTypesService>();
+            services.AddSingleton<TemplatePageService>();
             services.AddSingleton<ITemplateDatastorePopulator, DynamicTemplateDatastorePopulator>();
 
             services.AddSingleton<IComponentTypeRegistry>(sp =>

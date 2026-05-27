@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using OpenRpg.Editor.Core.Plugins;
 using OpenRpg.Editor.Infrastructure.Plugins;
 
@@ -10,11 +11,13 @@ namespace OpenRpg.Editor.UI.Services;
 public class GenreTypesService
 {
     private readonly GenreService _genreService;
+    private readonly ILogger<GenreTypesService> _logger;
     private IGenreTypesProvider _overrideProvider;
 
-    public GenreTypesService(GenreService genreService)
+    public GenreTypesService(GenreService genreService, ILogger<GenreTypesService> logger)
     {
         _genreService = genreService;
+        _logger = logger;
     }
 
     public void SetTypesProvider(IGenreTypesProvider typesProvider)
@@ -22,8 +25,18 @@ public class GenreTypesService
         _overrideProvider = typesProvider;
     }
 
-    public IGenreTypesProvider TypesProvider => 
-        _overrideProvider ?? _genreService.GetCombinedTypesProvider();
+    public IGenreTypesProvider TypesProvider
+    {
+        get
+        {
+            var provider = _overrideProvider ?? _genreService.GetCombinedTypesProvider();
+            if (provider.ItemTypes.Length == 0)
+            {
+                _logger.LogWarning("Types provider returned empty type collections - no plugins may be enabled");
+            }
+            return provider;
+        }
+    }
 
     public OptionData[] ItemTypes => TypesProvider.ItemTypes;
     public OptionData[] ItemQualityTypes => TypesProvider.ItemQualityTypes;

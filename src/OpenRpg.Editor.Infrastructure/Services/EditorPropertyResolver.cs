@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using OpenRpg.Core.Templates.Variables;
 using OpenRpg.Editor.Infrastructure.Editors;
 
@@ -9,6 +10,13 @@ namespace OpenRpg.Editor.Infrastructure.Services;
 
 public class EditorPropertyResolver : IEditorPropertyResolver
 {
+    private readonly ILogger<EditorPropertyResolver> _logger;
+
+    public EditorPropertyResolver(ILogger<EditorPropertyResolver> logger)
+    {
+        _logger = logger;
+    }
+
     public Dictionary<string, PropertyInfo> BuildPropertyMap(Type templateType)
     {
         var map = new Dictionary<string, PropertyInfo>();
@@ -137,6 +145,8 @@ public class EditorPropertyResolver : IEditorPropertyResolver
                     var containerType = FindContainerTypeForVariables(variablesType, containerName);
                     if (containerType != null)
                     {
+                        _logger.LogDebug("Converting dictionary to container '{ContainerName}' for {VariablesType}",
+                            containerName, variablesType.Name);
                         var converted = ConvertDictionaryToContainer(rawDict, containerType, containerName);
                         if (converted != null)
                         {
@@ -150,7 +160,15 @@ public class EditorPropertyResolver : IEditorPropertyResolver
         }
 
         var typeToCreate = FindContainerTypeForVariables(variablesType, containerName);
-        if (typeToCreate == null) return null;
+        if (typeToCreate == null)
+        {
+            _logger.LogWarning("Could not find container type for '{ContainerName}' on {VariablesType}",
+                containerName, variablesType.Name);
+            return null;
+        }
+
+        _logger.LogDebug("Auto-creating nested container '{ContainerName}' ({ContainerType}) for {VariablesType}",
+            containerName, typeToCreate.Name, variablesType.Name);
 
         var container = Activator.CreateInstance(typeToCreate);
         addVariableMethod.Invoke(variables, new object[] { containerKey.Value, container });

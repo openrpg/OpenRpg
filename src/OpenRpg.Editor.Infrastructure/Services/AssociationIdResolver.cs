@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using OpenRpg.Core.Templates;
 using OpenRpg.Data;
 using OpenRpg.Editor.Core.Plugins;
@@ -15,21 +16,26 @@ public class AssociationIdResolver : IAssociationIdResolver
     private readonly IDataSource _dataSource;
     private readonly ITemplateOptionsResolver _optionsResolver;
     private readonly GenreService _genreService;
+    private readonly ILogger<AssociationIdResolver> _logger;
     private static readonly MethodInfo _getAllMethodDef = typeof(IDataSource)
         .GetMethods()
         .FirstOrDefault(m => m.Name == nameof(IDataSource.GetAll) && m.IsGenericMethodDefinition);
 
-    public AssociationIdResolver(IDataSource dataSource, ITemplateOptionsResolver optionsResolver, GenreService genreService)
+    public AssociationIdResolver(IDataSource dataSource, ITemplateOptionsResolver optionsResolver, GenreService genreService, ILogger<AssociationIdResolver> logger)
     {
         _dataSource = dataSource;
         _optionsResolver = optionsResolver;
         _genreService = genreService;
+        _logger = logger;
     }
 
     public AssociationIdOptions GetOptionsFor(string context, int typeValue)
     {
         if (!_mappings.TryGetValue((context, typeValue), out var mapping))
+        {
+            _logger.LogDebug("No mapping found for association context '{Context}' with type value {TypeValue}", context, typeValue);
             return new AssociationIdOptions();
+        }
 
         var result = mapping.Kind switch
         {
@@ -67,7 +73,10 @@ public class AssociationIdResolver : IAssociationIdResolver
         var registry = _genreService.GetTemplateTypeRegistry();
         var descriptor = registry.GetTemplateType(templateTypeKey);
         if (descriptor == null)
+        {
+            _logger.LogWarning("Could not resolve template type '{TemplateTypeKey}' for association", templateTypeKey);
             return null;
+        }
 
         return registry.GetTemplateClassType(descriptor);
     }

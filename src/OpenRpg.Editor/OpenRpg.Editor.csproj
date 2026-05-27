@@ -27,6 +27,7 @@
 
     <ItemGroup>
       <PackageReference Include="Blazor-ApexCharts" Version="6.0.2" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0" />
       <PackageReference Include="Photino.Blazor" Version="4.0.13" />
     </ItemGroup>
 
