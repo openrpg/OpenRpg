@@ -10,6 +10,7 @@
 @using OpenRpg.Editor.Infrastructure.Persistence
 @using OpenRpg.Editor.Infrastructure.Plugins
 @using OpenRpg.Editor.UI.Components.Modals
+@using OpenRpg.Editor.UI.Models
 
 @inject IFileBrowser FileBrowser
 @inject EditorState EditorState
@@ -63,15 +64,15 @@
         ModalService.ShowModal(GenreSelectionRef.Reference);
     }
 
-    private async Task ConfirmCreateProject(List<string> enabledGenreIds)
+    private async Task ConfirmCreateProject(GenreSelectionResult result)
     {
         var projectFolder = FileBrowser.BrowseToFolder();
         if (string.IsNullOrEmpty(projectFolder)) { return; }
 
-        var newProject = await ProjectCreator.CreateProjectAt(projectFolder, enabledGenreIds);
+        var newProject = await ProjectCreator.CreateProjectAt(projectFolder, result.EnabledGenreIds, result.GenerateTypeFiles);
         EditorState.ProjectContext = newProject;
         
-        foreach (var genreId in enabledGenreIds)
+        foreach (var genreId in result.EnabledGenreIds)
         {
             GenreService.EnablePlugin(genreId);
         }

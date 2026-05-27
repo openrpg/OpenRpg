@@ -26,12 +26,13 @@ public class EditorProjectSaver
     public GenreService GenreService { get; }
     public IProjectFileGenerator ProjectFileGenerator { get; }
     
-    public EditorProjectSaver(EditorState editorState, EditorDatasource editorDatasource, EditorLocaleDatasource editorLocaleDatasource, GenreService genreService)
+    public EditorProjectSaver(EditorState editorState, EditorDatasource editorDatasource, EditorLocaleDatasource editorLocaleDatasource, GenreService genreService, IProjectFileGenerator projectFileGenerator)
     {
         EditorState = editorState;
         EditorDatasource = editorDatasource;
         EditorLocaleDatasource = editorLocaleDatasource;
         GenreService = genreService;
+        ProjectFileGenerator = projectFileGenerator;
     }
     
     public async Task SaveData()

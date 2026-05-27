@@ -13,7 +13,7 @@ namespace OpenRpg.Editor.Infrastructure.Persistence;
 
 public class ProjectCreator(GenreService GenreService)
 {
-    public async Task<ProjectContext> CreateProjectAt(string folderPath, IEnumerable<string> enabledGenreIds = null)
+    public async Task<ProjectContext> CreateProjectAt(string folderPath, IEnumerable<string> enabledGenreIds = null, bool generateTypeFiles = false)
     {
         if(string.IsNullOrEmpty(folderPath))
         { throw new ArgumentException("Folder path is empty", nameof(folderPath)); }
@@ -31,12 +31,13 @@ public class ProjectCreator(GenreService GenreService)
         }
 
         var newProject = new Project { Plugins = plugins };
+        newProject.GenerateTypeFiles = generateTypeFiles;
         var projectFile = $"{folderPath}/project.json";
+        
         var projectContent = JsonConvert.SerializeObject(newProject, Formatting.Indented);
+        await File.WriteAllTextAsync(projectFile, projectContent);
         
         var projectContext = newProject.CreateContext(projectFile);
-        
-        await File.WriteAllTextAsync(projectFile, projectContent);
         Directory.CreateDirectory(projectContext.TemplatePath);
         Directory.CreateDirectory(projectContext.AssetPath);
         Directory.CreateDirectory(projectContext.LocalePath);

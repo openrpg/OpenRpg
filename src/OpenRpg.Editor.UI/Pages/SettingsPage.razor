@@ -1,0 +1,134 @@
+@page "/settings"
+@using System.Reactive.Disposables
+@using OpenRpg.Editor.Core.Extensions
+@using OpenRpg.Editor.Core.Models
+@using OpenRpg.Editor.Core.Services.Events.Bus
+@using OpenRpg.Editor.Core.Services.Notifications
+@using OpenRpg.Editor.Infrastructure.Events
+@using OpenRpg.Editor.Infrastructure.Persistence
+@using OpenRpg.Editor.Infrastructure.Plugins
+
+@implements IDisposable
+
+@inject EditorState EditorState
+@inject EditorProjectSaver EditorProjectSaver
+@inject GenreService GenreService
+@inject INotifier Notifier
+@inject IEventBus EventBus
+
+<h1 class="title is-1">Project Settings</h1>
+
+@if (EditorState.ProjectContext == null)
+{
+    <div class="notification is-warning">
+        <p>No project is currently loaded. Please create or open a project first.</p>
+    </div>
+}
+else
+{
+    <div class="box">
+        <h2 class="title is-3">Project Info</h2>
+        <table class="table is-fullwidth">
+            <tbody>
+                <tr>
+                    <td><strong>Project Path</strong></td>
+                    <td><code>@EditorState.ProjectContext.ProjectPath</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Version</strong></td>
+                    <td>@EditorState.ProjectContext.Project.Version</td>
+                </tr>
+                <tr>
+                    <td><strong>Enabled Plugins</strong></td>
+                    <td>
+                        @if (EditorState.ProjectContext.Project.Plugins.Count > 0)
+                        {
+                            <div class="tags">
+                                @foreach (var plugin in EditorState.ProjectContext.Project.Plugins)
+                                {
+                                    <span class="tag is-primary">@plugin.Id (@plugin.Version)</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="tag is-light">None</span>
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="box">
+        <h2 class="title is-3">Type Generation</h2>
+        <div class="content">
+            <p>When enabled, the editor will generate C# type class files from your template data on each save. These generated files provide compile-time type safety when referencing types in code.</p>
+        </div>
+
+        <div class="field">
+            <div class="control has-text-dark">
+                <label class="checkbox">
+                    <input type="checkbox" checked="@_generateTypeFiles" @onchange="OnGenerateTypeFilesChanged" />
+                    Generate Type Classes
+                </label>
+                <p class="help">Type classes will be generated to: <code>@EditorState.ProjectContext.Project.GeneratedFilePath</code></p>
+            </div>
+        </div>
+
+        <div class="buttons is-right">
+            <button class="button is-primary" @onclick="SaveSettings" disabled="@(!_hasChanges)">
+                <span class="icon"><i class="fas fa-save" aria-hidden="true"></i></span>
+                <span>Save Settings</span>
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _generateTypeFiles;
+    private bool _hasChanges;
+    private CompositeDisposable _subs = new();
+
+    protected override void OnInitialized()
+    {
+        LoadProjectSettings();
+        EventBus
+            .Receive<ProjectChangedEvent>()
+            .Subscribe(_ => { LoadProjectSettings(); InvokeAsync(StateHasChanged); })
+            .AddTo(_subs);
+        base.OnInitialized();
+    }
+
+    private void LoadProjectSettings()
+    {
+        if (EditorState.ProjectContext?.Project != null)
+        {
+            _generateTypeFiles = EditorState.ProjectContext.Project.GenerateTypeFiles;
+            _hasChanges = false;
+        }
+    }
+
+    private async Task SaveSettings()
+    {
+        if (EditorState.ProjectContext?.Project == null) { return; }
+
+        EditorState.ProjectContext.Project.GenerateTypeFiles = _generateTypeFiles;
+
+        await EditorProjectSaver.SaveProject();
+        _hasChanges = false;
+        await Notifier.ShowNotification("Project settings saved");
+        EventBus.PublishAsync(new ProjectChangedEvent());
+    }
+
+    private void OnGenerateTypeFilesChanged(ChangeEventArgs e)
+    {
+        _generateTypeFiles = (bool)(e.Value ?? false);
+        _hasChanges = _generateTypeFiles != EditorState.ProjectContext?.Project?.GenerateTypeFiles;
+    }
+
+    public void Dispose()
+    {
+        _subs?.Dispose();
+    }
+}
