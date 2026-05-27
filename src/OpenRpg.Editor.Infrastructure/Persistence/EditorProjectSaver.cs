@@ -131,7 +131,12 @@ public class EditorProjectSaver
         var generatedFiles = ProjectFileGenerator.GenerateFiles(EditorState.ProjectContext, EditorDatasource);
         foreach (var generatedFile in generatedFiles)
         {
-            var filePath = Path.Combine(EditorState.ProjectContext.Project.GeneratedFilePath, generatedFile.Path, generatedFile.Filename);
+            var filePath = generatedFile.Path is { Length: > 0 }
+                ? Path.Combine(EditorState.ProjectContext.Project.GeneratedFilePath, generatedFile.Path, generatedFile.Filename)
+                : Path.Combine(EditorState.ProjectContext.Project.GeneratedFilePath, generatedFile.Filename);
+
+            var dir = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
             await File.WriteAllTextAsync(filePath, generatedFile.Content);
         }
     }

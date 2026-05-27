@@ -17,7 +17,7 @@ public static class ProjectExtensions
         
         public string GeneratedFilePath
         {
-            get => project.Metadata.GetValueOrDefault(ProjectMetadataKeys.GeneratedFilePath, "Types");
+            get => project.Metadata.GetValueOrDefault(ProjectMetadataKeys.GeneratedFilePath, "types");
             set => project.Metadata[ProjectMetadataKeys.GeneratedFilePath] = value;
         }
     }
