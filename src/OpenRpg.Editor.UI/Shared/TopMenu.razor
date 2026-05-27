@@ -13,7 +13,7 @@
 
 @inject EditorState EditorState;
 @inject IEventBus EventBus;
-@inject SaveProjectExecutor SaveProjectExecutor;
+@inject EditorProjectSaver EditorProjectSaver;
 @inject INotifier Notifier;
 @inject GenreService GenreService;
 
@@ -22,7 +22,7 @@
         <div class="navbar-start">
             <span class="tag is-dark app-logo">OpenRpg Editor - v@(GetType().Assembly.GetName().Version) (Alpha)</span>
         </div>
-        @if (EditorState.CurrentProject != null)
+        @if (EditorState.ProjectContext != null)
         {
             <div class="navbar ml-0">
                 <div class="navbar-item has-dropdown is-hoverable">
@@ -93,14 +93,14 @@
 
     private IEnumerable<ITemplateTypeDescriptor> GetTemplateTypes()
     {
-        if (EditorState.CurrentProject == null) return Enumerable.Empty<ITemplateTypeDescriptor>();
+        if (EditorState.ProjectContext == null) return Enumerable.Empty<ITemplateTypeDescriptor>();
         var registry = GenreService.GetTemplateTypeRegistry();
         return registry.GetTemplateTypes();
     }
 
     public async void SaveProject()
     {
-        await SaveProjectExecutor.Execute();
+        await EditorProjectSaver.SaveData();
         await Notifier.ShowNotification("Project Saved");
     }
 

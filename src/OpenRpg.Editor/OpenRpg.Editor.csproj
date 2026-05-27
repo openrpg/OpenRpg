@@ -36,6 +36,14 @@
         </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Content\Data\class-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Data\item-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Data\quest-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Data\race-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Locales\en-gb.lang.json" />
+    </ItemGroup>
+
     <Target Name="_StaticWebAssetsComputeFilesToBuild" AfterTargets="GetCopyToOutputDirectoryItems" DependsOnTargets="ResolveStaticWebAssetsInputs">
         <ItemGroup>
             <!-- Filter the static web assets foreign to the project and then add them to the list of resolved

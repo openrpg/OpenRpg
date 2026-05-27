@@ -161,9 +161,9 @@ else
     {
         GenreService.RefreshPlugins();
         
-        if (EditorState.CurrentProject?.Project?.Plugins != null)
+        if (EditorState.ProjectContext?.Project?.Plugins != null)
         {
-            foreach (var plugin in EditorState.CurrentProject.Project.Plugins)
+            foreach (var plugin in EditorState.ProjectContext.Project.Plugins)
             {
                 GenreService.EnablePlugin(plugin.Id);
             }

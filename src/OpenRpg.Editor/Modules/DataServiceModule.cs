@@ -8,6 +8,7 @@ using OpenRpg.Editor.Core.Models;
 using OpenRpg.Editor.Core.Services.Events.Broker;
 using OpenRpg.Editor.Core.Services.Events.Bus;
 using OpenRpg.Editor.Core.Services.FileSystem;
+using OpenRpg.Editor.Core.Services.Generators;
 using OpenRpg.Editor.Core.Services.Modal;
 using OpenRpg.Editor.Core.Services.Notifications;
 using OpenRpg.Editor.Core.Services.Threading;
@@ -55,9 +56,11 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<IEventBus, EventBus>();
             
             services.AddSingleton<EditorState>();
-            services.AddSingleton<CreateProjectExecutor>();
-            services.AddSingleton<SaveProjectExecutor>();
+            services.AddSingleton<ProjectCreator>();
+            services.AddSingleton<EditorProjectSaver>();
             services.AddSingleton<EditorDataLoader>();
+
+            services.AddSingleton<IProjectFileGenerator, ProjectFileGenerator>();
             
             services.AddSingleton<EditorDatasource>();
             services.AddSingleton<IDataSource>(x => x.GetService<EditorDatasource>());

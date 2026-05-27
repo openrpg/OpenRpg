@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using OpenRpg.Core.Templates;
 using OpenRpg.Data;
 using OpenRpg.Editor.Infrastructure.Plugins;
-using OpenRpg.Projects.Json.Extensions;
 using OpenRpg.Projects.Json.Loaders.Templates;
 using OpenRpg.Projects.Loaders.Templates;
 using OpenRpg.Projects.Models;
@@ -43,7 +39,7 @@ public class DynamicTemplateDatastorePopulator : JsonTemplateDatastorePopulator
                 if (!await FileService.Exists(typeFilePath)) { continue; }
 
                 var genericMethod = processMethod.MakeGenericMethod(templateClassType);
-                var task = (Task)genericMethod.Invoke(this, [project, absoluteTemplateFolderPath, dataSource]);
+                var task = (Task)genericMethod.Invoke(this, [project, absoluteTemplateFolderPath, dataSource, false]);
                 if(task == null) { throw new Exception($"Failed to invoke dynamic template process for type [{templateType.Key}]");  }
                 await task;
             }

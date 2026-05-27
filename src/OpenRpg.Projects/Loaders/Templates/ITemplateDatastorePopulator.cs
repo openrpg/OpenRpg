@@ -5,5 +5,5 @@ namespace OpenRpg.Projects.Loaders.Templates;
 
 public interface ITemplateDatastorePopulator
 {
-    Task PopulateDatastore(Project project, string projectReference, IDataSource dataSource);
+    Task PopulateDatastore(ProjectContext projectContext, IDataSource dataSource);
 }

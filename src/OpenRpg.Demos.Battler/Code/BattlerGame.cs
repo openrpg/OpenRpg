@@ -69,7 +69,6 @@ public class BattlerGame : Game
 
     protected override void Update(GameTime gameTime)
     {
-        // Exit is now handled per-scene (Escape on top-level screen only)
         if (_projectLoaded && _sceneManager.ActiveScene == null)
         {
             var partyCreateScene = _serviceProvider.GetRequiredService<PartyCreateScene>();
@@ -106,7 +105,8 @@ public class BattlerGame : Game
         {
             var dataLoader = _serviceProvider.GetRequiredService<IDataLoader>();
             var projectPath = Path.Combine(AppContext.BaseDirectory, @"Content/Project/project.json");
-            var project = await dataLoader.Load(projectPath);
+            var projectContext = await dataLoader.Load(projectPath);
+            var project = projectContext.Project;
             var dataSource = _serviceProvider.GetRequiredService<IDataSource>();
 
             var items = dataSource.GetAll<ItemTemplate>().Count();

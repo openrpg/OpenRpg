@@ -1,5 +1,6 @@
 using OpenRpg.Data;
 using OpenRpg.Localization.Data.DataSources;
+using OpenRpg.Projects.Extensions;
 using OpenRpg.Projects.Loaders.Locales;
 using OpenRpg.Projects.Loaders.Projects;
 using OpenRpg.Projects.Loaders.Templates;
@@ -9,6 +10,9 @@ namespace OpenRpg.Projects.Loaders;
 
 public class FileDataLoader : IDataLoader
 {
+    public event EventHandler<ProjectContext>? ProjectLoaded;
+    public event EventHandler<ProjectContext>? DataLoaded;
+    
     public IDataSource Datasource { get; }
     public ILocaleDataSource LocaleDatasource { get; }
     
@@ -25,16 +29,17 @@ public class FileDataLoader : IDataLoader
         LocaleDatastorePopulator = localeDatastorePopulator;
     }
 
-    public virtual async Task<Project> Load(string projectFile)
+    public virtual async Task<ProjectContext> Load(string projectFile)
     {
         var project = await ProjectLoader.LoadProject(projectFile);
-        var projectPath = Path.GetDirectoryName(projectFile);
-        await OnProjectLoaded(project, projectPath);
+        var projectContext = project.CreateContext(projectFile);
         
-        await TemplateDatastorePopulator.PopulateDatastore(project, projectPath, Datasource);
-        await LocaleDatastorePopulator.PopulateDatastore(project, projectPath, LocaleDatasource);
-        return project;
+        ProjectLoaded?.Invoke(this, projectContext);
+        
+        await TemplateDatastorePopulator.PopulateDatastore(projectContext, Datasource);
+        await LocaleDatastorePopulator.PopulateDatastore(projectContext, LocaleDatasource);
+        DataLoaded?.Invoke(this, projectContext);
+        
+        return projectContext;
     }
-    
-    public virtual async Task OnProjectLoaded(Project project, string projectPath) { }
 }

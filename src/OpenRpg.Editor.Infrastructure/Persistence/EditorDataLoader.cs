@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using OpenRpg.Data;
 using OpenRpg.Editor.Core.Models;
 using OpenRpg.Editor.Infrastructure.Data;
@@ -26,28 +25,29 @@ public class EditorDataLoader : FileDataLoader
         EditorState = editorState;
         ProjectMigrations = projectMigrations;
         GenreService = genreService;
+
+        ProjectLoaded += OnProjectLoaded;
     }
 
-    public override async Task OnProjectLoaded(Project project, string projectPath)
+    public void OnProjectLoaded(object sender, ProjectContext projectContext)
     {
-        EditorState.CurrentProject = new LoadedProject() { Project = project, ProjectPath = projectPath };
+        EditorState.ProjectContext = projectContext;
+        
+        var project = projectContext.Project;
+        if (project.Plugins.Count <= 0) { return; }
+        
+        var pluginIds = project.Plugins.Select(p => p.Id).ToList();
+        GenreService.SetEnabledPlugins(pluginIds);
 
-        if (project.Plugins.Count > 0)
+        if (Datasource is not EditorDatasource editorDs) { return; } 
+        
+        var templateTypeRegistry = GenreService.GetTemplateTypeRegistry();
+        foreach (var templateType in templateTypeRegistry.GetTemplateTypes())
         {
-            var pluginIds = project.Plugins.Select(p => p.Id).ToList();
-            GenreService.SetEnabledPlugins(pluginIds);
-
-            if (Datasource is EditorDatasource editorDs)
+            var classType = templateTypeRegistry.GetTemplateClassType(templateType);
+            if (classType != null && !editorDs.Database.ContainsKey(classType))
             {
-                var templateTypeRegistry = GenreService.GetTemplateTypeRegistry();
-                foreach (var templateType in templateTypeRegistry.GetTemplateTypes())
-                {
-                    var classType = templateTypeRegistry.GetTemplateClassType(templateType);
-                    if (classType != null && !editorDs.Database.ContainsKey(classType))
-                    {
-                        editorDs.Database.Add(classType, new Dictionary<object, object>());
-                    }
-                }
+                editorDs.Database.Add(classType, new Dictionary<object, object>());
             }
         }
     }

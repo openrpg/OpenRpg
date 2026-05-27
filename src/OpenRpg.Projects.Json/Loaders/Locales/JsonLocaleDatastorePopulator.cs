@@ -21,17 +21,17 @@ public class JsonLocaleDatastorePopulator : ILocaleDatastorePopulator
     public virtual async Task<IReadOnlyCollection<string>> GetAllLocaleFiles(string localePath)
     { return await FileService.GetChildContents(localePath, "*.json"); }
 
-    public async Task PopulateDatastore(Project project, string projectPath, ILocaleDataSource dataSource)
+    public async Task PopulateDatastore(ProjectContext projectContext, ILocaleDataSource dataSource)
     {
-        var localesFolderPath = project.LocalesFolder;
-        var absoluteLocaleFolderPath = Path.Combine(projectPath, localesFolderPath);
+        var localesFolderPath = projectContext.Project.LocalesFolder;
+        var absoluteLocaleFolderPath = Path.Combine(projectContext.ProjectPath, localesFolderPath);
         var localePathExists = await FileService.Exists(absoluteLocaleFolderPath);
         if(!localePathExists) { throw new Exception($"Locale folder [{absoluteLocaleFolderPath}] cannot be found"); }
         
         var localeFiles = await GetAllLocaleFiles(absoluteLocaleFolderPath);
         foreach (var localeFile in localeFiles)
         {
-            var localeDataset = await LocaleLoader.LoadLocales(project, localeFile);
+            var localeDataset = await LocaleLoader.LoadLocales(projectContext.Project, localeFile);
             localeDataset.LocaleData.ForEach(x => AddLocale(localeDataset.LocaleCode, x.Key, x.Value, dataSource));
         }
     }
