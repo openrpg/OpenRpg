@@ -1,0 +1,100 @@
+[
+  {
+    "Id": 1,
+    "NameLocaleId": "monster-goblin-name",
+    "DescriptionLocaleId": "monster-goblin-description",
+    "Variables": {
+      "9000": "monster-goblin",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 30.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 8.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 5.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 3.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "100": [
+        { "ItemTemplateId": 20, "DropRate": 0.3 },
+        { "ItemTemplateId": 1, "DropRate": 0.1 },
+        { "ItemTemplateId": 10, "DropRate": 0.1 }
+      ]
+    }
+  },
+  {
+    "Id": 2,
+    "NameLocaleId": "monster-bat-name",
+    "DescriptionLocaleId": "monster-bat-description",
+    "Variables": {
+      "9000": "monster-bat",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 15.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 5.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 2.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 8.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "100": [
+        { "ItemTemplateId": 20, "DropRate": 0.2 },
+        { "ItemTemplateId": 17, "DropRate": 0.1 }
+      ]
+    }
+  },
+  {
+    "Id": 3,
+    "NameLocaleId": "monster-wolf-name",
+    "DescriptionLocaleId": "monster-wolf-description",
+    "Variables": {
+      "9000": "monster-wolf",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 40.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 12.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 4.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 6.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "100": [
+        { "ItemTemplateId": 20, "DropRate": 0.3 },
+        { "ItemTemplateId": 16, "DropRate": 0.1 },
+        { "ItemTemplateId": 6, "DropRate": 0.05 }
+      ]
+    }
+  },
+  {
+    "Id": 4,
+    "NameLocaleId": "monster-skeleton-name",
+    "DescriptionLocaleId": "monster-skeleton-description",
+    "Variables": {
+      "9000": "monster-skeleton",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 50.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 10.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 8.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 3.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "100": [
+        { "ItemTemplateId": 21, "DropRate": 0.2 },
+        { "ItemTemplateId": 11, "DropRate": 0.15 },
+        { "ItemTemplateId": 2, "DropRate": 0.08 },
+        { "ItemTemplateId": 14, "DropRate": 0.1 }
+      ]
+    }
+  },
+  {
+    "Id": 5,
+    "NameLocaleId": "monster-slime-name",
+    "DescriptionLocaleId": "monster-slime-description",
+    "Variables": {
+      "9000": "monster-slime",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 20.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 3.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 1.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 2.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "100": [
+        { "ItemTemplateId": 20, "DropRate": 0.5 }
+      ]
+    }
+  }
+]

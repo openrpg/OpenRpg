@@ -27,7 +27,7 @@ public static class IEntityTemplateVariableExtensions
     {
         public RaceData Race
         {
-            get => vars.GetAsOrDefault(CoreEntityTemplateVariableTypes.Race, () => new RaceData());
+            get => vars.GetAsOrDefaultAndSet(CoreEntityTemplateVariableTypes.Race, () => new RaceData());
             set => vars[CoreEntityTemplateVariableTypes.Race] = value;
         }
     }
@@ -39,7 +39,7 @@ public static class IEntityTemplateVariableExtensions
     {
         public ClassData Class
         {
-            get => vars.GetAsOrDefault(CoreEntityTemplateVariableTypes.Class, () => new ClassData());
+            get => vars.GetAsOrDefaultAndSet(CoreEntityTemplateVariableTypes.Class, () => new ClassData());
             set => vars[CoreEntityTemplateVariableTypes.Class] = value;
         }
     }
@@ -51,7 +51,7 @@ public static class IEntityTemplateVariableExtensions
     {
         public MultiClasses MultiClass
         {
-            get => vars.GetAsOrDefault(CoreEntityTemplateVariableTypes.MultiClasses,  () => new MultiClasses());
+            get => vars.GetAsOrDefaultAndSet(CoreEntityTemplateVariableTypes.MultiClasses,  () => new MultiClasses());
             set => vars[CoreEntityTemplateVariableTypes.MultiClasses] = value;
         }
     }

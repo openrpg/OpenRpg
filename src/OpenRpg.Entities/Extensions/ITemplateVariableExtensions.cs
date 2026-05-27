@@ -41,7 +41,7 @@ namespace OpenRpg.Entities.Extensions
             
             public ProceduralEffects ProceduralEffects
             {
-                get => vars.GetAsOrDefault(CoreTemplateVariableTypes.ProceduralEffects, () => new ProceduralEffects());
+                get => vars.GetAsOrDefaultAndSet(CoreTemplateVariableTypes.ProceduralEffects, () => new ProceduralEffects());
                 set => vars[CoreTemplateVariableTypes.ProceduralEffects] = value;
             }
             

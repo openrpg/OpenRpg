@@ -17,7 +17,7 @@ namespace OpenRpg.Items.TradeSkills.Extensions
         {
             public TradeSkillState TradeSkillState
             {
-                get => vars.GetAsOrDefault(TradeSkillEntityVariableTypes.TradeSkillState, () => new TradeSkillState());
+                get => vars.GetAsOrDefaultAndSet(TradeSkillEntityVariableTypes.TradeSkillState, () => new TradeSkillState());
                 set => vars[TradeSkillEntityVariableTypes.TradeSkillState] = value;
             }
         }

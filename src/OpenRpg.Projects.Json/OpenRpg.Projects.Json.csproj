@@ -14,10 +14,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\OpenRpg.Items.TradeSkills\OpenRpg.Items.TradeSkills.csproj" />
-      <ProjectReference Include="..\OpenRpg.Items\OpenRpg.Items.csproj" />
+      <ProjectReference Include="..\OpenRpg.Genres\OpenRpg.Genres.csproj" />
       <ProjectReference Include="..\OpenRpg.Projects\OpenRpg.Projects.csproj" />
-      <ProjectReference Include="..\OpenRpg.Quests\OpenRpg.Quests.csproj" />
     </ItemGroup>
 
     <ItemGroup>

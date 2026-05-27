@@ -19,7 +19,16 @@ public class QuestEntityVariableExtensionTests
         Assert.True(entityVars.HasFactionReputation());
         Assert.Equal(entityVars.FactionReputation, dummyFactionRep);
     }
-    
+
+    [Fact]
+    public void should_use_same_faction_reputation_instance_on_subsequent_access()
+    {
+        var entityVars = new EntityVariables();
+        var rep = entityVars.FactionReputation;
+        rep[1] = 50;
+        Assert.Equal(50, entityVars.FactionReputation[1]);
+    }
+
     [Fact]
     public void should_correctly_handle_quest_state_on_entity()
     {
@@ -31,7 +40,16 @@ public class QuestEntityVariableExtensionTests
         Assert.True(entityVars.HasQuestState());
         Assert.Equal(entityVars.QuestState, dummyQuestState);
     }
-    
+
+    [Fact]
+    public void should_use_same_quest_state_instance_on_subsequent_access()
+    {
+        var entityVars = new EntityVariables();
+        var state = entityVars.QuestState;
+        state[42] = 1;
+        Assert.Equal(1, entityVars.QuestState[42]);
+    }
+
     [Fact]
     public void should_correctly_handle_trigger_state_on_entity()
     {
@@ -42,5 +60,14 @@ public class QuestEntityVariableExtensionTests
         entityVars.TriggerState = dummyQuestState;
         Assert.True(entityVars.HasTriggerState());
         Assert.Equal(entityVars.TriggerState, dummyQuestState);
+    }
+
+    [Fact]
+    public void should_use_same_trigger_state_instance_on_subsequent_access()
+    {
+        var entityVars = new EntityVariables();
+        var state = entityVars.TriggerState;
+        state[1] = true;
+        Assert.True(entityVars.TriggerState[1]);
     }
 }

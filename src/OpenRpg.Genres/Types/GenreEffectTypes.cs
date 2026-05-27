@@ -41,6 +41,8 @@ namespace OpenRpg.Genres.Types
         public static readonly int HealthRegenRateBonusPercentage = 73;
         public static readonly int StaminaRegenRateBonusAmount = 74;
         public static readonly int StaminaRegenRateBonusPercentage = 75;
+        public static readonly int LifeRestoreAmount = 76;
+        public static readonly int LifeRestorePercentage = 77;
 
         
         // Ability Related

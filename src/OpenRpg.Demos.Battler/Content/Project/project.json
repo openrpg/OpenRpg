@@ -1,0 +1,9 @@
+{
+  "Version": "1.0.1",
+  "Type": "json",
+  "Metadata": {},
+  "Plugins": [
+    { "Id": "default", "Version": "1.0.0" },
+    { "Id": "fantasy", "Version": "1.0.0" }
+  ]
+}

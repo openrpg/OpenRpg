@@ -23,7 +23,7 @@ namespace OpenRpg.Entities.Extensions
             
             public TagList Tags 
             {
-                get => vars.GetAsOrDefault(CoreAnyVariableTypes.Tags, () => new TagList());
+                get => vars.GetAsOrDefaultAndSet(CoreAnyVariableTypes.Tags, () => new TagList());
                 set => vars[CoreAnyVariableTypes.Tags] = value;
             }
         }

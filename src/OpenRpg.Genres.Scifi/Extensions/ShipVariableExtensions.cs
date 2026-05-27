@@ -16,19 +16,19 @@ namespace OpenRpg.Genres.Scifi.Extensions
         {
             public ShipEquipment Equipment
             {
-                get => vars.GetAsOrDefault(ShipVariableTypes.Equipment, () => new ShipEquipment());
+                get => vars.GetAsOrDefaultAndSet(ShipVariableTypes.Equipment, () => new ShipEquipment());
                 set => vars[ShipVariableTypes.Equipment] = value;
             }
             
             public Inventory Inventory
             {
-                get => vars.GetAsOrDefault(ShipVariableTypes.Inventory, () => new Inventory());
+                get => vars.GetAsOrDefaultAndSet(ShipVariableTypes.Inventory, () => new Inventory());
                 set => vars[ShipVariableTypes.Inventory] = value;
             }
 
             public Character Pilot
             {
-                get => vars.GetAsOrDefault(ShipVariableTypes.Pilot, () => new Character());
+                get => vars.GetAsOrDefaultAndSet(ShipVariableTypes.Pilot, () => new Character());
                 set => vars[ShipVariableTypes.Pilot] = value;
             }
         }

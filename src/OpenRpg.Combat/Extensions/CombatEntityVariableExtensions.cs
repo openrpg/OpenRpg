@@ -17,7 +17,7 @@ namespace OpenRpg.Combat.Extensions
         {
             public IActiveEffects ActiveEffects
             {
-                get => vars.GetAsOrDefault(CombatEntityVariableTypes.ActiveEffects, () => new DefaultActiveEffects());
+                get => vars.GetAsOrDefaultAndSet(CombatEntityVariableTypes.ActiveEffects, () => new DefaultActiveEffects());
                 set => vars[CombatEntityVariableTypes.ActiveEffects] = value;
             }
         }

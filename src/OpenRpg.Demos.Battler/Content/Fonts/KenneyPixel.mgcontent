@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SourceFile>E:/Code/open-source/openrpg/OpenRpg/src/OpenRpg.Demos.Battler/Content/Fonts/KenneyPixel.spritefont</SourceFile>
+  <SourceTime>2026-05-20T13:59:43.6523122+01:00</SourceTime>
+  <DestFile>E:/Code/open-source/openrpg/OpenRpg/src/OpenRpg.Demos.Battler/Content/bin/Windows/Content/Fonts/KenneyPixel.xnb</DestFile>
+  <DestTime>2026-05-20T14:04:14.5481392+01:00</DestTime>
+  <Importer>FontDescriptionImporter</Importer>
+  <ImporterTime>2025-10-20T15:25:32+01:00</ImporterTime>
+  <Processor>FontDescriptionProcessor</Processor>
+  <ProcessorTime>2025-10-20T15:25:32+01:00</ProcessorTime>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

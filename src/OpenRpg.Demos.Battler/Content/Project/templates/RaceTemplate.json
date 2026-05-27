@@ -1,0 +1,19 @@
+[
+  {
+    "Id": 1,
+    "NameLocaleId": "race-human-name",
+    "DescriptionLocaleId": "race-human-description",
+    "Variables": {
+      "9000": "race-human",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 40, "Potency": 2.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 220, "Potency": 2.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 222, "Potency": 2.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 224, "Potency": 2.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 226, "Potency": 2.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 228, "Potency": 2.0, "Requirements": [] }
+      ],
+      "4003": []
+    }
+  }
+]
