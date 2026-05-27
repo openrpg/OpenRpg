@@ -18,7 +18,7 @@
 
 <Markdown>
     ## Pattern Generation
-    You can generate templates with a given pattern like so
+    This is still experimental, but you can generate templates with a given pattern like so
 </Markdown>
 
 <br />
@@ -346,6 +346,7 @@
     private void GenerateItemCraftingTemplates()
     {
         var patternIds = MetalLookups.Keys.ToArray();
+        var metalLocaleGenerator = new FixedPatternLocaleGenerator() { NamePattern = "{0} {1}", DescriptionPattern = "{0} {1}", PatternNames = MetalLookups };
         
         _ingotCrafting = _craftingTemplatePatternGenerator.Generate(new ItemCraftingTemplatePatternGeneratorConfig()
         {
@@ -357,7 +358,8 @@
             InputPatternTypeId = ItemPatternTypes.Ore,
             AmountOutput = 1,
             OutputPatternTypeId = ItemPatternTypes.Ingot,
-            PatternTypeId = ItemPatternTypes.Ingot
+            PatternTypeId = ItemPatternTypes.Ingot,
+            LocaleGenerator = metalLocaleGenerator
         });
                 
         _swordCrafting = _craftingTemplatePatternGenerator.Generate(new ItemCraftingTemplatePatternGeneratorConfig()
@@ -370,7 +372,8 @@
             InputPatternTypeId = ItemPatternTypes.Ingot,
             AmountOutput = 1,
             OutputPatternTypeId = ItemPatternTypes.Sword,
-            PatternTypeId = ItemPatternTypes.Sword
+            PatternTypeId = ItemPatternTypes.Sword,
+            LocaleGenerator = metalLocaleGenerator
         });                
         
         _armourCrafting = _craftingTemplatePatternGenerator.Generate(new ItemCraftingTemplatePatternGeneratorConfig()
@@ -383,7 +386,8 @@
             InputPatternTypeId = ItemPatternTypes.Ingot,
             AmountOutput = 1,
             OutputPatternTypeId = ItemPatternTypes.Armour,
-            PatternTypeId = ItemPatternTypes.Armour
+            PatternTypeId = ItemPatternTypes.Armour,
+            LocaleGenerator = metalLocaleGenerator
         });
     }
 

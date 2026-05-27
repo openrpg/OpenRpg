@@ -45,8 +45,14 @@ public class CraftingTemplatePatternGenerator : ITemplatePatternGenerator<ItemCr
             outputItemEntry.Variables.Amount = config.AmountOutput;
             var outputItems = new List<TradeSkillItemEntry> { outputItemEntry };
             
+            var nameLocaleId = config.LocaleGenerator.GenerateNameLocaleId(patternId, config.TypeCode);
+            var descriptionLocaleId = config.LocaleGenerator.GenerateDescriptionLocaleId(patternId, config.TypeCode);
+            
             var template = new ItemCraftingTemplate();
-            template.Id = id;
+            template.Id = id++;
+            // TODO: Need to fix how this gets generated
+            //template.NameLocaleId = nameLocaleId;
+            //template.DescriptionLocaleId = descriptionLocaleId;
             template.InputItems = inputItems;
             template.OutputItems = outputItems;
             template.Variables.PatternId = patternId;
@@ -56,13 +62,14 @@ public class CraftingTemplatePatternGenerator : ITemplatePatternGenerator<ItemCr
             var skillDifficulty = (int)Math.Round(config.SkillScore.Plot(i));
             if(skillDifficulty > 0)
             {
-                template.Variables.Requirements = [
-                    new Requirement
+                template.Variables.Requirements = new List<Requirement>
+                {
+                    new()
                     {
                         RequirementType = FantasyRequirementTypes.TradeSkillRequirement,
                         Association = new Association(config.SkillType, skillDifficulty)
                     }
-                ];
+                };
             }
             
             itemCraftingTemplates.Add(template);
