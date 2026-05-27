@@ -6,10 +6,10 @@ using Newtonsoft.Json;
 using OpenRpg.Core.Templates;
 using OpenRpg.Editor.Core.Extensions;
 using OpenRpg.Editor.Core.Models;
-using OpenRpg.Editor.Core.Services.Generators;
 using OpenRpg.Editor.Infrastructure.Data;
 using OpenRpg.Editor.Infrastructure.Extensions;
 using OpenRpg.Editor.Infrastructure.Plugins;
+using OpenRpg.Editor.Infrastructure.Services.Generators;
 using OpenRpg.Projects.Models;
 
 namespace OpenRpg.Editor.Infrastructure.Persistence;
