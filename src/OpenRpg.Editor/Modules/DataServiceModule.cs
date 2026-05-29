@@ -1,8 +1,10 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Types;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Requirements;
+using OpenRpg.Core.Utils;
 using OpenRpg.Data;
 using OpenRpg.Editor.Core.Models;
 using OpenRpg.Editor.Core.Services.Events.Broker;
@@ -24,6 +26,7 @@ using OpenRpg.Editor.UI.Components.Editors.List;
 using OpenRpg.Editor.UI.Services;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Types;
+using OpenRpg.Items.Loot;
 using OpenRpg.Items.Types;
 using OpenRpg.Localization.Data.DataSources;
 using OpenRpg.Localization.Data.Repositories;
@@ -46,7 +49,10 @@ namespace OpenRpg.Editor.Modules
             VariablesConverter.RegisterKey(CoreTemplateVariableTypes.Requirements, typeof(Requirement));
             VariablesConverter.RegisterKey(CombatTemplateVariableTypes.Abilities, typeof(AbilityData));
             VariablesConverter.RegisterKey(LootTableEntryVariableTypes.Requirements, typeof(Requirement));
+            
             services.AddSingleton<ICloner, Cloner>();
+            services.AddSingleton<IRandomizer>(x => new DefaultRandomizer(new Random()));
+            services.AddSingleton<ILootTableProcessor, DefaultLootTableProcessor>();
             services.AddTransient<IModalService, ModalService>();
             services.AddTransient<INotifier, Notifier>();
             services.AddSingleton<IFileBrowser, PhotinoNativeFileBrowser>();

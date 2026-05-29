@@ -27,7 +27,7 @@ public class ItemEntityTemplateVariableExtensionTests
         var entityVars = new EntityTemplateVariables();
         Assert.False(entityVars.HasLootTable());
         
-        var dummyLootTable = new DefaultLootTable();
+        var dummyLootTable = new LootTableData();
         entityVars.LootTable = dummyLootTable;
         Assert.True(entityVars.HasLootTable());
         Assert.Equal(entityVars.LootTable, dummyLootTable);

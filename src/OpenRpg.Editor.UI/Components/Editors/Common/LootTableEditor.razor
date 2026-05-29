@@ -7,15 +7,12 @@
 @using OpenRpg.Items.Loot
 @using OpenRpg.Items.Templates
 
-@inject IRepository Repository
+@inject IRepository Repository;
 
-@{
-    var entityLootTable = Template.Variables.LootTable as DefaultLootTable;
-}
 
-@if (entityLootTable != null)
+@if (LootTable != null)
 {
-    <Accordion Title="Loot Table" IsExpanded="@(entityLootTable.AvailableLoot.Count > 0)" BadgeCount="@entityLootTable.AvailableLoot.Count">
+    <Accordion Title="Loot Table" IsExpanded="@(LootTable.AvailableLoot.Count > 0)" BadgeCount="@LootTable.AvailableLoot.Count">
         <table class="table is-fullwidth is-rounded">
             <thead>
                 <tr>
@@ -28,7 +25,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (entityLootTable.AvailableLoot.Count == 0)
+                @if (LootTable.AvailableLoot.Count == 0)
                 {
                     <tr>
                         <td colspan="10000" class="has-text-centered">
@@ -36,7 +33,7 @@
                         </td>
                     </tr>
                 }
-                @foreach (var entry in entityLootTable.AvailableLoot.ToList())
+                @foreach (var entry in LootTable.AvailableLoot.ToList())
                 {
                     <tr @key="entry">
                         <td>
@@ -65,7 +62,7 @@
                             </label>
                         </td>
                         <td>
-                            <button class="button is-danger" @onclick="x => entityLootTable.AvailableLoot.Remove(entry)">X</button>
+                            <button class="button is-danger" @onclick="x => LootTable.AvailableLoot.Remove(entry)">X</button>
                         </td>
                     </tr>
                 }
@@ -78,8 +75,8 @@
     [Parameter]
     public EntityTemplate Template { get; set; }
     
-    DefaultLootTable LootTable => (DefaultLootTable)Template.Variables.LootTable;
-
+    public LootTableData LootTable => Template.Variables.LootTable;
+    
     void AddLootEntry()
     {
         LootTable.AvailableLoot.Add(new LootTableEntry { ItemData = new ItemData() });
