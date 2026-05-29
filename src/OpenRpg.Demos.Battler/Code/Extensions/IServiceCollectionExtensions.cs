@@ -15,13 +15,12 @@ using OpenRpg.Data;
 using OpenRpg.Data.InMemory;
 using OpenRpg.Demos.Battler.Code.Scenes;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle;
-using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Scenes.CharacterMenu;
 using OpenRpg.Demos.Battler.Code.Scenes.PartyCreate;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Providers;
 using OpenRpg.Demos.Battler.Code.Services;
 using OpenRpg.Demos.Battler.Code.Services.Game;
-using OpenRpg.Demos.Battler.Code.Types;
+using OpenRpg.Items.Loot;
 using OpenRpg.Entities.Entity.Populators.State;
 using OpenRpg.Entities.Entity.Populators.Stats;
 using OpenRpg.Genres.Effects;
@@ -62,6 +61,7 @@ public static class IServiceCollectionExtensions
 
         services.AddSingleton<ITemplateAccessor, TemplateAccessor>();
         services.AddSingleton<Builders.GameCharacterBuilder>();
+        services.AddSingleton<ILootTableProcessor, DefaultLootTableProcessor>();
         
         return services;
     }
@@ -73,7 +73,7 @@ public static class IServiceCollectionExtensions
         VariablesConverter.RegisterKey(CombatAbilityTemplateVariableTypes.Damage, typeof(Damage));
         VariablesConverter.RegisterKey(CombatTemplateVariableTypes.Abilities, typeof(AbilityData));
         VariablesConverter.RegisterKey(LootTableEntryVariableTypes.Requirements, typeof(Requirement));
-        VariablesConverter.RegisterKey(DemoEntityVariableTypes.LootTable, typeof(SimpleLootEntry));
+        VariablesConverter.RegisterKey(ItemEntityTemplateVariableTypes.LootTable, typeof(LootTableData));
 
         services.AddSingleton<IFileService, DefaultFileService>();
         services.AddSingleton<IProjectLoader, JsonProjectLoader>();
