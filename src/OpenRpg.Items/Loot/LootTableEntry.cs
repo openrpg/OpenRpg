@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Variables.General;
-using OpenRpg.Entities.Requirements;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.Variables;
 
@@ -10,7 +6,7 @@ namespace OpenRpg.Items.Loot
 {
     public class LootTableEntry : IHasVariables<LootTableEntryVariables>
     {
-        public LootTableEntryVariables Variables { get; set; } = new LootTableEntryVariables();
+        public LootTableEntryVariables Variables { get; set; } = new();
         public ItemData ItemData { get; set; }
     }
 }

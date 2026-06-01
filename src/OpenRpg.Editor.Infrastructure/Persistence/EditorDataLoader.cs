@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using OpenRpg.Data;
 using OpenRpg.Editor.Core.Models;
 using OpenRpg.Editor.Infrastructure.Data;
@@ -17,38 +17,54 @@ namespace OpenRpg.Editor.Infrastructure.Persistence;
 
 public class EditorDataLoader : FileDataLoader
 {
+    private readonly ILogger<EditorDataLoader> _logger;
+
     public EditorState EditorState { get; }
     public IEnumerable<IProjectMigration> ProjectMigrations { get; }
     public GenreService GenreService { get; }
 
-    public EditorDataLoader(IDataSource datasource, ILocaleDataSource localeDatasource, IProjectLoader projectLoader, ITemplateDatastorePopulator templateDatastorePopulator, ILocaleDatastorePopulator localeDatastorePopulator, EditorState editorState, IEnumerable<IProjectMigration> projectMigrations, GenreService genreService) : base(datasource, localeDatasource, projectLoader, templateDatastorePopulator, localeDatastorePopulator)
+    public EditorDataLoader(IDataSource datasource, ILocaleDataSource localeDatasource, IProjectLoader projectLoader, ITemplateDatastorePopulator templateDatastorePopulator, ILocaleDatastorePopulator localeDatastorePopulator, EditorState editorState, IEnumerable<IProjectMigration> projectMigrations, GenreService genreService, ILogger<EditorDataLoader> logger) : base(datasource, localeDatasource, projectLoader, templateDatastorePopulator, localeDatastorePopulator)
     {
         EditorState = editorState;
         ProjectMigrations = projectMigrations;
         GenreService = genreService;
+        _logger = logger;
+
+        ProjectLoaded += OnProjectLoaded;
     }
 
-    public override async Task OnProjectLoaded(Project project, string projectPath)
+    public void OnProjectLoaded(object sender, ProjectContext projectContext)
     {
-        EditorState.CurrentProject = new LoadedProject() { Project = project, ProjectPath = projectPath };
+        EditorState.ProjectContext = projectContext;
 
-        if (project.Plugins.Count > 0)
+        _logger.LogInformation("Project loaded from '{ProjectPath}'", projectContext.ProjectPath);
+
+        var project = projectContext.Project;
+        if (project.Plugins.Count <= 0)
         {
-            var pluginIds = project.Plugins.Select(p => p.Id).ToList();
-            GenreService.SetEnabledPlugins(pluginIds);
+            _logger.LogWarning("Project has no plugins configured");
+            return;
+        }
 
-            if (Datasource is EditorDatasource editorDs)
+        var pluginIds = project.Plugins.Select(p => p.Id).ToList();
+        _logger.LogInformation("Enabling {PluginCount} plugin(s) from project configuration: [{PluginIds}]",
+            pluginIds.Count, string.Join(", ", pluginIds));
+        GenreService.SetEnabledPlugins(pluginIds);
+
+        if (Datasource is not EditorDatasource editorDs) { return; }
+
+        var templateTypeRegistry = GenreService.GetTemplateTypeRegistry();
+        var registeredCount = 0;
+        foreach (var templateType in templateTypeRegistry.GetTemplateTypes())
+        {
+            var classType = templateTypeRegistry.GetTemplateClassType(templateType);
+            if (classType != null && !editorDs.Database.ContainsKey(classType))
             {
-                var templateTypeRegistry = GenreService.GetTemplateTypeRegistry();
-                foreach (var templateType in templateTypeRegistry.GetTemplateTypes())
-                {
-                    var classType = templateTypeRegistry.GetTemplateClassType(templateType);
-                    if (classType != null && !editorDs.Database.ContainsKey(classType))
-                    {
-                        editorDs.Database.Add(classType, new Dictionary<object, object>());
-                    }
-                }
+                editorDs.Database.Add(classType, new Dictionary<object, object>());
+                registeredCount++;
             }
         }
+
+        _logger.LogInformation("Datasource initialized with {TemplateTypeCount} template type(s)", registeredCount);
     }
 }

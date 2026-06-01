@@ -17,11 +17,13 @@ public class ItemTemplatePatternGenerator : ITemplatePatternGenerator<ItemTempla
         {
             var patternId = patternIds[i];
             var nameLocaleId = config.LocaleGenerator.GenerateNameLocaleId(patternId, config.TypeCode);
+            var descriptionLocaleId = config.LocaleGenerator.GenerateDescriptionLocaleId(patternId, config.TypeCode);
             
             var template = new ItemTemplate
             {
                 Id = id++,
                 NameLocaleId = nameLocaleId,
+                DescriptionLocaleId = descriptionLocaleId,
                 ItemType = config.ItemType
             };
             template.Variables.AssetCode = nameLocaleId.ToLower().Replace(" ", "-");

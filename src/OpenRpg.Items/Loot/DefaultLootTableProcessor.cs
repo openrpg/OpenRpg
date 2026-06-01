@@ -7,27 +7,23 @@ using OpenRpg.Items.Types;
 
 namespace OpenRpg.Items.Loot
 {
-    public class DefaultLootTable : ILootTable
+    public class DefaultLootTableProcessor : ILootTableProcessor
     {
         public IRandomizer Randomizer { get; set; }
-        public ICollection<LootTableEntry> AvailableLoot { get; set; } = new List<LootTableEntry>();
-
-        public DefaultLootTable(){}
         
-        public DefaultLootTable(ICollection<LootTableEntry> availableLoot, IRandomizer randomizer)
-        {
-            Randomizer = randomizer;
-            AvailableLoot = availableLoot;
-        }
+        public DefaultLootTableProcessor(){}
         
-        public IEnumerable<ItemData> GetLoot()
-        { return GetRandomLootEntries().Select(x => x.ItemData.Clone()); }
+        public DefaultLootTableProcessor(IRandomizer randomizer)
+        { Randomizer = randomizer; }
         
-        public IEnumerable<LootTableEntry> GetRandomLootEntries()
+        public IEnumerable<ItemData> GetLoot(LootTableData lootTable)
+        { return GetRandomLootEntries(lootTable).Select(x => x.ItemData.Clone()); }
+        
+        public IEnumerable<LootTableEntry> GetRandomLootEntries(LootTableData lootTable)
         {
             var uniqueItems = new List<ItemData>();
 
-            foreach (var loot in AvailableLoot)
+            foreach (var loot in lootTable.AvailableLoot)
             {
                 var randomChance = Randomizer.Random(0f, 1f);
                 if (!(loot.Variables.DropRate >= randomChance)) { continue; }

@@ -6,7 +6,7 @@ namespace OpenRpg.Editor.Core.Models;
 
 public class EditorState
 {
-    public LoadedProject CurrentProject { get; set; }
+    public ProjectContext ProjectContext { get; set; }
     public IReadOnlyList<EditorPluginInfo> AvailableGenres { get; set; } = new List<EditorPluginInfo>();
     public IReadOnlyList<EditorPluginInfo> EnabledGenres { get; set; } = new List<EditorPluginInfo>();
 
@@ -15,5 +15,5 @@ public class EditorState
 
     public IGenreTypesProvider CurrentTypesProvider { get; set; }
 
-    public bool IsProjectLoaded => CurrentProject != null;
+    public bool IsProjectLoaded => ProjectContext != null;
 }

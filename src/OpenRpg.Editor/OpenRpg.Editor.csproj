@@ -27,6 +27,7 @@
 
     <ItemGroup>
       <PackageReference Include="Blazor-ApexCharts" Version="6.0.2" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0" />
       <PackageReference Include="Photino.Blazor" Version="4.0.13" />
     </ItemGroup>
 
@@ -34,6 +35,14 @@
         <None Update="openrpg.ico">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Content\Data\class-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Data\item-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Data\quest-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Data\race-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Locales\en-gb.lang.json" />
     </ItemGroup>
 
     <Target Name="_StaticWebAssetsComputeFilesToBuild" AfterTargets="GetCopyToOutputDirectoryItems" DependsOnTargets="ResolveStaticWebAssetsInputs">

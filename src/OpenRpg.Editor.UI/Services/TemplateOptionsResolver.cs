@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using OpenRpg.Editor.Core.Plugins;
 using OpenRpg.Editor.Infrastructure.Services;
 
@@ -6,17 +7,19 @@ namespace OpenRpg.Editor.UI.Services;
 public class TemplateOptionsResolver : ITemplateOptionsResolver
 {
     private readonly GenreTypesService _genreTypes;
+    private readonly ILogger<TemplateOptionsResolver> _logger;
 
-    public TemplateOptionsResolver(GenreTypesService genreTypes)
+    public TemplateOptionsResolver(GenreTypesService genreTypes, ILogger<TemplateOptionsResolver> logger)
     {
         _genreTypes = genreTypes;
+        _logger = logger;
     }
 
     public OptionData[] GetOptionsForType(string typeSource, string templateTypeName = "")
     {
         var finalTypeSource = ResolveSkillType(typeSource, templateTypeName);
 
-        return finalTypeSource switch
+        var result = finalTypeSource switch
         {
             "itemTypes" => _genreTypes.ItemTypes,
             "itemQualityTypes" => _genreTypes.ItemQualityTypes,
@@ -34,8 +37,16 @@ public class TemplateOptionsResolver : ITemplateOptionsResolver
             "targetTypes" => _genreTypes.TargetTypes,
             "damageTypes" => _genreTypes.DamageTypes,
             "itemSlotTypes" => _genreTypes.ItemSlotTypes,
-            _ => System.Array.Empty<OptionData>()
+            _ => ResolveUnknownTypeSource(finalTypeSource)
         };
+
+        return result;
+    }
+
+    private OptionData[] ResolveUnknownTypeSource(string typeSource)
+    {
+        _logger.LogWarning("Unknown type source '{TypeSource}' requested - returning empty options", typeSource);
+        return System.Array.Empty<OptionData>();
     }
 
     private static string ResolveSkillType(string typeSource, string templateTypeName)

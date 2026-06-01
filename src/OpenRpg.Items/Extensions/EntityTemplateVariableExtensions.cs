@@ -25,9 +25,9 @@ public static class EntityTemplateVariableExtensions
         
     extension(EntityTemplateVariables vars)
     {
-        public ILootTable LootTable
+        public LootTableData LootTable
         {
-            get => vars.GetAsOrDefaultAndSet(ItemEntityTemplateVariableTypes.LootTable, () => new DefaultLootTable());
+            get => vars.GetAsOrDefaultAndSet(ItemEntityTemplateVariableTypes.LootTable, () => new LootTableData());
             set => vars[ItemEntityTemplateVariableTypes.LootTable] = value;
         }
     }

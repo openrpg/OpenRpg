@@ -38,14 +38,14 @@ public class JsonTemplateDatastorePopulator : ITemplateDatastorePopulator
         await ProcessTemplates<EntityTemplate>(project, absoluteTemplateFolderPath, dataSource);
     }
     
-    public async Task PopulateDatastore(Project project, string projectPath, IDataSource dataSource)
+    public async Task PopulateDatastore(ProjectContext projectContext, IDataSource dataSource)
     {
-        var templateFolderPath = project.TemplatesFolder;
-        var absoluteTemplateFolderPath = Path.Combine(projectPath, templateFolderPath);
+        var templateFolderPath = projectContext.Project.TemplatesFolder;
+        var absoluteTemplateFolderPath = Path.Combine(projectContext.ProjectPath, templateFolderPath);
         var templatePathExists = await FileService.Exists(absoluteTemplateFolderPath);
         if(!templatePathExists) { throw new Exception($"Template folder [{absoluteTemplateFolderPath}] cannot be found"); }
         
-        await ProcessTemplateTypes(project, absoluteTemplateFolderPath, dataSource);
+        await ProcessTemplateTypes(projectContext.Project, absoluteTemplateFolderPath, dataSource);
     }
 
     protected async Task ProcessTemplates<T>(Project project, string templateFolderPath, IDataSource dataSource, bool throwOnMissing = false) where T : ITemplate

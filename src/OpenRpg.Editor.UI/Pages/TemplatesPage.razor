@@ -6,18 +6,16 @@
 @using OpenRpg.Editor.Core.Plugins
 @using OpenRpg.Editor.Core.Services.Notifications
 @using OpenRpg.Editor.Infrastructure.Plugins
-@using OpenRpg.Editor.Infrastructure.Services
-@using OpenRpg.Entities.Extensions
-@using OpenRpg.Localization.Data.Repositories
+@using OpenRpg.Editor.UI.Services
 @using OpenRpg.Editor.Infrastructure.Helpers
-@using OpenRpg.Core.Variables
+@using OpenRpg.Localization.Data.Repositories
 
 @inject INotifier Notifier
 @inject IRepository Repository
 @inject ILocaleRepository LocaleRepository
-@inject ICloner Cloner
 @inject NavigationManager NavigationManager
 @inject GenreService GenreService
+@inject TemplatePageService TemplateService
 
 <style>
     .template-link {
@@ -215,24 +213,22 @@
     
     private void LoadTemplateType()
     {
-        var registry = GenreService.GetTemplateTypeRegistry();
-        Descriptor = registry.GetTemplateType(TemplateType);
+        TemplateHelper = TemplateService.CreateHelper(TemplateType, out var descriptor);
+        Descriptor = descriptor;
 
-        if (Descriptor == null) { return; }
+        if (TemplateHelper == null || Descriptor == null) { return; }
 
         var templateType = Type.GetType(Descriptor.TemplateTypeName);
         if (templateType == null) { return; }
 
-        TemplateHelper = new DynamicTemplateHelper(templateType, Repository);
-
         var genericEditorType = typeof(DynamicTemplateEditor<>).MakeGenericType(templateType);
         _dynamicEditor = genericEditorType;
-        
+
         FriendlyName = Descriptor.Name;
 
         RefreshTemplateList();
         CurrentTemplate = _allTemplates.FirstOrDefault();
-        
+
         UpdateEditorParams();
 
         if (CurrentTemplate != null)
@@ -247,7 +243,7 @@
         {
             { "Template", CurrentTemplate },
             { "AssetCodePrefix", Descriptor.AssetCodePrefix },
-            { "ExternalGroups", GetEditorGroups() }
+            { "ExternalGroups", TemplateService.GetEditorGroups(Descriptor) }
         };
     }
 
@@ -255,28 +251,6 @@
     {
         var registry = GenreService.GetTemplateTypeRegistry();
         return registry.GetTemplateTypes();
-    }
-
-    private List<TemplateEditorGroup> GetEditorGroups()
-    {
-        if (Descriptor?.Groups != null)
-        {
-            return Descriptor.Groups.Select(g => new TemplateEditorGroup
-            {
-                Title = g.Title,
-                EditorComponent = g.EditorComponent,
-                Options = g.Options ?? new Dictionary<string, string>(),
-                Fields = g.Fields?.Select(f => new TemplateEditorField
-                {
-                    Property = f.Property,
-                    Name = f.Name,
-                    EditorType = f.EditorType,
-                    EditorComponent = f.EditorComponent,
-                    Options = f.Options ?? new Dictionary<string, string>()
-                }).ToList() ?? new List<TemplateEditorField>()
-            }).ToList();
-        }
-        return new List<TemplateEditorGroup>();
     }
 
     private void RefreshTemplateList()
@@ -296,13 +270,7 @@
     }
 
     private string GetAssetCode(ITemplate template)
-    {
-        var id = template.GetType().GetProperty("Id")?.GetValue(template) as int? ?? 0;
-        var variables = template.GetType().GetProperty("Variables")?.GetValue(template) as IVariables<object>;
-        return variables?.HasAssetCode() == true
-            ? variables.AssetCode
-            : $"{Descriptor?.AssetCodePrefix ?? "template"}-{id}";
-    }
+        => TemplateService.GetAssetCode(template, Descriptor?.AssetCodePrefix);
 
     private void GoToPage(int page)
     {
@@ -314,24 +282,8 @@
     
     private void AddTemplate()
     {
-        var newId = TemplateHelper.GetNewId();
-        var newTemplate = Activator.CreateInstance(TemplateHelper.TemplateType) as ITemplate;
+        var newTemplate = TemplateService.CreateTemplate(TemplateHelper, Descriptor.AssetCodePrefix);
         if (newTemplate == null) { return; }
-
-        var variables = TemplateHelper.GetVariables(newTemplate);
-        variables.AssetCode = $"{Descriptor.AssetCodePrefix}-{newId}";
-        
-        TemplateHelper.SetId(newTemplate, newId);
-        TemplateHelper.ListifyProperties(newTemplate);
-        TemplateHelper.GenerateLocaleCodes(newTemplate);
-
-        var localeCode = LocaleRepository.CurrentLocaleCode;
-        if (!string.IsNullOrEmpty(newTemplate.NameLocaleId) && !LocaleRepository.DataSource.Exists(localeCode, newTemplate.NameLocaleId))
-        { LocaleRepository.DataSource.Create(localeCode, newTemplate.NameLocaleId, ""); }
-        if (!string.IsNullOrEmpty(newTemplate.DescriptionLocaleId) && !LocaleRepository.DataSource.Exists(localeCode, newTemplate.DescriptionLocaleId))
-        { LocaleRepository.DataSource.Create(localeCode, newTemplate.DescriptionLocaleId, ""); }
-
-        TemplateHelper.Create(newTemplate, newId);
 
         RefreshTemplateList();
         CurrentTemplate = newTemplate;
@@ -359,7 +311,7 @@
 
         _showDeleteConfirm = false;
 
-        TemplateHelper.Delete(CurrentTemplate);
+        TemplateService.DeleteTemplate(TemplateHelper, CurrentTemplate);
         await Notifier.ShowNotification($"Deleted {FriendlyName} Template");
 
         RefreshTemplateList();
@@ -377,26 +329,9 @@
     {
         if (CurrentTemplate == null) { return; }
 
-        var rawClone = Cloner.Clone(CurrentTemplate);
-        var clone = rawClone as ITemplate;
-        var newId = TemplateHelper.GetNewId();
+        var clone = TemplateService.CloneTemplate(TemplateHelper, CurrentTemplate);
+        if (clone == null) { return; }
 
-        var oldNameLocaleId = clone.NameLocaleId;
-        var oldDescriptionLocaleId = clone.DescriptionLocaleId;
-
-        var variables = TemplateHelper.GetVariables(clone);
-        variables.AssetCode = $"{variables.AssetCode}-clone";
-        
-        TemplateHelper.SetId(clone, newId);
-        TemplateHelper.ListifyProperties(clone);
-        TemplateHelper.GenerateLocaleCodes(clone);
-
-        var localeCode = LocaleRepository.CurrentLocaleCode;
-        CopyLocaleEntry(localeCode, oldNameLocaleId, clone.NameLocaleId);
-        CopyLocaleEntry(localeCode, oldDescriptionLocaleId, clone.DescriptionLocaleId);
-
-        TemplateHelper.Create(clone, newId);
-        
         await Notifier.ShowNotification($"Cloned {FriendlyName} Template");
 
         RefreshTemplateList();
@@ -405,14 +340,5 @@
         StateHasChanged();
     }
 
-    private void CopyLocaleEntry(string localeCode, string oldLocaleId, string newLocaleId)
-    {
-        if (string.IsNullOrEmpty(oldLocaleId) || string.IsNullOrEmpty(newLocaleId))
-            return;
-        if (!LocaleRepository.DataSource.Exists(localeCode, oldLocaleId))
-            return;
-        var text = LocaleRepository.DataSource.Get(localeCode, oldLocaleId);
-        if (!LocaleRepository.DataSource.Exists(localeCode, newLocaleId))
-        { LocaleRepository.DataSource.Create(localeCode, newLocaleId, text); }
-    }
+
 }

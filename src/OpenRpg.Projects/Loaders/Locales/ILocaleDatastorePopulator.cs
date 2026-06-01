@@ -5,5 +5,5 @@ namespace OpenRpg.Projects.Loaders.Locales;
 
 public interface ILocaleDatastorePopulator
 {
-    Task PopulateDatastore(Project project, string projectReference, ILocaleDataSource dataSource);
+    Task PopulateDatastore(ProjectContext projectContext, ILocaleDataSource dataSource);
 }

@@ -1,8 +1,10 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Types;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Requirements;
+using OpenRpg.Core.Utils;
 using OpenRpg.Data;
 using OpenRpg.Editor.Core.Models;
 using OpenRpg.Editor.Core.Services.Events.Broker;
@@ -17,12 +19,14 @@ using OpenRpg.Editor.Infrastructure.Persistence.Loaders;
 using OpenRpg.Editor.Infrastructure.Persistence.Migrations;
 using OpenRpg.Editor.Infrastructure.Plugins;
 using OpenRpg.Editor.Infrastructure.Services;
+using OpenRpg.Editor.Infrastructure.Services.Generators;
 using OpenRpg.Editor.Services.FileSystem;
 using OpenRpg.Editor.UI.Components.Editors.Common;
 using OpenRpg.Editor.UI.Components.Editors.List;
 using OpenRpg.Editor.UI.Services;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Entities.Types;
+using OpenRpg.Items.Loot;
 using OpenRpg.Items.Types;
 using OpenRpg.Localization.Data.DataSources;
 using OpenRpg.Localization.Data.Repositories;
@@ -45,7 +49,10 @@ namespace OpenRpg.Editor.Modules
             VariablesConverter.RegisterKey(CoreTemplateVariableTypes.Requirements, typeof(Requirement));
             VariablesConverter.RegisterKey(CombatTemplateVariableTypes.Abilities, typeof(AbilityData));
             VariablesConverter.RegisterKey(LootTableEntryVariableTypes.Requirements, typeof(Requirement));
+            
             services.AddSingleton<ICloner, Cloner>();
+            services.AddSingleton<IRandomizer>(x => new DefaultRandomizer(new Random()));
+            services.AddSingleton<ILootTableProcessor, DefaultLootTableProcessor>();
             services.AddTransient<IModalService, ModalService>();
             services.AddTransient<INotifier, Notifier>();
             services.AddSingleton<IFileBrowser, PhotinoNativeFileBrowser>();
@@ -55,9 +62,11 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<IEventBus, EventBus>();
             
             services.AddSingleton<EditorState>();
-            services.AddSingleton<CreateProjectExecutor>();
-            services.AddSingleton<SaveProjectExecutor>();
+            services.AddSingleton<ProjectCreator>();
+            services.AddSingleton<EditorProjectSaver>();
             services.AddSingleton<EditorDataLoader>();
+
+            services.AddSingleton<IProjectFileGenerator, ProjectFileGenerator>();
             
             services.AddSingleton<EditorDatasource>();
             services.AddSingleton<IDataSource>(x => x.GetService<EditorDatasource>());
@@ -78,6 +87,7 @@ namespace OpenRpg.Editor.Modules
             services.AddSingleton<ManifestPluginLoader>();
             services.AddSingleton<GenreService>();
             services.AddSingleton<GenreTypesService>();
+            services.AddSingleton<TemplatePageService>();
             services.AddSingleton<ITemplateDatastorePopulator, DynamicTemplateDatastorePopulator>();
 
             services.AddSingleton<IComponentTypeRegistry>(sp =>

@@ -9,7 +9,7 @@
 @using OpenRpg.Items.Loot
 
 @inject ITemplateAccessor TemplateAccessor
-@inject IRandomizer Randomizer
+@inject ILootTableProcessor LootTableProcessor;
 
 <Markdown>
     ## Loot Tables
@@ -18,12 +18,12 @@
 </Markdown>
 <br />
 <Markdown>
-    ### `ILootTable` interface
-    This interface exposes `AvailableLoot` which houses all the loot that can possibly be dropped as well as a method
+    ### `LootTableData`
+    This model contains `AvailableLoot` which houses all the loot that can possibly be dropped as well as a method
     `GetLoot` which returns random drops for that loot table.
     
-    The idea here is that you setup the loot tables ahead of time and assign them to your `IEnemy` implementations,
-    from there when the enemy has died you can just call `GetLoot`, which allocates you the drops.
+    The idea here is that you setup the loot tables ahead of time and assign them to your `EntityTemplate`,
+    from there when the enemy has died you can just get a `ILootTableProcessor` and call `GetLoot`, which allocates you the drops.
     
     > One thing you may notice here is that all the loot is items, however in your scenarios you may want to give
     xp or gold as drops. To do this its recommended you wrap the gold/xp in an item and expose it as a custom variable
@@ -31,9 +31,9 @@
 </Markdown>
 <br />
 <Markdown>
-    ### `ILootTableEntry` interface
+    ### `LootTableEntry`
     
-    So the loot table itself needs you to provide it `ILootTableEntry` instances which wrap the item instance as well as 
+    So the loot table itself needs you to provide it `LootTableEntry` instances which wrap the item instance as well as 
     the variables associated, such as `DropRate` or `IsUnique`. 
     
     > As with all `Variable` style objects you can add whatever variables you want to these entries, out the box there is 
@@ -42,7 +42,7 @@
     
     Here is an example of creating a simple loot entry for an item:
     ```csharp
-    IItem potionItem = GeneratePotion(); // Gets an IItem for the potion
+    ItemData potionItem = GeneratePotion(); // Gets an IItem for the potion
     var lootEntryVariables = new LootTableEntryVariables();
     lootEntryVariables.DropRate(1.0f); // 100% drop
     
@@ -52,7 +52,6 @@
         Variables = lootEntryVariables
     };
     ```
-    
 </Markdown>
 <br />
 <Markdown>
@@ -71,16 +70,15 @@
     var swordItem = GenerateSword();
     var swordLootEntry = swordItem.GenerateLootTableEntry(0.25f); // Give it a 25% chance of dropping
     
-    var lootTable = new DefaultLootTable
-    {
-    Randomizer = Randomizer, // You can provide any IRandomizer instance
-    AvailableLoot = new[] { potionLootEntry, swordLootEntry }
+    var lootTable = new LootTableData
+    { 
+        AvailableLoot = new[] { potionLootEntry, swordLootEntry }
     }
     ```
 
     Now that we have a loot table we can query it and get loot from it.
     
-    > You would normally use the `IEnemy` interface to attach loot to enemies but you can use them outside of
+    > You would normally use the `EntityTemplate.Variables.LootTable` to attach loot to enemies but you can use them outside of
     that or however you want really
 </Markdown>
 <br />
@@ -102,26 +100,25 @@
 </div>
 @code {
 
-    public ILootTable _lootTable;
-    public List<ItemData> _currentLoot = new List<ItemData>();
+    public LootTableData LootTable;
+    public List<ItemData> _currentLoot = new();
 
     protected override void OnInitialized()
     {
-        _lootTable = CreateLootTable();
+        LootTable = CreateLootTable();
 
         base.OnInitialized();
     }
 
-    public ILootTable CreateLootTable()
+    public LootTableData CreateLootTable()
     {
         var potionItem = GeneratePotion();
         var potionLootEntry = potionItem.GenerateLootTableEntry();
     
         var swordItem = GenerateSword();
         var swordLootEntry = swordItem.GenerateLootTableEntry(0.25f);
-        return new DefaultLootTable
+        return new LootTableData
         {
-            Randomizer = Randomizer,
             AvailableLoot = new[] {potionLootEntry, swordLootEntry}
         };
     }
@@ -146,7 +143,7 @@
 
     public void GetRandomLoot()
     {
-        var loot = _lootTable.GetLoot();
+        var loot = LootTableProcessor.GetLoot(LootTable);
         _currentLoot.Clear();
         _currentLoot.AddRange(loot);
     }

@@ -10,10 +10,11 @@
 @using OpenRpg.Editor.Infrastructure.Persistence
 @using OpenRpg.Editor.Infrastructure.Plugins
 @using OpenRpg.Editor.UI.Components.Modals
+@using OpenRpg.Editor.UI.Models
 
 @inject IFileBrowser FileBrowser
 @inject EditorState EditorState
-@inject CreateProjectExecutor CreateProjectExecutor
+@inject ProjectCreator ProjectCreator
 @inject EditorDataLoader EditorDataLoader
 @inject IEventBus EventBus
 @inject GenreService GenreService
@@ -21,7 +22,7 @@
 <h1 class="title is-1">OpenRpg Data Editor</h1>
 
 <div class="box">
-    @if (EditorState.CurrentProject == null)
+    @if (EditorState.ProjectContext == null)
     {
         <p class="content">Please create or load an existing project.</p>
         <div class="field">
@@ -40,7 +41,7 @@
     }
     else
     {
-        <p class="content">Using Project: <span class="tag">@EditorState.CurrentProject.ProjectPath</span></p>
+        <p class="content">Using Project: <span class="tag">@EditorState.ProjectContext.ProjectPath</span></p>
     }
 </div>
 
@@ -63,15 +64,15 @@
         ModalService.ShowModal(GenreSelectionRef.Reference);
     }
 
-    private async Task ConfirmCreateProject(List<string> enabledGenreIds)
+    private async Task ConfirmCreateProject(GenreSelectionResult result)
     {
         var projectFolder = FileBrowser.BrowseToFolder();
         if (string.IsNullOrEmpty(projectFolder)) { return; }
 
-        var newProject = await CreateProjectExecutor.Execute(projectFolder, enabledGenreIds);
-        EditorState.CurrentProject = newProject;
+        var newProject = await ProjectCreator.CreateProjectAt(projectFolder, result.EnabledGenreIds, result.GenerateTypeFiles);
+        EditorState.ProjectContext = newProject;
         
-        foreach (var genreId in enabledGenreIds)
+        foreach (var genreId in result.EnabledGenreIds)
         {
             GenreService.EnablePlugin(genreId);
         }
@@ -85,11 +86,11 @@
         var projectFile = FileBrowser.BrowseToOpenFile(filterList: "*.json");
         if(string.IsNullOrEmpty(projectFile)) { return; }
 
-        await EditorDataLoader.Load(projectFile);
+        var project = await EditorDataLoader.Load(projectFile);
         
-        if (EditorState.CurrentProject?.Project?.Plugins != null)
+        if (EditorState.ProjectContext?.Project?.Plugins != null)
         {
-            foreach (var plugin in EditorState.CurrentProject.Project.Plugins)
+            foreach (var plugin in EditorState.ProjectContext.Project.Plugins)
             {
                 GenreService.EnablePlugin(plugin.Id);
             }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Variables;
@@ -216,5 +217,43 @@ public class IVariableExtensionTests
         Assert.True(vars.ContainsKey(0));
         Assert.Equal(expected, actualValue);
         Assert.Equal(expected, vars[0]);
+    }
+
+    [Fact]
+    public void should_create_default_and_store_when_get_as_or_default_and_set_is_called_and_key_does_not_exist()
+    {
+        var vars = new Variables<object>(0);
+        var result = vars.GetAsOrDefaultAndSet(0, () => new List<int>());
+
+        Assert.NotNull(result);
+        Assert.True(vars.ContainsKey(0));
+        Assert.Same(result, vars[0]);
+    }
+
+    [Fact]
+    public void should_return_existing_value_when_get_as_or_default_and_set_is_called_and_key_exists_with_valid_value()
+    {
+        var expected = new List<int> { 1, 2, 3 };
+        var vars = new Variables<object>(0);
+        vars[0] = expected;
+
+        var result = vars.GetAsOrDefaultAndSet<IReadOnlyCollection<int>>(0, () => new List<int>());
+
+        Assert.Same(expected, result);
+        Assert.Same(expected, vars[0]);
+    }
+
+    [Fact]
+    public void should_create_default_and_overwrite_null_when_get_as_or_default_and_set_is_called_and_key_exists_with_null_value()
+    {
+        var vars = new Variables<object>(0);
+        vars[0] = null!;
+
+        var result = vars.GetAsOrDefaultAndSet<IReadOnlyCollection<int>>(0, () => new List<int>());
+
+        Assert.NotNull(result);
+        Assert.True(vars.ContainsKey(0));
+        Assert.Same(result, vars[0]);
+        Assert.IsType<List<int>>(vars[0]);
     }
 }

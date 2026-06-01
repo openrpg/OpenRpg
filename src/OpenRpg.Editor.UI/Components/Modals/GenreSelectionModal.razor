@@ -1,4 +1,5 @@
 @using OpenRpg.Editor.Core.Plugins
+@using OpenRpg.Editor.UI.Models
 
 <div class="box">
     <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
@@ -18,6 +19,16 @@
                 <p class="help">@genre.Description</p>
             </div>
         }
+
+        <hr />
+
+        <div class="control has-text-dark">
+            <label class="checkbox">
+                <input type="checkbox" @bind="_generateTypeFiles" />
+                Generate Type Classes
+            </label>
+            <p class="help">Generate C# type classes from template data for compile-time type safety.</p>
+        </div>
     }
     else
     {
@@ -37,12 +48,13 @@
     public IEnumerable<EditorPluginInfo> Genres { get; set; }
 
     [Parameter]
-    public EventCallback<List<string>> OnConfirmed { get; set; }
+    public EventCallback<GenreSelectionResult> OnConfirmed { get; set; }
 
     [Parameter]
     public EventCallback OnCancelled { get; set; }
 
     public Dictionary<string, bool> _selectedGenres = new();
+    private bool _generateTypeFiles = true;
 
     protected override void OnParametersSet()
     {
@@ -53,6 +65,7 @@
     private async Task Confirm()
     {
         var enabledGenreIds = _selectedGenres.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
-        await OnConfirmed.InvokeAsync(enabledGenreIds);
+        var result = new GenreSelectionResult(enabledGenreIds, _generateTypeFiles);
+        await OnConfirmed.InvokeAsync(result);
     }
 }
