@@ -5,6 +5,7 @@ using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Processors.Attacks.Entity;
 using OpenRpg.Data;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
+using OpenRpg.Demos.Battler.Code.Types;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
 using OpenRpg.Genres.Requirements;
@@ -19,9 +20,8 @@ public class TurnManager
     private readonly IDataSource _dataSource;
     private readonly ILocaleDataSource _localeDataSource;
     private readonly AbilityExecutor _abilityExecutor;
+    private readonly BasicAttackExecutor _basicAttackExecutor;
     private readonly ItemEffectApplier _itemEffectApplier;
-    private readonly IEntityAttackGenerator _attackGenerator;
-    private readonly IEntityAttackProcessor _attackProcessor;
     private List<BattleEntity> _party;
     private List<BattleEntity> _enemies;
     private double _phaseTimer;
@@ -49,9 +49,8 @@ public class TurnManager
     {
         _dataSource = dataSource;
         _localeDataSource = localeDataSource;
-        _attackGenerator = attackGenerator;
-        _attackProcessor = attackProcessor;
         _abilityExecutor = new AbilityExecutor(dataSource, requirementChecker, localeDataSource, attackGenerator, attackProcessor);
+        _basicAttackExecutor = new BasicAttackExecutor(attackGenerator, attackProcessor);
         _itemEffectApplier = new ItemEffectApplier();
     }
 
@@ -82,7 +81,7 @@ public class TurnManager
 
             case Phase.TurnDwell:
                 _phaseTimer += dt;
-                if (_phaseTimer >= 0.8)
+                if (_phaseTimer >= BattlerConstants.TurnDwellSeconds)
                 {
                     ExecuteAction();
                     CurrentPhase = Phase.TargetFlash;
@@ -95,7 +94,7 @@ public class TurnManager
 
             case Phase.TargetFlash:
                 _phaseTimer += dt;
-                if (_phaseTimer >= 0.3)
+                if (_phaseTimer >= BattlerConstants.TargetFlashSeconds)
                 {
                     CurrentPhase = CheckGameOver() ? Phase.GameOver : Phase.Idle;
                     _phaseTimer = 0;
@@ -189,25 +188,11 @@ public class TurnManager
     private void ExecuteBasicAttack(BattleEntity specificTarget = null)
     {
         var targets = CurrentAttacker.Team == Team.Player ? _enemies : _party;
-        var aliveTargets = targets.Where(e => e.IsAlive).ToList();
+        var result = _basicAttackExecutor.ExecuteBasicAttack(CurrentAttacker, specificTarget, targets);
 
-        BattleEntity target;
-        if (specificTarget != null && specificTarget.IsAlive)
-            target = specificTarget;
-        else
-            target = aliveTargets[_rng.Next(aliveTargets.Count)];
-        CurrentTargets = [target];
-
-        var attack = _attackGenerator.GenerateAttack(CurrentAttacker.Entity.Stats);
-        var processed = _attackProcessor.ProcessAttack(attack, target.Entity.Stats);
-        var totalDamage = (int)Math.Max(1, processed.DamageDone.Sum(d => d.Value));
-
-        target.Entity.State.DeductHealth(totalDamage);
-        OnDamageDealt?.Invoke(target, totalDamage, attack.IsCritical);
-
-        var attackerName = UI.NameHelper.NormalizeName(CurrentAttacker.Name);
-        var targetName = UI.NameHelper.NormalizeName(target.Name);
-        LastActionMessage = CombatLogBuilder.BuildAttackMessage(attackerName, targetName, totalDamage, attack.IsCritical);
+        CurrentTargets = [result.Target];
+        OnDamageDealt?.Invoke(result.Target, result.Damage, result.IsCrit);
+        LastActionMessage = result.Message;
     }
 
     private void UseItemOnTarget(ItemData itemData, BattleEntity target)

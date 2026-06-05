@@ -23,7 +23,6 @@ namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Combat;
 
 public class AbilityExecutor
 {
-    private static readonly Random _rng = new();
     private readonly IDataSource _dataSource;
     private readonly ICharacterRequirementChecker _requirementChecker;
     private readonly ILocaleDataSource _localeDataSource;
@@ -106,7 +105,8 @@ public class AbilityExecutor
 
         if (affordable.Count == 0) return false;
 
-        var pick = affordable[_rng.Next(affordable.Count)];
+        var rng = new Random();
+        var pick = affordable[rng.Next(affordable.Count)];
         result = ExecuteAbility(entity, pick.Template);
         return true;
     }
@@ -114,32 +114,14 @@ public class AbilityExecutor
     public AbilityResult ExecuteAbility(BattleEntity attacker, AbilityTemplate template, List<BattleEntity> specificTargets = null)
     {
         var baseDamage = template.Variables.GetAsOrDefault<Damage>(CombatAbilityTemplateVariableTypes.Damage, () => new Damage(0, 0));
-        var isHealing = baseDamage.Type >= 90;
-        var targetType = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetType, 1);
-        var targetCount = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetCount, 1);
+        var isHealing = TargetResolver.IsHealing(baseDamage);
         var manaCost = template.Variables.GetIntOrDefault(FantasyAbilityTemplateVariableTypes.ManaCost, 0);
 
         attacker.Entity.State.DeductMana(manaCost, attacker.MaxMana);
 
-        List<BattleEntity> selected;
-        if (specificTargets != null && specificTargets.Count > 0)
-        {
-            selected = specificTargets.Where(t => t.IsAlive).ToList();
-            if (selected.Count == 0)
-                return new AbilityResult([], "", []);
-        }
-        else
-        {
-            var pool = isHealing
-                ? (attacker.Team == Team.Player ? _party : _enemies)
-                : (attacker.Team == Team.Player ? _enemies : _party);
-            var aliveTargets = pool.Where(e => e.IsAlive).ToList();
-            var actualTargetCount = targetType == CombatTargetTypes.MultipleTarget
-                ? Math.Min(targetCount, aliveTargets.Count) : 1;
-            if (actualTargetCount == 0)
-                return new AbilityResult([], "", []);
-            selected = aliveTargets.OrderBy(_ => _rng.Next()).Take(actualTargetCount).ToList();
-        }
+        var selected = TargetResolver.ResolveTargets(template, attacker, specificTargets, _party, _enemies);
+        if (selected.Count == 0)
+            return new AbilityResult([], "", []);
 
         var attackerName = NameHelper.NormalizeName(attacker.Name);
         var abilityName = _localeDataSource.Get("en-gb", template.NameLocaleId);

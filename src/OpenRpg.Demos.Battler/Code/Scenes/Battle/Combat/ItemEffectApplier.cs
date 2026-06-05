@@ -15,6 +15,19 @@ public class ItemEffectApplier
 {
     public record ApplyResult(int HealAmount, int ManaAmount, int ReviveAmount);
 
+    public static bool HasLifeRestoreEffect(ItemTemplate template)
+    {
+        if (template.Variables.Effects == null) return false;
+        foreach (var effect in template.Variables.Effects)
+        {
+            if (effect is StaticEffect se &&
+                (se.EffectType == GenreEffectTypes.LifeRestoreAmount ||
+                 se.EffectType == GenreEffectTypes.LifeRestorePercentage))
+                return true;
+        }
+        return false;
+    }
+
     public ApplyResult ApplyItemEffects(ItemData itemData, BattleEntity target, ItemTemplate template)
     {
         var healAmount = 0;

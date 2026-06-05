@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Combat.Types;
 using OpenRpg.Data;
@@ -26,7 +25,7 @@ public class PartyProvider : IPartyProvider
         _characterBuilder = characterBuilder;
     }
 
-    public Task<List<BattleEntity>> BuildPartyAsync()
+    public List<BattleEntity> BuildParty()
     {
         var entities = new List<BattleEntity>();
         var slotIndex = 0;
@@ -42,7 +41,7 @@ public class PartyProvider : IPartyProvider
             var character = _characterBuilder
                 .CreateNew()
                 .WithRaceId(RaceLookups.Human)
-                .WithClassId(classId, 1)
+                .WithClassId(classId, BattlerConstants.DefaultCharacterLevel)
                 .WithName(name)
                 .Build();
 
@@ -67,6 +66,6 @@ public class PartyProvider : IPartyProvider
             slotIndex++;
         }
 
-        return Task.FromResult(entities);
+        return entities;
     }
 }

@@ -90,7 +90,7 @@ public class BattleScene : IScene
             _floatingNumbers.Clear();
 
             Party = _gameState.Party;
-            Enemies = await _enemyFormationProvider.GenerateFormationAsync();
+            Enemies = _enemyFormationProvider.GenerateFormation();
             LayoutEntities();
 
             foreach (var e in Party.Concat(Enemies))
@@ -199,8 +199,17 @@ public class BattleScene : IScene
                     var aliveEnemies = Enemies.Where(e => e.IsAlive).ToList();
                     var aliveParty = Party.Where(e => e.IsAlive).ToList();
                     var abilities = _turnManager.GetAvailableAbilities(_turnManager.CurrentAttacker);
-                    _commandMenu.Show(_turnManager.CurrentAttacker, aliveEnemies, abilities, _localeDataSource,
-                        _gameState.SharedInventory, aliveParty, _dataSource, Party);
+                    _commandMenu.Show(new CommandMenuContext
+                    {
+                        Attacker = _turnManager.CurrentAttacker,
+                        AliveEnemies = aliveEnemies,
+                        Abilities = abilities,
+                        LocaleDataSource = _localeDataSource,
+                        InventoryItems = _gameState.SharedInventory,
+                        AliveParty = aliveParty,
+                        DataSource = _dataSource,
+                        AllParty = Party
+                    });
                 }
 
             _commandMenu.HandleInput(currentKeyboard, _previousKeyboard);
