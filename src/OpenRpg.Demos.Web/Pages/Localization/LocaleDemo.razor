@@ -1,0 +1,265 @@
+@page "/localization/locale-demo"
+@using OpenRpg.Localization
+@using OpenRpg.Localization.Data.DataSources
+@using OpenRpg.Localization.Data.Repositories
+@using OpenRpg.Localization.Data.Extensions
+@inject ILocaleRepository LocaleRepository
+@inject ILocaleDataSource LocaleDataSource
+
+<div class="columns">
+    <div class="column is-two-thirds">
+        <Markdown>
+            ## Interactive Locale Demo
+
+            To show a more real example of locale information and usage, you can see all current setup locales and also add new locales/entries.
+            
+            In the real world you would likely use the OpenRpg Editor or your own tooling to manage locales etc, but this gives a good interactive example of how it all hangs together.
+        </Markdown>
+        <br />
+        <CardSection>
+            <Markdown Containerless="true">
+                ### Locale Browser — @_currentLocale
+            </Markdown>
+            <div class="field">
+                <div class="control has-icons-left">
+                    <input class="input" type="text" placeholder="Search locale keys..." @bind="_searchTerm" @bind:event="oninput" />
+                    <span class="icon is-small is-left">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="field">
+                <div class="tags">
+                    <span class="tag @(string.IsNullOrEmpty(_categoryFilter) ? "is-info" : "is-dark")" @onclick="() => { _categoryFilter = null; _page = 1; }" style="cursor:pointer">All</span>
+                    @foreach (var cat in _categories)
+                    {
+                        <span class="tag @(_categoryFilter == cat ? "is-info" : "is-dark")" @onclick="() => { _categoryFilter = cat; _page = 1; }" style="cursor:pointer">@cat</span>
+                    }
+                </div>
+            </div>
+            <div style="max-height: 500px; overflow-y: auto;">
+                <table class="table is-fullwidth is-striped is-hoverable is-narrow">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var entry in PagedEntries)
+                        {
+                            <tr>
+                                <td><code>@entry.Key</code></td>
+                                <td>@entry.Value</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="level is-mobile mt-2">
+                <div class="level-left">
+                    <span class="has-text-grey is-size-7">@FilteredEntries.Count entries total</span>
+                </div>
+                <div class="level-right">
+                    <div class="buttons has-addons">
+                        <button class="button is-small is-dark" disabled="@(_page <= 1)" @onclick="() => _page--">Prev</button>
+                        <span class="button is-small is-static">@_page / @TotalPages</span>
+                        <button class="button is-small is-dark" disabled="@(_page >= TotalPages)" @onclick="() => _page++">Next</button>
+                    </div>
+                </div>
+            </div>
+        </CardSection>
+    </div>
+    <div class="column is-one-third">
+        <CardSection>
+            <Markdown Containerless="true">
+                ### Locale Settings
+                
+                You can switch the active locale below, or add a new one if you want.
+            </Markdown>
+            <div class="tags">
+                @foreach (var locale in _availableLocales)
+                {
+                    <span class="tag @(locale == _currentLocale ? "is-info" : "is-dark")" style="cursor:pointer" @onclick="() => SwitchLocale(locale)">@locale</span>
+                }
+            </div>
+            <div class="field has-addons">
+                <div class="control">
+                    <input class="input is-small" type="text" placeholder="New locale code..." @bind="_newLocaleCodeInput" />
+                </div>
+                <div class="control">
+                    <button class="button is-small is-info" @onclick="AddNewLocale">Create Locale</button>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(_localeSwitchResult))
+            {
+                <div class="notification is-success is-light py-2 px-3 mt-2 mb-0">@_localeSwitchResult</div>
+            }
+        </CardSection>
+        <br/>
+        <CardSection>
+            <Markdown Containerless="true">
+                ### Add Locale Entry
+
+                Adding to: **@_currentLocale**
+            </Markdown>
+            <div class="field">
+                <label class="label">Key</label>
+                <div class="control">
+                    <input class="input is-small" type="text" placeholder="e.g. types-effects-100" @bind="_newLocaleKey"/>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Translated Text</label>
+                <div class="control">
+                    <input class="input is-small" type="text" placeholder="Translated text..." @bind="_newLocaleText"/>
+                </div>
+            </div>
+            <div class="field">
+                <button class="button is-primary is-small" @onclick="CreateLocaleEntry">Add Entry</button>
+            </div>
+            @if (!string.IsNullOrEmpty(_createResult))
+            {
+                <div class="notification is-success is-light py-2 px-3">@_createResult</div>
+            }
+        </CardSection>
+    </div>
+</div>
+
+@code {
+    private ILocaleDataSource _localeDataSource;
+    private List<string> _availableLocales = new();
+    private string _currentLocale = string.Empty;
+    private string _newLocaleCodeInput = string.Empty;
+    private string _localeSwitchResult;
+
+    private Dictionary<string, string> _allEntries = new();
+    private List<string> _categories = new();
+    private string _searchTerm = string.Empty;
+    private string _categoryFilter;
+    private int _page = 1;
+    private const int PageSize = 50;
+    private string _newLocaleKey;
+    private string _newLocaleText;
+    private string _createResult;
+
+    private List<KeyValuePair<string, string>> FilteredEntries
+    {
+        get
+        {
+            var entries = _allEntries.AsEnumerable();
+
+            if (!string.IsNullOrEmpty(_categoryFilter))
+                entries = entries.Where(e => e.Key.StartsWith(_categoryFilter));
+
+            if (!string.IsNullOrEmpty(_searchTerm))
+                entries = entries.Where(e =>
+                    e.Key.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    e.Value.Contains(_searchTerm, StringComparison.OrdinalIgnoreCase));
+
+            return entries.ToList();
+        }
+    }
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(FilteredEntries.Count / (double)PageSize));
+
+    private List<KeyValuePair<string, string>> PagedEntries =>
+        FilteredEntries.Skip((_page - 1) * PageSize).Take(PageSize).ToList();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _localeDataSource = LocaleRepository.DataSource;
+        _currentLocale = LocaleRepository.CurrentLocaleCode;
+        RefreshAvailableLocales();
+        LoadLocaleData();
+    }
+
+    private void RefreshAvailableLocales()
+    {
+        _availableLocales = LocaleDataSource.GetLocaleCodes().OrderBy(x => x).ToList();
+    }
+
+    private void LoadLocaleData()
+    {
+        _page = 1;
+
+        var dataset = LocaleRepository.GetDataset();
+        _allEntries = dataset.LocaleData
+            .OrderBy(e => e.Key)
+            .ToDictionary(e => e.Key, e => e.Value);
+
+        _categories = _allEntries.Keys
+            .Select(k =>
+            {
+                var lastDash = k.LastIndexOf('-');
+                return lastDash > 0 ? k[..lastDash] : k;
+            })
+            .Distinct()
+            .OrderBy(c => c)
+            .ToList();
+    }
+
+    private void SwitchLocale(string locale)
+    {
+        LocaleRepository.ChangeLocale(locale);
+        _currentLocale = locale;
+        _localeSwitchResult = $"Switched to '{locale}'.";
+        LoadLocaleData();
+    }
+
+    private void AddNewLocale()
+    {
+        _localeSwitchResult = null;
+
+        if (string.IsNullOrWhiteSpace(_newLocaleCodeInput))
+        {
+            _localeSwitchResult = "Please enter a locale code.";
+            return;
+        }
+
+        var localeCode = _newLocaleCodeInput.Trim().ToLowerInvariant();
+
+        if (_availableLocales.Contains(localeCode))
+        {
+            _localeSwitchResult = $"Locale '{localeCode}' already exists.";
+            return;
+        }
+
+        _localeDataSource.GetLocaleDataset(localeCode);
+        RefreshAvailableLocales();
+        _localeSwitchResult = $"Created locale '{localeCode}'.";
+        _newLocaleCodeInput = string.Empty;
+    }
+
+    private void CreateLocaleEntry()
+    {
+        _createResult = null;
+
+        if (string.IsNullOrWhiteSpace(_newLocaleKey) || string.IsNullOrWhiteSpace(_newLocaleText))
+        {
+            _createResult = "All fields are required.";
+            return;
+        }
+
+        try
+        {
+            if (LocaleRepository.Exists(_newLocaleKey))
+            {
+                LocaleRepository.Update(_newLocaleKey, _newLocaleText);
+                _createResult = $"Updated '{_newLocaleKey}' in '{_currentLocale}'.";
+            }
+            else
+            {
+                LocaleRepository.Create(_newLocaleKey, _newLocaleText);
+                _createResult = $"Created '{_newLocaleKey}' in '{_currentLocale}'.";
+            }
+
+            LoadLocaleData();
+        }
+        catch (Exception)
+        {
+            _createResult = $"Failed to add entry to '{_currentLocale}'.";
+        }
+    }
+}

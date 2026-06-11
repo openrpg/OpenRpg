@@ -1,0 +1,97 @@
+@page "/localization/basic-components"
+
+<Markdown>
+    ## Localization Components
+
+    The `OpenRpg.Localization` library provides a locale-aware text resolution system. Rather than hardcoding display strings
+    on templates and entities, you store **locale codes** (keys) and resolve them at runtime via a `ILocaleRepository`.
+
+    This approach means one template can serve any language — you just swap the locale dataset.
+</Markdown>
+<br />
+<div class="columns">
+    <div class="column is-two-thirds">
+        <Markdown>
+            ### Core Architecture
+
+            The system is layered into three parts:
+
+            1. **`LocaleDataset`** — A mapping of string keys to translated text for a single locale code (e.g. `"en-gb"`).
+            2. **`ILocaleDataSource`** — Storage abstraction for one or more locale datasets. The demo uses `InMemoryLocaleDataSource`.
+            3. **`ILocaleRepository`** — The consumer-facing API. Holds a `CurrentLocaleCode` and resolves keys via extension methods.
+
+            #### How it works in practice
+
+            Templates store locale codes, not display text:
+
+            ```csharp
+            var swordTemplate = new ItemTemplate();
+            swordTemplate.NameLocaleId = "item-sword-name";
+            swordTemplate.DescriptionLocaleId = "item-sword-desc";
+            ```
+
+            To display the name, you resolve it through the repository:
+
+            ```csharp
+            var displayName = LocaleRepository.Get("item-sword-name");
+            // => "Long Sword" (if en-gb dataset has that key)
+            ```
+
+            #### Switching Languages
+
+            Calling `ChangeLocale()` swaps the active dataset for all subsequent lookups:
+
+            ```csharp
+            LocaleRepository.ChangeLocale("fr-fr");
+            var frenchName = LocaleRepository.Get("item-sword-name");
+            ```
+        </Markdown>
+        <br/>
+        <Markdown>
+            ### Query Pattern
+
+            The repository uses a **Command/Query** separation pattern. Instead of methods directly on the repository,
+            operations are encapsulated as query objects:
+
+            ```csharp
+            // Direct query usage
+            var name = repository.Query(new GetLocaleQuery("item-sword-name"));
+
+            // Or use the extension method (recommended)
+            var name = repository.Get("item-sword-name");
+            ```
+        </Markdown>
+    </div>
+    <div class="column is-one-third">
+        <Markdown>
+            ### Extension Methods
+
+            The `RepositoryExtensions` class provides a clean API over the query pattern:
+
+            - **`Get(id)`** — Resolve a single locale key to its display text.
+            - **`GetAll(ids...)`** — Resolve multiple keys at once.
+            - **`Create(id, text)`** — Add a new key-value pair to the current locale.
+            - **`Update(id, text)`** — Overwrite an existing key with new text.
+            - **`Delete(id)`** — Remove a key from the current locale.
+            - **`Exists(id)`** — Check if a key exists without throwing.
+            - **`GetDataset()`** — Retrieve the entire locale dataset.
+        </Markdown>
+        <br />
+        <Markdown>
+            ### Demo Locale Data
+
+            The web demo pre-generates locale data for `en-gb` using `LocaleDataGenerator`. It reflects over
+            the type constant classes and creates human-readable labels:
+
+            - `FantasyEffectTypes.HealthBonusAmount` → key `types-effects-100` → `"Health"`
+            - `FantasyItemTypes.Sword` → key `types-item-type-300` → `"Sword"`
+            - `FantasyDamageTypes.Fire` → key `types-damage-900` → `"Fire"`
+
+            Keys follow the pattern `"{prefix}{intId}"` where the int ID matches the static const fields on the Types classes.
+        </Markdown>
+    </div>
+</div>
+
+@code {
+
+}
