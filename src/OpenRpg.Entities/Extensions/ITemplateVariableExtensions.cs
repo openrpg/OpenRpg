@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using OpenRpg.Core.Effects;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Requirements;
@@ -30,13 +31,13 @@ namespace OpenRpg.Entities.Extensions
             public IReadOnlyCollection<IEffect> Effects
             {
                 get => vars.GetAsOrDefaultAndSet(CoreTemplateVariableTypes.Effects, () => new List<IEffect>());
-                set => vars[CoreTemplateVariableTypes.Effects] = value;
+                set => vars[CoreTemplateVariableTypes.Effects] = value as List<IEffect> ?? value?.ToList() ?? new List<IEffect>();
             }
 
             public IReadOnlyCollection<Requirement> Requirements
             {
                 get => vars.GetAsOrDefaultAndSet(CoreTemplateVariableTypes.Requirements, () => new List<Requirement>());
-                set => vars[CoreTemplateVariableTypes.Requirements] = value;
+                set => vars[CoreTemplateVariableTypes.Requirements] = value as List<Requirement> ?? value?.ToList() ?? new List<Requirement>();
             }
             
             public ProceduralEffects ProceduralEffects

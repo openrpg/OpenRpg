@@ -9,6 +9,7 @@ using OpenRpg.Demos.Infrastructure.Data;
 using OpenRpg.Demos.Infrastructure.Extensions;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Races.Templates;
+using OpenRpg.Entities.Modifications.Templates;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.TradeSkills.Templates;
 using OpenRpg.Localization.Data.DataSources;
@@ -36,6 +37,7 @@ namespace OpenRpg.Demos.Infrastructure.DI
             data.Add(typeof(ItemTemplate), new ItemTemplateDataGenerator().GenerateDictionary());
             data.Add(typeof(ItemGatheringTemplate), new GatheringTemplateDataGenerator().GenerateDictionary());
             data.Add(typeof(ItemCraftingTemplate), new CraftingTemplateDataGenerator().GenerateDictionary());
+            data.Add(typeof(ItemModificationTemplate), new ItemModificationTemplateDataGenerator().GenerateDictionary());
             return new InMemoryDataSource(data);
         }
 

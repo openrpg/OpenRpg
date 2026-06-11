@@ -43,7 +43,12 @@
     public Character Character { get; set; }
     
     public string GetEffectText(int effectType)
-    { return LocaleRepository.Get(LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.EffectTextKey, effectType)); }
+    {
+        var key = LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.EffectTextKey, effectType);
+        if (LocaleRepository.Exists(key))
+        { return LocaleRepository.Get(key); }
+        return effectType.ToString();
+    }
 
     public bool HasRequirements(IEffect staticEffect)
     {
