@@ -7,6 +7,7 @@ using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Types;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.TradeSkills.Extensions;
+using OpenRpg.Quests.Extensions;
 using OpenRpg.Quests.State;
 
 namespace OpenRpg.Genres.Requirements
@@ -118,6 +119,7 @@ namespace OpenRpg.Genres.Requirements
                 var hasTrigger = state.ContainsKey(requirement.Association.AssociatedId);
                 var triggerState = (requirement.Association.AssociatedValue == 1);
                 if(requirement.Association.AssociatedValue == 0 && !hasTrigger) { return true; }
+                if(!hasTrigger) { return false; }
                 
                 return state[requirement.Association.AssociatedId] == triggerState;
             }
