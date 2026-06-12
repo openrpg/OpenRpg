@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Combat.Processors.Attacks;
 using OpenRpg.Combat.Processors.Attacks.Entity;
@@ -21,6 +22,8 @@ using OpenRpg.Genres.Requirements;
 using OpenRpg.Genres.Objectives;
 using OpenRpg.Items.Equippables.Slots;
 using OpenRpg.Items.Loot;
+using OpenRpg.Tags;
+using OpenRpg.Tags.Data;
 
 namespace OpenRpg.Demos.Infrastructure.DI
 {
@@ -42,6 +45,41 @@ namespace OpenRpg.Demos.Infrastructure.DI
             services.AddSingleton<ICharacterPopulator, CharacterPopulator>();
             services.AddSingleton<FantasyCharacterBuilder>();
             services.AddSingleton<IEquipmentSlotValidator, FantasyCharacterEquipmentSlotValidator>();
+            services.AddSingleton<ITagRegistry>(CreateTagRegistry());
+        }
+
+        private static ITagRegistry CreateTagRegistry()
+        {
+            // Tag IDs used in the demo
+            const int Armour = 1, Weapon = 2, Heavy = 3, Light = 4, Metal = 5, Wood = 6, Leather = 7, Fire = 8, Ice = 9, Consumable = 10;
+
+            var registry = new TagRegistry();
+            registry.AddRelationship(Armour, Heavy, 0.5f);
+            registry.AddRelationship(Armour, Light, 0.5f);
+            registry.AddRelationship(Armour, Metal, 0.4f);
+            registry.AddRelationship(Armour, Wood, 0.2f);
+            registry.AddRelationship(Armour, Leather, 0.6f);
+
+            registry.AddRelationship(Weapon, Heavy, 0.3f);
+            registry.AddRelationship(Weapon, Light, 0.7f);
+            registry.AddRelationship(Weapon, Metal, 0.8f);
+            registry.AddRelationship(Weapon, Wood, 0.4f);
+
+            registry.AddRelationship(Heavy, Metal, 0.6f);
+            registry.AddRelationship(Heavy, Wood, 0.3f);
+            registry.AddRelationship(Heavy, Leather, -0.3f);
+
+            registry.AddRelationship(Light, Leather, 0.7f);
+            registry.AddRelationship(Light, Wood, 0.3f);
+            registry.AddRelationship(Light, Metal, -0.2f);
+
+            registry.AddRelationship(Fire, Heavy, -0.3f);
+            registry.AddRelationship(Fire, Light, 0.3f);
+
+            registry.AddRelationship(Ice, Heavy, 0.3f);
+            registry.AddRelationship(Ice, Light, -0.3f);
+
+            return registry;
         }
     }
 }

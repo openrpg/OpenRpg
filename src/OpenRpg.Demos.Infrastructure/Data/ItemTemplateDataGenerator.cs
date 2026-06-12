@@ -11,11 +11,14 @@ using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Templates;
+using OpenRpg.Tags;
 
 namespace OpenRpg.Demos.Infrastructure.Data
 {
     public class ItemTemplateDataGenerator : IDataGenerator<ItemTemplate>
     {
+        public const int ArmourTag = 1, WeaponTag = 2, HeavyTag = 3, LightTag = 4, MetalTag = 5, WoodTag = 6, LeatherTag = 7, FireTag = 8, IceTag = 9, ConsumableTag = 10;
+
         public IEnumerable<ItemTemplate> GenerateData()
         {
             return new []
@@ -52,6 +55,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             {
                 new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
             };
+            template.Variables.Tags = new TagList(WeaponTag, HeavyTag, MetalTag);
 
             return template;
         }
@@ -79,6 +83,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             template.Variables.Value = 10000;
             template.Variables.AssetCode = "sword";
             template.Variables.Effects = swordEffects;
+            template.Variables.Tags = new TagList(WeaponTag, HeavyTag, MetalTag, FireTag);
             
             return template;
         }
@@ -102,6 +107,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             template.Variables.Value = 100;
             template.Variables.AssetCode = "chest";
             template.Variables.Effects = chestEffects;
+            template.Variables.Tags = new TagList(ArmourTag, HeavyTag, LeatherTag);
             
             return template;
         }
@@ -125,6 +131,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             template.Variables.Value = 10;
             template.Variables.AssetCode = "boots";
             template.Variables.Effects = bootsEffects;
+            template.Variables.Tags = new TagList(ArmourTag, LightTag, LeatherTag);
             
             return template;
         }
@@ -148,6 +155,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             template.Variables.Value = 50;
             template.Variables.AssetCode = "helm";
             template.Variables.Effects = helmEffects;
+            template.Variables.Tags = new TagList(ArmourTag, HeavyTag, MetalTag);
             
             return template;
         }
@@ -170,6 +178,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             {
                 new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = 30.0f }
             };
+            template.Variables.Tags = new TagList(ConsumableTag);
 
             return template;
         }
@@ -192,6 +201,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             {
                 new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = -5.0f }
             };
+            template.Variables.Tags = new TagList(ConsumableTag);
             
             return template;
         }
@@ -210,6 +220,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             template.Variables.Value = 5;
             template.Variables.MaxStacks = 20;
             template.Variables.AssetCode = "copper-ingot";
+            template.Variables.Tags = new TagList(MetalTag);
             
             return template;
         }
@@ -228,6 +239,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             template.Variables.Value = 1;
             template.Variables.MaxStacks = 20;
             template.Variables.AssetCode = "copper-ore";
+            template.Variables.Tags = new TagList(MetalTag);
             
             return template;
         }
@@ -246,6 +258,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             template.Variables.Value = 1;
             template.Variables.MaxStacks = 20;
             template.Variables.AssetCode = "iron-ore";
+            template.Variables.Tags = new TagList(MetalTag);
             
             return template;
         }
@@ -264,6 +277,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             template.Variables.Value = 1;
             template.Variables.MaxStacks = 20;
             template.Variables.AssetCode = "oak-log";
+            template.Variables.Tags = new TagList(WoodTag);
             
             return template;
         }
@@ -286,6 +300,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             {
                 new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 50 }
             };
+            template.Variables.Tags = new TagList(WeaponTag, LightTag, MetalTag);
             
             return template;
         }
