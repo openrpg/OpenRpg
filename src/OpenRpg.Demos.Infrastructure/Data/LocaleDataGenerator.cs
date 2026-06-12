@@ -28,6 +28,8 @@ namespace OpenRpg.Demos.Infrastructure.Data
         public static readonly string UtilityTypesTextKey = "types-ai-utility-";
         public static readonly string AdviceTypesTextKey = "types-ai-advice-";
         public static readonly string TradeSkillTypesTextKey = "types-trade-skill-";
+        public static readonly string FactionNameTextKey = "factions-name-";
+        public static readonly string FactionDescTextKey = "factions-desc-";
         
         public IEnumerable<LocaleDataset> GenerateData()
         {
@@ -46,6 +48,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             GenerateUtilityTypeLocaleText(localeDataset);
             GenerateAdviceTypeLocaleText(localeDataset);
             GenerateTradeSkillTypeLocaleText(localeDataset);
+            GenerateFactionLocaleText(localeDataset);
 
             return new[] { localeDataset };
         }
@@ -139,6 +142,16 @@ namespace OpenRpg.Demos.Infrastructure.Data
         {
             GetTypeFieldsDictionary<FantasyTradeSkillTypes>()
                 .ForEach((key, value) => localeDataset.LocaleData.Add(GetKeyFor(TradeSkillTypesTextKey, key), value));
+        }
+
+        public void GenerateFactionLocaleText(LocaleDataset localeDataset)
+        {
+            localeDataset.LocaleData.Add(GetKeyFor(FactionNameTextKey, FactionDataGenerator.MerchantsGuildId), "Merchants Guild");
+            localeDataset.LocaleData.Add(GetKeyFor(FactionDescTextKey, FactionDataGenerator.MerchantsGuildId), "A powerful trade organisation that controls most commerce in the region.");
+            localeDataset.LocaleData.Add(GetKeyFor(FactionNameTextKey, FactionDataGenerator.CityGuardId), "City Guard");
+            localeDataset.LocaleData.Add(GetKeyFor(FactionDescTextKey, FactionDataGenerator.CityGuardId), "The official law enforcement arm of the city.");
+            localeDataset.LocaleData.Add(GetKeyFor(FactionNameTextKey, FactionDataGenerator.ThievesGuildId), "Thieves Guild");
+            localeDataset.LocaleData.Add(GetKeyFor(FactionDescTextKey, FactionDataGenerator.ThievesGuildId), "A shadowy network of rogues and smugglers operating in the underbelth.");
         }
     }
 }

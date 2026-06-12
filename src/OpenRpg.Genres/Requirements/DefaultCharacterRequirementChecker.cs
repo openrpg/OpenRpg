@@ -9,6 +9,7 @@ using OpenRpg.Genres.Types;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.TradeSkills.Extensions;
 using OpenRpg.Quests;
+using OpenRpg.Quests.Extensions;
 using OpenRpg.Quests.State;
 using OpenRpg.Quests.Types;
 
@@ -98,6 +99,14 @@ namespace OpenRpg.Genres.Requirements
             {
                 if(!character.Variables.HasActiveEffects()) { return false; }
                 return character.Variables.ActiveEffects.HasEffect(requirement.Association.AssociatedId);
+            }
+
+            if (requirement.RequirementType == QuestRequirementTypes.FactionStateRequirement)
+            {
+                if (!character.Variables.HasFactionReputation()) { return false; }
+                var factionRep = character.Variables.FactionReputation;
+                if (!factionRep.ContainsKey(requirement.Association.AssociatedId)) { return false; }
+                return factionRep[requirement.Association.AssociatedId] >= requirement.Association.AssociatedValue;
             }
             
             return true;
