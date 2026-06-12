@@ -34,7 +34,7 @@ namespace OpenRpg.Genres.Effects
             foreach (var modification in itemData.Modifications)
             {
                 var modificationTemplate = TemplateAccessor.GetModificationTemplate<ItemModificationTemplate>(modification.TemplateId);
-                ComputeEffects([], relatedEntity, computedEffects);
+                ComputeEffects(modificationTemplate.Variables.Effects, relatedEntity, computedEffects);
             }
         }
 

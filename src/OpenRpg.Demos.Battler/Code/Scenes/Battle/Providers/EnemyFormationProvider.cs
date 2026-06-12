@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using OpenRpg.Data;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
+using OpenRpg.Demos.Battler.Code.Types;
 using OpenRpg.Entities.Entity.Templates;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Genres.Characters;
@@ -27,10 +27,10 @@ public class EnemyFormationProvider : IEnemyFormationProvider
         _characterPopulator = characterPopulator;
     }
 
-    public Task<List<BattleEntity>> GenerateFormationAsync()
+    public List<BattleEntity> GenerateFormation()
     {
         var allMonsters = _dataSource.GetAll<EntityTemplate>().ToList();
-        var count = 6;
+        var count = BattlerConstants.DefaultEnemyCount;
         var entities = new List<BattleEntity>();
 
         for (var i = 0; i < count; i++)
@@ -51,13 +51,11 @@ public class EnemyFormationProvider : IEnemyFormationProvider
                 Name = name,
                 AssetCode = assetCode,
                 Team = Team.Enemy,
-                // 2 columns × 3 rows: first 3 = front column (Slot=1, closer to party), last 3 = back column (Slot=0)
-                // Within each column: top (Row=0) → middle (Row=1) → bottom (Row=2)
                 SlotInRow = i < 3 ? 1 : 0,
                 Row = i % 3
             });
         }
 
-        return Task.FromResult(entities);
+        return entities;
     }
 }

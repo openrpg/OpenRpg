@@ -68,7 +68,7 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
 
             if (template is ItemTemplate itemTemplate)
             { itemTemplate.ModificationAllowances = itemTemplate.ModificationAllowances.AsList(); }
-            else if (template is Quest quest)
+            else if (template is QuestTemplate quest)
             {
                 quest.Gifts = quest.Gifts.AsList();
                 quest.Objectives = quest.Objectives.AsList();

@@ -12,10 +12,12 @@ using OpenRpg.Data;
 using OpenRpg.Entities.Extensions;
 using OpenRpg.Demos.Battler.Code.Scenes;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Combat;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.UI;
 using OpenRpg.Demos.Battler.Code.Services.Game;
+using OpenRpg.Demos.Battler.Code.Types;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Extensions;
@@ -48,6 +50,7 @@ public class CharacterMenuScene : IScene
     private readonly ILocaleDataSource _localeDataSource;
     private readonly IEquipmentSlotValidator _slotValidator;
     private readonly ICharacterPopulator _characterPopulator;
+    private readonly EquipmentService _equipmentService;
 
     private bool _loaded;
     private SpriteFont _font;
@@ -111,6 +114,7 @@ public class CharacterMenuScene : IScene
         _localeDataSource = localeDataSource;
         _slotValidator = slotValidator;
         _characterPopulator = characterPopulator;
+        _equipmentService = new EquipmentService(dataSource, localeDataSource, slotValidator, characterPopulator, gameState);
     }
 
     public Task LoadAsync()
@@ -461,14 +465,7 @@ public class CharacterMenuScene : IScene
 
     private void RefreshCandidates()
     {
-        _candidateItems = [];
-        foreach (var itemData in _gameState.SharedInventory)
-        {
-            var template = _dataSource.Get<ItemTemplate>(itemData.TemplateId);
-            if (template == null) continue;
-            if (_slotValidator.CanEquipItemType(_browsingSlotType, template.ItemType))
-                _candidateItems.Add((itemData, template));
-        }
+        _candidateItems = _equipmentService.GetCandidateItems(_browsingSlotType);
     }
 
     private void DrawEquipmentSelect(SpriteBatch sb)
@@ -549,25 +546,7 @@ public class CharacterMenuScene : IScene
 
     private string GetItemBonusText(ItemTemplate template)
     {
-        var parts = new List<string>();
-        if (template.Variables.Effects != null)
-        {
-            foreach (var effect in template.Variables.Effects)
-            {
-                if (effect is not OpenRpg.Core.Effects.StaticEffect se) continue;
-                if (se.EffectType == 1) // DamageBonusAmount
-                    parts.Add($" ATK+{se.Potency}");
-                else if (se.EffectType == 21) // DefenseBonusAmount
-                    parts.Add($" DEF+{se.Potency}");
-                else if (se.EffectType == 60) // HealthBonusAmount
-                    parts.Add($" HP+{se.Potency}");
-                else if (se.EffectType == 44) // MovementSpeedBonusAmount
-                    parts.Add($" SPD+{se.Potency}");
-                else if (se.EffectType == 263) // UnarmedDamageBonusAmount
-                    parts.Add($" ATK+{se.Potency}");
-            }
-        }
-        return parts.Count > 0 ? string.Join("", parts) : "";
+        return _equipmentService.GetItemBonusText(template);
     }
 
     // ========================================================================
@@ -660,17 +639,17 @@ public class CharacterMenuScene : IScene
     {
         return itemType switch
         {
-            2 => "Weapon",
-            30 => "Head",
-            31 => "Body",
-            32 => "Legs",
-            33 => "Back",
-            34 => "Feet",
-            35 => "Wrist",
-            36 => "Neck",
-            37 => "Ring",
-            50 => "Off Hand",
-            60 => "Consumable",
+            BattlerConstants.ItemTypes.Weapon => "Weapon",
+            BattlerConstants.ItemTypes.Head => "Head",
+            BattlerConstants.ItemTypes.Body => "Body",
+            BattlerConstants.ItemTypes.Legs => "Legs",
+            BattlerConstants.ItemTypes.Back => "Back",
+            BattlerConstants.ItemTypes.Feet => "Feet",
+            BattlerConstants.ItemTypes.Wrist => "Wrist",
+            BattlerConstants.ItemTypes.Neck => "Neck",
+            BattlerConstants.ItemTypes.Ring => "Ring",
+            BattlerConstants.ItemTypes.OffHand => "Off Hand",
+            BattlerConstants.ItemTypes.Consumable => "Consumable",
             _ => ""
         };
     }
@@ -821,9 +800,7 @@ public class CharacterMenuScene : IScene
         {
             if (_selectedIndex == idx)
             {
-                _gameState.SharedInventory.Add(currentItem);
-                slots[_browsingSlotType] = null;
-                _characterPopulator.Populate(entity.Entity, refreshState: false);
+                _equipmentService.UnequipItem(entity, _browsingSlotType);
                 _selectedIndex = 0;
                 RefreshCandidates();
                 return;
@@ -837,12 +814,7 @@ public class CharacterMenuScene : IScene
             var itemIndex = _selectedIndex - idx;
             var (itemData, _) = _candidateItems[itemIndex];
 
-            _gameState.SharedInventory.Remove(itemData);
-            if (currentItem != null)
-                _gameState.SharedInventory.Add(currentItem);
-
-            slots[_browsingSlotType] = itemData;
-            _characterPopulator.Populate(entity.Entity, refreshState: false);
+            _equipmentService.EquipItem(entity, _browsingSlotType, itemData);
 
             // Return to character detail after equipping
             _selectedIndex = _selectedSlotIndex;
@@ -869,7 +841,7 @@ public class CharacterMenuScene : IScene
         // Selecting a consumable item -> choose a target to use it on
         var itemData = _gameState.SharedInventory[_selectedIndex];
         var template = _dataSource.Get<ItemTemplate>(itemData.TemplateId);
-        if (template != null && template.ItemType == 60) // Consumable
+        if (template != null && template.ItemType == BattlerConstants.ItemTypes.Consumable)
         {
             _itemToUseData = itemData;
             _itemToUseTemplate = template;
@@ -916,51 +888,14 @@ public class CharacterMenuScene : IScene
 
     private void ApplyItemToTarget(BattleEntity target)
     {
-        if (_itemToUseTemplate?.Variables.Effects == null) return;
-
-        foreach (var effect in _itemToUseTemplate.Variables.Effects)
-        {
-            if (effect is not StaticEffect se) continue;
-
-            if (se.EffectType == GenreEffectTypes.HealthRestoreAmount)
-            {
-                var healAmount = (int)se.Potency;
-                target.Hp = Math.Min(target.Hp + healAmount, target.MaxHp);
-            }
-            else if (se.EffectType == GenreEffectTypes.HealthRestorePercentage)
-            {
-                var healAmount = (int)(target.MaxHp * se.Potency);
-                target.Hp = Math.Min(target.Hp + healAmount, target.MaxHp);
-            }
-            else if (se.EffectType == FantasyEffectTypes.ManaRestoreAmount)
-            {
-                var restoreAmount = (int)se.Potency;
-                target.Entity.State.Mana = (int)Math.Min(target.Mana + restoreAmount, target.MaxMana);
-            }
-            else if (se.EffectType == GenreEffectTypes.LifeRestoreAmount)
-            {
-                var reviveHp = (int)se.Potency;
-                target.Entity.State.RestoreLife(reviveHp, target.MaxHp);
-            }
-            else if (se.EffectType == GenreEffectTypes.LifeRestorePercentage)
-            {
-                var reviveHp = (int)(target.MaxHp * se.Potency);
-                target.Entity.State.RestoreLife(reviveHp, target.MaxHp);
-            }
-        }
+        if (_itemToUseTemplate == null) return;
+        var applier = new ItemEffectApplier();
+        applier.ApplyItemEffects(_itemToUseData, target, _itemToUseTemplate);
     }
 
     private static bool HasLifeRestoreEffect(ItemTemplate template)
     {
-        if (template.Variables.Effects == null) return false;
-        foreach (var effect in template.Variables.Effects)
-        {
-            if (effect is StaticEffect se &&
-                (se.EffectType == GenreEffectTypes.LifeRestoreAmount ||
-                 se.EffectType == GenreEffectTypes.LifeRestorePercentage))
-                return true;
-        }
-        return false;
+        return ItemEffectApplier.HasLifeRestoreEffect(template);
     }
 
     private int GetItemTargetSelectCount()
@@ -1024,9 +959,6 @@ public class CharacterMenuScene : IScene
 
     private string GetItemName(ItemData itemData)
     {
-        var template = _dataSource.Get<ItemTemplate>(itemData.TemplateId);
-        return template != null
-            ? _localeDataSource.Get("en-gb", template.NameLocaleId)
-            : $"Item #{itemData.TemplateId}";
+        return _equipmentService.GetItemName(itemData);
     }
 }

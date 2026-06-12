@@ -13,6 +13,7 @@ using OpenRpg.Combat.Types;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Data;
+using OpenRpg.Demos.Battler.Code.Scenes.Battle.Combat;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Rendering;
 using OpenRpg.Entities.Types;
@@ -78,22 +79,17 @@ public class CommandMenuUi
             {
                 var (template, _, canAfford) = _availableAbilities[_selectedIndex];
                 if (!canAfford) return [];
-
-                var damage = template.Variables.GetAsOrDefault<Damage>(CombatAbilityTemplateVariableTypes.Damage, () => new Damage(0, 0));
-                var isHealing = damage.Type >= 90;
-                var targetType = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetType, 1);
-                if (targetType == CombatTargetTypes.MultipleTarget)
-                {
-                    var pool = isHealing ? _aliveParty : _aliveEnemies;
-                    if (pool == null) return [];
-                    var targetCount = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetCount, 1);
-                    var actualCount = Math.Min(targetCount, pool.Count);
-                    return pool.Take(actualCount).ToList();
-                }
+                return TargetResolver.ResolvePreviewTargets(template, _aliveParty, _aliveEnemies);
             }
 
             return [];
         }
+    }
+
+    public void Show(CommandMenuContext context)
+    {
+        Show(context.Attacker, context.AliveEnemies, context.Abilities, context.LocaleDataSource,
+            context.InventoryItems, context.AliveParty, context.DataSource, context.AllParty);
     }
 
     public void Show(
@@ -199,17 +195,7 @@ public class CommandMenuUi
 
     private static bool HasLifeRestoreEffect(ItemTemplate template)
     {
-        if (!template.Variables.ContainsKey(CoreTemplateVariableTypes.Effects)) return false;
-        var effects = template.Variables[CoreTemplateVariableTypes.Effects];
-        if (effects is not System.Collections.IEnumerable enumerable) return false;
-        foreach (var effect in enumerable)
-        {
-            if (effect is OpenRpg.Core.Effects.StaticEffect se &&
-                (se.EffectType == GenreEffectTypes.LifeRestoreAmount ||
-                 se.EffectType == GenreEffectTypes.LifeRestorePercentage))
-                return true;
-        }
-        return false;
+        return ItemEffectApplier.HasLifeRestoreEffect(template);
     }
 
     private void BuildGumElements()
@@ -416,15 +402,14 @@ public class CommandMenuUi
 
         _selectedAbility = template;
 
-        var damage = template.Variables.GetAsOrDefault<Damage>(CombatAbilityTemplateVariableTypes.Damage, () => new Damage(0, 0));
-        var isHealing = damage.Type >= 90;
+        var isHealing = TargetResolver.IsHealing(template);
         var targetType = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetType, 1);
-        var targetCount = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetCount, 1);
 
         if (targetType == CombatTargetTypes.MultipleTarget)
         {
             var pool = isHealing ? _aliveParty : _aliveEnemies;
             if (pool == null || pool.Count == 0) return;
+            var targetCount = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetCount, 1);
             var actualCount = Math.Min(targetCount, pool.Count);
             var targets = pool.Take(actualCount).ToList();
             FireAction(new PlayerAction

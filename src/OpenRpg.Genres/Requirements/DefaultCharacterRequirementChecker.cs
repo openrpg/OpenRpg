@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Requirements;
@@ -7,7 +8,10 @@ using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Types;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.TradeSkills.Extensions;
+using OpenRpg.Quests;
+using OpenRpg.Quests.Extensions;
 using OpenRpg.Quests.State;
+using OpenRpg.Quests.Types;
 
 namespace OpenRpg.Genres.Requirements
 {
@@ -96,15 +100,24 @@ namespace OpenRpg.Genres.Requirements
                 if(!character.Variables.HasActiveEffects()) { return false; }
                 return character.Variables.ActiveEffects.HasEffect(requirement.Association.AssociatedId);
             }
+
+            if (requirement.RequirementType == QuestRequirementTypes.FactionStateRequirement)
+            {
+                if (!character.Variables.HasFactionReputation()) { return false; }
+                var factionRep = character.Variables.FactionReputation;
+                if (!factionRep.ContainsKey(requirement.Association.AssociatedId)) { return false; }
+                return factionRep[requirement.Association.AssociatedId] >= requirement.Association.AssociatedValue;
+            }
             
             return true;
         }
 
-        public virtual bool IsRequirementMet(IQuestState state, Requirement requirement)
+        public virtual bool IsRequirementMet(IReadOnlyList<QuestData> quests, Requirement requirement)
         {
             if (requirement.RequirementType == GenreRequirementTypes.QuestStateRequirement)
             {
-                var questState = state.GetQuestState(requirement.Association.AssociatedId);
+                var questData = quests.FirstOrDefault(q => q.TemplateId == requirement.Association.AssociatedId);
+                var questState = questData?.State ?? QuestStateTypes.QuestNotStarted;
                 return requirement.Association.AssociatedValue == questState;
             }
             
@@ -118,6 +131,7 @@ namespace OpenRpg.Genres.Requirements
                 var hasTrigger = state.ContainsKey(requirement.Association.AssociatedId);
                 var triggerState = (requirement.Association.AssociatedValue == 1);
                 if(requirement.Association.AssociatedValue == 0 && !hasTrigger) { return true; }
+                if(!hasTrigger) { return false; }
                 
                 return state[requirement.Association.AssociatedId] == triggerState;
             }

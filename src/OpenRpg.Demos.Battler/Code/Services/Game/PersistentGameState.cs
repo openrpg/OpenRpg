@@ -134,28 +134,28 @@ public class PersistentGameState : IPersistentGameState
 
     private void AddStarterItems()
     {
-        // Give the party some starter items in shared inventory
-        var potionTemplate = _dataSource.Get<ItemTemplate>(20); // Potion
+        var potionTemplate = _dataSource.Get<ItemTemplate>(BattlerConstants.PotionTemplateId);
         if (potionTemplate != null)
         {
             var potion = new ItemData { TemplateId = potionTemplate.Id };
-            _sharedInventory.Add(potion);
-            _sharedInventory.Add(potion);
-            _sharedInventory.Add(potion);
+            for (var i = 0; i < BattlerConstants.StarterPotionCount; i++)
+                _sharedInventory.Add(potion);
         }
 
-        var etherTemplate = _dataSource.Get<ItemTemplate>(22); // Ether
+        var etherTemplate = _dataSource.Get<ItemTemplate>(BattlerConstants.EtherTemplateId);
         if (etherTemplate != null)
         {
             var ether = new ItemData { TemplateId = etherTemplate.Id };
-            _sharedInventory.Add(ether);
+            for (var i = 0; i < BattlerConstants.StarterEtherCount; i++)
+                _sharedInventory.Add(ether);
         }
 
-        var pDownTemplate = _dataSource.Get<ItemTemplate>(23); // Phoenix Down
+        var pDownTemplate = _dataSource.Get<ItemTemplate>(BattlerConstants.PhoenixDownTemplateId);
         if (pDownTemplate != null)
         {
             var pDown = new ItemData { TemplateId = pDownTemplate.Id };
-            _sharedInventory.Add(pDown);
+            for (var i = 0; i < BattlerConstants.StarterPhoenixDownCount; i++)
+                _sharedInventory.Add(pDown);
         }
     }
 }

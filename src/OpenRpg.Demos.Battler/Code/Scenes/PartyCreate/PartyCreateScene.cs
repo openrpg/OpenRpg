@@ -251,24 +251,35 @@ public class PartyCreateScene : IScene
     {
         if (!_loaded) return;
 
-        // Title
         TextHelper.DrawStringWithSpacing(spriteBatch, _font, "CREATE YOUR PARTY",
             new Vector2(400, 8), Color.White, centered: true);
 
-        var isPartyFull = _chosenClassIds.Count >= 4;
+        var isPartyFull = _chosenClassIds.Count >= BattlerConstants.MaxPartySize;
         var panelY = 36;
         var panelH = 275;
 
-        // ===================================================================
-        // LEFT PANEL: Available Classes
-        // ===================================================================
+        DrawAvailableClassesPanel(spriteBatch, panelY, panelH, isPartyFull);
+        DrawYourPartyPanel(spriteBatch, panelY, panelH, isPartyFull);
+        DrawStatsPreviewPanel(spriteBatch, panelY + panelH + 15);
+
+        var helpY = 565;
+        var helpText = isPartyFull
+            ? "Up/Down Navigate  |  Enter Proceed  |  Back Undo"
+            : "Up/Down Browse  |  Enter Select / Random  |  Back Undo";
+        TextHelper.DrawStringWithSpacing(spriteBatch, _font,
+            helpText,
+            new Vector2(400, helpY), Palette.UiHelpText, centered: true);
+    }
+
+    private void DrawAvailableClassesPanel(SpriteBatch sb, int panelY, int panelH, bool isPartyFull)
+    {
         var leftX = 20;
         var leftW = 370;
 
-        UiHelper.DrawPanel(spriteBatch, _pixel, leftX, panelY, leftW, panelH, Palette.PanelBg);
-        UiHelper.DrawTitleBar(spriteBatch, _pixel, leftX + 1, panelY + 1, leftW - 2, 20);
+        UiHelper.DrawPanel(sb, _pixel, leftX, panelY, leftW, panelH, Palette.PanelBg);
+        UiHelper.DrawTitleBar(sb, _pixel, leftX + 1, panelY + 1, leftW - 2, 20);
 
-        TextHelper.DrawStringWithSpacing(spriteBatch, _font, "AVAILABLE CLASSES",
+        TextHelper.DrawStringWithSpacing(sb, _font, "AVAILABLE CLASSES",
             new Vector2(leftX + 12, panelY + 4), Palette.UiSectionTitle);
 
         var listY = panelY + 28;
@@ -278,9 +289,8 @@ public class PartyCreateScene : IScene
             var isSelected = i == _selectedClassIndex && !isPartyFull;
             var isChosen = _chosenClassIds.Contains(info.ClassId);
 
-            // Highlight the selected row
             if (isSelected)
-                UiHelper.DrawSelectionHighlight(spriteBatch, _pixel, leftX + 4, listY - 2, leftW - 8, 22);
+                UiHelper.DrawSelectionHighlight(sb, _pixel, leftX + 4, listY - 2, leftW - 8, 22);
 
             var prefix = isSelected ? "> " : "  ";
             var suffix = isChosen ? " (selected)" : "";
@@ -291,44 +301,42 @@ public class PartyCreateScene : IScene
                     ? Color.Lime
                     : new Color(180, 180, 190);
 
-            TextHelper.DrawStringWithSpacing(spriteBatch, _font,
+            TextHelper.DrawStringWithSpacing(sb, _font,
                 $"{prefix}{info.Name}{suffix}",
                 new Vector2(leftX + 16, listY), textColor);
 
             listY += 24;
         }
 
-        // Description of the selected class
         var selectedInfo = GetSelectedPreview();
         if (selectedInfo != null)
         {
-            TextHelper.DrawStringWithSpacing(spriteBatch, _font,
+            TextHelper.DrawStringWithSpacing(sb, _font,
                 selectedInfo.Description,
                 new Vector2(leftX + 12, panelY + panelH - 50),
                 Palette.UiTextLabel);
 
-            // Asset code / sprite hint
             var spriteLabel = $"[Sprite: {selectedInfo.AssetCode}]";
-            TextHelper.DrawStringWithSpacing(spriteBatch, _font,
+            TextHelper.DrawStringWithSpacing(sb, _font,
                 spriteLabel,
                 new Vector2(leftX + 12, panelY + panelH - 28),
                 Palette.UiTextLabel * 0.7f);
         }
+    }
 
-        // ===================================================================
-        // RIGHT PANEL: Your Party
-        // ===================================================================
+    private void DrawYourPartyPanel(SpriteBatch sb, int panelY, int panelH, bool isPartyFull)
+    {
         var rightX = 410;
         var rightW = 370;
 
-        UiHelper.DrawPanel(spriteBatch, _pixel, rightX, panelY, rightW, panelH, Palette.PanelBg);
-        UiHelper.DrawTitleBar(spriteBatch, _pixel, rightX + 1, panelY + 1, rightW - 2, 20);
+        UiHelper.DrawPanel(sb, _pixel, rightX, panelY, rightW, panelH, Palette.PanelBg);
+        UiHelper.DrawTitleBar(sb, _pixel, rightX + 1, panelY + 1, rightW - 2, 20);
 
-        TextHelper.DrawStringWithSpacing(spriteBatch, _font, "YOUR PARTY",
+        TextHelper.DrawStringWithSpacing(sb, _font, "YOUR PARTY",
             new Vector2(rightX + 12, panelY + 4), Palette.UiSectionTitle);
 
         var slotY = panelY + 28;
-        for (var i = 0; i < 4; i++)
+        for (var i = 0; i < BattlerConstants.MaxPartySize; i++)
         {
             var isFilled = i < _chosenClassIds.Count;
             var slotText = isFilled ? GetClassName(_chosenClassIds[i]) : $"---";
@@ -337,32 +345,29 @@ public class PartyCreateScene : IScene
                 ? new Color(180, 230, 180)
                 : new Color(80, 80, 90);
 
-            // Slot number
-            TextHelper.DrawStringWithSpacing(spriteBatch, _font,
+            TextHelper.DrawStringWithSpacing(sb, _font,
                 $"{i + 1}. {slotText}",
                 new Vector2(rightX + 20, slotY), slotColor);
 
             slotY += 28;
         }
 
-        // Selection count
         var statusY = panelY + 148;
         if (_chosenClassIds.Count > 0)
         {
-            TextHelper.DrawStringWithSpacing(spriteBatch, _font,
-                $"[{_chosenClassIds.Count}/4 selected]",
+            TextHelper.DrawStringWithSpacing(sb, _font,
+                $"[{_chosenClassIds.Count}/{BattlerConstants.MaxPartySize} selected]",
                 new Vector2(rightX + 12, statusY),
                 new Color(160, 200, 160));
         }
 
-        // Proceed button (only when party is full)
         var buttonStartY = statusY + 20;
         if (isPartyFull)
         {
             var proceedY = buttonStartY;
             var isProceedSel = _selectedClassIndex == ClassLookups.AllClassIds.Length;
 
-            UiHelper.DrawButton(spriteBatch, _pixel,
+            UiHelper.DrawButton(sb, _pixel,
                 rightX + 20, proceedY - 4, rightW - 40, 30,
                 isProceedSel,
                 fillColor: new Color(20, 45, 25),
@@ -370,7 +375,7 @@ public class PartyCreateScene : IScene
                 borderColor: new Color(30, 60, 35),
                 selectedBorderColor: new Color(80, 160, 100));
 
-            TextHelper.DrawStringWithSpacing(spriteBatch, _font,
+            TextHelper.DrawStringWithSpacing(sb, _font,
                 ">>> PROCEED <<<",
                 new Vector2(rightX + rightW / 2, proceedY + 2),
                 isProceedSel ? Color.Lime : new Color(100, 200, 100),
@@ -379,32 +384,32 @@ public class PartyCreateScene : IScene
             buttonStartY = proceedY + 36;
         }
 
-        // Random button (always visible)
         var randomSelIndex = isPartyFull
             ? ClassLookups.AllClassIds.Length + 1
             : ClassLookups.AllClassIds.Length;
         var isRandomSel = _selectedClassIndex == randomSelIndex;
 
-        UiHelper.DrawButton(spriteBatch, _pixel,
+        UiHelper.DrawButton(sb, _pixel,
             rightX + 20, buttonStartY - 4, rightW - 40, 30,
             isRandomSel);
 
-        TextHelper.DrawStringWithSpacing(spriteBatch, _font,
+        TextHelper.DrawStringWithSpacing(sb, _font,
             _chosenClassIds.Count > 0 ? "[ Random Party ]" : ">>> RANDOM PARTY <<<",
             new Vector2(rightX + rightW / 2, buttonStartY + 2),
             isRandomSel ? Color.LightBlue : new Color(130, 140, 160),
             centered: true);
+    }
 
-        // ===================================================================
-        // BOTTOM PANEL: Stats Preview
-        // ===================================================================
-        var statsY = 326;
+    private void DrawStatsPreviewPanel(SpriteBatch sb, int statsY)
+    {
+        var leftX = 20;
         var statsH = 190;
+        var selectedInfo = GetSelectedPreview();
 
-        UiHelper.DrawPanel(spriteBatch, _pixel, leftX, statsY, 760, statsH, Palette.PanelBg);
-        UiHelper.DrawTitleBar(spriteBatch, _pixel, leftX + 1, statsY + 1, 758, 20);
+        UiHelper.DrawPanel(sb, _pixel, leftX, statsY, 760, statsH, Palette.PanelBg);
+        UiHelper.DrawTitleBar(sb, _pixel, leftX + 1, statsY + 1, 758, 20);
 
-        TextHelper.DrawStringWithSpacing(spriteBatch, _font,
+        TextHelper.DrawStringWithSpacing(sb, _font,
             $"{selectedInfo?.Name ?? "?"} STATS",
             new Vector2(leftX + 12, statsY + 4), Palette.UiSectionTitle);
 
@@ -415,40 +420,24 @@ public class PartyCreateScene : IScene
             var col3X = leftX + 540;
             var statRowY = statsY + 30;
 
-            // Row 1: HP, MP, Attack
-            DrawStat(spriteBatch, col1X, statRowY, "HP", selectedInfo.MaxHp.ToString(), Palette.HpGreen);
-            DrawStat(spriteBatch, col2X, statRowY, "MP", selectedInfo.MaxMana.ToString(), Palette.MpText);
-            DrawStat(spriteBatch, col3X, statRowY, "Attack", selectedInfo.Attack.ToString(), Color.White);
+            DrawStat(sb, col1X, statRowY, "HP", selectedInfo.MaxHp.ToString(), Palette.HpGreen);
+            DrawStat(sb, col2X, statRowY, "MP", selectedInfo.MaxMana.ToString(), Palette.MpText);
+            DrawStat(sb, col3X, statRowY, "Attack", selectedInfo.Attack.ToString(), Color.White);
 
-            // Row 2: Defense, Speed, --
-            DrawStat(spriteBatch, col1X, statRowY + 24, "Defense", selectedInfo.Defense.ToString(), Color.White);
-            DrawStat(spriteBatch, col2X, statRowY + 24, "Speed", selectedInfo.Speed.ToString(), Color.White);
+            DrawStat(sb, col1X, statRowY + 24, "Defense", selectedInfo.Defense.ToString(), Color.White);
+            DrawStat(sb, col2X, statRowY + 24, "Speed", selectedInfo.Speed.ToString(), Color.White);
 
-            // Divider
-            TextHelper.DrawStringWithSpacing(spriteBatch, _font, "ATTRIBUTES",
+            TextHelper.DrawStringWithSpacing(sb, _font, "ATTRIBUTES",
                 new Vector2(leftX + 12, statRowY + 56), Palette.UiSectionTitle);
 
-            // Row 3: STR, DEX, CON
-            DrawStat(spriteBatch, col1X, statRowY + 78, "STR", selectedInfo.Strength.ToString(), new Color(240, 180, 80));
-            DrawStat(spriteBatch, col2X, statRowY + 78, "DEX", selectedInfo.Dexterity.ToString(), new Color(80, 200, 80));
-            DrawStat(spriteBatch, col3X, statRowY + 78, "CON", selectedInfo.Constitution.ToString(), new Color(180, 120, 80));
+            DrawStat(sb, col1X, statRowY + 78, "STR", selectedInfo.Strength.ToString(), new Color(240, 180, 80));
+            DrawStat(sb, col2X, statRowY + 78, "DEX", selectedInfo.Dexterity.ToString(), new Color(80, 200, 80));
+            DrawStat(sb, col3X, statRowY + 78, "CON", selectedInfo.Constitution.ToString(), new Color(180, 120, 80));
 
-            // Row 4: INT, WIS, CHA
-            DrawStat(spriteBatch, col1X, statRowY + 102, "INT", selectedInfo.Intelligence.ToString(), new Color(80, 140, 240));
-            DrawStat(spriteBatch, col2X, statRowY + 102, "WIS", selectedInfo.Wisdom.ToString(), new Color(140, 180, 220));
-            DrawStat(spriteBatch, col3X, statRowY + 102, "CHA", selectedInfo.Charisma.ToString(), new Color(220, 140, 220));
+            DrawStat(sb, col1X, statRowY + 102, "INT", selectedInfo.Intelligence.ToString(), new Color(80, 140, 240));
+            DrawStat(sb, col2X, statRowY + 102, "WIS", selectedInfo.Wisdom.ToString(), new Color(140, 180, 220));
+            DrawStat(sb, col3X, statRowY + 102, "CHA", selectedInfo.Charisma.ToString(), new Color(220, 140, 220));
         }
-
-        // ===================================================================
-        // Help text at bottom
-        // ===================================================================
-        var helpY = 565;
-        var helpText = isPartyFull
-            ? "Up/Down Navigate  |  Enter Proceed  |  Back Undo"
-            : "Up/Down Browse  |  Enter Select / Random  |  Back Undo";
-        TextHelper.DrawStringWithSpacing(spriteBatch, _font,
-            helpText,
-            new Vector2(400, helpY), Palette.UiHelpText, centered: true);
     }
 
     // ========================================================================

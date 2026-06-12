@@ -8,5 +8,12 @@ namespace OpenRpg.Entities.Modifications
         public int TemplateId { get; }
 
         public ModificationVariables Variables { get; set; } = new ModificationVariables();
+
+        public ModificationData() { }
+
+        public ModificationData(int templateId)
+        {
+            TemplateId = templateId;
+        }
     }
 }
