@@ -69,7 +69,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 IsRepeatable = false,
                 Objectives = new List<Objective>
                 {
-                    new() { ObjectiveType = GenresObjectiveTypes.EnemyDefeatedObjective, Association = new Association(99, 1) }
+                    new() { ObjectiveType = GenresObjectiveTypes.EnemyDefeatedObjective, Association = new Association(99, 3) }
                 },
                 Rewards = new List<Reward>
                 {
@@ -91,7 +91,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 IsRepeatable = true,
                 Objectives = new List<Objective>
                 {
-                    new() { ObjectiveType = ObjectiveTypes.ItemObjective, Association = new Association(0, 0) }
+                    new() { ObjectiveType = ObjectiveTypes.ItemObjective, Association = new Association(ItemTemplateLookups.Chest, 1) }
                 },
                 Rewards = new List<Reward>
                 {

@@ -43,5 +43,17 @@ namespace OpenRpg.Quests.Extensions
                 set =>  vars[QuestEntityVariableTypes.TriggerState] = value;
             }
         }
+
+        public static bool HasObjectiveState(this EntityVariables vars) 
+        { return vars.ContainsKey(QuestEntityVariableTypes.ObjectiveState); }
+        
+        extension(EntityVariables vars)
+        {
+            public IObjectiveState ObjectiveState
+            {
+                get => vars.GetAsOrDefaultAndSet(QuestEntityVariableTypes.ObjectiveState, () => new ObjectiveState());
+                set =>  vars[QuestEntityVariableTypes.ObjectiveState] = value;
+            }
+        }
     }
 }

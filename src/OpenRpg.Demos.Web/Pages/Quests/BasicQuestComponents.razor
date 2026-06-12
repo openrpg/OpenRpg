@@ -77,6 +77,39 @@
     
     > There are many ways you can link together quests or have atomic quests which are simple to start and finish, you can also extend them with
     your own meta data via the variables if needed.
+
+    ### Objective Verification
+
+    The library provides an `ICharacterObjectiveChecker` that verifies objectives against four contexts:
+
+    - **Character** — checks level, class, active effects (stateless)
+    - **Quest State** — checks if prerequisite quests are complete (stateless)
+    - **Trigger State** — checks if trigger objectives are met (stateless)
+    - **Objective State** — checks accumulated progress like kill counts and item collections (stateful)
+
+    ```csharp
+    // Check a single objective against all contexts
+    var met = ObjectiveChecker.IsObjectiveMet(character, objective);
+
+    // Batch check all objectives for a quest
+    var allMet = ObjectiveChecker.AreObjectivesMet(character, questData);
+    ```
+
+    ### Objective State Tracking
+
+    For objectives that track accumulated progress (killing enemies, collecting items), the `IObjectiveState`
+    stores per-quest-per-objective progress counts:
+
+    ```csharp
+    // Update progress when game events happen
+    character.Variables.ObjectiveState.AddObjectiveProgress(questId, objectiveIndex, 1);
+
+    // Check if an objective is complete
+    var complete = character.Variables.ObjectiveState.IsObjectiveComplete(questId, objectiveIndex, requiredAmount);
+    ```
+
+    > Progress is push-based — your game code explicitly calls `AddObjectiveProgress` when events happen
+    > (enemy killed, item picked up, etc). This keeps the system flexible for any event source.
     
     ### Rewards
     Rewards are what the player will get from completing the quest, and you may not always want to show all of the rewards based on their type. In most cases

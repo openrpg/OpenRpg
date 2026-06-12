@@ -9,5 +9,6 @@ namespace OpenRpg.Quests.Types
         public static int TriggerVariables = 32;
         public static int FactionVariables = 33;
         public static int FactionReputationVariables = 34;
+        public static int ObjectiveStateVariables = 35;
     }
 }

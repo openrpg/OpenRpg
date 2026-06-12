@@ -70,4 +70,25 @@ public class QuestEntityVariableExtensionTests
         state[1] = true;
         Assert.True(entityVars.TriggerState[1]);
     }
+
+    [Fact]
+    public void should_correctly_handle_objective_state_on_entity()
+    {
+        var entityVars = new EntityVariables();
+        Assert.False(entityVars.HasObjectiveState());
+
+        var dummyObjectiveState = new ObjectiveState();
+        entityVars.ObjectiveState = dummyObjectiveState;
+        Assert.True(entityVars.HasObjectiveState());
+        Assert.Equal(entityVars.ObjectiveState, dummyObjectiveState);
+    }
+
+    [Fact]
+    public void should_use_same_objective_state_instance_on_subsequent_access()
+    {
+        var entityVars = new EntityVariables();
+        var state = entityVars.ObjectiveState;
+        state.SetObjectiveProgress(10, 0, 5);
+        Assert.Equal(5, entityVars.ObjectiveState.GetObjectiveProgress(10, 0));
+    }
 }

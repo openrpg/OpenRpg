@@ -1,6 +1,6 @@
 namespace OpenRpg.Core.Associations
 {
-    public struct Association
+    public record Association
     {
         /// <summary>
         /// The required id of whatever is associated

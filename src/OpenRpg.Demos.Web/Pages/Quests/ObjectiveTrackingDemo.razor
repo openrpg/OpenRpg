@@ -1,0 +1,365 @@
+@page "/quests/objective-tracking"
+
+@using OpenRpg.Core.Associations
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Demos.Infrastructure.Data
+@using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Genres.Objectives
+@using OpenRpg.Genres.Requirements
+@using OpenRpg.Genres.Types
+@using OpenRpg.Quests
+@using OpenRpg.Quests.Extensions
+@using OpenRpg.Quests.Objectives
+@using OpenRpg.Quests.State
+@using OpenRpg.Quests.Types
+@using QuestVars = OpenRpg.Quests.Variables.QuestVariables
+
+@inject DemoCharacterBuilder CharacterBuilder
+@inject ICharacterObjectiveChecker ObjectiveChecker
+
+<Markdown>
+    ## Objective Tracking
+
+    Now that we understand quest structure and state, we need to verify whether a player has completed each objective.
+    The `ICharacterObjectiveChecker` provides a formalised system for this, following the same pattern as `ICharacterRequirementChecker`.
+
+    ### Stateless vs Stateful Objectives
+
+    **Stateless objectives** are verified against live game state each time they are checked:
+    - `TriggerObjective` — is the trigger set?
+    - `QuestObjective` — is the prerequisite quest complete?
+    - `LevelObjective` — is the character high enough level?
+    - `ClassObjective` — does the character have the right class?
+    - `EffectObjective` — does the character have the active effect?
+
+    **Stateful objectives** track accumulated progress over time:
+    - `ItemObjective` — have you collected N items?
+    - `EnemyDefeatedObjective` — have you defeated N enemies?
+    - `CurrencyObjective` — have you collected N currency?
+</Markdown>
+<br />
+
+<div class="columns">
+    <div class="column is-half">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark has-text-centered">How The Checker Works</h4>
+            <br />
+            <Markdown Containerless="true">
+                The `ICharacterObjectiveChecker` has four overloads:
+
+                ```csharp
+                // Character context — level, class, effects
+                IsObjectiveMet(Character, Objective)
+
+                // Quest state context — prerequisite quests
+                IsObjectiveMet(IQuestState, Objective)
+
+                // Trigger context — trigger objectives
+                IsObjectiveMet(ITriggerState, Objective)
+
+                // Objective state context — kill counts, item collections
+                IsObjectiveMet(IObjectiveState, Objective, questId, objectiveIndex)
+                ```
+            </Markdown>
+        </CardSection>
+    </div>
+    <div class="column">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark has-text-centered">Batch Checking</h4>
+            <br />
+            <Markdown Containerless="true">
+                Use `AreObjectivesMet` to check all objectives across all contexts at once:
+
+                ```csharp
+                // Checks character + questState + triggerState + objectiveState
+                var allMet = ObjectiveChecker
+                    .AreObjectivesMet(character, questData);
+                ```
+
+                This is what gates the "Complete Quest" button.
+            </Markdown>
+        </CardSection>
+    </div>
+</div>
+<br />
+
+<Markdown>
+    ## Interactive Objective Demo
+
+    Below are five quests showcasing different objective types. Select a quest to see its objectives,
+    check their status, and simulate progress for stateful objectives.
+</Markdown>
+<br />
+
+<div class="columns">
+    <div class="column is-two-thirds">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark has-text-centered">Quest Log</h4>
+            <h5 class="subtitle is-6 has-text-dark has-text-centered">Click a quest to interact with it</h5>
+            <br />
+            @foreach (var questData in _quests)
+            {
+                var state = questData.State;
+                var stateName = GetStateName(state);
+                var stateClass = GetStateClass(state);
+                var isSelected = _selectedQuest?.Quest.Id == questData.Quest.Id;
+                var qd = questData;
+
+                <div class="box @(isSelected ? "has-background-info-light" : "")" style="cursor: pointer;" @onclick="() => SelectQuest(qd)">
+                    <div class="columns is-vcentered">
+                        <div class="column">
+                            <h6 class="title is-6 has-text-dark">@qd.Quest.NameLocaleId</h6>
+                            <p class="subtitle is-7 has-text-grey">@qd.Quest.DescriptionLocaleId</p>
+                        </div>
+                        <div class="column is-narrow">
+                            <span class="tag @stateClass">@stateName</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </CardSection>
+    </div>
+    <div class="column">
+        <CardSection>
+            @if (_selectedQuest != null)
+            {
+                var state = _selectedQuest.State;
+                <h4 class="title is-5 has-text-dark has-text-centered">@_selectedQuest.Quest.NameLocaleId</h4>
+                <h5 class="subtitle is-6 has-text-dark has-text-centered">State: @GetStateName(state)</h5>
+                <br />
+
+                @if (_selectedQuest.Quest.Objectives.Any())
+                {
+                    <h6 class="title is-6 has-text-dark">Objectives</h6>
+                    @foreach (var (obj, index) in _selectedQuest.Quest.Objectives.Select((o, i) => (o, i)))
+                    {
+                        var progress = _selectedQuest.ObjectiveState.GetObjectiveProgress(_selectedQuest.Quest.Id, index);
+                        var charMet = ObjectiveChecker.IsObjectiveMet(_character, obj);
+                        var questMet = ObjectiveChecker.IsObjectiveMet(_character.Variables.QuestState, obj);
+                        var trigMet = ObjectiveChecker.IsObjectiveMet(_character.Variables.TriggerState, obj);
+                        var objMet = ObjectiveChecker.IsObjectiveMet(_selectedQuest.ObjectiveState, obj, _selectedQuest.Quest.Id, index);
+                        var allMet = charMet && questMet && trigMet && objMet;
+                        <div class="box">
+                            <div class="columns is-vcentered is-mobile">
+                                <div class="column">
+                                    <span class="tag @(allMet ? "is-success" : "is-light")">@(allMet ? "Done" : "Todo")</span>
+                                    <span class="has-text-dark">&nbsp;@GetObjectiveText(obj, progress)</span>
+                                </div>
+                                @if (state == QuestStateTypes.QuestActive && IsStatefulObjective(obj))
+                                {
+                                    <div class="column is-narrow">
+                                        <a class="button is-small is-info" @onclick="() => SimulateProgress(_selectedQuest, index)">
+                                            +1
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                            <div class="tags" style="margin-top: 0.5rem;">
+                                <span class="tag @(charMet ? "is-success is-light" : "is-danger is-light")">Character</span>
+                                <span class="tag @(questMet ? "is-success is-light" : "is-danger is-light")">QuestState</span>
+                                <span class="tag @(trigMet ? "is-success is-light" : "is-danger is-light")">Trigger</span>
+                                <span class="tag @(objMet ? "is-success is-light" : "is-danger is-light")">ObjectiveState</span>
+                            </div>
+                        </div>
+                    }
+                    <br />
+                }
+
+                <div class="buttons is-centered">
+                    @if (state == QuestStateTypes.QuestNotStarted)
+                    {
+                        <a class="button is-success" @onclick="() => AcceptQuest(_selectedQuest)">
+                            Accept Quest
+                        </a>
+                    }
+                    else if (state == QuestStateTypes.QuestActive)
+                    {
+                        var canComplete = ObjectiveChecker.AreObjectivesMet(_character, _selectedQuest);
+                        <a class="button is-info @(!canComplete ? "is-static" : "")" @onclick="() => CompleteQuest(_selectedQuest)">
+                            Complete Quest
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="tag is-success is-light">Quest Completed</span>
+                    }
+                </div>
+            }
+            else
+            {
+                <h4 class="title is-5 has-text-dark has-text-centered">Select a Quest</h4>
+                <h5 class="subtitle is-6 has-text-dark has-text-centered">Click a quest on the left to see details</h5>
+            }
+        </CardSection>
+    </div>
+</div>
+<br />
+
+<Markdown>
+    ## Push-Based Progress Updates
+
+    Progress on stateful objectives is updated explicitly by game code. This keeps the system flexible —
+    your game decides when to push progress, whether that's from an event system, a combat handler, or anything else.
+
+    ```csharp
+    // When the player kills an enemy
+    questData.ObjectiveState.AddObjectiveProgress(questId, objectiveIndex, 1);
+
+    // When the player collects items
+    questData.ObjectiveState.AddObjectiveProgress(questId, objectiveIndex, amount);
+
+    // Check if an objective is complete
+    var complete = questData.ObjectiveState.IsObjectiveComplete(questId, objectiveIndex, requiredAmount);
+
+    // Reset progress when accepting a quest
+    questData.ObjectiveState.ClearQuestObjectives(questId, quest.Objectives.Count);
+    ```
+</Markdown>
+<br />
+
+<Markdown>
+    ## QuestData Lifecycle
+
+    `QuestData` consolidates the quest template, its runtime state, and objective progress into a single object:
+
+    ```csharp
+    // Create when accepting a quest
+    var questData = new QuestData(quest, QuestStateTypes.QuestActive);
+    questData.ObjectiveState.ClearQuestObjectives(quest.Id, quest.Objectives.Count);
+
+    // During gameplay — push progress
+    questData.ObjectiveState.AddObjectiveProgress(quest.Id, 0, 1);
+
+    // Check completion
+    var canComplete = ObjectiveChecker.AreObjectivesMet(character, questData);
+
+    // Complete
+    questData.State = QuestStateTypes.QuestComplete;
+    ```
+
+    > The `QuestData` class is a simple wrapper — you can store it wherever makes sense for your game
+    > (on the entity, in a player session, in a quest log service, etc). The `ObjectiveState` is
+    > standalone and can be used independently of `QuestData` if needed.
+</Markdown>
+
+@code {
+    private Character _character;
+    private List<QuestData> _quests = new();
+    private QuestData _selectedQuest;
+
+    private const int GoblinKillQuestId = 100;
+    private const int HerbCollectionQuestId = 200;
+    private const int TalkToElderQuestId = 300;
+    private const int ReachLevelQuestId = 400;
+    private const int ProveWorthQuestId = 500;
+
+    private const int ElderTriggerId = 10;
+
+    protected override void OnInitialized()
+    {
+        _character = CharacterBuilder.CreateNew().Build();
+        _quests = CreateQuests();
+        base.OnInitialized();
+    }
+
+    private List<QuestData> CreateQuests()
+    {
+        return new List<QuestData>
+        {
+            new(MakeQuest(GoblinKillQuestId, "Goblin Hunt", "Defeat 3 goblins terrorising the village outskirts.",
+                new List<Objective> { new() { ObjectiveType = GenresObjectiveTypes.EnemyDefeatedObjective, Association = new Association(99, 3) } },
+                new List<Reward> { new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 300) } })),
+
+            new(MakeQuest(HerbCollectionQuestId, "Herb Collection", "Gather 5 moonshade herbs for the village healer.",
+                new List<Objective> { new() { ObjectiveType = ObjectiveTypes.ItemObjective, Association = new Association(ItemTemplateLookups.HealingPotion, 5) } },
+                new List<Reward> { new() { RewardType = GenreRewardTypes.CurrencyReward, Association = new Association(0, 100) } })),
+
+            new(MakeQuest(TalkToElderQuestId, "Speak to the Elder", "The Elder has information about the goblin threat. Speak to him first.",
+                new List<Objective> { new() { ObjectiveType = ObjectiveTypes.TriggerObjective, Association = new Association(ElderTriggerId, 1) } },
+                new List<Reward> { new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 50) } })),
+
+            new(MakeQuest(ReachLevelQuestId, "Prove Your Strength", "Reach level 5 to join the warrior guild.",
+                new List<Objective> { new() { ObjectiveType = ObjectiveTypes.LevelObjective, Association = new Association(0, 5) } },
+                new List<Reward> { new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 200) } })),
+
+            new(MakeQuest(ProveWorthQuestId, "Guild Initiation", "Complete the Goblin Hunt to prove your worth to the guild.",
+                new List<Objective> { new() { ObjectiveType = ObjectiveTypes.QuestObjective, Association = new Association(GoblinKillQuestId, 1) } },
+                new List<Reward> { new() { RewardType = GenreRewardTypes.CurrencyReward, Association = new Association(0, 500) } }))
+        };
+    }
+
+    private Quest MakeQuest(int id, string name, string description, List<Objective> objectives, List<Reward> rewards)
+    {
+        return new Quest
+        {
+            Id = id,
+            NameLocaleId = name,
+            DescriptionLocaleId = description,
+            IsRepeatable = false,
+            Objectives = objectives,
+            Rewards = rewards,
+            Variables = new QuestVars()
+        };
+    }
+
+    private void SelectQuest(QuestData questData) => _selectedQuest = questData;
+
+    private void AcceptQuest(QuestData questData)
+    {
+        questData.State = QuestStateTypes.QuestActive;
+        questData.ObjectiveState.ClearQuestObjectives(questData.Quest.Id, questData.Quest.Objectives.Count);
+    }
+
+    private void CompleteQuest(QuestData questData)
+    {
+        questData.State = QuestStateTypes.QuestComplete;
+    }
+
+    private void SimulateProgress(QuestData questData, int objectiveIndex)
+    {
+        questData.ObjectiveState.AddObjectiveProgress(questData.Quest.Id, objectiveIndex, 1);
+    }
+
+    private bool IsStatefulObjective(Objective obj)
+    {
+        return obj.ObjectiveType == ObjectiveTypes.ItemObjective
+            || obj.ObjectiveType == GenresObjectiveTypes.EnemyDefeatedObjective
+            || obj.ObjectiveType == GenresObjectiveTypes.EnemySightedObjective
+            || obj.ObjectiveType == GenresObjectiveTypes.CurrencyObjective;
+    }
+
+    private string GetStateName(int state)
+    {
+        if (state == QuestStateTypes.QuestNotStarted) return "Not Started";
+        if (state == QuestStateTypes.QuestActive) return "Active";
+        if (state == QuestStateTypes.QuestComplete) return "Complete";
+        return "Unknown";
+    }
+
+    private string GetStateClass(int state)
+    {
+        if (state == QuestStateTypes.QuestNotStarted) return "is-light";
+        if (state == QuestStateTypes.QuestActive) return "is-warning";
+        if (state == QuestStateTypes.QuestComplete) return "is-success";
+        return "is-dark";
+    }
+
+    private string GetObjectiveText(Objective obj, int progress)
+    {
+        var required = obj.Association.AssociatedValue;
+        if (obj.ObjectiveType == ObjectiveTypes.TriggerObjective) return "Trigger objective";
+        if (obj.ObjectiveType == ObjectiveTypes.LevelObjective) return $"Reach level {required}";
+        if (obj.ObjectiveType == ObjectiveTypes.ClassObjective) return "Change class";
+        if (obj.ObjectiveType == ObjectiveTypes.EffectObjective) return "Gain an effect";
+        if (obj.ObjectiveType == ObjectiveTypes.QuestObjective) return "Complete prerequisite quest";
+        if (obj.ObjectiveType == ObjectiveTypes.ItemObjective) return $"Collect items ({progress}/{required})";
+        if (obj.ObjectiveType == GenresObjectiveTypes.EnemyDefeatedObjective) return $"Defeat enemies ({progress}/{required})";
+        if (obj.ObjectiveType == GenresObjectiveTypes.EnemySightedObjective) return $"Sight enemies ({progress}/{required})";
+        if (obj.ObjectiveType == GenresObjectiveTypes.CurrencyObjective) return $"Collect currency ({progress}/{required})";
+        return "Complete objective";
+    }
+}
