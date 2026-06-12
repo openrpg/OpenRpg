@@ -20,7 +20,7 @@ public static class IServiceProviderExtensions
         dataSource.Database.Add(typeof(ItemTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(RaceTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(ClassTemplate), new Dictionary<object, object>());
-        dataSource.Database.Add(typeof(Quest), new Dictionary<object, object>());
+        dataSource.Database.Add(typeof(QuestTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(ItemCraftingTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(ItemGatheringTemplate), new Dictionary<object, object>());
 

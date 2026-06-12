@@ -73,7 +73,7 @@
     },
     "quest": {
       "name": "Quest",
-      "templateType": "OpenRpg.Quests.Quest, OpenRpg.Quests",
+      "templateType": "OpenRpg.Quests.QuestTemplate, OpenRpg.Quests",
       "assetCodePrefix": "quest",
       "groups": [
         {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Moq;
 using OpenRpg.Core.Associations;
 using OpenRpg.Core.Requirements;
@@ -8,6 +9,7 @@ using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Genres.Requirements;
 using OpenRpg.Genres.Types;
+using OpenRpg.Quests;
 using OpenRpg.Quests.Extensions;
 using OpenRpg.Quests.State;
 using OpenRpg.Quests.Types;
@@ -28,7 +30,7 @@ public class RequirementExtensionsTests
     public void are_requirements_met_with_character_should_check_all_three()
     {
         _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<Character>(), It.IsAny<Requirement>())).Returns(true);
-        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IQuestState>(), It.IsAny<Requirement>())).Returns(true);
+        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IReadOnlyList<QuestData>>(), It.IsAny<Requirement>())).Returns(true);
         _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<ITriggerState>(), It.IsAny<Requirement>())).Returns(true);
 
         var character = CreateCharacter();
@@ -41,9 +43,9 @@ public class RequirementExtensionsTests
 
         Assert.True(result);
         _mockChecker.Verify(x => x.IsRequirementMet(character, It.IsAny<Requirement>()), Times.Once);
-        var questState = character.Variables.QuestState;
+        var activeQuests = character.Variables.ActiveQuests;
         var triggerState = character.Variables.TriggerState;
-        _mockChecker.Verify(x => x.IsRequirementMet(questState, It.IsAny<Requirement>()), Times.Once);
+        _mockChecker.Verify(x => x.IsRequirementMet(activeQuests, It.IsAny<Requirement>()), Times.Once);
         _mockChecker.Verify(x => x.IsRequirementMet(triggerState, It.IsAny<Requirement>()), Times.Once);
     }
 
@@ -51,7 +53,7 @@ public class RequirementExtensionsTests
     public void are_requirements_met_with_character_should_return_false_when_character_check_fails()
     {
         _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<Character>(), It.IsAny<Requirement>())).Returns(false);
-        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IQuestState>(), It.IsAny<Requirement>())).Returns(true);
+        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IReadOnlyList<QuestData>>(), It.IsAny<Requirement>())).Returns(true);
         _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<ITriggerState>(), It.IsAny<Requirement>())).Returns(true);
 
         var character = CreateCharacter();
@@ -69,7 +71,7 @@ public class RequirementExtensionsTests
     public void are_requirements_met_with_character_should_return_false_when_quest_state_check_fails()
     {
         _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<Character>(), It.IsAny<Requirement>())).Returns(true);
-        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IQuestState>(), It.IsAny<Requirement>())).Returns(false);
+        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IReadOnlyList<QuestData>>(), It.IsAny<Requirement>())).Returns(false);
         _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<ITriggerState>(), It.IsAny<Requirement>())).Returns(true);
 
         var character = CreateCharacter();
@@ -87,7 +89,7 @@ public class RequirementExtensionsTests
     public void are_requirements_met_with_character_should_return_false_when_trigger_check_fails()
     {
         _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<Character>(), It.IsAny<Requirement>())).Returns(true);
-        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IQuestState>(), It.IsAny<Requirement>())).Returns(true);
+        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IReadOnlyList<QuestData>>(), It.IsAny<Requirement>())).Returns(true);
         _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<ITriggerState>(), It.IsAny<Requirement>())).Returns(false);
 
         var character = CreateCharacter();
@@ -105,7 +107,7 @@ public class RequirementExtensionsTests
     public void are_requirements_met_with_character_should_return_true_when_all_pass()
     {
         _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<Character>(), It.IsAny<Requirement>())).Returns(true);
-        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IQuestState>(), It.IsAny<Requirement>())).Returns(true);
+        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IReadOnlyList<QuestData>>(), It.IsAny<Requirement>())).Returns(true);
         _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<ITriggerState>(), It.IsAny<Requirement>())).Returns(true);
 
         var character = CreateCharacter();
@@ -122,40 +124,40 @@ public class RequirementExtensionsTests
     [Fact]
     public void are_requirements_met_for_quest_state_should_check_all_requirements()
     {
-        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IQuestState>(), It.IsAny<Requirement>())).Returns(true);
+        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IReadOnlyList<QuestData>>(), It.IsAny<Requirement>())).Returns(true);
 
-        var questState = new QuestState();
+        var quests = new List<QuestData>();
         var requirements = new[]
         {
             new Requirement { RequirementType = QuestRequirementTypes.QuestStateRequirement, Association = new Association(1, QuestStateTypes.QuestActive) },
             new Requirement { RequirementType = QuestRequirementTypes.QuestStateRequirement, Association = new Association(2, QuestStateTypes.QuestComplete) }
         };
 
-        var result = _mockChecker.Object.AreRequirementsMet(questState, requirements);
+        var result = _mockChecker.Object.AreRequirementsMet(quests, requirements);
 
         Assert.True(result);
-        _mockChecker.Verify(x => x.IsRequirementMet(questState, It.IsAny<Requirement>()), Times.Exactly(2));
+        _mockChecker.Verify(x => x.IsRequirementMet(quests, It.IsAny<Requirement>()), Times.Exactly(2));
     }
 
     [Fact]
     public void are_requirements_met_for_quest_state_should_return_false_when_any_fails()
     {
         var callCount = 0;
-        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IQuestState>(), It.IsAny<Requirement>()))
+        _mockChecker.Setup(x => x.IsRequirementMet(It.IsAny<IReadOnlyList<QuestData>>(), It.IsAny<Requirement>()))
             .Returns(() =>
             {
                 callCount++;
                 return callCount != 2;
             });
 
-        var questState = new QuestState();
+        var quests = new List<QuestData>();
         var requirements = new[]
         {
             new Requirement { RequirementType = QuestRequirementTypes.QuestStateRequirement, Association = new Association(1, QuestStateTypes.QuestActive) },
             new Requirement { RequirementType = QuestRequirementTypes.QuestStateRequirement, Association = new Association(2, QuestStateTypes.QuestComplete) }
         };
 
-        var result = _mockChecker.Object.AreRequirementsMet(questState, requirements);
+        var result = _mockChecker.Object.AreRequirementsMet(quests, requirements);
 
         Assert.False(result);
     }
@@ -218,7 +220,7 @@ public class RequirementExtensionsTests
         {
             Variables = new EntityVariables()
         };
-        var _ = character.Variables.QuestState;
+        var _ = character.Variables.ActiveQuests;
         var __ = character.Variables.TriggerState;
         return character;
     }

@@ -2,14 +2,14 @@
 
 The quests project builds upon the `OpenRpg.Items` project to allow a way to express quests that can be carried out by players within the game.
 
-A `Quest` is a `Template` that generally contains information about the `Objectives`, the `Rewards` as well as other metadata and a way to track the state of completed quests and faction information.
+A `QuestTemplate` is a `Template` that generally contains information about the `Objectives`, the `Rewards` as well as other metadata and a way to track the state of completed quests and faction information.
 
 > It is recommended you look over the interactive web demo for a more in depth example and explanation of this project.
 
 ## Quest Structure
 
 ```csharp
-var quest = new Quest
+var quest = new QuestTemplate
 {
     Id = 1,
     NameLocaleId = "Goblin Hunt",
@@ -18,7 +18,7 @@ var quest = new Quest
     Objectives = new List<Objective> { ... },
     Rewards = new List<Reward> { ... },
     Gifts = new List<Reward> { ... },           // items given at quest start
-    Variables = new QuestVariables()             // stores Requirements at key 4003
+    Variables = new QuestTemplateVariables()             // stores Requirements at key 4003
 };
 ```
 
@@ -92,12 +92,12 @@ Progress is **push-based** — game code explicitly calls `AddObjectiveProgress`
 
 ## QuestData
 
-`QuestData` is a consolidated runtime wrapper that bundles quest definition, state, and objective state:
+`QuestData` is a proper `ITemplateData` instance that bundles quest definition, state, and objective state. It links to the template via `TemplateId` (like `ItemData`):
 
 ```csharp
-var questData = new QuestData(quest, QuestStateTypes.QuestActive);
-// questData.Quest        — the quest template
-// questData.State        — current state (NotStarted/Active/Complete)
+var questData = new QuestData(quest.Id, QuestStateTypes.QuestActive);
+// questData.TemplateId    — links to the QuestTemplate
+// questData.State         — current state (NotStarted/Active/Complete)
 // questData.ObjectiveState — per-objective progress
 ```
 
@@ -105,14 +105,14 @@ var questData = new QuestData(quest, QuestStateTypes.QuestActive);
 
 ```csharp
 // Accept a quest
-var questData = new QuestData(quest, QuestStateTypes.QuestActive);
+var questData = new QuestData(quest.Id, QuestStateTypes.QuestActive);
 questData.ObjectiveState.ClearQuestObjectives(quest.Id, quest.Objectives.Count);
 
 // Track progress (called by game code when events happen)
 questData.ObjectiveState.AddObjectiveProgress(quest.Id, objectiveIndex, 1);
 
 // Check if all objectives are met
-var canComplete = ObjectiveChecker.AreObjectivesMet(character, questData);
+var canComplete = ObjectiveChecker.AreObjectivesMet(character, quest, questData);
 
 // Complete the quest
 questData.State = QuestStateTypes.QuestComplete;

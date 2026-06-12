@@ -16,7 +16,8 @@
 @using OpenRpg.Quests.Objectives
 @using OpenRpg.Quests.State
 @using OpenRpg.Quests.Types
-@using QuestVars = OpenRpg.Quests.Variables.QuestVariables
+@using OpenRpg.Quests.Variables
+@using QuestVars = OpenRpg.Quests.Variables.QuestTemplateVariables
 
 @inject DemoCharacterBuilder CharacterBuilder
 @inject ICharacterObjectiveChecker ObjectiveChecker
@@ -56,13 +57,13 @@
                 IsObjectiveMet(Character, Objective)
 
                 // Quest state context — prerequisite quests
-                IsObjectiveMet(IQuestState, Objective)
+                IsObjectiveMet(IReadOnlyList&lt;QuestData&gt;, Objective)
 
                 // Trigger context — trigger objectives
                 IsObjectiveMet(ITriggerState, Objective)
 
                 // Objective state context — kill counts, item collections
-                IsObjectiveMet(IObjectiveState, Objective, questId, objectiveIndex)
+                IsObjectiveMet(ObjectiveState, Objective, questId, objectiveIndex)
                 ```
             </Markdown>
         </CardSection>
@@ -77,7 +78,7 @@
                 ```csharp
                 // Checks character + questState + triggerState + objectiveState
                 var allMet = ObjectiveChecker
-                    .AreObjectivesMet(character, questData);
+                    .AreObjectivesMet(character, questTemplate, questData);
                 ```
 
                 This is what gates the "Complete Quest" button.
@@ -103,17 +104,18 @@
             <br />
             @foreach (var questData in _quests)
             {
+                var template = _questTemplates[questData.TemplateId];
                 var state = questData.State;
                 var stateName = GetStateName(state);
                 var stateClass = GetStateClass(state);
-                var isSelected = _selectedQuest?.Quest.Id == questData.Quest.Id;
+                var isSelected = _selectedQuest?.TemplateId == questData.TemplateId;
                 var qd = questData;
 
                 <div class="box @(isSelected ? "has-background-info-light" : "")" style="cursor: pointer;" @onclick="() => SelectQuest(qd)">
                     <div class="columns is-vcentered">
                         <div class="column">
-                            <h6 class="title is-6 has-text-dark">@qd.Quest.NameLocaleId</h6>
-                            <p class="subtitle is-7 has-text-grey">@qd.Quest.DescriptionLocaleId</p>
+                            <h6 class="title is-6 has-text-dark">@template.NameLocaleId</h6>
+                            <p class="subtitle is-7 has-text-grey">@template.DescriptionLocaleId</p>
                         </div>
                         <div class="column is-narrow">
                             <span class="tag @stateClass">@stateName</span>
@@ -127,21 +129,22 @@
         <CardSection>
             @if (_selectedQuest != null)
             {
+                var selectedTemplate = _questTemplates[_selectedQuest.TemplateId];
                 var state = _selectedQuest.State;
-                <h4 class="title is-5 has-text-dark has-text-centered">@_selectedQuest.Quest.NameLocaleId</h4>
+                <h4 class="title is-5 has-text-dark has-text-centered">@selectedTemplate.NameLocaleId</h4>
                 <h5 class="subtitle is-6 has-text-dark has-text-centered">State: @GetStateName(state)</h5>
                 <br />
 
-                @if (_selectedQuest.Quest.Objectives.Any())
+                @if (selectedTemplate.Objectives.Any())
                 {
                     <h6 class="title is-6 has-text-dark">Objectives</h6>
-                    @foreach (var (obj, index) in _selectedQuest.Quest.Objectives.Select((o, i) => (o, i)))
+                    @foreach (var (obj, index) in selectedTemplate.Objectives.Select((o, i) => (o, i)))
                     {
-                        var progress = _selectedQuest.ObjectiveState.GetObjectiveProgress(_selectedQuest.Quest.Id, index);
+                        var progress = _selectedQuest.GetObjectiveProgress(index);
                         var charMet = ObjectiveChecker.IsObjectiveMet(_character, obj);
-                        var questMet = ObjectiveChecker.IsObjectiveMet(_character.Variables.QuestState, obj);
+                        var questMet = ObjectiveChecker.IsObjectiveMet(_character.Variables.ActiveQuests, obj);
                         var trigMet = ObjectiveChecker.IsObjectiveMet(_character.Variables.TriggerState, obj);
-                        var objMet = ObjectiveChecker.IsObjectiveMet(_selectedQuest.ObjectiveState, obj, _selectedQuest.Quest.Id, index);
+                        var objMet = ObjectiveChecker.IsObjectiveMet(_selectedQuest.ObjectiveState, obj, selectedTemplate.Id, index);
                         var allMet = charMet && questMet && trigMet && objMet;
                         <div class="box">
                             <div class="columns is-vcentered is-mobile">
@@ -173,7 +176,8 @@
                                         }
                                         else if (obj.ObjectiveType == ObjectiveTypes.QuestObjective)
                                         {
-                                            var prereqComplete = _character.Variables.QuestState.GetQuestState(obj.Association.AssociatedId) == QuestStateTypes.QuestComplete;
+                                            var prereqQuest = _character.Variables.ActiveQuests.FirstOrDefault(q => q.TemplateId == obj.Association.AssociatedId);
+                                            var prereqComplete = prereqQuest?.State == QuestStateTypes.QuestComplete;
                                             <a class="button is-small @(prereqComplete ? "is-success" : "is-warning")" @onclick="() => CompletePrerequisiteQuest(obj.Association.AssociatedId)">
                                                 @(prereqComplete ? "Done" : "Complete Quest")
                                             </a>
@@ -201,7 +205,7 @@
                     }
                     else if (state == QuestStateTypes.QuestActive)
                     {
-                        var canComplete = ObjectiveChecker.AreObjectivesMet(_character, _selectedQuest);
+                        var canComplete = ObjectiveChecker.AreObjectivesMet(_character, _questTemplates[_selectedQuest.TemplateId], _selectedQuest);
                         <a class="button is-info @(!canComplete ? "is-static" : "")" @onclick="() => CompleteQuest(_selectedQuest)">
                             Complete Quest
                         </a>
@@ -230,16 +234,16 @@
 
     ```csharp
     // When the player kills an enemy
-    questData.ObjectiveState.AddObjectiveProgress(questId, objectiveIndex, 1);
+    questData.AddObjectiveProgress(objectiveIndex, 1);
 
     // When the player collects items
-    questData.ObjectiveState.AddObjectiveProgress(questId, objectiveIndex, amount);
+    questData.AddObjectiveProgress(objectiveIndex, amount);
 
     // Check if an objective is complete
-    var complete = questData.ObjectiveState.IsObjectiveComplete(questId, objectiveIndex, requiredAmount);
+    var complete = questData.IsObjectiveComplete(objectiveIndex, requiredAmount);
 
     // Reset progress when accepting a quest
-    questData.ObjectiveState.ClearQuestObjectives(questId, quest.Objectives.Count);
+    questData.ClearObjectives(quest.Objectives.Count);
     ```
 </Markdown>
 <br />
@@ -251,14 +255,14 @@
 
     ```csharp
     // Create when accepting a quest
-    var questData = new QuestData(quest, QuestStateTypes.QuestActive);
-    questData.ObjectiveState.ClearQuestObjectives(quest.Id, quest.Objectives.Count);
+    var questData = new QuestData(template.Id);
+    questData.ClearObjectives(template.Objectives.Count);
 
     // During gameplay — push progress
-    questData.ObjectiveState.AddObjectiveProgress(quest.Id, 0, 1);
+    questData.AddObjectiveProgress(0, 1);
 
     // Check completion
-    var canComplete = ObjectiveChecker.AreObjectivesMet(character, questData);
+    var canComplete = ObjectiveChecker.AreObjectivesMet(character, questTemplate, questData);
 
     // Complete
     questData.State = QuestStateTypes.QuestComplete;
@@ -273,6 +277,7 @@
     private Character _character;
     private List<QuestData> _quests = new();
     private QuestData _selectedQuest;
+    private Dictionary<int, QuestTemplate> _questTemplates = new();
 
     private const int GoblinKillQuestId = 100;
     private const int HerbCollectionQuestId = 200;
@@ -291,33 +296,39 @@
 
     private List<QuestData> CreateQuests()
     {
+        var goblinQuest = MakeQuest(GoblinKillQuestId, "Goblin Hunt", "Defeat 3 goblins terrorising the village outskirts.",
+            new List<Objective> { new() { ObjectiveType = GenresObjectiveTypes.EnemyDefeatedObjective, Association = new Association(99, 3) } },
+            new List<Reward> { new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 300) } });
+
+        var herbQuest = MakeQuest(HerbCollectionQuestId, "Herb Collection", "Gather 5 moonshade herbs for the village healer.",
+            new List<Objective> { new() { ObjectiveType = ObjectiveTypes.ItemObjective, Association = new Association(ItemTemplateLookups.HealingPotion, 5) } },
+            new List<Reward> { new() { RewardType = GenreRewardTypes.CurrencyReward, Association = new Association(0, 100) } });
+
+        var elderQuest = MakeQuest(TalkToElderQuestId, "Speak to the Elder", "The Elder has information about the goblin threat. Speak to him first.",
+            new List<Objective> { new() { ObjectiveType = ObjectiveTypes.TriggerObjective, Association = new Association(ElderTriggerId, 1) } },
+            new List<Reward> { new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 50) } });
+
+        var levellingQuest = MakeQuest(ReachLevelQuestId, "Prove Your Strength", "Reach level 5 to join the warrior guild.",
+            new List<Objective> { new() { ObjectiveType = ObjectiveTypes.LevelObjective, Association = new Association(0, 5) } },
+            new List<Reward> { new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 200) } });
+
+        var guildQuest = MakeQuest(ProveWorthQuestId, "Guild Initiation", "Complete the Goblin Hunt to prove your worth to the guild.",
+            new List<Objective> { new() { ObjectiveType = ObjectiveTypes.QuestObjective, Association = new Association(GoblinKillQuestId, 1) } },
+            new List<Reward> { new() { RewardType = GenreRewardTypes.CurrencyReward, Association = new Association(0, 500) } });
+        
         return new List<QuestData>
         {
-            new(MakeQuest(GoblinKillQuestId, "Goblin Hunt", "Defeat 3 goblins terrorising the village outskirts.",
-                new List<Objective> { new() { ObjectiveType = GenresObjectiveTypes.EnemyDefeatedObjective, Association = new Association(99, 3) } },
-                new List<Reward> { new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 300) } })),
-
-            new(MakeQuest(HerbCollectionQuestId, "Herb Collection", "Gather 5 moonshade herbs for the village healer.",
-                new List<Objective> { new() { ObjectiveType = ObjectiveTypes.ItemObjective, Association = new Association(ItemTemplateLookups.HealingPotion, 5) } },
-                new List<Reward> { new() { RewardType = GenreRewardTypes.CurrencyReward, Association = new Association(0, 100) } })),
-
-            new(MakeQuest(TalkToElderQuestId, "Speak to the Elder", "The Elder has information about the goblin threat. Speak to him first.",
-                new List<Objective> { new() { ObjectiveType = ObjectiveTypes.TriggerObjective, Association = new Association(ElderTriggerId, 1) } },
-                new List<Reward> { new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 50) } })),
-
-            new(MakeQuest(ReachLevelQuestId, "Prove Your Strength", "Reach level 5 to join the warrior guild.",
-                new List<Objective> { new() { ObjectiveType = ObjectiveTypes.LevelObjective, Association = new Association(0, 5) } },
-                new List<Reward> { new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 200) } })),
-
-            new(MakeQuest(ProveWorthQuestId, "Guild Initiation", "Complete the Goblin Hunt to prove your worth to the guild.",
-                new List<Objective> { new() { ObjectiveType = ObjectiveTypes.QuestObjective, Association = new Association(GoblinKillQuestId, 1) } },
-                new List<Reward> { new() { RewardType = GenreRewardTypes.CurrencyReward, Association = new Association(0, 500) } }))
+            new() { TemplateId = goblinQuest.Id },
+            new() { TemplateId = herbQuest.Id },
+            new() { TemplateId = elderQuest.Id },
+            new() { TemplateId = levellingQuest.Id },
+            new() { TemplateId = guildQuest.Id }
         };
     }
 
-    private Quest MakeQuest(int id, string name, string description, List<Objective> objectives, List<Reward> rewards)
+    private QuestTemplate MakeQuest(int id, string name, string description, List<Objective> objectives, List<Reward> rewards)
     {
-        return new Quest
+        var template = new QuestTemplate
         {
             Id = id,
             NameLocaleId = name,
@@ -327,26 +338,27 @@
             Rewards = rewards,
             Variables = new QuestVars()
         };
+        _questTemplates[id] = template;
+        return template;
     }
 
     private void SelectQuest(QuestData questData) => _selectedQuest = questData;
 
     private void AcceptQuest(QuestData questData)
     {
+        var template = _questTemplates[questData.TemplateId];
         questData.State = QuestStateTypes.QuestActive;
-        questData.ObjectiveState.ClearQuestObjectives(questData.Quest.Id, questData.Quest.Objectives.Count);
-        _character.Variables.QuestState.SetQuestState(questData.Quest.Id, QuestStateTypes.QuestActive);
+        questData.ClearObjectives(template.Objectives.Count);
     }
 
     private void CompleteQuest(QuestData questData)
     {
         questData.State = QuestStateTypes.QuestComplete;
-        _character.Variables.QuestState.SetQuestState(questData.Quest.Id, QuestStateTypes.QuestComplete);
     }
 
     private void SimulateProgress(QuestData questData, int objectiveIndex)
     {
-        questData.ObjectiveState.AddObjectiveProgress(questData.Quest.Id, objectiveIndex, 1);
+        questData.AddObjectiveProgress(objectiveIndex, 1);
     }
 
     private void ToggleTrigger(int triggerId)
@@ -363,7 +375,9 @@
 
     private void CompletePrerequisiteQuest(int questId)
     {
-        _character.Variables.QuestState.SetQuestState(questId, QuestStateTypes.QuestComplete);
+        var questData = _character.Variables.ActiveQuests.FirstOrDefault(q => q.TemplateId == questId);
+        if (questData != null)
+        { questData.State = QuestStateTypes.QuestComplete; }
     }
 
     private bool IsStatefulObjective(Objective obj)
@@ -403,7 +417,8 @@
         if (obj.ObjectiveType == ObjectiveTypes.EffectObjective) return "Gain an effect";
         if (obj.ObjectiveType == ObjectiveTypes.QuestObjective)
         {
-            var complete = _character.Variables.QuestState.GetQuestState(obj.Association.AssociatedId) == QuestStateTypes.QuestComplete;
+            var prereqQuest = _character.Variables.ActiveQuests.FirstOrDefault(q => q.TemplateId == obj.Association.AssociatedId);
+            var complete = prereqQuest?.State == QuestStateTypes.QuestComplete;
             return $"Complete prerequisite quest {(complete ? "(done)" : "(pending)")}";
         }
         if (obj.ObjectiveType == ObjectiveTypes.ItemObjective) return $"Collect items ({progress}/{required})";

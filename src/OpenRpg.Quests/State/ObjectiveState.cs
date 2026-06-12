@@ -4,9 +4,10 @@ using OpenRpg.Quests.Types;
 
 namespace OpenRpg.Quests.State
 {
-    public class ObjectiveState : Variables<int>, IObjectiveState
+    public class ObjectiveState : Variables<int>
     {
-        public ObjectiveState(IDictionary<int, int> internalVariables = null) : base(QuestVariableTypes.ObjectiveStateVariables, internalVariables)
+        public ObjectiveState(IDictionary<int, int> internalVariables = null)
+            : base(QuestVariableTypes.ObjectiveStateVariables, internalVariables)
         {
         }
     }

@@ -39,7 +39,7 @@ namespace OpenRpg.Demos.Infrastructure.DI
             data.Add(typeof(ItemGatheringTemplate), new GatheringTemplateDataGenerator().GenerateDictionary());
             data.Add(typeof(ItemCraftingTemplate), new CraftingTemplateDataGenerator().GenerateDictionary());
             data.Add(typeof(ItemModificationTemplate), new ItemModificationTemplateDataGenerator().GenerateDictionary());
-            data.Add(typeof(Quest), new QuestStateDataGenerator().GenerateDictionary());
+            data.Add(typeof(QuestTemplate), new QuestStateDataGenerator().GenerateDictionary());
             return new InMemoryDataSource(data);
         }
 

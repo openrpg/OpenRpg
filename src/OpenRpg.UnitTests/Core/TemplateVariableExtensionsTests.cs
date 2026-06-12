@@ -13,7 +13,7 @@ public class TemplateVariableExtensionsTests
     [Fact]
     public void should_use_same_procedural_effects_instance_on_subsequent_access()
     {
-        var vars = new QuestVariables();
+        var vars = new QuestTemplateVariables();
         var first = vars.ProceduralEffects;
         var second = vars.ProceduralEffects;
         Assert.Same(first, second);
@@ -22,7 +22,7 @@ public class TemplateVariableExtensionsTests
     [Fact]
     public void should_use_same_effects_instance_on_subsequent_access()
     {
-        var vars = new QuestVariables();
+        var vars = new QuestTemplateVariables();
         var first = vars.Effects;
         var second = vars.Effects;
         Assert.Same(first, second);
@@ -31,7 +31,7 @@ public class TemplateVariableExtensionsTests
     [Fact]
     public void should_use_same_requirements_instance_on_subsequent_access()
     {
-        var vars = new QuestVariables();
+        var vars = new QuestTemplateVariables();
         var first = vars.Requirements;
         var second = vars.Requirements;
         Assert.Same(first, second);
@@ -40,7 +40,7 @@ public class TemplateVariableExtensionsTests
     [Fact]
     public void should_normalize_array_to_list_when_setting_effects()
     {
-        var vars = new QuestVariables();
+        var vars = new QuestTemplateVariables();
         var effects = new[]
         {
             new StaticEffect { EffectType = 1, Potency = 10 },
@@ -58,7 +58,7 @@ public class TemplateVariableExtensionsTests
     [Fact]
     public void should_normalize_array_to_list_when_setting_requirements()
     {
-        var vars = new QuestVariables();
+        var vars = new QuestTemplateVariables();
         var requirements = new[]
         {
             new Requirement { RequirementType = 1, Association = new OpenRpg.Core.Associations.Association(0, 5) }
@@ -75,7 +75,7 @@ public class TemplateVariableExtensionsTests
     [Fact]
     public void should_preserve_list_reference_when_setting_effects_with_list()
     {
-        var vars = new QuestVariables();
+        var vars = new QuestTemplateVariables();
         var effects = new List<IEffect>
         {
             new StaticEffect { EffectType = 1, Potency = 10 }
@@ -89,7 +89,7 @@ public class TemplateVariableExtensionsTests
     [Fact]
     public void should_store_empty_list_when_setting_effects_with_null()
     {
-        var vars = new QuestVariables();
+        var vars = new QuestTemplateVariables();
         vars.Effects = null;
 
         var result = vars.Effects;
@@ -100,7 +100,7 @@ public class TemplateVariableExtensionsTests
     [Fact]
     public void should_return_same_instance_after_setting_array_for_effects()
     {
-        var vars = new QuestVariables();
+        var vars = new QuestTemplateVariables();
         vars.Effects = new[] { new StaticEffect { EffectType = 1, Potency = 10 } };
 
         var first = vars.Effects;
@@ -111,7 +111,7 @@ public class TemplateVariableExtensionsTests
     [Fact]
     public void should_return_same_instance_after_setting_array_for_requirements()
     {
-        var vars = new QuestVariables();
+        var vars = new QuestTemplateVariables();
         vars.Requirements = new[] { new Requirement { RequirementType = 1 } };
 
         var first = vars.Requirements;
@@ -122,7 +122,7 @@ public class TemplateVariableExtensionsTests
     [Fact]
     public void should_preserve_effects_content_after_normalizing_array()
     {
-        var vars = new QuestVariables();
+        var vars = new QuestTemplateVariables();
         var effect1 = new StaticEffect { EffectType = 100, Potency = 15.0f };
         var effect2 = new StaticEffect { EffectType = 200, Potency = 25.0f };
 

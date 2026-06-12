@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using OpenRpg.Entities.Entity.Variables;
+using OpenRpg.Quests;
 using OpenRpg.Quests.Extensions;
 using OpenRpg.Quests.Factions;
 using OpenRpg.Quests.State;
@@ -30,27 +32,6 @@ public class QuestEntityVariableExtensionTests
     }
 
     [Fact]
-    public void should_correctly_handle_quest_state_on_entity()
-    {
-        var entityVars = new EntityVariables();
-        Assert.False(entityVars.HasQuestState());
-        
-        var dummyQuestState = new QuestState();
-        entityVars.QuestState = dummyQuestState;
-        Assert.True(entityVars.HasQuestState());
-        Assert.Equal(entityVars.QuestState, dummyQuestState);
-    }
-
-    [Fact]
-    public void should_use_same_quest_state_instance_on_subsequent_access()
-    {
-        var entityVars = new EntityVariables();
-        var state = entityVars.QuestState;
-        state[42] = 1;
-        Assert.Equal(1, entityVars.QuestState[42]);
-    }
-
-    [Fact]
     public void should_correctly_handle_trigger_state_on_entity()
     {
         var entityVars = new EntityVariables();
@@ -72,23 +53,54 @@ public class QuestEntityVariableExtensionTests
     }
 
     [Fact]
-    public void should_correctly_handle_objective_state_on_entity()
+    public void should_correctly_handle_active_quests_on_entity()
     {
         var entityVars = new EntityVariables();
-        Assert.False(entityVars.HasObjectiveState());
+        Assert.False(entityVars.HasActiveQuests());
 
-        var dummyObjectiveState = new ObjectiveState();
-        entityVars.ObjectiveState = dummyObjectiveState;
-        Assert.True(entityVars.HasObjectiveState());
-        Assert.Equal(entityVars.ObjectiveState, dummyObjectiveState);
+        var dummyQuests = new List<QuestData> { new QuestData { TemplateId = 1 } };
+        entityVars.ActiveQuests = dummyQuests;
+        Assert.True(entityVars.HasActiveQuests());
+        Assert.Equal(entityVars.ActiveQuests, dummyQuests);
     }
 
     [Fact]
-    public void should_use_same_objective_state_instance_on_subsequent_access()
+    public void should_use_same_active_quests_instance_on_subsequent_access()
     {
         var entityVars = new EntityVariables();
-        var state = entityVars.ObjectiveState;
-        state.SetObjectiveProgress(10, 0, 5);
-        Assert.Equal(5, entityVars.ObjectiveState.GetObjectiveProgress(10, 0));
+        var quests = entityVars.ActiveQuests;
+        quests.Add(new QuestData { TemplateId = 42 });
+        Assert.Single(entityVars.ActiveQuests);
+        Assert.Equal(42, entityVars.ActiveQuests[0].TemplateId);
+    }
+
+    [Fact]
+    public void should_find_quest_data_by_template_id()
+    {
+        var entityVars = new EntityVariables();
+        var quest1 = new QuestData { TemplateId = 10 };
+        var quest2 = new QuestData { TemplateId = 20 };
+        entityVars.ActiveQuests = new List<QuestData> { quest1, quest2 };
+
+        var found = entityVars.FindQuestData(20);
+        Assert.Equal(quest2, found);
+    }
+
+    [Fact]
+    public void find_quest_data_should_return_null_when_not_found()
+    {
+        var entityVars = new EntityVariables();
+        entityVars.ActiveQuests = new List<QuestData> { new QuestData { TemplateId = 10 } };
+
+        var found = entityVars.FindQuestData(99);
+        Assert.Null(found);
+    }
+
+    [Fact]
+    public void find_quest_data_should_return_null_when_no_active_quests()
+    {
+        var entityVars = new EntityVariables();
+        var found = entityVars.FindQuestData(10);
+        Assert.Null(found);
     }
 }

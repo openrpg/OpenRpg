@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Entities.Extensions;
@@ -37,10 +39,13 @@ namespace OpenRpg.Genres.Objectives
             return true;
         }
 
-        public virtual bool IsObjectiveMet(IQuestState state, Objective objective)
+        public virtual bool IsObjectiveMet(IReadOnlyList<QuestData> quests, Objective objective)
         {
             if (objective.ObjectiveType == ObjectiveTypes.QuestObjective)
-            { return state.GetQuestState(objective.Association.AssociatedId) == QuestStateTypes.QuestComplete; }
+            {
+                var questData = quests.FirstOrDefault(q => q.TemplateId == objective.Association.AssociatedId);
+                return questData?.State == QuestStateTypes.QuestComplete;
+            }
 
             return true;
         }
@@ -53,19 +58,22 @@ namespace OpenRpg.Genres.Objectives
             return true;
         }
 
-        public virtual bool IsObjectiveMet(IObjectiveState state, Objective objective, int questId, int objectiveIndex)
+        public virtual bool IsObjectiveMet(ObjectiveState state, Objective objective, int questId, int objectiveIndex)
         {
+            var key = (questId << 16) | (objectiveIndex & 0xFFFF);
+            var progress = state.ContainsKey(key) ? state[key] : 0;
+
             if (objective.ObjectiveType == ObjectiveTypes.ItemObjective)
-            { return state.IsObjectiveComplete(questId, objectiveIndex, objective.Association.AssociatedValue); }
+            { return progress >= objective.Association.AssociatedValue; }
 
             if (objective.ObjectiveType == GenresObjectiveTypes.EnemyDefeatedObjective)
-            { return state.IsObjectiveComplete(questId, objectiveIndex, objective.Association.AssociatedValue); }
+            { return progress >= objective.Association.AssociatedValue; }
 
             if (objective.ObjectiveType == GenresObjectiveTypes.EnemySightedObjective)
-            { return state.IsObjectiveComplete(questId, objectiveIndex, objective.Association.AssociatedValue); }
+            { return progress >= objective.Association.AssociatedValue; }
 
             if (objective.ObjectiveType == GenresObjectiveTypes.CurrencyObjective)
-            { return state.IsObjectiveComplete(questId, objectiveIndex, objective.Association.AssociatedValue); }
+            { return progress >= objective.Association.AssociatedValue; }
 
             return true;
         }

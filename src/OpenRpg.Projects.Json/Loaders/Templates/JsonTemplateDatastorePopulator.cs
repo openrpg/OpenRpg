@@ -31,7 +31,7 @@ public class JsonTemplateDatastorePopulator : ITemplateDatastorePopulator
         await ProcessTemplates<ItemTemplate>(project, absoluteTemplateFolderPath, dataSource);
         await ProcessTemplates<ClassTemplate>(project, absoluteTemplateFolderPath, dataSource);
         await ProcessTemplates<RaceTemplate>(project, absoluteTemplateFolderPath, dataSource);
-        await ProcessTemplates<Quest>(project, absoluteTemplateFolderPath, dataSource);
+        await ProcessTemplates<QuestTemplate>(project, absoluteTemplateFolderPath, dataSource);
         await ProcessTemplates<ItemCraftingTemplate>(project, absoluteTemplateFolderPath, dataSource);
         await ProcessTemplates<ItemGatheringTemplate>(project, absoluteTemplateFolderPath, dataSource);
         await ProcessTemplates<AbilityTemplate>(project, absoluteTemplateFolderPath, dataSource);

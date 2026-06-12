@@ -10,7 +10,7 @@ using OpenRpg.Quests.Types;
 
 namespace OpenRpg.Demos.Infrastructure.Data
 {
-    public class QuestStateDataGenerator : IDataGenerator<Quest>
+    public class QuestStateDataGenerator : IDataGenerator<QuestTemplate>
     {
         public const int FindArtifactQuestId = 10;
         public const int DefeatGoblinQuestId = 20;
@@ -19,7 +19,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
         public const int SpokenToElderTriggerId = 1;
         public const int FoundMapTriggerId = 2;
 
-        public IEnumerable<Quest> GenerateData()
+        public IEnumerable<QuestTemplate> GenerateData()
         {
             return new[]
             {
@@ -29,9 +29,9 @@ namespace OpenRpg.Demos.Infrastructure.Data
             };
         }
 
-        private Quest MakeFindArtifactQuest()
+        private QuestTemplate MakeFindArtifactQuest()
         {
-            var quest = new Quest
+            var quest = new QuestTemplate
             {
                 Id = FindArtifactQuestId,
                 NameLocaleId = "Find the Lost Artifact",
@@ -46,7 +46,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                     new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 200) },
                     new() { RewardType = GenreRewardTypes.CurrencyReward, Association = new Association(0, 150) }
                 },
-                Variables = new Quests.Variables.QuestVariables()
+                Variables = new Quests.Variables.QuestTemplateVariables()
             };
             quest.Variables.Requirements = new[]
             {
@@ -59,9 +59,9 @@ namespace OpenRpg.Demos.Infrastructure.Data
             return quest;
         }
 
-        private Quest MakeDefeatGoblinQuest()
+        private QuestTemplate MakeDefeatGoblinQuest()
         {
-            var quest = new Quest
+            var quest = new QuestTemplate
             {
                 Id = DefeatGoblinQuestId,
                 NameLocaleId = "Defeat the Goblin Chief",
@@ -76,14 +76,14 @@ namespace OpenRpg.Demos.Infrastructure.Data
                     new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 300) },
                     new() { RewardType = GenreRewardTypes.ItemReward, Association = new Association(ItemTemplateLookups.SuperSword, 1) }
                 },
-                Variables = new Quests.Variables.QuestVariables()
+                Variables = new Quests.Variables.QuestTemplateVariables()
             };
             return quest;
         }
 
-        private Quest MakeDeliverLetterQuest()
+        private QuestTemplate MakeDeliverLetterQuest()
         {
-            var quest = new Quest
+            var quest = new QuestTemplate
             {
                 Id = DeliverLetterQuestId,
                 NameLocaleId = "Deliver the Letter",
@@ -98,7 +98,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
                     new() { RewardType = FantasyRewardTypes.ExperienceReward, Association = new Association(0, 50) },
                     new() { RewardType = GenreRewardTypes.CurrencyReward, Association = new Association(0, 25) }
                 },
-                Variables = new Quests.Variables.QuestVariables()
+                Variables = new Quests.Variables.QuestTemplateVariables()
             };
             return quest;
         }
