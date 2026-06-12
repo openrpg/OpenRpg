@@ -149,12 +149,35 @@
                                     <span class="tag @(allMet ? "is-success" : "is-light")">@(allMet ? "Done" : "Todo")</span>
                                     <span class="has-text-dark">&nbsp;@GetObjectiveText(obj, progress)</span>
                                 </div>
-                                @if (state == QuestStateTypes.QuestActive && IsStatefulObjective(obj))
+                                @if (state == QuestStateTypes.QuestActive)
                                 {
                                     <div class="column is-narrow">
-                                        <a class="button is-small is-info" @onclick="() => SimulateProgress(_selectedQuest, index)">
-                                            +1
-                                        </a>
+                                        @if (IsStatefulObjective(obj))
+                                        {
+                                            <a class="button is-small is-info" @onclick="() => SimulateProgress(_selectedQuest, index)">
+                                                +1
+                                            </a>
+                                        }
+                                        else if (obj.ObjectiveType == ObjectiveTypes.TriggerObjective)
+                                        {
+                                            var triggered = _character.Variables.TriggerState.HasTriggered(obj.Association.AssociatedId);
+                                            <a class="button is-small @(triggered ? "is-success" : "is-warning")" @onclick="() => ToggleTrigger(obj.Association.AssociatedId)">
+                                                @(triggered ? "Triggered" : "Set Trigger")
+                                            </a>
+                                        }
+                                        else if (obj.ObjectiveType == ObjectiveTypes.LevelObjective)
+                                        {
+                                            <a class="button is-small is-warning" @onclick="() => SetLevel(obj.Association.AssociatedValue)">
+                                                Set Level @obj.Association.AssociatedValue
+                                            </a>
+                                        }
+                                        else if (obj.ObjectiveType == ObjectiveTypes.QuestObjective)
+                                        {
+                                            var prereqComplete = _character.Variables.QuestState.GetQuestState(obj.Association.AssociatedId) == QuestStateTypes.QuestComplete;
+                                            <a class="button is-small @(prereqComplete ? "is-success" : "is-warning")" @onclick="() => CompletePrerequisiteQuest(obj.Association.AssociatedId)">
+                                                @(prereqComplete ? "Done" : "Complete Quest")
+                                            </a>
+                                        }
                                     </div>
                                 }
                             </div>
@@ -312,16 +335,35 @@
     {
         questData.State = QuestStateTypes.QuestActive;
         questData.ObjectiveState.ClearQuestObjectives(questData.Quest.Id, questData.Quest.Objectives.Count);
+        _character.Variables.QuestState.SetQuestState(questData.Quest.Id, QuestStateTypes.QuestActive);
     }
 
     private void CompleteQuest(QuestData questData)
     {
         questData.State = QuestStateTypes.QuestComplete;
+        _character.Variables.QuestState.SetQuestState(questData.Quest.Id, QuestStateTypes.QuestComplete);
     }
 
     private void SimulateProgress(QuestData questData, int objectiveIndex)
     {
         questData.ObjectiveState.AddObjectiveProgress(questData.Quest.Id, objectiveIndex, 1);
+    }
+
+    private void ToggleTrigger(int triggerId)
+    {
+        var current = _character.Variables.TriggerState.HasTriggered(triggerId);
+        _character.Variables.TriggerState.SetTrigger(triggerId, !current);
+    }
+
+    private void SetLevel(int level)
+    {
+        if (_character.Variables.HasClass())
+        { _character.Variables.Class.Variables.Level = level; }
+    }
+
+    private void CompletePrerequisiteQuest(int questId)
+    {
+        _character.Variables.QuestState.SetQuestState(questId, QuestStateTypes.QuestComplete);
     }
 
     private bool IsStatefulObjective(Objective obj)
@@ -351,11 +393,19 @@
     private string GetObjectiveText(Objective obj, int progress)
     {
         var required = obj.Association.AssociatedValue;
-        if (obj.ObjectiveType == ObjectiveTypes.TriggerObjective) return "Trigger objective";
+        if (obj.ObjectiveType == ObjectiveTypes.TriggerObjective)
+        {
+            var triggered = _character.Variables.TriggerState.HasTriggered(obj.Association.AssociatedId);
+            return $"Trigger objective {(triggered ? "(set)" : "(not set)")}";
+        }
         if (obj.ObjectiveType == ObjectiveTypes.LevelObjective) return $"Reach level {required}";
         if (obj.ObjectiveType == ObjectiveTypes.ClassObjective) return "Change class";
         if (obj.ObjectiveType == ObjectiveTypes.EffectObjective) return "Gain an effect";
-        if (obj.ObjectiveType == ObjectiveTypes.QuestObjective) return "Complete prerequisite quest";
+        if (obj.ObjectiveType == ObjectiveTypes.QuestObjective)
+        {
+            var complete = _character.Variables.QuestState.GetQuestState(obj.Association.AssociatedId) == QuestStateTypes.QuestComplete;
+            return $"Complete prerequisite quest {(complete ? "(done)" : "(pending)")}";
+        }
         if (obj.ObjectiveType == ObjectiveTypes.ItemObjective) return $"Collect items ({progress}/{required})";
         if (obj.ObjectiveType == GenresObjectiveTypes.EnemyDefeatedObjective) return $"Defeat enemies ({progress}/{required})";
         if (obj.ObjectiveType == GenresObjectiveTypes.EnemySightedObjective) return $"Sight enemies ({progress}/{required})";

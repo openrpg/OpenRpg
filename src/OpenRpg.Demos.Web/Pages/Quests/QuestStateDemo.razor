@@ -386,11 +386,13 @@
     {
         questData.State = QuestStateTypes.QuestActive;
         questData.ObjectiveState.ClearQuestObjectives(questData.Quest.Id, questData.Quest.Objectives.Count);
+        _character.Variables.QuestState.SetQuestState(questData.Quest.Id, QuestStateTypes.QuestActive);
     }
 
     private void CompleteQuest(QuestData questData)
     {
         questData.State = QuestStateTypes.QuestComplete;
+        _character.Variables.QuestState.SetQuestState(questData.Quest.Id, QuestStateTypes.QuestComplete);
     }
 
     private void SimulateProgress(QuestData questData, int objectiveIndex)
