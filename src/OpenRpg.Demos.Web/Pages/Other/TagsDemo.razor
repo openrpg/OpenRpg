@@ -232,9 +232,8 @@
     </div>
 
     <div class="columns">
-        @for (int d = 1; d <= 3; d++)
+        @for (var depth = 1; depth <= 3; depth++)
         {
-            var depth = d;
             var results = TagRegistry.GetRelatedTags(new[] { _depthSourceTag }, depth).OrderByDescending(x => x.Weight).ToArray();
             <div class="column">
                 <h6 class="title is-6 has-text-dark">Depth @depth</h6>
@@ -317,7 +316,7 @@
 
     protected override void OnInitialized()
     {
-        _items = TemplateAccessor.GetAll<ItemTemplate>().Cast<ItemTemplate>().ToList();
+        _items = TemplateAccessor.GetAll<ItemTemplate>().ToList();
         _allTagIds = _tagNames.Keys.OrderBy(x => x).ToList();
         base.OnInitialized();
     }
