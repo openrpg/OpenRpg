@@ -18,10 +18,10 @@
 
     The tag system provides a lightweight way to categorise and relate entities using integer IDs.
     Tags are stored in a `TagList` (extends `List&lt;int&gt;`) at variable key 9001 on every entity,
-    template, and data object in the system — they are universally inherited.
+    template, and data object in the system; they are universally inherited.
 
     The real power comes from `TagRegistry`, which defines weighted relationships between tags.
-    This lets you express semantic similarity — for example, "armour" correlates positively with
+    This lets you express semantic similarity. For example, "armour" correlates positively with
     "metal" and "leather", but negatively with "wood". The scoring pipeline uses these relationships
     to rank how well an entity matches a set of source tags.
 </Markdown>
@@ -221,7 +221,7 @@
 
         `GetRelatedTags(tags, depth)` walks the relationship graph N levels deep. At depth 1, it
         finds direct relationships. At depth 2, it follows those to find indirect connections.
-        Using **Fire** as the source tag shows this clearly — it only has 2 direct relationships,
+        Using **Fire** as the source tag shows this clearly: it only has 2 direct relationships,
         but deeper traversal discovers Metal, Wood, and Leather through intermediate hops.
     </Markdown>
     <div class="field">

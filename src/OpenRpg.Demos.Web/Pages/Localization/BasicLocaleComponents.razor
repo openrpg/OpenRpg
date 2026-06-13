@@ -6,7 +6,7 @@
     The `OpenRpg.Localization` library provides a locale-aware text resolution system. Rather than hardcoding display strings
     on templates and entities, you store **locale codes** (keys) and resolve them at runtime via a `ILocaleRepository`.
 
-    This approach means one template can serve any language — you just swap the locale dataset.
+    This approach means one template can serve any language; just swap the locale dataset.
 </Markdown>
 <br />
 <div class="columns">
@@ -16,9 +16,9 @@
 
             The system is layered into three parts:
 
-            1. **`LocaleDataset`** — A mapping of string keys to translated text for a single locale code (e.g. `"en-gb"`).
-            2. **`ILocaleDataSource`** — Storage abstraction for one or more locale datasets. The demo uses `InMemoryLocaleDataSource`.
-            3. **`ILocaleRepository`** — The consumer-facing API. Holds a `CurrentLocaleCode` and resolves keys via extension methods.
+            1. **`LocaleDataset`**: a mapping of string keys to translated text for a single locale code (e.g. `"en-gb"`).
+            2. **`ILocaleDataSource`**: storage abstraction for one or more locale datasets. The demo uses `InMemoryLocaleDataSource`.
+            3. **`ILocaleRepository`**: the consumer-facing API. Holds a `CurrentLocaleCode` and resolves keys via extension methods.
 
             #### How it works in practice
 
@@ -68,13 +68,13 @@
 
             The `RepositoryExtensions` class provides a clean API over the query pattern:
 
-            - **`Get(id)`** — Resolve a single locale key to its display text.
-            - **`GetAll(ids...)`** — Resolve multiple keys at once.
-            - **`Create(id, text)`** — Add a new key-value pair to the current locale.
-            - **`Update(id, text)`** — Overwrite an existing key with new text.
-            - **`Delete(id)`** — Remove a key from the current locale.
-            - **`Exists(id)`** — Check if a key exists without throwing.
-            - **`GetDataset()`** — Retrieve the entire locale dataset.
+            - **`Get(id)`**: resolve a single locale key to its display text.
+            - **`GetAll(ids...)`**: resolve multiple keys at once.
+            - **`Create(id, text)`**: add a new key-value pair to the current locale.
+            - **`Update(id, text)`**: overwrite an existing key with new text.
+            - **`Delete(id)`**: remove a key from the current locale.
+            - **`Exists(id)`**: check if a key exists without throwing.
+            - **`GetDataset()`**: retrieve the entire locale dataset.
         </Markdown>
         <br />
         <Markdown>

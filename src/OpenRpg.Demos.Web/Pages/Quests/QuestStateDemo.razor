@@ -35,8 +35,8 @@
 
     The library uses a `QuestData` object per quest, stored in a list on the entity's variables:
 
-    - **`List&lt;QuestData&gt;`** (ActiveQuests) — each `QuestData` holds a template ID, state int, and per-objective progress
-    - **`ITriggerState`** — maps trigger IDs to booleans (dialogue flags, story gates)
+    - **`List&lt;QuestData&gt;`** (ActiveQuests): each `QuestData` holds a template ID, state int, and per-objective progress
+    - **`ITriggerState`**: maps trigger IDs to booleans (dialogue flags, story gates)
 
     Objective progress is tracked within each `QuestData` using a composite key that combines template ID and objective index.
     The `ICharacterObjectiveChecker` verifies objectives against character state, triggers, quest list, and objective progress:
@@ -191,7 +191,7 @@
 <Markdown>
     ## Trigger System
 
-    Triggers are boolean flags that represent story events — "spoken to NPC", "found the map", "unlocked the door".
+    Triggers are boolean flags that represent story events ("spoken to NPC", "found the map", "unlocked the door").
     They gate quest acceptance and progression. Toggle the triggers below to see how they affect the quest requirements.
 </Markdown>
 <br />
@@ -243,8 +243,8 @@
 <Markdown>
     ## How Requirement Checking Works
 
-    The `ICharacterRequirementChecker` has three overloads — one for character properties, one for quest state, and one for triggers.
-    The `AreRequirementsMet` extension method checks all three at once — character, quest list, and trigger state
+    The `ICharacterRequirementChecker` has three overloads: one for character properties, one for quest state, and one for triggers.
+    The `AreRequirementsMet` extension method checks all three at once (character, quest list, and trigger state)
     by pulling the active quests and trigger state from the character:
 
     ```csharp
@@ -264,18 +264,18 @@
 <Markdown>
     ## How Objective Checking Works
 
-    The `ICharacterObjectiveChecker` follows the same pattern as requirements — four overloads checking different contexts:
+    The `ICharacterObjectiveChecker` follows the same pattern as requirements: four overloads checking different contexts.
 
     ```csharp
-    // Stateless checks — verified from live character state
+    // Stateless checks: verified from live character state
     ObjectiveChecker.IsObjectiveMet(character, objective)          // level, class, effects
     ObjectiveChecker.IsObjectiveMet(quests, objective)             // quest completion prerequisites
     ObjectiveChecker.IsObjectiveMet(triggerState, objective)       // trigger-based objectives
 
-    // Stateful checks — verified from accumulated progress
+    // Stateful checks: verified from accumulated progress
     ObjectiveChecker.IsObjectiveMet(objectiveState, objective, questId, objectiveIndex)  // item counts, kill counts
 
-    // Batch check — all objectives for a quest
+    // Batch check: all objectives for a quest
     var allMet = ObjectiveChecker.AreObjectivesMet(character, questTemplate, questData);
     ```
 
@@ -347,7 +347,7 @@
                 new() { RewardType = GenreRewardTypes.ItemReward, Association = new Association(ItemTemplateLookups.SuperSword, 1) }
             });
 
-        var letterQuest = MakeQuest(QuestStateDataGenerator.DeliverLetterQuestId, "Deliver the Letter", "A simple errand — deliver a sealed letter to the merchant on the other side of town.",
+        var letterQuest = MakeQuest(QuestStateDataGenerator.DeliverLetterQuestId, "Deliver the Letter", "A simple errand. Deliver a sealed letter to the merchant on the other side of town.",
             new List<Objective> { new() { ObjectiveType = ObjectiveTypes.ItemObjective, Association = new Association(ItemTemplateLookups.Chest, 1) } },
             new List<Reward>
             {

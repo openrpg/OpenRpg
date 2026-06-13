@@ -15,7 +15,7 @@
     ## Inventory Transactions
 
     The `IInventoryTransaction` interface provides a way to make multiple changes to an inventory in
-    a single action — either **all succeed or all fail and no changes are made**. This is the
+    a single action: either **all succeed or all fail and no changes are made**. This is the
     canonical pattern for atomic multi-step operations like "swap a stack + give quest reward + take
     crafting inputs in one rollback-able unit".
 </Markdown>
@@ -91,7 +91,7 @@
                         <select @bind="_removalTemplateId">
                             @foreach (var tpl in TxDemo.AvailableTemplates)
                             {
-                                <option value="@tpl.Id">@tpl.Id — @tpl.NameLocaleId</option>
+                                <option value="@tpl.Id">@tpl.Id: @tpl.NameLocaleId</option>
                             }
                         </select>
                     </div>
@@ -112,7 +112,7 @@
                         <select @bind="_additionTemplateId">
                             @foreach (var tpl in TxDemo.AvailableTemplates)
                             {
-                                <option value="@tpl.Id">@tpl.Id — @tpl.NameLocaleId</option>
+                                <option value="@tpl.Id">@tpl.Id: @tpl.NameLocaleId</option>
                             }
                         </select>
                     </div>
@@ -217,7 +217,7 @@
     <br />
     @if (TxDemo.AuditLog.Count == 0)
     {
-        <p class="has-text-grey">No operations yet — try one of the scenarios above.</p>
+        <p class="has-text-grey">No operations yet. Try one of the scenarios above.</p>
     }
     else
     {

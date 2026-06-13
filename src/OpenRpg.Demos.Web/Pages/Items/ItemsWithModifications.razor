@@ -24,9 +24,9 @@
     Each modification adds its own effects which are aggregated into the item's total stats.
 
     The system has three parts:
-    1. **`ModificationAllowances`** on the item template — defines which modification types and how many can be applied (the "sockets")
-    2. **`ItemModificationData`** on the item instance — stores which modifications have been applied
-    3. **`ItemModificationTemplate`** — defines the effects each modification provides
+    1. **`ModificationAllowances`** on the item template: defines which modification types and how many can be applied (the "sockets")
+    2. **`ItemModificationData`** on the item instance: stores which modifications have been applied
+    3. **`ItemModificationTemplate`**: defines the effects each modification provides
 </Markdown>
 <br />
 
@@ -58,7 +58,7 @@
 
 <CardSection>
     <Markdown Containerless="true">
-        ### Interactive Demo — Apply Modifications
+        ### Interactive Demo: Apply Modifications
         Click a modification below to apply it to an available slot on the sword. Click an applied modification to remove it.
         Watch how the effects change as modifications are added and removed.
     </Markdown>
@@ -118,7 +118,7 @@
                     var typeName = GetModificationTypeName(slot.ModificationType);
                     var appliedCount = _appliedModifications.Count(a => GetModificationTemplate(a.TemplateId)?.ModificationType == slot.ModificationType);
                     <span class="tag @(appliedCount >= slot.AmountAllowed ? "is-warning" : "is-success")">
-                        @typeName — @appliedCount / @slot.AmountAllowed used
+                        @typeName: @appliedCount / @slot.AmountAllowed used
                     </span>
                 }
             </div>
@@ -149,7 +149,7 @@
             <div class="tags">
                 <span class="tag is-dark">None</span>
             </div>
-            <p class="has-text-grey mt-2">This item has no modification slots — it cannot be customised.</p>
+            <p class="has-text-grey mt-2">This item has no modification slots. It cannot be customised.</p>
         </div>
     </div>
 </CardSection>

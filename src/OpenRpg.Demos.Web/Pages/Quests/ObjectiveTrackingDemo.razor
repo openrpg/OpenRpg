@@ -31,16 +31,16 @@
     ### Stateless vs Stateful Objectives
 
     **Stateless objectives** are verified against live game state each time they are checked:
-    - `TriggerObjective` — is the trigger set?
-    - `QuestObjective` — is the prerequisite quest complete?
-    - `LevelObjective` — is the character high enough level?
-    - `ClassObjective` — does the character have the right class?
-    - `EffectObjective` — does the character have the active effect?
+    - `TriggerObjective`: is the trigger set?
+    - `QuestObjective`: is the prerequisite quest complete?
+    - `LevelObjective`: is the character high enough level?
+    - `ClassObjective`: does the character have the right class?
+    - `EffectObjective`: does the character have the active effect?
 
     **Stateful objectives** track accumulated progress over time:
-    - `ItemObjective` — have you collected N items?
-    - `EnemyDefeatedObjective` — have you defeated N enemies?
-    - `CurrencyObjective` — have you collected N currency?
+    - `ItemObjective`: have you collected N items?
+    - `EnemyDefeatedObjective`: have you defeated N enemies?
+    - `CurrencyObjective`: have you collected N currency?
 </Markdown>
 <br />
 
@@ -53,16 +53,16 @@
                 The `ICharacterObjectiveChecker` has four overloads:
 
                 ```csharp
-                // Character context — level, class, effects
+                // Character context: level, class, effects
                 IsObjectiveMet(Character, Objective)
 
-                // Quest state context — prerequisite quests
+                // Quest state context: prerequisite quests
                 IsObjectiveMet(IReadOnlyList&lt;QuestData&gt;, Objective)
 
-                // Trigger context — trigger objectives
+                // Trigger context: trigger objectives
                 IsObjectiveMet(ITriggerState, Objective)
 
-                // Objective state context — kill counts, item collections
+                // Objective state context: kill counts, item collections
                 IsObjectiveMet(ObjectiveState, Objective, questId, objectiveIndex)
                 ```
             </Markdown>
@@ -229,7 +229,7 @@
 <Markdown>
     ## Push-Based Progress Updates
 
-    Progress on stateful objectives is updated explicitly by game code. This keeps the system flexible —
+    Progress on stateful objectives is updated explicitly by game code. This keeps the system flexible;
     your game decides when to push progress, whether that's from an event system, a combat handler, or anything else.
 
     ```csharp
@@ -258,7 +258,7 @@
     var questData = new QuestData(template.Id);
     questData.ClearObjectives(template.Objectives.Count);
 
-    // During gameplay — push progress
+    // During gameplay: push progress
     questData.AddObjectiveProgress(0, 1);
 
     // Check completion
@@ -268,7 +268,7 @@
     questData.State = QuestStateTypes.QuestComplete;
     ```
 
-    > The `QuestData` class is a simple wrapper — you can store it wherever makes sense for your game
+    > The `QuestData` class is a simple wrapper. You can store it wherever makes sense for your game
     > (on the entity, in a player session, in a quest log service, etc). The `ObjectiveState` is
     > standalone and can be used independently of `QuestData` if needed.
 </Markdown>

@@ -24,14 +24,14 @@
 
     OpenRpg separates **how data is stored** from **how it's accessed** through three layers:
 
-    - **`IDataSource`** — Generic CRUD primitive (`Get`, `GetAll`, `Create`, `Update`, `Delete`, `Exists`).
+    - **`IDataSource`**: generic CRUD primitive (`Get`, `GetAll`, `Create`, `Update`, `Delete`, `Exists`).
       Implementations include `InMemoryDataSource`, `LiteDBDataSource`, and `DatabaseDataSource`.
-    - **`IRepository`** — Wraps an `IDataSource` and dispatches `IQuery&lt;T&gt;` objects. The repository
+    - **`IRepository`**: wraps an `IDataSource` and dispatches `IQuery&lt;T&gt;` objects. The repository
       is the only thing application code should depend on.
-    - **`IQuery&lt;T&gt;`** — A command object describing a single operation (e.g. `GetAllEntityQuery&lt;T&gt;`,
+    - **`IQuery&lt;T&gt;`**: a command object describing a single operation (e.g. `GetAllEntityQuery&lt;T&gt;`,
       `CreateEntityQuery&lt;T&gt;`). Lets you build a fluent, loggable pipeline of read/write operations.
 
-    The same `IRepository` code drives every backend — swap the `IDataSource` at the composition root
+    The same `IRepository` code drives every backend: swap the `IDataSource` at the composition root
     to move from in-memory testing to LiteDB or a relational database.
 </Markdown>
 <br />
@@ -52,7 +52,7 @@
 
     #### `LiteDBDataSource`
     Embedded NoSQL, file-based, single-file deployments. Needs a file path, so it only runs on
-    server / desktop — not in Blazor WebAssembly.
+    server / desktop, not in Blazor WebAssembly.
 
     ```csharp
     var liteDbRepo = new Repository(
@@ -63,13 +63,13 @@
 
     #### `DatabaseDataSource`
     Server-side relational DBs (Postgres, MySQL, SQLite, SQL Server). Adapter sits on top of
-    Dapper/EF Core/ADO.NET — you provide the SQL, the data source handles the per-type queries.
+    Dapper/EF Core/ADO.NET: you provide the SQL, the data source handles the per-type queries.
 
     ```csharp
     var dbRepo = new Repository(new DatabaseDataSource(connectionFactory, mappings));
     ```
 
-    The application code is identical for all three — only the constructor argument changes:
+    The application code is identical for all three, only the constructor argument changes:
 
     ```csharp
     var sword = inMemoryRepo.Get&lt;ItemTemplate&gt;(1);
@@ -184,7 +184,7 @@
         <CardSection>
             <Markdown Containerless="true">
                 ### Exists
-                Calls <code>repository.Exists&lt;T&gt;(id)</code> — true if the sandbox has the entity.
+                Calls <code>repository.Exists&lt;T&gt;(id)</code>: true if the sandbox has the entity.
             </Markdown>
             <br />
             <div class="field has-addons">
@@ -200,13 +200,13 @@
                 @if (_lastExistsResult.Value)
                 {
                     <div class="notification is-success is-light mt-3">
-                        <strong>Yes</strong> — id @_lastExistsIdValue exists
+                        <strong>Yes</strong>: id @_lastExistsIdValue exists
                     </div>
                 }
                 else
                 {
                     <div class="notification is-danger is-light mt-3">
-                        <strong>No</strong> — id @_lastExistsIdValue is not in the sandbox
+                        <strong>No</strong>: id @_lastExistsIdValue is not in the sandbox
                     </div>
                 }
             }
@@ -370,7 +370,7 @@
     <br />
     @if (_opLog.Count == 0)
     {
-        <p class="has-text-grey">No operations yet — try Get All, Create, or Update above.</p>
+        <p class="has-text-grey">No operations yet. Try Get All, Create, or Update above.</p>
     }
     else
     {

@@ -38,11 +38,11 @@
 
     Reputation scores can range from negative (hostile) to positive (allied). A common convention:
 
-    - **-100 to -51**: Hostile — attacks on sight
-    - **-50 to -11**: Unfriendly — higher prices, limited services
-    - **-10 to 10**: Neutral — default standing
-    - **11 to 50**: Friendly — discounts, access to faction quests
-    - **51 to 100**: Allied — full trust, unique rewards
+    - **-100 to -51**: Hostile. Attacks on sight.
+    - **-50 to -11**: Unfriendly. Higher prices, limited services.
+    - **-10 to 10**: Neutral. Default standing.
+    - **11 to 50**: Friendly. Discounts, access to faction quests.
+    - **51 to 100**: Allied. Full trust, unique rewards.
 </Markdown>
 <br />
 
@@ -197,7 +197,7 @@
     ### Key Types
 
     #### DefaultFaction
-    Faction template — holds Id, NameLocaleId, and DescriptionLocaleId. Stored in `IDataSource` and loaded at startup.
+    Faction template: holds Id, NameLocaleId, and DescriptionLocaleId. Stored in `IDataSource` and loaded at startup.
 
     #### FactionReputation
     A `Variables&lt;int&gt;` dictionary mapping faction ID to reputation score. Accessed via `EntityVariables.FactionReputation` (entity variable key 40).
