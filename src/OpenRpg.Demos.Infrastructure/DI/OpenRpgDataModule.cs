@@ -16,6 +16,7 @@ using OpenRpg.Quests;
 using OpenRpg.Quests.Factions;
 using OpenRpg.Localization.Data.DataSources;
 using OpenRpg.Localization.Data.Repositories;
+using OpenRpg.Demos.Infrastructure.Services;
 
 namespace OpenRpg.Demos.Infrastructure.DI
 {
@@ -29,6 +30,7 @@ namespace OpenRpg.Demos.Infrastructure.DI
             services.AddSingleton<IRepository, Repository>();
             services.AddSingleton<ILocaleRepository>(x => new LocaleRepository(x.GetService<ILocaleDataSource>(), "en-gb"));
             services.AddSingleton<DemoCharacterBuilder>();
+            services.AddSingleton<IPersistenceDemoService, PersistenceDemoService>();
         }
 
         public InMemoryDataSource GenerateDataSource()

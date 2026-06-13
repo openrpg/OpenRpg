@@ -1,16 +1,11 @@
-using System;
 using Moq;
 using Newtonsoft.Json;
 using OpenRpg.Core.Utils;
-using OpenRpg.Entities.Entity;
-using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Fantasy.Builders;
-using OpenRpg.Genres.Fantasy.Requirements;
 using OpenRpg.Genres.Populators.Entity;
 using OpenRpg.Items.Templates;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace OpenRpg.UnitTests.Genres.Fantasy
 {
