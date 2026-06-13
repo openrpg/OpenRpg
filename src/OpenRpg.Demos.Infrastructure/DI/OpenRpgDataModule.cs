@@ -31,6 +31,7 @@ namespace OpenRpg.Demos.Infrastructure.DI
             services.AddSingleton<ILocaleRepository>(x => new LocaleRepository(x.GetService<ILocaleDataSource>(), "en-gb"));
             services.AddSingleton<DemoCharacterBuilder>();
             services.AddSingleton<IPersistenceDemoService, PersistenceDemoService>();
+            services.AddSingleton<IInventoryTransactionDemoService, InventoryTransactionDemoService>();
         }
 
         public InMemoryDataSource GenerateDataSource()

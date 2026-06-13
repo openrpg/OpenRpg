@@ -36,7 +36,17 @@ namespace OpenRpg.Items.Inventories
         public void RevertAdditionsUpTo(int lastProcessedIndex)
         {
             for (var i = 0; i <= lastProcessedIndex; i++)
-            { Inventory.AttemptRemoveItem(Additions[i]); }
+            {
+                var itemToRemove = Additions[i];
+                if (Inventory.AttemptRemoveItem(itemToRemove))
+                { continue; }
+
+                if (!itemToRemove.Variables.HasAmount() && !itemToRemove.Variables.HasWeight())
+                {
+                    var matching = Inventory.Items.LastOrDefault(x => x.TemplateId == itemToRemove.TemplateId);
+                    if (matching != null) { Inventory.Items.Remove(matching); }
+                }
+            }
         }
         
         public bool ApplyChanges()

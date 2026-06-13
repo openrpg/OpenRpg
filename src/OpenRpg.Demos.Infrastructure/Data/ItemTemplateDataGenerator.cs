@@ -51,6 +51,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
             template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
             template.Variables.Value = 10;
             template.Variables.AssetCode = "sword";
+            template.Variables.MaxStacks = 1;
             template.Variables.Effects = new[]
             {
                 new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
