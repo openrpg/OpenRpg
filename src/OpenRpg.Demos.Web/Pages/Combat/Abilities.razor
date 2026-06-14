@@ -11,6 +11,7 @@
 @using OpenRpg.Genres.Effects
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Localization.Data.Extensions
 @using OpenRpg.Localization.Data.Repositories
 
 @inject DemoCharacterBuilder CharacterBuilder
@@ -23,11 +24,11 @@
     ## Abilities
 
     Quite often your game may need to do more than just "attack" you may have special moves like casing a fireball, or backstab.
-    
+
     `Abilities` attempt to express this notion in a data driven way so you can separate the *description* of the ability from the *logic* of the ability.
-    
+
     For example lets make an example **Fireball** ability template.
-    
+
     ```csharp
     var abilityTemplate = new AbilityTemplate()
     {
@@ -44,55 +45,55 @@
     abilityTemplate.Variables.AssetCode = "ability-fireball";
     return abilityTemplate;
     ```
-    
+
     There is a lot going on there, but we can see it seems to have a quick-ish cooldown, does 30 fire damage, can be fired a long range, does a medium AoE in 2.0f unit area and costs 10 mana.
-    
+
     > There are other things you can set such as `TargetCount` for abilities that can only hit fixed numbers of targets, or Stamina/Health costs and many more.
-    
+
     This alone is great and provides a way to describe your `Abilities` but it needs **something** to exist to actually let something use the abilities.
 </Markdown>
 <br />
 <Markdown>
     ## Thats not quite as easy to do
-    
+
     Ok so this is one of those parts of the system where there is no "out the box" solution to the problem, this is mainly because there isn't a huge amount of commonality between use cases.
-    
+
     For example if you were making a 3rd person souls-like and you wanted to use the above `Fireball` ability you would need to spawn an actual fireball in the world and have it move towards the target/position checking to see if it collides with anything along the way, then do effects for the AoE and collision checks in a 2.0f unit radius then generate an attack for the ability and apply it using the normal combat attack processing logic.
-    
+
     If you were a 2d turn based RPG you may have a simpler job as you can probably just do some flash effect to pretend the fireball hit, but then you need to work out how to turn 2.0f units into adjacent units being hit etc then formulate the attack and process.
-    
+
     > As you can see almost all scenarios require information related to positions/collision detection and animation systems which are all vastly different per engine/framework so its not really possible to provide useful abstractions within the library, but we can at least express the data and the components needed for these more complex engine/game specific processes.
-    
+
     So as you can see for all the varying scenarios you have, the only real thing that would happen for all is you creating an `Attack` from the ability like:
-    
+
     ```csharp
     var fireballAbilityData = new AbilityData { TemplateId = AbilityTypes.Fireball };
     var fireballAbility = TemplateAccessor.ToInstance(fireballAbilityData);
-    
+
     // Generate attack for the character using the ability
     var attack = AttackGenerator.GenerateAttack(fireballAbility, Character.Stats);
     // process attack on target
     ```
-    
+
     This seems to do some of the work for us, but what if our ability should only do 50% damage to adjacent/aoe targets and 150% damage to the main target? what if there is a chance of the targets getting the *Burning* debuff? what if we have some other ability that is passive and makes all corpses touched by fire explode?
-    
+
     As you can see the **execution** of an ability requires too much game/design context and runtime data that are not expressed within OpenRpg, so all we can do is help you express the fundamentals of an ability then write bespoke handlers for each ability that take into account your game/design scenarios/requirements.
-    
+
     > Some things to keep in mind at a high level is that `Abilities` are often asynchronous things, once they start lots of things may happen before its deemed as **done** so structure your handler in such a way that it can handle this.
 </Markdown>
 <br />
 <Markdown>
     ## An **almost** real world example
-    
+
     Here is some code from a real world Unity project (slightly altered) that shows how a fireball is handled:
-    
+
     ```csharp
     public class FireballAbilityExecutor : AbilityExecutor
     {
         public override int AbilityTemplateId { get; } = AbilityTypeLookups.Fireball;
-        
+
         public IPooledProjectileLifecycleHandler ProjectileLifecycleHandler { get; }
-        
+
         public SpriteAnimationsAsset FireballVfx { get; }
         public SpriteAnimationsAsset FireballHitVfx { get; }
 
@@ -107,11 +108,11 @@
         {
             var range = AbilityTemplate.Variables.Range() + character.Stats.ScaledAttackRange();
             var allTargets = GetEntitiesWithinRadius(transform.Position, range, isEnemy);
-            
+
             var targets = allTargets
                 .Take(AbilityTemplate.Variables.TargetCount())
                 .ToArray();
-            
+
             if(targets.Length == 0) { return false; }
 
             foreach (var targetEntityId in targets)
@@ -130,7 +131,7 @@
                 };
                 ProjectileLifecycleHandler.HandleSpawn(projectileData, x => OnProjectileHit(ownerEntity, x));
             }
-            
+
             return true;
         }
 
@@ -138,7 +139,7 @@
         {
             ProjectileLifecycleHandler.HandleRecycle(args.ProjectileEntity);
             if(args.TargetEntity is null) { return; }
-            
+
             var character = EntityComponentAccessor.GetComponent&lt;CharacterComponent>(ownerEntity).Character;
             var attack = AttackGenerator.GenerateAttack(AbilityTemplate.Variables.Damage().Clone(), character.Stats);
             PooledEffectService.ShowEffectAt(FireballHitVfx, args.ProjectilePosition.ToUnity(), rotation: args.ProjectileRotation);
@@ -146,12 +147,16 @@
         }
     }
     ```
-    
+
     Just to be clear this isn't code you can drop into your project and off you go, it is taking into account 2d positions/collisions, async handling of projectiles and vfx etc and lots of other custom logic.
-    
+
     It does however give a rough high level example showing the sort of things you may need to think about and how you can express them.
-    
-    > Unfortunately the base `AbilityExecutor` is too large to show here, but its a custom class that for **that project** wraps up stuff like positional 
+
+    > Unfortunately the base `AbilityExecutor` is too large to show here, but its a custom class that for **that project** wraps up stuff like positional
+</Markdown>
+<br />
+<Markdown>
+    See [Ability Targeting & Damage Execution](combat/ability-targeting) for an interactive sandbox that runs the targeting + damage pieces from the Battler demo's executor end-to-end against a 1v-many party.
 </Markdown>
 
 @code {
@@ -168,7 +173,7 @@
         var fireballAbilityData = new AbilityData { TemplateId = 1 };
         FireballAbility = new Ability { Data = fireballAbilityData, Template = FireballTemplate };
         GenerateAttack();
-        
+
         base.OnInitialized();
     }
 

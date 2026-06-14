@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using OpenRpg.Combat.Abilities;
 using OpenRpg.Core.Templates;
 using OpenRpg.Data;
 using OpenRpg.Data.InMemory;
@@ -32,6 +33,7 @@ namespace OpenRpg.Demos.Infrastructure.DI
             services.AddSingleton<DemoCharacterBuilder>();
             services.AddSingleton<IPersistenceDemoService, PersistenceDemoService>();
             services.AddSingleton<IInventoryTransactionDemoService, InventoryTransactionDemoService>();
+            services.AddSingleton<IAbilityExecutionDemoService, AbilityExecutionDemoService>();
         }
 
         public InMemoryDataSource GenerateDataSource()
@@ -45,6 +47,7 @@ namespace OpenRpg.Demos.Infrastructure.DI
             data.Add(typeof(ItemModificationTemplate), new ItemModificationTemplateDataGenerator().GenerateDictionary());
             data.Add(typeof(QuestTemplate), new QuestStateDataGenerator().GenerateDictionary());
             data.Add(typeof(DefaultFaction), new FactionDataGenerator().GenerateDictionary());
+            data.Add(typeof(AbilityTemplate), new AbilityTemplateDataGenerator().GenerateDictionary());
             return new InMemoryDataSource(data);
         }
 
