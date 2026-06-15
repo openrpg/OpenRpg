@@ -1,0 +1,291 @@
+@page "/procedural/effect-resolution"
+
+@using OpenRpg.Core.Effects
+@using OpenRpg.Core.Utils
+@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Scaling
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Entities.Procedural.Effects
+@using OpenRpg.Entities.Procedural.Effects.Builders
+@using OpenRpg.Entities.Types
+@using OpenRpg.Genres.Fantasy.Types
+
+<PageTitle>Procedural Effect Resolution</PageTitle>
+
+<Markdown>
+    ## Procedural Effect Resolution
+
+    In the [Procedural Items](/procedural/procedural-items) demo we used
+    `GenerateProceduralInstance(randomizer)` to roll a *random* procedural value
+    and resolve it into effects. The library also exposes a *deterministic*
+    counterpart that takes the procedural value as input and resolves it directly:
+
+    ```csharp
+    IReadOnlyCollection&lt;IEffect&gt; GenerateEffectsFrom(
+        this ProceduralEffects proceduralEffects, int proceduralValue);
+    ```
+
+    This is the function used for level scaling, deterministic loot tables,
+    save-game reproducibility, and any other case where the procedural value is
+    already known. This page lets you drive that input value with a slider and
+    watch the resolved effect list update in real time.
+</Markdown>
+
+<br />
+
+<div class="columns">
+    <div class="column is-two-fifths">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark">Procedural Value</h4>
+            <div class="field">
+                <label class="label">Value: @ProceduralValue</label>
+                <div class="control">
+                    <input class="slider is-fullwidth is-info has-output-tooltip"
+                           step="1" min="0" max="100"
+                           type="range"
+                           @bind="ProceduralValue"
+                           @bind:after="OnProceduralValueChanged">
+                </div>
+            </div>
+            <div class="field is-grouped">
+                <p class="control">
+                    <a class="button is-small" @onclick="() => SetValue(10)">Low (10)</a>
+                </p>
+                <p class="control">
+                    <a class="button is-small is-info" @onclick="() => SetValue(50)">Mid (50)</a>
+                </p>
+                <p class="control">
+                    <a class="button is-small" @onclick="() => SetValue(95)">High (95)</a>
+                </p>
+            </div>
+            <div class="field">
+                <label class="checkbox">
+                    <input type="checkbox" @bind="IncludeNarrowBand">
+                    Include narrow-banded effect (Fire Damage, input range 30-70)
+                </label>
+            </div>
+            <p class="has-text-grey is-size-7">
+                The narrow-banded effect demonstrates the <code>IsOutsideRange</code>
+                filter inside <code>GenerateEffectsFrom</code>: if the procedural value
+                falls outside the effect's input scale, the effect is skipped entirely.
+            </p>
+        </CardSection>
+    </div>
+    <div class="column is-three-fifths">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark">Resolved Effects (@ResolvedEffects.Count)</h4>
+            @if (ResolvedEffects.Count == 0)
+            {
+                <p class="has-text-grey">No effects resolved for this procedural value.</p>
+            }
+            else
+            {
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped is-narrow">
+                        <thead>
+                            <tr>
+                                <th>Effect Type</th>
+                                <th>Potency</th>
+                                <th>Input Range</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var (effect, sourceLabel, inputRange) in ResolvedRows)
+                            {
+                                <tr>
+                                    <td>@GetEffectTypeName(effect.EffectType)</td>
+                                    <td>@effect.Potency.ToString("F2")</td>
+                                    <td>@inputRange</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            <p class="has-text-grey is-size-7">
+                <code>GenerateEffectsFrom</code> only returns effects whose
+                <code>GroupType</code> is <code>Primary</code>. Optional effects are the
+                domain of the random path (<code>GenerateProceduralInstance</code>).
+            </p>
+        </CardSection>
+    </div>
+</div>
+
+<br />
+
+<CardSection>
+    <h4 class="title is-5 has-text-dark">Blunt Damage Bell Curve</h4>
+    <p class="has-text-grey is-size-7">
+        The black dot marks the current procedural value. At v=@ProceduralValue
+        the resolved blunt damage potency is
+        <strong>@BluntScalingFunction.Plot(ProceduralValue).ToString("F2")</strong>.
+        Notice the bell-curve shape: only mid-range values (around 50) approach the
+        upper end of the output range (30), while low and high values stay near the
+        bottom (20).
+    </p>
+    <ScalingFunctionChart Title="Blunt Damage Potency"
+                          ScalingFunction="BluntScalingFunction"
+                          HighlightValue="ProceduralValueAsFloat"
+                          @ref="Chart"
+                          XAxisName="Procedural Value"
+                          YAxisName="Blunt Damage" />
+</CardSection>
+
+<br />
+
+<Markdown>
+    ### Random path vs deterministic path
+
+    The library exposes two functions for procedural content, and they have different
+    responsibilities.
+
+    #### `GenerateProceduralEffectAssociations(proceduralEffects, randomizer)`
+    Takes an `IRandomizer`, returns a random-count list of `Association` records pointing
+    into the template. Used for random loot drops and randomized crafting.
+    ```csharp
+    IReadOnlyCollection&lt;Association&gt; GenerateProceduralEffectAssociations(
+        this ProceduralEffects proceduralEffects, IRandomizer randomizer);
+    ```
+
+    #### `GenerateEffectsFrom(proceduralEffects, proceduralValue)`
+    Takes a known 0-100 value, returns a list of `IEffect` with potencies already plotted.
+    Used for loot tables, level scaling, and save-game replay.
+    ```csharp
+    IReadOnlyCollection&lt;IEffect&gt; GenerateEffectsFrom(
+        this ProceduralEffects proceduralEffects, int proceduralValue);
+    ```
+
+    The [Procedural Items](/procedural/procedural-items) page exercises the first.
+    This page exercises the second.
+    
+    ### Why primary effects only
+
+    The deterministic path is intentionally restricted to `Primary` effects because
+    primary effects are the "this item always has X" baseline, while optional
+    effects are the "this item may have Y" randomization pool. Mixing them in the
+    deterministic path would make the same procedural value resolve to different
+    effect lists on different calls, defeating the purpose of determinism.
+</Markdown>
+
+@code {
+    public int ProceduralValue { get; set; } = 50;
+    public bool IncludeNarrowBand { get; set; } = true;
+
+    public ProceduralEffects MainEffects { get; set; }
+    public ProceduralEffects NarrowBandEffects { get; set; }
+    public ScalingFunction BluntScalingFunction { get; set; }
+
+    public IRefreshable Chart { get; set; }
+
+    public float ProceduralValueAsFloat => ProceduralValue;
+
+    public IReadOnlyCollection<IEffect> ResolvedEffects
+    {
+        get
+        {
+            var main = MainEffects.GenerateEffectsFrom(ProceduralValue);
+            if (!IncludeNarrowBand)
+            {
+                return main;
+            }
+            var narrow = NarrowBandEffects.GenerateEffectsFrom(ProceduralValue);
+            return main.Concat(narrow).ToList();
+        }
+    }
+
+    public IReadOnlyList<(StaticEffect Effect, string Source, string InputRange)> ResolvedRows
+    {
+        get
+        {
+            var rows = new List<(StaticEffect, string, string)>();
+            foreach (var effect in MainEffects.Effects.Where(x => x.GroupType == CoreProceduralGroupTypes.Primary))
+            {
+                var range = effect.PotencyFunction.InputScale;
+                rows.Add((new StaticEffect
+                {
+                    EffectType = effect.EffectType,
+                    Potency = effect.PotencyFunction.Plot(ProceduralValue)
+                }, "Main", FormatRange(range)));
+            }
+            if (IncludeNarrowBand)
+            {
+                foreach (var effect in NarrowBandEffects.Effects.Where(x => x.GroupType == CoreProceduralGroupTypes.Primary))
+                {
+                    var range = effect.PotencyFunction.InputScale;
+                    rows.Add((new StaticEffect
+                    {
+                        EffectType = effect.EffectType,
+                        Potency = effect.PotencyFunction.Plot(ProceduralValue)
+                    }, "Narrow", FormatRange(range)));
+                }
+            }
+            return rows;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        MainEffects = ProceduralEffectsBuilder
+            .Create()
+            .WithPrimaryEffect(new ScaledEffect
+            {
+                EffectType = FantasyEffectTypes.BluntDamageAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .WithPrimaryEffect(new ScaledEffect
+            {
+                EffectType = FantasyEffectTypes.StrengthBonusAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .Build();
+
+        NarrowBandEffects = ProceduralEffectsBuilder
+            .Create()
+            .WithPrimaryEffect(new ScaledEffect
+            {
+                EffectType = FantasyEffectTypes.FireDamageAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), new RangeF(30, 70)),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .Build();
+
+        BluntScalingFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred);
+
+        base.OnInitialized();
+    }
+
+    public async Task OnProceduralValueChanged()
+    {
+        if (Chart != null)
+        {
+            // TODO: No idea why this needs a double refresh, but it won't work otherwise
+            await Chart.Refresh();
+            StateHasChanged();
+            await Chart.Refresh();
+            StateHasChanged();
+        }
+    }
+
+    public async Task SetValue(int value)
+    {
+        ProceduralValue = value;
+        await OnProceduralValueChanged();
+    }
+
+    public string GetEffectTypeName(int effectType)
+    {
+        if (effectType == FantasyEffectTypes.BluntDamageAmount) { return "Blunt Damage"; }
+        if (effectType == FantasyEffectTypes.PiercingDamageAmount) { return "Piercing Damage"; }
+        if (effectType == FantasyEffectTypes.StrengthBonusAmount) { return "Strength Bonus"; }
+        if (effectType == FantasyEffectTypes.FireDamageAmount) { return "Fire Damage"; }
+        return $"Effect #{effectType}";
+    }
+
+    public static string FormatRange(RangeF range)
+    {
+        return $"[{range.Min:F0} - {range.Max:F0}]";
+    }
+}
