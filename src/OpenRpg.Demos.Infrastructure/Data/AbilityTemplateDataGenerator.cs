@@ -13,11 +13,6 @@ using OpenRpg.Genres.Fantasy.Types;
 
 namespace OpenRpg.Demos.Infrastructure.Data
 {
-    public static class AbilityExecutionConstants
-    {
-        public const int HealingTypeId = 90;
-    }
-
     /// <summary>
     /// Mirrors the Battler demo's 10-ability roster (Slash, Power Strike, Chi Blast,
     /// Focus Strike, Backstab, Poison Blade, Fire Bolt, Ice Storm, Cure, Cura) so
@@ -129,7 +124,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
         public AbilityTemplate MakeCure()
         {
             var template = NewHealingAbility(Cure, "ability-cure", "ability-cure-desc",
-                new Damage(AbilityExecutionConstants.HealingTypeId, 45f),
+                new Damage(FantasyDamageTypes.LightDamage, 45f),
                 targetType: CombatTargetTypes.SingleTarget, targetCount: 1, manaCost: 8);
             template.Variables.AssetCode = "ability-cure";
             return template;
@@ -138,7 +133,7 @@ namespace OpenRpg.Demos.Infrastructure.Data
         public AbilityTemplate MakeCura()
         {
             var template = NewHealingAbility(Cura, "ability-cura", "ability-cura-desc",
-                new Damage(AbilityExecutionConstants.HealingTypeId, 18f),
+                new Damage(FantasyDamageTypes.LightDamage, 18f),
                 targetType: CombatTargetTypes.MultipleTarget, targetCount: 4, manaCost: 14);
             template.Variables.AssetCode = "ability-cura";
             return template;

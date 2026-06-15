@@ -140,7 +140,7 @@ namespace OpenRpg.Demos.Infrastructure.Services
 
             var targetType = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetType, 1);
             var targetCount = template.Variables.GetIntOrDefault(CombatAbilityTemplateVariableTypes.TargetCount, 1);
-            var isHealing = template.Variables.Damage.Type >= AbilityExecutionConstants.HealingTypeId;
+            var isHealing = template.Variables.Damage.Type == FantasyDamageTypes.LightDamage;
 
             var pool = isHealing ? (IReadOnlyList<Combatant>)_party : _enemies;
             Log($"  - target pool: {(isHealing ? "party" : "enemies")}, TargetType={targetType}, TargetCount={targetCount}");

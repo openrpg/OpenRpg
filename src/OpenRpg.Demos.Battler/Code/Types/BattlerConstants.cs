@@ -14,9 +14,6 @@ public static class BattlerConstants
     public const double TurnDwellSeconds = 0.8;
     public const double TargetFlashSeconds = 0.3;
 
-    // Healing threshold: Damage.Type >= this value is treated as healing
-    public const int HealingDamageTypeThreshold = 90;
-
     // Starter item template IDs
     public const int PotionTemplateId = 20;
     public const int EtherTemplateId = 22;

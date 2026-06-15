@@ -167,7 +167,7 @@
 
     ```csharp
     var baseDamage = template.Variables.Damage;
-    var isHealing = baseDamage.Type >= 90;
+    var isHealing = baseDamage.Type == FantasyDamageTypes.LightDamage;
     var manaCost = template.Variables.ManaCost;
     caster.Mana = Math.Max(0, caster.Mana - manaCost);
 
