@@ -6,6 +6,7 @@
         <PublishReadyToRun>false</PublishReadyToRun>
         <TieredCompilation>false</TieredCompilation>
         <UseWindowsForms>true</UseWindowsForms>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
