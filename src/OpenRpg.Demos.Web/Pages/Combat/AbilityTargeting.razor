@@ -1,0 +1,275 @@
+@page "/combat/ability-targeting"
+
+@using OpenRpg.Combat.Abilities
+@using OpenRpg.Combat.Processors.Attacks.Entity
+@using OpenRpg.Combat.Types
+@using OpenRpg.Combat.Extensions
+@using OpenRpg.Demos.Infrastructure.Services
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject IAbilityExecutionDemoService AbilityDemo;
+@inject ILocaleRepository LocaleRepository;
+
+<Markdown>
+    ## Ability Targeting & Damage Execution
+
+    The [Abilities](combat/abilities) page covers what an `AbilityTemplate` looks like and why the *execution* of an ability is mostly a game-specific concern. This page focuses on the **targeting and damage pieces you can solve in OpenRpg** by running a 1v-many combat sandbox that mirrors the Battler demo's `AbilityExecutor` and `TargetResolver` end-to-end.
+
+    Library code that does the heavy lifting here:
+
+    - `TargetType` (1=Single, 2=Multiple, 5=AoE, ...) and `TargetCount` decide **who** gets hit.
+    - `IEntityAttackGenerator.GenerateAttack(Ability, stats)` produces an `Attack` from the ability's base damage plus the caster's stat bonuses.
+    - `IEntityAttackProcessor.ProcessAttack(Attack, target.Stats)` subtracts the defender's per-type defense and returns the damage done.
+
+    The sandbox below does the same flow end-to-end on a private party of 4 casters and 5 enemies. Casters use the library's attack generator and processor against the enemy pool; heals target the ally pool. Each cast runs through the same target-resolution + damage-application pattern as the Battler demo, just without the positional/animation code.
+</Markdown>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Caster Selection
+
+        Pick a party member, then pick an ability. Class-gated abilities (Fighter, Mage) will be disabled if the chosen caster cannot meet the requirement. Mana cost is deducted on cast; HP changes are visible in the targets panel below.
+    </Markdown>
+    <div class="columns">
+        <div class="column">
+            <h6 class="title is-6 has-text-dark">Caster</h6>
+            <div class="select is-fullwidth">
+                <select @bind="_selectedCasterIndex" @bind:after="OnCasterChanged">
+                    @foreach (var caster in AbilityDemo.Party)
+                    {
+                        <option value="@caster.Index" disabled="@(!caster.IsAlive)">
+                            @caster.Name (@caster.ClassName) - HP @caster.CurrentHp/@caster.MaxHp, MP @caster.CurrentMana/@caster.MaxMana@(caster.IsAlive ? "" : " [dead]")
+                        </option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="column">
+            <h6 class="title is-6 has-text-dark">Ability</h6>
+            <div class="select is-fullwidth">
+                <select @bind="_selectedAbilityId" @bind:after="StateHasChanged">
+                    @if (UsableAbilities.Count == 0)
+                    {
+                        <option value="0" disabled>(no usable abilities for this caster)</option>
+                    }
+                    else
+                    {
+                        @foreach (var ability in UsableAbilities)
+                        {
+                            var caster = CurrentCaster;
+                            var blocked = caster != null && ability.ManaCost > caster.CurrentMana;
+                            <option value="@ability.Id" disabled="@blocked">
+                                @ResolveAbilityName(ability) - @TargetTypeLabel(ability.TargetType) (@ability.TargetCount target@(ability.TargetCount == 1 ? "" : "s")), @ability.ManaCost MP
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="buttons">
+        <button class="button is-primary" @onclick="CastSelected" disabled="@(!CanCastSelected)">Cast Ability</button>
+        <button class="button is-warning is-light" @onclick="ResetSandbox">Reset Sandbox</button>
+    </div>
+    @if (_castError != null)
+    {
+        <div class="notification is-warning is-light mt-2">
+            <strong>Cast blocked.</strong> @_castError
+        </div>
+    }
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Targets
+
+        HP bars for the party (left) and enemy formation (right). Targets highlighted with a blue bar were hit by the most recent damage ability; targets with a green bar were healed by the most recent healing ability. Use **Reset Sandbox** to restore HP and MP to their seeded values.
+    </Markdown>
+    <div class="columns">
+        <div class="column">
+            <h6 class="title is-6 has-text-dark">Party</h6>
+            @foreach (var caster in AbilityDemo.Party)
+            {
+                var isHealTarget = AbilityDemo.LastCastAllyTargetIndexes.Contains(caster.Index);
+                <div class="mb-2 p-2 @(isHealTarget ? "has-background-info-light" : "has-background-light")" style="border-radius: 4px;">
+                    <div class="is-flex is-justify-content-space-between">
+                        <strong>@caster.Name</strong>
+                        <span class="has-text-grey is-size-7">@caster.ClassName</span>
+                    </div>
+                    <div class="is-size-7 has-text-grey">HP @caster.CurrentHp / @caster.MaxHp - MP @caster.CurrentMana / @caster.MaxMana</div>
+                    <progress class="progress is-small @HpBarClass(caster.CurrentHp, caster.MaxHp)" value="@caster.CurrentHp" max="@caster.MaxHp" style="margin-top: 0.25rem; margin-bottom: 0.25rem;">@caster.CurrentHp</progress>
+                </div>
+            }
+        </div>
+        <div class="column">
+            <h6 class="title is-6 has-text-dark">Enemies</h6>
+            @foreach (var enemy in AbilityDemo.Enemies)
+            {
+                var isDamageTarget = AbilityDemo.LastCastEnemyTargetIndexes.Contains(enemy.Index);
+                <div class="mb-2 p-2 @(isDamageTarget ? "has-background-info-light" : "has-background-light")" style="border-radius: 4px;">
+                    <div class="is-flex is-justify-content-space-between">
+                        <strong>@enemy.Name</strong>
+                        <span class="has-text-grey is-size-7">@(enemy.IsAlive ? "" : "(dead)")</span>
+                    </div>
+                    <div class="is-size-7 has-text-grey">HP @enemy.CurrentHp / @enemy.MaxHp</div>
+                    <progress class="progress is-small @HpBarClass(enemy.CurrentHp, enemy.MaxHp)" value="@enemy.CurrentHp" max="@enemy.MaxHp" style="margin-top: 0.25rem; margin-bottom: 0.25rem;">@enemy.CurrentHp</progress>
+                </div>
+            }
+        </div>
+    </div>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Damage Split For Multi-Target Abilities
+
+        For abilities with `TargetType = MultipleTarget` (Slash, Chi Blast, Ice Storm, Cura) the executor picks the first N alive targets in the pool and splits the attack's damage evenly across them. The math is:
+
+        ```csharp
+        var targetCount = Math.Min(ability.Variables.TargetCount, aliveEnemiesInPool.Count);
+        var splitFraction = 1.0f / targetCount;
+        var perTargetDamage = Math.Max(1, (int)Math.Round(rawDamage * splitFraction));
+        ```
+
+        This is one of many possible interpretations. The library exposes `TargetType` and `TargetCount` as data; your executor is free to implement any spread rule: equal split, primary-target + diminishing returns, cone falloff, or per-target weighting by proximity. The Battler demo's executor skips the split entirely (every target takes the full rolled damage), so check it side by side with this demo to see two valid interpretations of the same `TargetType=MultipleTarget` template.
+    </Markdown>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Combat Log
+
+        Timestamped trace of every cast. Most recent first. The library's attack generator + processor only return an `Attack` + a `ProcessedAttack`; the per-target split, mana deduction, heal application, and hit/kill labelling are all done by the demo service wrapping those calls.
+    </Markdown>
+    @if (AbilityDemo.CombatLog.Count == 0)
+    {
+        <p class="has-text-grey is-size-7">No casts yet. Pick a caster + ability and press Cast Ability.</p>
+    }
+    else
+    {
+        <pre style="background: #f5f5f5; padding: 0.75rem; max-height: 320px; overflow-y: auto; font-size: 0.8rem;">@string.Join("\n", AbilityDemo.CombatLog)</pre>
+    }
+</CardSection>
+<br />
+
+<Markdown>
+    ## Cost & Cooldown
+
+    Each ability carries a flat `ManaCost`. The executor deducts it on cast (visible in the caster's MP column above). The library also exposes `Cooldown`, `Range`, and `AttackSize` per ability, but **turn-based cooldown tracking is out of scope for the executor**; it is the responsibility of your turn manager. The Battler demo's `TurnManager` keeps a per-ability cooldown dictionary across turns; if you want that, copy the same pattern.
+
+    The full cast loop the demo runs is roughly equivalent to the Battler's `AbilityExecutor.ExecuteAbility`:
+
+    ```csharp
+    var baseDamage = template.Variables.Damage;
+    var isHealing = baseDamage.Type == FantasyDamageTypes.LightDamage;
+    var manaCost = template.Variables.ManaCost;
+    caster.Mana = Math.Max(0, caster.Mana - manaCost);
+
+    var pool = isHealing ? party : enemies;
+    var resolved = pool.Where(e => e.IsAlive)
+        .Take(template.Variables.TargetType == CombatTargetTypes.MultipleTarget
+              ? template.Variables.TargetCount : 1)
+        .ToList();
+
+    foreach (var target in resolved)
+    {
+        var attack = attackGenerator.GenerateAttack(baseDamage, caster.Stats);
+        var processed = attackProcessor.ProcessAttack(attack, target.Stats);
+        var split = 1.0f / resolved.Count;
+        target.Hp = Math.Max(0, target.Hp - (int)Math.Round(processed.DamageDone.Sum(d =&gt; d.Value) * split));
+    }
+    ```
+
+    The actual Battler executor skips the `split` line; this demo adds it to show how the variables in an ability template let you express and control a multi-target damage rule.
+</Markdown>
+<br />
+
+@code {
+
+    private int _selectedCasterIndex = 0;
+    private int _selectedAbilityId = 1;
+    private string _castError;
+
+    private CasterSnapshot? CurrentCaster => AbilityDemo.Party.ElementAtOrDefault(_selectedCasterIndex);
+    private AbilityOption? CurrentAbility => UsableAbilities.FirstOrDefault(a => a.Id == _selectedAbilityId);
+
+    private IReadOnlyList<AbilityOption> UsableAbilities => AbilityDemo.GetAbilitiesForCaster(_selectedCasterIndex);
+
+    private bool CanCastSelected => AbilityDemo.CanCasterUseAbility(_selectedCasterIndex, _selectedAbilityId);
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            SnapSelectedAbilityToFirstUsable();
+        }
+    }
+
+    private void OnCasterChanged()
+    {
+        SnapSelectedAbilityToFirstUsable();
+        StateHasChanged();
+    }
+
+    private void SnapSelectedAbilityToFirstUsable()
+    {
+        if (UsableAbilities.Count == 0) { _selectedAbilityId = 0; return; }
+        if (UsableAbilities.All(a => a.Id != _selectedAbilityId))
+        {
+            _selectedAbilityId = UsableAbilities[0].Id;
+        }
+    }
+
+    private void CastSelected()
+    {
+        _castError = null;
+        var ability = CurrentAbility;
+        var caster = CurrentCaster;
+        if (ability == null || caster == null) { return; }
+        if (!caster.IsAlive) { _castError = $"{caster.Name} is dead."; return; }
+        if (ability.ManaCost > caster.CurrentMana) { _castError = $"{caster.Name} does not have enough mana (need {ability.ManaCost}, have {caster.CurrentMana})."; return; }
+
+        AbilityDemo.CastAbility(_selectedCasterIndex, _selectedAbilityId);
+    }
+
+    private void ResetSandbox()
+    {
+        AbilityDemo.Reset();
+        _castError = null;
+        SnapSelectedAbilityToFirstUsable();
+    }
+
+    private string ResolveAbilityName(AbilityOption ability)
+    {
+        try { return LocaleRepository.Get(ability.Name); }
+        catch { return ability.Name; }
+    }
+
+    private static string TargetTypeLabel(int targetType) => targetType switch
+    {
+        1 => "Single",
+        2 => "Multi",
+        3 => "Pos",
+        4 => "Multi-Pos",
+        5 => "AoE",
+        6 => "Multi-AoE",
+        _ => "?",
+    };
+
+    private static string HpBarClass(int current, int max)
+    {
+        if (max <= 0) { return "is-dark"; }
+        if (current <= 0) { return "is-dark"; }
+        var pct = (double)current / max;
+        if (pct < 0.25) { return "is-danger"; }
+        if (pct < 0.5) { return "is-warning"; }
+        return "is-success";
+    }
+
+}

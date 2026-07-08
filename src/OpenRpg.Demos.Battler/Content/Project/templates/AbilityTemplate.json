@@ -116,7 +116,7 @@
     "NameLocaleId": "ability-cure",
     "DescriptionLocaleId": "ability-cure-desc",
     "Variables": {
-      "2": { "Type": 90, "Value": 45.0 },
+      "2": { "Type": 84, "Value": 45.0 },
       "5": 1,
       "7": 1,
       "40": 8,
@@ -130,7 +130,7 @@
     "NameLocaleId": "ability-cura",
     "DescriptionLocaleId": "ability-cura-desc",
     "Variables": {
-      "2": { "Type": 90, "Value": 18.0 },
+      "2": { "Type": 84, "Value": 18.0 },
       "5": 2,
       "7": 4,
       "40": 14,

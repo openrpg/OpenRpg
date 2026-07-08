@@ -39,6 +39,7 @@ namespace OpenRpg.Demos.Infrastructure.DI
             services.AddSingleton<ILootTableProcessor, DefaultLootTableProcessor>();
             services.AddSingleton<IEntityAttackGenerator, FantasyAttackGenerator>();
             services.AddSingleton<IAttackProcessor<EntityStatsVariables>, DefaultAttackProcessor>();
+            services.AddSingleton<IEntityAttackProcessor, DefaultAttackProcessor>();
             services.AddSingleton<ICharacterRequirementChecker, DefaultFantasyCharacterRequirementChecker>();
             services.AddSingleton<ICharacterObjectiveChecker, DefaultFantasyCharacterObjectiveChecker>();
             services.AddSingleton<ICharacterEffectProcessor, CharacterEffectProcessor>();

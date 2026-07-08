@@ -7,7 +7,7 @@ using OpenRpg.Combat.Extensions;
 using OpenRpg.Combat.Types;
 using OpenRpg.Core.Extensions;
 using OpenRpg.Demos.Battler.Code.Scenes.Battle.Models;
-using OpenRpg.Demos.Battler.Code.Types;
+using OpenRpg.Genres.Fantasy.Types;
 
 namespace OpenRpg.Demos.Battler.Code.Scenes.Battle.Combat;
 
@@ -21,12 +21,12 @@ public static class TargetResolver
     {
         var damage = template.Variables.GetAsOrDefault<Damage>(
             CombatAbilityTemplateVariableTypes.Damage, () => new Damage(0, 0));
-        return damage.Type >= BattlerConstants.HealingDamageTypeThreshold;
+        return damage.Type == FantasyDamageTypes.LightDamage;
     }
 
     public static bool IsHealing(Damage damage)
     {
-        return damage.Type >= BattlerConstants.HealingDamageTypeThreshold;
+        return damage.Type == FantasyDamageTypes.LightDamage;
     }
 
     public static List<BattleEntity> ResolveTargets(

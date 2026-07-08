@@ -1,0 +1,742 @@
+@page "/data/persistence"
+
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using OpenRpg.Core.Common
+@using OpenRpg.Core.Effects
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Queries
+@using OpenRpg.Demos.Infrastructure.Services
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Entities.Races.Templates
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Templates
+@using OpenRpg.Quests
+@using OpenRpg.Quests.Extensions
+
+@inject IPersistenceDemoService Persistence
+
+<Markdown>
+    ## Persistence Layer
+
+    OpenRpg separates **how data is stored** from **how it's accessed** through three layers:
+
+    - **`IDataSource`**: generic CRUD primitive (`Get`, `GetAll`, `Create`, `Update`, `Delete`, `Exists`).
+      Implementations include `InMemoryDataSource`, `LiteDBDataSource`, and `DatabaseDataSource`.
+    - **`IRepository`**: wraps an `IDataSource` and dispatches `IQuery&lt;T&gt;` objects. The repository
+      is the only thing application code should depend on.
+    - **`IQuery&lt;T&gt;`**: a command object describing a single operation (e.g. `GetAllEntityQuery&lt;T&gt;`,
+      `CreateEntityQuery&lt;T&gt;`). Lets you build a fluent, loggable pipeline of read/write operations.
+
+    The same `IRepository` code drives every backend: swap the `IDataSource` at the composition root
+    to move from in-memory testing to LiteDB or a relational database.
+</Markdown>
+<br />
+
+<Markdown>
+    ### Pluggable Backends
+
+    The same `IRepository` API works against all three implementations. The only thing that changes
+    is how the `IDataSource` is constructed and registered.
+
+    #### `InMemoryDataSource` (used in this demo)
+    Tests, prototypes, single-process. No external dependencies.
+
+    ```csharp
+    var inMemoryRepo = new Repository(
+        new InMemoryDataSource(new Dictionary&lt;Type, Dictionary&lt;object, object&gt;&gt;()));
+    ```
+
+    #### `LiteDBDataSource`
+    Embedded NoSQL, file-based, single-file deployments. Needs a file path, so it only runs on
+    server / desktop, not in Blazor WebAssembly.
+
+    ```csharp
+    var liteDbRepo = new Repository(
+        new LiteDBDataSource(
+            new LiteDatabase("game-data.db"),
+            new Dictionary&lt;Type, string&gt; { { typeof(ItemTemplate), "items" } }));
+    ```
+
+    #### `DatabaseDataSource`
+    Server-side relational DBs (Postgres, MySQL, SQLite, SQL Server). Adapter sits on top of
+    Dapper/EF Core/ADO.NET: you provide the SQL, the data source handles the per-type queries.
+
+    ```csharp
+    var dbRepo = new Repository(new DatabaseDataSource(connectionFactory, mappings));
+    ```
+
+    The application code is identical for all three, only the constructor argument changes:
+
+    ```csharp
+    var sword = inMemoryRepo.Get&lt;ItemTemplate&gt;(1);
+    ```
+</Markdown>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Sandbox Notice
+        This page uses a **private** `InMemoryDataSource` owned by `IPersistenceDemoService`, so
+        mutations here don't affect other pages (Character Builder, Quest Tracker, etc.). Use the
+        <strong>Reset Sandbox</strong> button below to restore the original seed.
+    </Markdown>
+    <br />
+    <div class="buttons">
+        <button class="button is-warning" @onclick="ResetSandbox">Reset Sandbox</button>
+        <span class="tag is-light is-medium">Sandbox entries: @_totalEntries</span>
+        <span class="tag is-info is-light">Selected type: @_selectedType.Name</span>
+    </div>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Type Selector
+        The `IRepository` API is generic over `T`, so the same CRUD code works for every `IHasDataId`
+        type. Pick one to drive the panels below.
+    </Markdown>
+    <br />
+    <div class="field">
+        <div class="control">
+            <div class="select is-medium">
+                <select @bind="_selectedTypeName" @bind:after="OnTypeChanged">
+                    @foreach (var type in _availableTypes)
+                    {
+                        <option value="@type.FullName">@type.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Get All
+        Calls <code>repository.GetAll&lt;T&gt;()</code> (or the underlying
+        <code>GetAllEntityQuery&lt;T&gt;</code>) and lists every entry in the sandbox.
+    </Markdown>
+    <br />
+    <button class="button is-link is-small" @onclick="() => DoGetAll()">Reload</button>
+    @if (_lastList is not null)
+    {
+        <div class="table-container mt-3">
+            <table class="table is-fullwidth is-striped is-narrow">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Key Fields</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in _lastList)
+                    {
+                        <tr>
+                            <td><strong>@row.Id</strong></td>
+                            <td>@row.Name</td>
+                            <td><code>@row.Summary</code></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</CardSection>
+<br />
+
+<div class="columns">
+    <div class="column">
+        <CardSection>
+            <Markdown Containerless="true">
+                ### Get By Id
+                Calls <code>repository.Get&lt;T&gt;(id)</code> and shows the matching entity.
+            </Markdown>
+            <br />
+            <div class="field has-addons">
+                <div class="control">
+                    <input class="input" type="number" placeholder="Id" @bind="_getByIdValue" />
+                </div>
+                <div class="control">
+                    <button class="button is-link" @onclick="() => DoGetById(_getByIdValue)">Fetch</button>
+                </div>
+            </div>
+            @if (_lastSingleEntity is not null)
+            {
+                <div class="notification is-success is-light mt-3">
+                    <strong>Found:</strong> @_lastSingleEntity
+                </div>
+            }
+            @if (_lastSingleEntityMissed)
+            {
+                <div class="notification is-warning is-light mt-3">
+                    <strong>Not found:</strong> no @_selectedType.Name with id @_lastGetByIdValue
+                </div>
+            }
+        </CardSection>
+    </div>
+    <div class="column">
+        <CardSection>
+            <Markdown Containerless="true">
+                ### Exists
+                Calls <code>repository.Exists&lt;T&gt;(id)</code>: true if the sandbox has the entity.
+            </Markdown>
+            <br />
+            <div class="field has-addons">
+                <div class="control">
+                    <input class="input" type="number" placeholder="Id" @bind="_existsIdValue" />
+                </div>
+                <div class="control">
+                    <button class="button is-info" @onclick="() => DoExists(_existsIdValue)">Check</button>
+                </div>
+            </div>
+            @if (_lastExistsResult.HasValue)
+            {
+                @if (_lastExistsResult.Value)
+                {
+                    <div class="notification is-success is-light mt-3">
+                        <strong>Yes</strong>: id @_lastExistsIdValue exists
+                    </div>
+                }
+                else
+                {
+                    <div class="notification is-danger is-light mt-3">
+                        <strong>No</strong>: id @_lastExistsIdValue is not in the sandbox
+                    </div>
+                }
+            }
+        </CardSection>
+    </div>
+</div>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Create
+        Builds a new entity, allocates the next id (via <code>Max(existing) + 1</code>), and calls
+        <code>repository.Create(entity)</code>. For `ItemTemplate` the form also writes a base
+        effect to demonstrate variable mutation.
+    </Markdown>
+    <br />
+    <div class="columns">
+        <div class="column is-half">
+            <div class="field">
+                <label class="label">Name (Locale Id)</label>
+                <div class="control">
+                    <input class="input" type="text" @bind="_createName" placeholder="e.g. New Sword" />
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Description (Locale Id)</label>
+                <div class="control">
+                    <input class="input" type="text" @bind="_createDescription" placeholder="optional" />
+                </div>
+            </div>
+            @if (_selectedType == typeof(ItemTemplate))
+            {
+                <div class="field">
+                    <label class="label">Value (gold)</label>
+                    <div class="control">
+                        <input class="input" type="number" @bind="_createValue" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Base Effect Potency (Damage Bonus)</label>
+                    <div class="control">
+                        <input class="input" type="number" @bind="_createPotency" />
+                    </div>
+                </div>
+            }
+            <div class="field">
+                <div class="control">
+                    <button class="button is-primary" @onclick="DoCreate">Create</button>
+                </div>
+            </div>
+        </div>
+        <div class="column is-half">
+            @if (_lastCreated is not null)
+            {
+                <div class="notification is-success is-light">
+                    <strong>Created:</strong>
+                    <pre style="white-space: pre-wrap;">@_lastCreated</pre>
+                </div>
+            }
+        </div>
+    </div>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Update
+        Loads an existing entity by id, applies the form's edited values, and calls
+        <code>repository.Update(entity)</code>.
+    </Markdown>
+    <br />
+    <div class="columns">
+        <div class="column is-half">
+            <div class="field has-addons">
+                <div class="control">
+                    <input class="input" type="number" placeholder="Id to load" @bind="_updateIdValue" />
+                </div>
+                <div class="control">
+                    <button class="button is-link" @onclick="() => LoadForUpdate(_updateIdValue)">Load</button>
+                </div>
+            </div>
+            @if (_updateTarget is not null)
+            {
+                <div class="field">
+                    <label class="label">Name (Locale Id)</label>
+                    <div class="control">
+                        <input class="input" type="text" @bind="_updateName" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Description (Locale Id)</label>
+                    <div class="control">
+                        <input class="input" type="text" @bind="_updateDescription" />
+                    </div>
+                </div>
+                @if (_selectedType == typeof(ItemTemplate))
+                {
+                    <div class="field">
+                        <label class="label">Value (gold)</label>
+                        <div class="control">
+                            <input class="input" type="number" @bind="_updateValue" />
+                        </div>
+                    </div>
+                }
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary" @onclick="DoUpdate">Save</button>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="column is-half">
+            @if (_lastUpdated is not null)
+            {
+                <div class="notification is-success is-light">
+                    <strong>Updated:</strong>
+                    <pre style="white-space: pre-wrap;">@_lastUpdated</pre>
+                </div>
+            }
+        </div>
+    </div>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Delete
+        Calls <code>repository.Delete&lt;T&gt;(id)</code> and shows the entity that was removed.
+    </Markdown>
+    <br />
+    <div class="field has-addons">
+        <div class="control">
+            <input class="input" type="number" placeholder="Id to delete" @bind="_deleteIdValue" />
+        </div>
+        <div class="control">
+            <button class="button is-danger" @onclick="() => DoDelete(_deleteIdValue)">Delete</button>
+        </div>
+    </div>
+    @if (_lastDeleted is not null)
+    {
+        <div class="notification is-warning is-light mt-3">
+            <strong>Deleted:</strong>
+            <pre style="white-space: pre-wrap;">@_lastDeleted</pre>
+        </div>
+    }
+    @if (_lastDeleteMissed)
+    {
+        <div class="notification is-danger is-light mt-3">
+            <strong>No-op:</strong> no @_selectedType.Name with id @_lastDeleteIdValue
+        </div>
+    }
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Operation Log
+        Each panel above appends a timestamped line below. This is useful when you want to wire up
+        a real auditing or replay layer on top of the same `IRepository`.
+    </Markdown>
+    <br />
+    @if (_opLog.Count == 0)
+    {
+        <p class="has-text-grey">No operations yet. Try Get All, Create, or Update above.</p>
+    }
+    else
+    {
+        <pre style="background: #f5f5f5; padding: 0.75rem; max-height: 220px; overflow-y: auto;">@string.Join("\n", _opLog)</pre>
+    }
+</CardSection>
+
+@code {
+    private readonly List<Type> _availableTypes = new()
+    {
+        typeof(RaceTemplate),
+        typeof(ItemTemplate),
+        typeof(QuestTemplate)
+    };
+
+    private string _selectedTypeName = typeof(RaceTemplate).FullName;
+    private Type _selectedType = typeof(RaceTemplate);
+
+    private string _getByIdValue = "";
+    private string _existsIdValue = "";
+    private string _updateIdValue = "";
+    private string _deleteIdValue = "";
+
+    private string _createName = "";
+    private string _createDescription = "";
+    private int _createValue = 50;
+    private int _createPotency = 10;
+
+    private int? _loadedUpdateId;
+    private string _updateName = "";
+    private string _updateDescription = "";
+    private int _updateValue;
+
+    private List<EntityRow>? _lastList;
+    private string? _lastSingleEntity;
+    private bool _lastSingleEntityMissed;
+    private string? _lastGetByIdValue;
+
+    private bool? _lastExistsResult;
+    private string? _lastExistsIdValue;
+
+    private string? _lastCreated;
+    private string? _lastUpdated;
+    private string? _lastDeleted;
+    private bool _lastDeleteMissed;
+    private string? _lastDeleteIdValue;
+
+    private object? _updateTarget;
+
+    private readonly List<string> _opLog = new();
+
+    private int _totalEntries => CountAll();
+
+    private record EntityRow(int Id, string Name, string Summary);
+
+    protected override void OnInitialized()
+    {
+        DoGetAll();
+    }
+
+    private void OnTypeChanged()
+    {
+        _selectedType = _availableTypes.First(t => t.FullName == _selectedTypeName);
+        _lastList = null;
+        _lastSingleEntity = null;
+        _lastSingleEntityMissed = false;
+        _lastExistsResult = null;
+        _lastCreated = null;
+        _lastUpdated = null;
+        _lastDeleted = null;
+        _lastDeleteMissed = false;
+        _updateTarget = null;
+        _loadedUpdateId = null;
+        DoGetAll();
+    }
+
+    private void ResetSandbox()
+    {
+        Persistence.Reset();
+        Log($"[RESET] sandbox restored from seed snapshot");
+        OnTypeChanged();
+    }
+
+    private void DoGetAll()
+    {
+        var rows = InvokeTyped<IReadOnlyCollection<IHasDataId>>(nameof(IPersistenceDemoService.GetAll))
+            .Cast<IHasDataId>()
+            .Select(e => new EntityRow(e.Id, GetName(e), GetSummary(e)))
+            .OrderBy(r => r.Id)
+            .ToList();
+
+        _lastList = rows;
+        Log($"GetAll<{_selectedType.Name}>() -> {rows.Count} items");
+        StateHasChanged();
+    }
+
+    private void DoGetById(string rawId)
+    {
+        if (!TryParseId(rawId, out var id))
+        {
+            _lastSingleEntity = null;
+            _lastSingleEntityMissed = true;
+            _lastGetByIdValue = rawId;
+            return;
+        }
+
+        var entity = InvokeTyped<IHasDataId>(nameof(IPersistenceDemoService.Get), id);
+        _lastGetByIdValue = rawId;
+        if (entity is null)
+        {
+            _lastSingleEntity = null;
+            _lastSingleEntityMissed = true;
+            Log($"Get<{_selectedType.Name}>({id}) -> not found");
+        }
+        else
+        {
+            _lastSingleEntity = FormatEntity(entity);
+            _lastSingleEntityMissed = false;
+            Log($"Get<{_selectedType.Name}>({id}) -> {entity.Id}");
+        }
+        StateHasChanged();
+    }
+
+    private void DoExists(string rawId)
+    {
+        if (!TryParseId(rawId, out var id))
+        {
+            _lastExistsResult = null;
+            _lastExistsIdValue = rawId;
+            return;
+        }
+
+        var result = InvokeTyped<bool>(nameof(IPersistenceDemoService.Exists), id);
+        _lastExistsResult = result;
+        _lastExistsIdValue = rawId;
+        Log($"Exists<{_selectedType.Name}>({id}) -> {result}");
+        StateHasChanged();
+    }
+
+    private void DoCreate()
+    {
+        if (string.IsNullOrWhiteSpace(_createName))
+        {
+            Log($"Create<{_selectedType.Name}>() -> skipped (name required)");
+            return;
+        }
+
+        var entity = BuildNewEntity();
+        var created = InvokeTyped<IHasDataId>(nameof(IPersistenceDemoService.Create), entity) as IHasDataId;
+        if (created is not null)
+        {
+            _lastCreated = FormatEntity(created);
+            Log($"Create<{_selectedType.Name}>() -> id {created.Id}");
+        }
+        DoGetAll();
+        StateHasChanged();
+    }
+
+    private void LoadForUpdate(string rawId)
+    {
+        if (!TryParseId(rawId, out var id))
+        {
+            return;
+        }
+
+        var entity = InvokeTyped<IHasDataId>(nameof(IPersistenceDemoService.Get), id);
+        if (entity is null)
+        {
+            _updateTarget = null;
+            _loadedUpdateId = null;
+            Log($"LoadForUpdate({id}) -> not found");
+            StateHasChanged();
+            return;
+        }
+
+        _loadedUpdateId = id;
+        _updateTarget = entity;
+        _updateName = GetName(entity);
+        _updateDescription = GetDescription(entity);
+        if (entity is ItemTemplate item)
+        {
+            _updateValue = item.Variables.Value;
+        }
+        StateHasChanged();
+    }
+
+    private void DoUpdate()
+    {
+        if (_updateTarget is null || _loadedUpdateId is null)
+        {
+            return;
+        }
+
+        ApplyEdits(_updateTarget);
+        var updated = InvokeTyped<IHasDataId>(nameof(IPersistenceDemoService.Update), _updateTarget) as IHasDataId;
+        if (updated is not null)
+        {
+            _lastUpdated = FormatEntity(updated);
+            Log($"Update<{_selectedType.Name}>({updated.Id}) -> saved");
+        }
+        DoGetAll();
+        StateHasChanged();
+    }
+
+    private void DoDelete(string rawId)
+    {
+        if (!TryParseId(rawId, out var id))
+        {
+            _lastDeleteMissed = true;
+            _lastDeleteIdValue = rawId;
+            return;
+        }
+
+        var existing = InvokeTyped<IHasDataId>(nameof(IPersistenceDemoService.Get), id);
+        var result = InvokeTyped<bool>(nameof(IPersistenceDemoService.Delete), id);
+        _lastDeleteIdValue = rawId;
+        if (result && existing is not null)
+        {
+            _lastDeleted = FormatEntity(existing);
+            _lastDeleteMissed = false;
+            Log($"Delete<{_selectedType.Name}>({id}) -> removed");
+        }
+        else
+        {
+            _lastDeleted = null;
+            _lastDeleteMissed = true;
+            Log($"Delete<{_selectedType.Name}>({id}) -> not found");
+        }
+        DoGetAll();
+        StateHasChanged();
+    }
+
+    private object BuildNewEntity()
+    {
+        if (_selectedType == typeof(RaceTemplate))
+        {
+            var t = new RaceTemplate { NameLocaleId = _createName, DescriptionLocaleId = _createDescription };
+            t.Variables.AssetCode = "race-custom";
+            t.Variables.Effects = Array.Empty<StaticEffect>();
+            return t;
+        }
+        if (_selectedType == typeof(ItemTemplate))
+        {
+            var t = new ItemTemplate
+            {
+                NameLocaleId = _createName,
+                DescriptionLocaleId = _createDescription,
+                ItemType = FantasyItemTypes.GenericWeapon,
+                ModificationAllowances = Array.Empty<OpenRpg.Entities.Modifications.ModificationAllowance>()
+            };
+            t.Variables.AssetCode = "item-custom";
+            t.Variables.Value = _createValue;
+            t.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            t.Variables.Effects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = _createPotency }
+            };
+            return t;
+        }
+        if (_selectedType == typeof(QuestTemplate))
+        {
+            return new QuestTemplate
+            {
+                NameLocaleId = _createName,
+                DescriptionLocaleId = _createDescription,
+                IsRepeatable = false
+            };
+        }
+        throw new InvalidOperationException($"Unsupported type {_selectedType.FullName}");
+    }
+
+    private void ApplyEdits(object entity)
+    {
+        if (entity is RaceTemplate race)
+        {
+            race.NameLocaleId = _updateName;
+            race.DescriptionLocaleId = _updateDescription;
+            return;
+        }
+        if (entity is ItemTemplate item)
+        {
+            item.NameLocaleId = _updateName;
+            item.DescriptionLocaleId = _updateDescription;
+            item.Variables.Value = _updateValue;
+            return;
+        }
+        if (entity is QuestTemplate quest)
+        {
+            quest.NameLocaleId = _updateName;
+            quest.DescriptionLocaleId = _updateDescription;
+        }
+    }
+
+    private T InvokeTyped<T>(string methodName, params object[] args)
+    {
+        var method = typeof(IPersistenceDemoService).GetMethod(methodName)!
+            .MakeGenericMethod(_selectedType);
+        return (T)method.Invoke(Persistence, args)!;
+    }
+
+    private int CountAll()
+    {
+        return _availableTypes.Sum(t =>
+        {
+            var method = typeof(IPersistenceDemoService).GetMethod(nameof(IPersistenceDemoService.GetAll))!
+                .MakeGenericMethod(t);
+            var list = (System.Collections.IEnumerable)method.Invoke(Persistence, null);
+            var count = 0;
+            foreach (var _ in list) { count++; }
+            return count;
+        });
+    }
+
+    private static bool TryParseId(string raw, out int id)
+    {
+        return int.TryParse(raw, out id);
+    }
+
+    private static string GetName(IHasDataId entity)
+    {
+        return entity switch
+        {
+            RaceTemplate r => r.NameLocaleId ?? "(unnamed)",
+            ItemTemplate i => i.NameLocaleId ?? "(unnamed)",
+            QuestTemplate q => q.NameLocaleId ?? "(unnamed)",
+            _ => entity.GetType().Name
+        };
+    }
+
+    private static string GetDescription(IHasDataId entity)
+    {
+        return entity switch
+        {
+            RaceTemplate r => r.DescriptionLocaleId ?? string.Empty,
+            ItemTemplate i => i.DescriptionLocaleId ?? string.Empty,
+            QuestTemplate q => q.DescriptionLocaleId ?? string.Empty,
+            _ => string.Empty
+        };
+    }
+
+    private static string GetSummary(IHasDataId entity)
+    {
+        return entity switch
+        {
+            RaceTemplate r => $"Effects={r.Variables.Effects?.Count ?? 0}, AssetCode={r.Variables.AssetCode}",
+            ItemTemplate i => $"Value={i.Variables.Value}, ItemType={i.ItemType}, Effects={i.Variables.Effects?.Count ?? 0}",
+            QuestTemplate q => $"Objectives={q.Objectives?.Count ?? 0}, Rewards={q.Rewards?.Count ?? 0}, Repeatable={q.IsRepeatable}",
+            _ => string.Empty
+        };
+    }
+
+    private static string FormatEntity(IHasDataId entity)
+    {
+        var name = GetName(entity);
+        var desc = GetDescription(entity);
+        var summary = GetSummary(entity);
+        return $"Id={entity.Id}, Name={name}\n  Description: {desc}\n  {summary}";
+    }
+
+    private void Log(string message)
+    {
+        var stamp = DateTime.Now.ToString("HH:mm:ss");
+        _opLog.Insert(0, $"[{stamp}] {message}");
+        if (_opLog.Count > 50)
+        {
+            _opLog.RemoveRange(50, _opLog.Count - 50);
+        }
+    }
+}

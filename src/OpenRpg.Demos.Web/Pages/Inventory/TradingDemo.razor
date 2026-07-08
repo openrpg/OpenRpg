@@ -20,7 +20,7 @@
 
     The trading system uses `ITrader` to define a merchant's stock, with `ItemTradeEntry` entries
     that specify `BuyRate` and `SellRate` multipliers against the base item value. This lets you
-    create merchants with different pricing — a weaponsmith might charge 1.5× base value but only
+    create merchants with different pricing. A weaponsmith might charge 1.5× base value but only
     buy items at 0.4×, while a general store offers fairer rates.
 
     - **Buy Price** = `ItemTemplate.Variables.Value × BuyRate`

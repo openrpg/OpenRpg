@@ -1,0 +1,299 @@
+@page "/inventory/transactions"
+
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Demos.Infrastructure.Services
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Inventories
+@using OpenRpg.Items.Templates
+
+@inject IInventoryTransactionDemoService TxDemo
+
+<Markdown>
+    ## Inventory Transactions
+
+    The `IInventoryTransaction` interface provides a way to make multiple changes to an inventory in
+    a single action: either **all succeed or all fail and no changes are made**. This is the
+    canonical pattern for atomic multi-step operations like "swap a stack + give quest reward + take
+    crafting inputs in one rollback-able unit".
+</Markdown>
+<br />
+
+<Markdown>
+    ### How It Works
+
+    1. **Queue operations** with `AddItem(ItemData)` / `RemoveItem(ItemData)`. Nothing touches the
+       real inventory yet.
+    2. **Pre-check** runs `Removals.All(Inventory.HasItem)` to fail fast if any removal target is
+       missing.
+    3. **Apply removals** in order. If any fails, all previous removals are rolled back.
+    4. **Apply additions** in order. If any fails, all additions are rolled back **and** the
+       previous removals are re-applied.
+    5. `ApplyChanges()` returns a single `bool` indicating success.
+
+    ```csharp
+    var succeeded = inventory.CreateTransaction(templateAccessor)
+        .RemoveItems(new[] { oreToConsume })
+        .AddItems(new[] { ingotToReceive })
+        .ApplyChanges();
+    ```
+</Markdown>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Sandbox State
+        The demo operates on a **private** `Inventory` owned by the demo service, so mutations here
+        don't affect other pages. Use **Reset Sandbox Reset** to restore the original seed.
+    </Markdown>
+    <br />
+    <div class="buttons">
+        <button class="button is-warning" @onclick="ResetSandbox">Reset Sandbox</button>
+    </div>
+    <div class="table-container">
+        <table class="table is-fullwidth is-striped is-narrow">
+            <thead>
+                <tr>
+                    <th>Template Id</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in SandboxRows())
+                {
+                    <tr>
+                        <td><strong>@row.TemplateId</strong></td>
+                        <td>@row.Name</td>
+                        <td>@row.Amount</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Queue Operations
+        Stage a removal and an addition, then <strong>Apply</strong> to commit (or roll back) the
+        transaction as a single atomic unit.
+    </Markdown>
+    <div class="columns">
+        <div class="column">
+            <h6 class="title is-6 has-text-dark">Removal</h6>
+            <div class="field has-addons">
+                <div class="control">
+                    <div class="select">
+                        <select @bind="_removalTemplateId">
+                            @foreach (var tpl in TxDemo.AvailableTemplates)
+                            {
+                                <option value="@tpl.Id">@tpl.Id: @tpl.NameLocaleId</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="control">
+                    <input class="input" type="number" placeholder="Amount" @bind="_removalAmount" />
+                </div>
+                <div class="control">
+                    <button class="button is-link" @onclick="QueueRemoval">Stage Removal</button>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <h6 class="title is-6 has-text-dark">Addition</h6>
+            <div class="field has-addons">
+                <div class="control">
+                    <div class="select">
+                        <select @bind="_additionTemplateId">
+                            @foreach (var tpl in TxDemo.AvailableTemplates)
+                            {
+                                <option value="@tpl.Id">@tpl.Id: @tpl.NameLocaleId</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="control">
+                    <input class="input" type="number" placeholder="Amount" @bind="_additionAmount" />
+                </div>
+                <div class="control">
+                    <button class="button is-link" @onclick="QueueAddition">Stage Addition</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="columns">
+        <div class="column">
+            <h6 class="title is-6 has-text-dark">Staged Removals</h6>
+            @if (TxDemo.StagedRemovals.Count == 0)
+            {
+                <p class="has-text-grey is-size-7">(none staged)</p>
+            }
+            else
+            {
+                <ul>
+                    @foreach (var item in TxDemo.StagedRemovals)
+                    {
+                        <li>template <code>@item.TemplateId</code> x@(item.Variables.HasAmount() ? item.Variables.Amount.ToString() : "1")</li>
+                    }
+                </ul>
+            }
+        </div>
+        <div class="column">
+            <h6 class="title is-6 has-text-dark">Staged Additions</h6>
+            @if (TxDemo.StagedAdditions.Count == 0)
+            {
+                <p class="has-text-grey is-size-7">(none staged)</p>
+            }
+            else
+            {
+                <ul>
+                    @foreach (var item in TxDemo.StagedAdditions)
+                    {
+                        <li>template <code>@item.TemplateId</code> x@(item.Variables.HasAmount() ? item.Variables.Amount.ToString() : "1")</li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button class="button is-primary" @onclick="ApplyStaged">Apply Transaction</button>
+        <button class="button is-light" @onclick="ClearStaging">Clear Staging</button>
+    </div>
+    @if (_lastApplySucceeded.HasValue)
+    {
+        @if (_lastApplySucceeded.Value)
+        {
+            <div class="notification is-success is-light">
+                <strong>Committed.</strong> All staged changes applied to the inventory.
+            </div>
+        }
+        else
+        {
+            <div class="notification is-warning is-light">
+                <strong>Rolled back.</strong> Pre-check failed or a mid-transaction operation could not be applied. Inventory is unchanged.
+            </div>
+        }
+    }
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Pre-defined Scenarios
+        Buttons that pre-stage common patterns so you don't have to fill in the form.
+    </Markdown>
+    <div class="buttons">
+        <button class="button is-link is-light" @onclick="RunSuccessfulTrade">
+            Successful Trade (consume 3 ore, add 1 ingot)
+        </button>
+        <button class="button is-warning is-light" @onclick="RunFailedRemoval">
+            Failed Removal (try to remove an item not in inventory)
+        </button>
+        <button class="button is-danger is-light" @onclick="RunFailedAddition">
+            Failed Addition (try to add 5 swords when only 1 slot remains)
+        </button>
+    </div>
+    <p class="has-text-grey is-size-7">
+        Note: the "Failed Addition" scenario requires the inventory to have at least one item
+        already, since the transaction would otherwise succeed by adding a new stack. Reset the
+        sandbox first if you've drained it.
+    </p>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Audit Log
+        Timestamped log of every transaction step. The library's `IInventoryTransaction` only
+        returns a final `bool`, so this log is generated by the demo service wrapping each call.
+    </Markdown>
+    <br />
+    @if (TxDemo.AuditLog.Count == 0)
+    {
+        <p class="has-text-grey">No operations yet. Try one of the scenarios above.</p>
+    }
+    else
+    {
+        <pre style="background: #f5f5f5; padding: 0.75rem; max-height: 240px; overflow-y: auto;">@string.Join("\n", TxDemo.AuditLog)</pre>
+    }
+</CardSection>
+
+@code {
+    private int _removalTemplateId = ItemTemplateLookups.CopperOre;
+    private int _removalAmount = 3;
+    private int _additionTemplateId = ItemTemplateLookups.CopperIngot;
+    private int _additionAmount = 1;
+    private bool? _lastApplySucceeded;
+
+    private void ResetSandbox()
+    {
+        TxDemo.Reset();
+        _lastApplySucceeded = null;
+    }
+
+    private void QueueRemoval() => TxDemo.QueueRemoval(_removalTemplateId, _removalAmount);
+    private void QueueAddition() => TxDemo.QueueAddition(_additionTemplateId, _additionAmount);
+    private void ClearStaging()
+    {
+        TxDemo.ClearStaging();
+        _lastApplySucceeded = null;
+    }
+
+    private void ApplyStaged()
+    {
+        _lastApplySucceeded = TxDemo.ApplyStaged();
+    }
+
+    private void RunSuccessfulTrade()
+    {
+        TxDemo.ClearStaging();
+        TxDemo.QueueRemoval(ItemTemplateLookups.CopperOre, 3);
+        TxDemo.QueueAddition(ItemTemplateLookups.CopperIngot, 1);
+        _lastApplySucceeded = TxDemo.ApplyStaged();
+    }
+
+    private void RunFailedRemoval()
+    {
+        TxDemo.ClearStaging();
+        TxDemo.QueueRemoval(ItemTemplateLookups.SuperSword, 1);
+        _lastApplySucceeded = TxDemo.ApplyStaged();
+    }
+
+    private void RunFailedAddition()
+    {
+        TxDemo.ClearStaging();
+        // CopperSword has MaxStacks=1, so each addition tries to create a new stack.
+        // Sandbox starts at 3 items with MaxSlots=4, so we can fit one more new stack
+        // before the third addition trips the slot check and triggers rollback.
+        TxDemo.QueueRemoval(ItemTemplateLookups.CopperOre, 1);
+        for (var i = 0; i < 4; i++)
+        {
+            TxDemo.QueueAddition(ItemTemplateLookups.CopperSword, 1);
+        }
+        _lastApplySucceeded = TxDemo.ApplyStaged();
+    }
+
+    private record SandboxRow(int TemplateId, string Name, int Amount);
+
+    private IEnumerable<SandboxRow> SandboxRows()
+    {
+        var byTemplate = TxDemo.Sandbox.Items
+            .GroupBy(x => x.TemplateId)
+            .OrderBy(g => g.Key);
+
+        foreach (var group in byTemplate)
+        {
+            var amount = group.Sum(x => x.Variables.HasAmount() ? x.Variables.Amount : 1);
+            var template = TxDemo.AvailableTemplates.FirstOrDefault(t => t.Id == group.Key);
+            var name = template?.NameLocaleId ?? "(unknown)";
+            yield return new SandboxRow(group.Key, name, amount);
+        }
+    }
+}
