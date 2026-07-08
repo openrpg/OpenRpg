@@ -1,0 +1,110 @@
+[
+  {
+    "Id": 1,
+    "NameLocaleId": "monster-goblin-name",
+    "DescriptionLocaleId": "monster-goblin-description",
+    "Variables": {
+      "9000": "monster-goblin",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 30.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 8.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 5.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 3.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "11": {
+        "AvailableLoot": [
+          { "ItemData": { "TemplateId": 20 }, "Variables": { "1": 0.3 } },
+          { "ItemData": { "TemplateId": 1 }, "Variables": { "1": 0.1 } },
+          { "ItemData": { "TemplateId": 10 }, "Variables": { "1": 0.1 } }
+        ]
+      }
+    }
+  },
+  {
+    "Id": 2,
+    "NameLocaleId": "monster-bat-name",
+    "DescriptionLocaleId": "monster-bat-description",
+    "Variables": {
+      "9000": "monster-bat",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 15.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 5.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 2.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 8.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "11": {
+        "AvailableLoot": [
+          { "ItemData": { "TemplateId": 20 }, "Variables": { "1": 0.2 } },
+          { "ItemData": { "TemplateId": 17 }, "Variables": { "1": 0.1 } }
+        ]
+      }
+    }
+  },
+  {
+    "Id": 3,
+    "NameLocaleId": "monster-wolf-name",
+    "DescriptionLocaleId": "monster-wolf-description",
+    "Variables": {
+      "9000": "monster-wolf",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 40.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 12.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 4.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 6.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "11": {
+        "AvailableLoot": [
+          { "ItemData": { "TemplateId": 20 }, "Variables": { "1": 0.3 } },
+          { "ItemData": { "TemplateId": 16 }, "Variables": { "1": 0.1 } },
+          { "ItemData": { "TemplateId": 6 }, "Variables": { "1": 0.05 } }
+        ]
+      }
+    }
+  },
+  {
+    "Id": 4,
+    "NameLocaleId": "monster-skeleton-name",
+    "DescriptionLocaleId": "monster-skeleton-description",
+    "Variables": {
+      "9000": "monster-skeleton",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 50.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 10.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 8.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 3.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "11": {
+        "AvailableLoot": [
+          { "ItemData": { "TemplateId": 21 }, "Variables": { "1": 0.2 } },
+          { "ItemData": { "TemplateId": 11 }, "Variables": { "1": 0.15 } },
+          { "ItemData": { "TemplateId": 2 }, "Variables": { "1": 0.08 } },
+          { "ItemData": { "TemplateId": 14 }, "Variables": { "1": 0.1 } }
+        ]
+      }
+    }
+  },
+  {
+    "Id": 5,
+    "NameLocaleId": "monster-slime-name",
+    "DescriptionLocaleId": "monster-slime-description",
+    "Variables": {
+      "9000": "monster-slime",
+      "4002": [
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 60, "Potency": 20.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 1, "Potency": 3.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 21, "Potency": 1.0, "Requirements": [] },
+        { "$type": "OpenRpg.Core.Effects.StaticEffect, OpenRpg.Core", "EffectType": 44, "Potency": 2.0, "Requirements": [] }
+      ],
+      "4003": [],
+      "11": {
+        "AvailableLoot": [
+          { "ItemData": { "TemplateId": 20 }, "Variables": { "1": 0.5 } }
+        ]
+      }
+    }
+  }
+]

@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <LangVersion>13</LangVersion>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>14</LangVersion>
         <ApplicationIcon>openrpg.ico</ApplicationIcon>
         <IsPackable>false</IsPackable>
         <WasmFingerprintAssets>false</WasmFingerprintAssets>
@@ -21,17 +21,28 @@
     <ItemGroup>
       <ProjectReference Include="..\OpenRpg.Data.InMemory\OpenRpg.Data.InMemory.csproj" />
       <ProjectReference Include="..\OpenRpg.Editor.UI\OpenRpg.Editor.UI.csproj" />
+      <ProjectReference Include="..\OpenRpg.Genres.Fantasy\OpenRpg.Genres.Fantasy.csproj" ReferenceOutputAssembly="false" />
+      <ProjectReference Include="..\OpenRpg.Genres.Scifi\OpenRpg.Genres.Scifi.csproj" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Blazor-ApexCharts" Version="5.1.0" />
-      <PackageReference Include="Photino.Blazor" Version="3.2.0" />
+      <PackageReference Include="Blazor-ApexCharts" Version="6.0.2" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0" />
+      <PackageReference Include="Photino.Blazor" Version="4.0.13" />
     </ItemGroup>
 
     <ItemGroup>
         <None Update="openrpg.ico">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Content\Data\class-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Data\item-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Data\quest-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Data\race-templates.json" />
+      <_ContentIncludedByDefault Remove="Content\Locales\en-gb.lang.json" />
     </ItemGroup>
 
     <Target Name="_StaticWebAssetsComputeFilesToBuild" AfterTargets="GetCopyToOutputDirectoryItems" DependsOnTargets="ResolveStaticWebAssetsInputs">
@@ -48,6 +59,14 @@
             <_SourceItemsToCopyToOutputDirectory Remove="@(_ExternalBuildStaticWebAsset)" />
             <_SourceItemsToCopyToOutputDirectory Include="@(_ExternalBuildStaticWebAsset)" />
         </ItemGroup>
+    </Target>
+
+    <Target Name="CopyGenrePlugins" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
+        <MakeDir Directories="$(OutputPath)Plugins" />
+        <Copy SourceFiles="$(SolutionDir)OpenRpg.Genres.Fantasy\bin\$(Configuration)\$(TargetFramework)\OpenRpg.Genres.Fantasy.dll" DestinationFolder="$(OutputPath)Plugins" />
+        <Copy SourceFiles="$(SolutionDir)OpenRpg.Genres.Fantasy\bin\$(Configuration)\$(TargetFramework)\OpenRpg.Genres.Fantasy.pdb" DestinationFolder="$(OutputPath)Plugins" Condition="Exists('$(SolutionDir)OpenRpg.Genres.Fantasy\bin\$(Configuration)\$(TargetFramework)\OpenRpg.Genres.Fantasy.pdb')" />
+        <Copy SourceFiles="$(SolutionDir)OpenRpg.Genres.Scifi\bin\$(Configuration)\$(TargetFramework)\OpenRpg.Genres.Scifi.dll" DestinationFolder="$(OutputPath)Plugins" />
+        <Copy SourceFiles="$(SolutionDir)OpenRpg.Genres.Scifi\bin\$(Configuration)\$(TargetFramework)\OpenRpg.Genres.Scifi.pdb" DestinationFolder="$(OutputPath)Plugins" Condition="Exists('$(SolutionDir)OpenRpg.Genres.Scifi\bin\$(Configuration)\$(TargetFramework)\OpenRpg.Genres.Scifi.pdb')" />
     </Target>
     
 </Project>

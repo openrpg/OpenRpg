@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using OpenRpg.Editor.Infrastructure.Data;
+using OpenRpg.Editor.Infrastructure.Plugins;
 using OpenRpg.Entities.Classes.Templates;
 using OpenRpg.Entities.Races.Templates;
 using OpenRpg.Items.Templates;
@@ -19,7 +20,7 @@ public static class IServiceProviderExtensions
         dataSource.Database.Add(typeof(ItemTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(RaceTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(ClassTemplate), new Dictionary<object, object>());
-        dataSource.Database.Add(typeof(Quest), new Dictionary<object, object>());
+        dataSource.Database.Add(typeof(QuestTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(ItemCraftingTemplate), new Dictionary<object, object>());
         dataSource.Database.Add(typeof(ItemGatheringTemplate), new Dictionary<object, object>());
 

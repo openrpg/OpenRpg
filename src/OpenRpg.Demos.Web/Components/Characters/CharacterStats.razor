@@ -4,37 +4,40 @@
 
 @if (Stats != null)
 {
-    <h4 class="subtitle mb-2 has-text-dark has-text-centered">Core Stats</h4>
-    <div class="columns">
-        <div class="column">
-            <TagLabel Label="Str" Content="@Stats.Strength().ToString("0")" ContentTagType="is-success"></TagLabel>
+    @if (ShowCoreStats)
+    {
+        <h4 class="subtitle mb-2 has-text-dark has-text-centered">Core Stats</h4>
+        <div class="columns">
+            <div class="column">
+                <TagLabel Label="Str" Content="@Stats.Strength.ToString("0")" ContentTagType="is-success"></TagLabel>
+            </div>
+            <div class="column">
+                <TagLabel Label="Dex" Content="@Stats.Dexterity.ToString("0")" ContentTagType="is-success"></TagLabel>
+            </div>
+            <div class="column">
+                <TagLabel Label="Int" Content="@Stats.Intelligence.ToString("0")" ContentTagType="is-success"></TagLabel>
+            </div>
+            <div class="column">
+                <TagLabel Label="Wis" Content="@Stats.Wisdom.ToString("0")" ContentTagType="is-success"></TagLabel>
+            </div>
+            <div class="column">
+                <TagLabel Label="Cha" Content="@Stats.Charisma.ToString("0")" ContentTagType="is-success"></TagLabel>
+            </div>
         </div>
-        <div class="column">
-            <TagLabel Label="Dex" Content="@Stats.Dexterity().ToString("0")" ContentTagType="is-success"></TagLabel>
-        </div>
-        <div class="column">
-            <TagLabel Label="Int" Content="@Stats.Intelligence().ToString("0")" ContentTagType="is-success"></TagLabel>
-        </div>
-        <div class="column">
-            <TagLabel Label="Wis" Content="@Stats.Wisdom().ToString("0")" ContentTagType="is-success"></TagLabel>
-        </div>
-        <div class="column">
-            <TagLabel Label="Cha" Content="@Stats.Charisma().ToString("0")" ContentTagType="is-success"></TagLabel>
-        </div>
-    </div>
+    }
     <h4 class="subtitle mb-2 has-text-dark has-text-centered">Combat Stats</h4>
     <div class="columns">
         <div class="column">
-            <TagLabel Label="P.Dmg" Content="@Stats.Damage().ToString("0")" ContentTagType="is-danger"></TagLabel>
+            <TagLabel Label="P.Dmg" Content="@Stats.Damage.ToString("0")" ContentTagType="is-danger"></TagLabel>
         </div>
         <div class="column">
-            <TagLabel Label="P.Def" Content="@Stats.Damage().ToString("0")" ContentTagType="is-link"></TagLabel>
+            <TagLabel Label="P.Def" Content="@Stats.Defense.ToString("0")" ContentTagType="is-link"></TagLabel>
         </div>
         <div class="column">
-            <TagLabel Label="M.Dmg" Content="@Stats.DarkDamage().ToString("0")" ContentTagType="is-danger"></TagLabel>
+            <TagLabel Label="M.Dmg" Content="@Stats.DarkDamage.ToString("0")" ContentTagType="is-danger"></TagLabel>
         </div>
         <div class="column">
-            <TagLabel Label="M.Def" Content="@Stats.DarkDefense().ToString("0")" ContentTagType="is-link"></TagLabel>
+            <TagLabel Label="M.Def" Content="@Stats.DarkDefense.ToString("0")" ContentTagType="is-link"></TagLabel>
         </div>
     </div>
 }
@@ -42,4 +45,7 @@
 @code {
     [Parameter]
     public EntityStatsVariables Stats { get; set; }
+
+    [Parameter] 
+    public bool ShowCoreStats { get; set; } = true;
 }

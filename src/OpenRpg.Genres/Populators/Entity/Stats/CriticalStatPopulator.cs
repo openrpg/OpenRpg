@@ -15,10 +15,13 @@ namespace OpenRpg.Genres.Populators.Entity.Stats
         
         public void Populate(EntityStatsVariables stats, ComputedEffects computedEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
-            stats.CriticalDamageChance(computedEffects.CalculateTotalValueFor(GenreEffectTypes.CriticalRateBonusAmount,
-                GenreEffectTypes.CriticalRateBonusPercentage));
-            stats.CriticalDamageMultiplier(computedEffects.CalculateTotalValueFor(GenreEffectTypes.CriticalDamageBonusAmount,
-                GenreEffectTypes.CriticalDamageBonusPercentage));
+            stats.CriticalDamageChance = computedEffects.CalculateTotalValueFor(
+                GenreEffectTypes.CriticalRateBonusAmount,
+                GenreEffectTypes.CriticalRateBonusPercentage);
+            
+            stats.CriticalDamageMultiplier = computedEffects.CalculateTotalValueFor(
+                GenreEffectTypes.CriticalDamageBonusAmount,
+                GenreEffectTypes.CriticalDamageBonusPercentage);
         }
     }
 }

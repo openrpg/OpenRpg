@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "1.0.0",
+  "pluginId": "default",
+  "name": "Base Genres",
+  "version": "1.0.0",
+  "description": "Built-in base types and templates from OpenRpg library",
+  "isDefault": true,
+  "typeSources": {
+    "itemTypes": "OpenRpg.Genres.Types.GenresItemTypes, OpenRpg.Genres",
+    "itemQualityTypes": "OpenRpg.Genres.Types.GenresItemQualityTypes, OpenRpg.Genres",
+    "requirementTypes": "OpenRpg.Genres.Types.GenreRequirementTypes, OpenRpg.Genres",
+    "effectTypes": "OpenRpg.Genres.Types.GenreEffectTypes, OpenRpg.Genres",
+    "genderTypes": "OpenRpg.Genres.Types.GenreGenderTypes, OpenRpg.Genres",
+    "rewardTypes": "OpenRpg.Genres.Types.GenreRewardTypes, OpenRpg.Genres",
+    "modificationTypes": "OpenRpg.Genres.Types.GenreModificationTypes, OpenRpg.Genres",
+    "objectiveTypes": "OpenRpg.Genres.Types.GenresObjectiveTypes, OpenRpg.Genres",
+    "effectScalingType": "OpenRpg.Entities.Types.CoreEffectScalingTypes, OpenRpg.Entities",
+    "statTypes": "OpenRpg.Genres.Types.GenreEntityStatsVariableTypes, OpenRpg.Genres",
+    "stateTypes": "OpenRpg.Genres.Types.GenreEntityStateVariableTypes, OpenRpg.Genres",
+    "craftingSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills",
+    "gatheringSkillTypes": "OpenRpg.Items.TradeSkills.Types.TradeSkillTypes, OpenRpg.Items.TradeSkills",
+    "targetTypes": "OpenRpg.Combat.Types.CombatTargetTypes, OpenRpg.Combat",
+    "damageTypes": "OpenRpg.Genres.Types.GenreDamageTypes, OpenRpg.Genres"
+  },
+  "templateTypes": {
+    "item": {
+      "name": "Item Template",
+      "templateType": "OpenRpg.Items.Templates.ItemTemplate, OpenRpg.Items",
+      "assetCodePrefix": "item",
+      "groups": [
+        {
+          "title": "Item Details",
+          "editorComponent": "ItemTemplateDetailsEditor"
+        },
+        {
+          "title": "Modification",
+          "fields": [
+            { "property": "ModificationAllowances", "editorComponent": "ModificationAllowancesEditor" }
+          ]
+        }
+      ]
+    },
+    "class": {
+      "name": "Class Template",
+      "templateType": "OpenRpg.Entities.Classes.Templates.ClassTemplate, OpenRpg.Entities",
+      "assetCodePrefix": "class",
+      "groups": []
+    },
+    "race": {
+      "name": "Race Template",
+      "templateType": "OpenRpg.Entities.Races.Templates.RaceTemplate, OpenRpg.Entities",
+      "assetCodePrefix": "race",
+      "groups": []
+    },
+    "ability": {
+      "name": "Ability Template",
+      "templateType": "OpenRpg.Combat.Abilities.AbilityTemplate, OpenRpg.Combat",
+      "assetCodePrefix": "ability",
+      "groups": [
+        {
+          "title": "Details",
+          "editorComponent": "AbilityDetailsEditor"
+        },
+        {
+          "title": "Damage",
+          "editorComponent": "AbilityDamageEditor"
+        },
+        {
+          "title": "Costs",
+          "editorComponent": "AbilityCostsEditor"
+        }
+      ]
+    },
+    "quest": {
+      "name": "Quest",
+      "templateType": "OpenRpg.Quests.QuestTemplate, OpenRpg.Quests",
+      "assetCodePrefix": "quest",
+      "groups": [
+        {
+          "title": "Objectives",
+          "fields": [
+            { "property": "Objectives", "editorComponent": "ObjectivesEditor" }
+          ]
+        },
+        {
+          "title": "Quest Gifts",
+          "fields": [
+            { "property": "Gifts", "editorComponent": "RewardsEditor" }
+          ]
+        },
+        {
+          "title": "Quest Rewards",
+          "fields": [
+            { "property": "Rewards", "editorComponent": "RewardsEditor" }
+          ]
+        }
+      ]
+    },
+    "crafting": {
+      "name": "Crafting Template",
+      "templateType": "OpenRpg.Items.TradeSkills.Templates.ItemCraftingTemplate, OpenRpg.Items.TradeSkills",
+      "assetCodePrefix": "crafting",
+      "groups": [
+        {
+          "title": "Skill Details",
+          "editorComponent": "TradeSkillDetailsEditor",
+          "options": { "isGatheringSkill": "false" }
+        },
+        {
+          "title": "Input Items",
+          "fields": [
+            { "property": "InputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
+          ]
+        },
+        {
+          "title": "Output Items",
+          "fields": [
+            { "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
+          ]
+        }
+      ]
+    },
+    "gathering": {
+      "name": "Gathering Template",
+      "templateType": "OpenRpg.Items.TradeSkills.Templates.ItemGatheringTemplate, OpenRpg.Items.TradeSkills",
+      "assetCodePrefix": "gathering",
+      "groups": [
+        {
+          "title": "Skill Details",
+          "editorComponent": "TradeSkillDetailsEditor",
+          "options": { "isGatheringSkill": "true" }
+        },
+        {
+          "title": "Output Items",
+          "fields": [
+            { "property": "OutputItems", "editorComponent": "TradeSkillItemEntriesEditor" }
+          ]
+        }
+      ]
+    },
+    "entity": {
+      "name": "Entity Template",
+      "templateType": "OpenRpg.Entities.Entity.Templates.EntityTemplate, OpenRpg.Entities",
+      "assetCodePrefix": "entity",
+      "groups": [
+        {
+          "title": "Entity Details",
+          "editorComponent": "EntityTemplateDetailsEditor"
+        },
+        {
+          "title": "Abilities",
+          "editorComponent": "AbilitiesEditor",
+          "options": { "hasOwnAccordion": "true" }
+        },
+        {
+          "title": "Loot Table",
+          "editorComponent": "LootTableEditor",
+          "options": { "hasOwnAccordion": "true" }
+        },
+        {
+          "title": "Starting Equipment",
+          "editorComponent": "EquipmentEditor",
+          "options": { "hasOwnAccordion": "true" }
+        }
+      ]
+    }
+  }
+}

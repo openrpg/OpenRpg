@@ -1,6 +1,6 @@
 @using OpenRpg.Core.Templates.Variables
-@using OpenRpg.Editor.Infrastructure.Variables
 @using OpenRpg.Entities.Extensions
+@using OpenRpg.Entities.Types
 
 <div class="field is-horizontal">
     <div class="field-label">
@@ -10,7 +10,7 @@
         <div class="field">
             <div class="control">
                 <input class="input" type="text" placeholder="i.e my-asset-code" 
-                       value="@Variables.AssetCode()" @onchange="AssetCodeChanged" />
+                       value="@Variables.AssetCode" @onchange="AssetCodeChanged" />
             </div>
         </div>
     </div>
@@ -29,14 +29,14 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (!Variables.ContainsKey(CustomVariableTypes.AssetCode))
-        { Variables.AssetCode(DefaultAssetCode); }
+        if (!Variables.ContainsKey(CoreAnyVariableTypes.AssetCode))
+        { Variables.AssetCode = DefaultAssetCode; }
     }
 
     private void AssetCodeChanged(ChangeEventArgs e)
     {
         var newAssetCode = e.Value.ToString();
-        Variables.AssetCode(newAssetCode);
+        Variables.AssetCode = newAssetCode;
         OnAssetCodeChanged.InvokeAsync(newAssetCode);
     }
 

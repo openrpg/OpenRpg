@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using OpenRpg.Core.Associations;
 using OpenRpg.Core.Requirements;
-using OpenRpg.Core.Utils;
 using OpenRpg.Demos.Infrastructure.Lookups;
-using OpenRpg.Entities.Requirements;
+using OpenRpg.Entities.Extensions;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.TradeSkills;
 using OpenRpg.Items.TradeSkills.Extensions;
@@ -25,44 +24,57 @@ public class CraftingTemplateDataGenerator : IDataGenerator<ItemCraftingTemplate
     public ItemCraftingTemplate MakeCopperIngotCraftingTemplate()
     {
         var inputItemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperOre };
-        inputItemEntry.Variables.Amount(5);
+        inputItemEntry.Variables.Amount = 5;
 
         var outputItemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperIngot };
-        outputItemEntry.Variables.Amount(1);
+        outputItemEntry.Variables.Amount = 1;
         
-        return new ItemCraftingTemplate()
+        var template = new ItemCraftingTemplate()
         {
             Id = ItemCraftingTemplateLookups.CopperIngot,
-            SkillType = FantasyCraftingTradeSkillTypes.Smelting,
-            SkillDifficulty = 0,
-            TimeToComplete = 2.0f,
             InputItems = new List<TradeSkillItemEntry>() { inputItemEntry },
             OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry },
         };
+        template.Variables.SkillType = FantasyTradeSkillTypes.Smelting;
+        template.Variables.TimeToAction = 2.0f;
+        return template;
     }
 
     public ItemCraftingTemplate MakeCopperSwordCraftingTemplate()
     {
         var inputItem1Entry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperIngot };
-        inputItem1Entry.Variables.Amount(2);
+        inputItem1Entry.Variables.Amount = 2;
         var inputItem2Entry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.OakLog };
-        inputItem2Entry.Variables.Amount(1);
+        inputItem2Entry.Variables.Amount = 1;
 
         var outputItemEntry = new TradeSkillItemEntry() { TemplateId = ItemTemplateLookups.CopperSword };
-        outputItemEntry.Variables.Amount(1);
+        outputItemEntry.Variables.Amount = 1;
         
-        return new ItemCraftingTemplate()
+        var craftingTemplate = new ItemCraftingTemplate()
         {
             Id = ItemCraftingTemplateLookups.CopperSword,
-            SkillType = FantasyCraftingTradeSkillTypes.Smithing,
-            SkillDifficulty = 10,
-            TimeToComplete = 2.0f,
             InputItems = new List<TradeSkillItemEntry>() { inputItem1Entry, inputItem2Entry },
-            OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry },
-            Requirements = new []
+            OutputItems = new List<TradeSkillItemEntry>() { outputItemEntry }
+        };
+        craftingTemplate.Variables.SkillType = FantasyTradeSkillTypes.Smithing;
+        craftingTemplate.Variables.TimeToAction = 2.0f;
+        craftingTemplate.Variables.Requirements =
+        [
+            new Requirement
             {
-                new Requirement { RequirementType = FantasyRequirementTypes.TradeSkillRequirement, Association = new Association(FantasyCraftingTradeSkillTypes.Smithing, 5) }
+                RequirementType = FantasyRequirementTypes.TradeSkillRequirement,
+                Association = new Association(FantasyTradeSkillTypes.Smithing, 10)
+            }
+        ];
+        
+        craftingTemplate.Variables.Requirements = new[]
+        {
+            new Requirement
+            {
+                RequirementType = FantasyRequirementTypes.TradeSkillRequirement,
+                Association = new Association(FantasyTradeSkillTypes.Smithing, 5)
             }
         };
+        return craftingTemplate;
     }
 }

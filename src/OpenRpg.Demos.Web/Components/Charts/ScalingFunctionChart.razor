@@ -11,18 +11,28 @@
         Stroke="new SeriesStroke() { Width = 2, Color = ChartColor }"
         YValue="@(e => e.OutputValue)"
         XValue="@(e => e.InputValue)"/>
+    @if (HasHighlight)
+    {
+        <ApexPointSeries TItem="DataPoint"
+            @key="@HighlightValue"
+            Items="HighlightData"
+            SeriesType="SeriesType.Scatter"
+            Stroke="new SeriesStroke() { Width = 4, Color = HighlightColor }"
+            YValue="@(e => e.OutputValue)"
+            XValue="@(e => e.InputValue)"/>
+    }
 </ApexChart>
 
 @code {
     [Parameter]
     public string Title { get; set; }
-    
+
     [Parameter]
     public ScalingFunction ScalingFunction { get; set; }
 
     [Parameter]
     public bool ShowLabels { get; set; } = true;
-    
+
     [Parameter]
     public string ChartColor { get; set; } = "#FF4560";
 
@@ -31,21 +41,43 @@
 
     [Parameter]
     public string YAxisName { get; set; } = "Output";
-    
+
+    [Parameter]
+    public float? HighlightValue { get; set; }
+
+    [Parameter]
+    public string HighlightColor { get; set; } = "#2c3e50";
+
     public List<DataPoint> Data { get; set; } = new();
-    
+    public List<DataPoint> HighlightData { get; set; } = new();
+    public bool HasHighlight => HighlightValue.HasValue;
+
     public ApexChartOptions<DataPoint> ChartOptions { get; set; } = new();
     public ApexChart<DataPoint> ChartInstance { get; set; }
-    
+
     void PopulatePoints()
     {
-        Data.Clear();
-        var newPoints = FixedDataRanges.NormalizedZeroToOne
+        Data = FixedDataRanges.NormalizedZeroToOne
             .Denormalize(ScalingFunction.InputScale.Min, ScalingFunction.InputScale.Max)
             .Select(GenerateDataPoint)
-            .ToArray();
-        
-        Data.AddRange(newPoints);
+            .ToList();
+
+        if (HighlightValue.HasValue)
+        {
+            var clampedInput = Math.Clamp(HighlightValue.Value,
+                ScalingFunction.InputScale.Min,
+                ScalingFunction.InputScale.Max);
+            HighlightData = new List<DataPoint>
+            {
+                new DataPoint(
+                    (decimal)clampedInput,
+                    (decimal)ScalingFunction.Plot(clampedInput))
+            };
+        }
+        else
+        {
+            HighlightData = new List<DataPoint>();
+        }
     }
 
     DataPoint GenerateDataPoint(float input)
@@ -96,6 +128,9 @@
     public async Task Refresh()
     {
         PopulatePoints();
-        await ChartInstance.RenderAsync();
+        if (ChartInstance != null)
+        {
+            await ChartInstance.UpdateSeriesAsync(false);
+        }
     }
 }

@@ -1,0 +1,130 @@
+using System.Collections.Generic;
+using OpenRpg.Core.Associations;
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Extensions;
+using OpenRpg.Core.Templates;
+using OpenRpg.Entities.Entity;
+using OpenRpg.Entities.Entity.Templates;
+using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Procedural;
+using OpenRpg.Entities.Procedural.Effects;
+using OpenRpg.Entities.Requirements;
+using OpenRpg.Entities.Types;
+
+namespace OpenRpg.Entities.Effects.Processors
+{
+    public class EntityEffectProcessor<T> : IEntityEffectProcessor<T> where T : EntityData
+    {
+        public ITemplateAccessor TemplateAccessor { get; }
+        public IEntityRequirementChecker<T> RequirementChecker { get; }
+
+        public EntityEffectProcessor(ITemplateAccessor templateAccessor, IEntityRequirementChecker<T> requirementChecker)
+        {
+            TemplateAccessor = templateAccessor;
+            RequirementChecker = requirementChecker;
+        }
+
+        public virtual ComputedEffects ComputeEffects(IReadOnlyCollection<IEffect> context, T relatedEntity)
+        {
+            var computedEffects = new ComputedEffects();
+            ComputeEffects(context, relatedEntity, computedEffects);
+            return computedEffects;
+        }
+        
+        public virtual void ComputeEffects(IReadOnlyCollection<IEffect> context, T relatedEntity, ComputedEffects computedEffects)
+        {
+            foreach (var effect in context)
+            {
+                if(!RequirementChecker.AreRequirementsMet(relatedEntity, effect.Requirements))
+                { continue; }
+                
+                if(effect is StaticEffect staticEffect) 
+                { computedEffects.Add(staticEffect.EffectType, staticEffect.Potency); }
+
+                if (effect is ScaledEffect scaledEffect)
+                { ComputeScaledEffect(scaledEffect, context, computedEffects, relatedEntity); }
+            }
+        }
+
+        public virtual ComputedEffects ComputeEffects(T entity)
+        {
+            var computedEffects = new ComputedEffects();
+            
+            if (entity.Variables.HasRace())
+            {
+                var template = TemplateAccessor.GetRaceTemplate(entity.Variables.Race.TemplateId);
+                ComputeEffects(template.Variables.Effects, entity, computedEffects);
+            }
+            
+            if (entity.Variables.HasClass())
+            {
+                var template = TemplateAccessor.GetClassTemplate(entity.Variables.Class.TemplateId);
+                ComputeEffects(template.Variables.Effects, entity, computedEffects);
+            }
+
+            if (entity.TemplateId != -1)
+            {
+                var entityTemplate = TemplateAccessor.Get<EntityTemplate>(entity.TemplateId);
+                if(entityTemplate.Variables.HasEffects())
+                { ComputeEffects(entityTemplate.Variables.Effects, entity, computedEffects); }
+            }
+            
+            return computedEffects;
+        }
+        
+        public virtual void ComputeProceduralEffects(ProceduralEffects proceduralEffects, IReadOnlyCollection<Association> effectAssociations, IReadOnlyCollection<IEffect> context, ComputedEffects computedEffects, T relatedEntity)
+        {
+            foreach (var effectAssociation in effectAssociations)
+            {
+                var effect = proceduralEffects.Effects[effectAssociation.AssociatedId];
+                if (effect.ScalingType == CoreEffectScalingTypes.Value)
+                {
+                    var staticEffect = effect.ToStatic(effectAssociation.AssociatedValue);
+                    computedEffects.Add(staticEffect.EffectType, staticEffect.Potency);
+                }
+                else
+                { ComputeScaledEffect(effect, context, computedEffects, relatedEntity); }
+            }
+        }
+
+        public virtual int GetLevelValue(ScaledEffect effect, IReadOnlyCollection<IEffect> context, ComputedEffects computedEffects, T relatedEntity)
+        {
+            if (effect.ScalingIndex >= 0)
+            {
+                if (relatedEntity.Variables.HasMultiClass())
+                {
+                    var relatedClass = relatedEntity.Variables.MultiClass.GetClass(effect.ScalingIndex);
+                    if(relatedClass != null) { return relatedClass.Variables.Level; }
+                }
+            }
+            
+            if(relatedEntity.Variables.HasClass()) { return relatedEntity.Variables.Class.Variables.Level; }
+            if(relatedEntity.Variables.HasLevel()) { return relatedEntity.Variables.Level; }
+            return 1;
+        }
+
+        public virtual void ComputeScaledEffect(ScaledEffect effect, IReadOnlyCollection<IEffect> context, ComputedEffects computedEffects, T relatedEntity)
+        {
+            if (effect.ScalingType == CoreEffectScalingTypes.Level)
+            {
+                var level = GetLevelValue(effect, context, computedEffects, relatedEntity);
+                computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(level));
+                return;
+            }
+
+            if (effect.ScalingType == CoreEffectScalingTypes.StateIndex)
+            {
+                computedEffects.AddDeferred(effect, context);
+                return;
+            }
+
+            if (effect.ScalingType == CoreEffectScalingTypes.StatIndex)
+            {
+                computedEffects.AddDeferred(effect, context);
+                return;
+            }
+            
+            computedEffects.Add(effect.EffectType, effect.PotencyFunction.Plot(effect.PotencyFunction.InputScale.Min));
+        }
+    }
+}

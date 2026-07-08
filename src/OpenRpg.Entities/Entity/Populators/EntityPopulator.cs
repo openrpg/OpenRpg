@@ -5,17 +5,17 @@ using OpenRpg.Entities.Extensions;
 
 namespace OpenRpg.Entities.Entity.Populators
 {
-    public class EntityPopulator<T> : IEntityPopulator<T> where T : Entity
+    public class EntityPopulator<T> : IEntityPopulator<T> where T : EntityData
     {
         public IEntityStatPopulator StatPopulator { get; }
         public IEntityStatePopulator StatePopulator { get; }
-        public IEffectProcessor<T> EffectProcessor { get; }
+        public IEntityEffectProcessor<T> EntityEffectProcessor { get; }
 
-        public EntityPopulator(IEntityStatPopulator statPopulator, IEntityStatePopulator statePopulator, IEffectProcessor<T> effectProcessor)
+        public EntityPopulator(IEntityStatPopulator statPopulator, IEntityStatePopulator statePopulator, IEntityEffectProcessor<T> entityEffectProcessor)
         {
             StatPopulator = statPopulator;
             StatePopulator = statePopulator;
-            EffectProcessor = effectProcessor;
+            EntityEffectProcessor = entityEffectProcessor;
         }
 
         public void PopulateStateAndState(T entity, ComputedEffects computedEffects, bool refreshState)
@@ -28,7 +28,7 @@ namespace OpenRpg.Entities.Entity.Populators
 
         public void Populate(T entity, bool refreshState = false)
         {
-            var computedEffects = EffectProcessor.ComputeEffects(entity);
+            var computedEffects = EntityEffectProcessor.ComputeEffects(entity);
             PopulateStateAndState(entity, computedEffects, refreshState);
             
             if (computedEffects.DeferredEffects.Count == 0)

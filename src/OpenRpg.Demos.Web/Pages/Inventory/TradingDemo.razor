@@ -1,0 +1,230 @@
+@page "/inventory/trading"
+
+@using OpenRpg.Core.Templates
+@using OpenRpg.Demos.Infrastructure.Data
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Items
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Inventories
+@using OpenRpg.Items.Templates
+@using OpenRpg.Items.TradeSkills.Trading
+
+@using OpenRpg.Demos.Infrastructure.Trading
+
+@inject ITemplateAccessor TemplateAccessor
+@inject DemoCharacterBuilder CharacterBuilder
+
+<Markdown>
+    ## Trading & Shop
+
+    The trading system uses `ITrader` to define a merchant's stock, with `ItemTradeEntry` entries
+    that specify `BuyRate` and `SellRate` multipliers against the base item value. This lets you
+    create merchants with different pricing. A weaponsmith might charge 1.5× base value but only
+    buy items at 0.4×, while a general store offers fairer rates.
+
+    - **Buy Price** = `ItemTemplate.Variables.Value × BuyRate`
+    - **Sell Price** = `ItemTemplate.Variables.Value × SellRate`
+</Markdown>
+<br />
+
+<Markdown>
+    ## Interactive Trading Demo
+
+    Below is a weapon merchant with various items. You start with **500 gold**. Buy items by
+    clicking the buy button (deducts gold, adds to inventory). Sell items by clicking them in
+    your inventory (removes item, credits gold).
+</Markdown>
+<br />
+
+<div class="columns">
+    <div class="column">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark has-text-centered">@_trader.Name</h4>
+            <h5 class="subtitle is-6 has-text-dark has-text-centered">Stock for sale</h5>
+            <br />
+
+            @foreach (var entry in _trader.Items)
+            {
+                var template = TemplateAccessor.GetItemTemplate(entry.ItemTemplateId);
+                var buyPrice = GetBuyPrice(template, entry);
+                var canAfford = _playerGold >= buyPrice;
+                var entryRef = entry;
+
+                <div class="box" style="margin-bottom: 0.75rem;">
+                    <div class="columns is-vcentered">
+                        <div class="column">
+                            <h6 class="title is-6 has-text-dark">@template.NameLocaleId</h6>
+                            <p class="is-size-7 has-text-grey">@template.DescriptionLocaleId</p>
+                            <p class="is-size-7" style="margin-top: 0.25rem;">
+                                Base value: <strong>@template.Variables.Value</strong>g
+                                <span class="has-text-grey">|</span>
+                                Rate: <strong>@entry.BuyRate.ToString("F1")</strong>×
+                            </p>
+                        </div>
+                        <div class="column is-narrow has-text-right">
+                            <span class="tag is-success is-medium" style="margin-bottom: 0.5rem;">@buyPrice gold</span>
+                            <br />
+                            <button class="button is-small @(canAfford ? "is-link" : "is-light")"
+                                    disabled="@(!canAfford)"
+                                    @onclick="() => BuyItem(entryRef)">
+                                Buy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </CardSection>
+    </div>
+
+    <div class="column">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark has-text-centered">Your Inventory</h4>
+            <br />
+
+            <div class="notification is-warning is-light">
+                <strong>Gold: @_playerGold</strong>
+            </div>
+
+            @if (!_playerInventory.Items.Any())
+            {
+                <p class="has-text-grey has-text-centered" style="padding: 2rem 0;">No items yet. Buy something!</p>
+            }
+            else
+            {
+                @foreach (var itemData in _playerInventory.Items)
+                {
+                    var template = TemplateAccessor.GetItemTemplate(itemData.TemplateId);
+                    var sellPrice = GetSellPrice(template, itemData);
+                    var itemDataRef = itemData;
+
+                    <div class="box" style="margin-bottom: 0.5rem;">
+                        <div class="columns is-vcentered">
+                            <div class="column">
+                                <h6 class="title is-6 has-text-dark">@template.NameLocaleId</h6>
+                                <p class="is-size-7">
+                                    Sell value: <strong>@sellPrice</strong>g
+                                    <span class="has-text-grey">|</span>
+                                    Rate: <strong>@GetSellRate(itemData)</strong>×
+                                </p>
+                            </div>
+                            <div class="column is-narrow">
+                                <button class="button is-small is-warning" @onclick="() => SellItem(itemDataRef)">
+                                    Sell
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </CardSection>
+
+        @if (_log.Any())
+        {
+            <CardSection>
+                <h4 class="title is-6 has-text-dark">Transaction Log</h4>
+                <div style="max-height: 200px; overflow-y: auto;">
+                    @foreach (var entry in _log.TakeLast(10).Reverse())
+                    {
+                        <p class="is-size-7 @entry.CssClass">@entry.Text</p>
+                    }
+                </div>
+            </CardSection>
+        }
+    </div>
+</div>
+<br />
+
+<Markdown>
+    ### How It Works
+
+    ```csharp
+    // Create a trader with stock and rates
+    var trader = new Trader("Weapon Merchant", new[]
+    {
+        new ItemTradeEntry { ItemTemplateId = swordId, BuyRate = 1.5f, SellRate = 0.4f }
+    });
+
+    // Calculate prices from base value
+    var template = templateAccessor.GetItemTemplate(entry.ItemTemplateId);
+    var buyPrice = (int)(template.Variables.Value * entry.BuyRate);
+    var sellPrice = (int)(template.Variables.Value * entry.SellRate);
+
+    // Buy: check gold, add to inventory, deduct gold
+    if (playerGold >= buyPrice)
+    {
+        inventory.AttemptAddItem(new Item { Data = new ItemData { TemplateId = entry.ItemTemplateId } });
+        playerGold -= buyPrice;
+    }
+
+    // Sell: remove from inventory, credit gold
+    inventory.AttemptRemoveItem(item.Data);
+    playerGold += sellPrice;
+    ```
+</Markdown>
+
+@code {
+    private Character _character;
+    private Trader _trader;
+    private Inventory _playerInventory;
+    private int _playerGold;
+    private readonly List<LogEntry> _log = new();
+
+    protected override void OnInitialized()
+    {
+        _character = CharacterBuilder.CreateNew().Build();
+        _trader = TraderDataGenerator.CreateWeaponMerchant();
+        _playerInventory = _character.Variables.Inventory;
+        _playerInventory.Variables.MaxSlots = 20;
+        _playerGold = TraderDataGenerator.GoldStartingAmount;
+        base.OnInitialized();
+    }
+
+    private int GetBuyPrice(ItemTemplate template, ItemTradeEntry entry)
+    {
+        return (int)(template.Variables.Value * entry.BuyRate);
+    }
+
+    private int GetSellPrice(ItemTemplate template, ItemData itemData)
+    {
+        var sellRate = GetSellRate(itemData);
+        return (int)(template.Variables.Value * sellRate);
+    }
+
+    private float GetSellRate(ItemData itemData)
+    {
+        var entry = _trader.Items.FirstOrDefault(x => x.ItemTemplateId == itemData.TemplateId);
+        return entry?.SellRate ?? 0.5f;
+    }
+
+    private void BuyItem(ItemTradeEntry entry)
+    {
+        var template = TemplateAccessor.GetItemTemplate(entry.ItemTemplateId);
+        var buyPrice = GetBuyPrice(template, entry);
+
+        if (_playerGold < buyPrice) { return; }
+
+        var itemData = new ItemData { TemplateId = entry.ItemTemplateId };
+        var item = new Item { Data = itemData, Template = template };
+
+        if (!_playerInventory.AttemptAddItem(item)) { return; }
+
+        _playerGold -= buyPrice;
+        _log.Add(new LogEntry($"Bought {template.NameLocaleId} for {buyPrice}g", "has-text-success"));
+        StateHasChanged();
+    }
+
+    private void SellItem(ItemData itemData)
+    {
+        var template = TemplateAccessor.GetItemTemplate(itemData.TemplateId);
+        var sellPrice = GetSellPrice(template, itemData);
+
+        if (!_playerInventory.AttemptRemoveItem(itemData)) { return; }
+
+        _playerGold += sellPrice;
+        _log.Add(new LogEntry($"Sold {template.NameLocaleId} for {sellPrice}g", "has-text-warning"));
+        StateHasChanged();
+    }
+
+    private record LogEntry(string Text, string CssClass);
+}

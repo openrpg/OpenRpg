@@ -1,0 +1,76 @@
+@using OpenRpg.Core.Templates
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items
+@using OpenRpg.Items.Equippables
+
+
+<div>
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column">
+            <div @onclick="@(() => OnItemInteraction.InvokeAsync(GetItemFromSlot(FantasyEquipmentSlotTypes.HeadSlot)))">
+                <EquipmentIcon Item="@GetItemFromSlot(FantasyEquipmentSlotTypes.HeadSlot)" Character="Character"/>
+            </div>
+        </div>
+        <div class="column"></div>
+    </div>
+    <div class="columns">
+        <div class="column">
+            <div @onclick="@(() => OnItemInteraction.InvokeAsync(GetItemFromSlot(FantasyEquipmentSlotTypes.MainHandSlot)))">
+                <EquipmentIcon Item="@GetItemFromSlot(FantasyEquipmentSlotTypes.MainHandSlot)" Character="Character"/>
+            </div>
+        </div>
+        <div class="column">
+            <div @onclick="@(() => OnItemInteraction.InvokeAsync(GetItemFromSlot(FantasyEquipmentSlotTypes.UpperBodySlot)))">
+                <EquipmentIcon Item="@GetItemFromSlot(FantasyEquipmentSlotTypes.UpperBodySlot)" Character="Character"/>
+            </div>
+        </div>
+        <div class="column">
+            <div @onclick="@(() => OnItemInteraction.InvokeAsync(GetItemFromSlot(FantasyEquipmentSlotTypes.OffHandSlot)))">
+                <EquipmentIcon Item="@GetItemFromSlot(FantasyEquipmentSlotTypes.OffHandSlot)" Character="Character"/>
+            </div>
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column">
+            <div @onclick="@(() => OnItemInteraction.InvokeAsync(GetItemFromSlot(FantasyEquipmentSlotTypes.FootSlot)))">
+                <EquipmentIcon Item="@GetItemFromSlot(FantasyEquipmentSlotTypes.FootSlot)" Character="Character"/>
+            </div>
+        </div>
+        <div class="column"></div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Equipment Equipment { get; set; }
+
+    [Parameter]
+    public Character Character { get; set; }
+
+    [Parameter]
+    public EventCallback<Item> OnItemInteraction { get; set; }
+    
+    [Parameter]
+    public ITemplateAccessor TemplateAccessor { get; set; }
+
+    public Item? GetItemFromSlot(int slotType)
+    {
+        if(!Equipment.HasItemEquipped(slotType))
+        { return null; }
+
+        var itemData = Equipment.GetItemInSlot(slotType);
+        if(itemData == null) { return null; }
+
+        return TemplateAccessor.ToInstance(itemData);
+    }
+
+    public void Refresh()
+    {
+        StateHasChanged();
+    }
+
+}

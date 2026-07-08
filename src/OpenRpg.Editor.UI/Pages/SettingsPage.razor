@@ -1,0 +1,194 @@
+@page "/settings"
+@using System.IO
+@using System.Reactive.Disposables
+@using OpenRpg.Editor.Core.Extensions
+@using OpenRpg.Editor.Core.Models
+@using OpenRpg.Editor.Core.Services.Events.Bus
+@using OpenRpg.Editor.Core.Services.FileSystem
+@using OpenRpg.Editor.Core.Services.Notifications
+@using OpenRpg.Editor.Infrastructure.Events
+@using OpenRpg.Editor.Infrastructure.Persistence
+@using OpenRpg.Editor.Infrastructure.Plugins
+
+@implements IDisposable
+
+@inject EditorState EditorState
+@inject EditorProjectSaver EditorProjectSaver
+@inject GenreService GenreService
+@inject INotifier Notifier
+@inject IEventBus EventBus
+@inject IFileBrowser FileBrowser
+
+<h1 class="title is-1">Project Settings</h1>
+
+@if (EditorState.ProjectContext == null)
+{
+    <div class="notification is-warning">
+        <p>No project is currently loaded. Please create or open a project first.</p>
+    </div>
+}
+else
+{
+    <div class="box">
+        <h2 class="title is-3">Project Info</h2>
+        <table class="table is-fullwidth">
+            <tbody>
+                <tr>
+                    <td><strong>Project Path</strong></td>
+                    <td><code>@EditorState.ProjectContext.ProjectPath</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Version</strong></td>
+                    <td>@EditorState.ProjectContext.Project.Version</td>
+                </tr>
+                <tr>
+                    <td><strong>Enabled Plugins</strong></td>
+                    <td>
+                        @if (EditorState.ProjectContext.Project.Plugins.Count > 0)
+                        {
+                            <div class="tags">
+                                @foreach (var plugin in EditorState.ProjectContext.Project.Plugins)
+                                {
+                                    <span class="tag is-primary">@plugin.Id (@plugin.Version)</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="tag is-light">None</span>
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="box">
+        <h2 class="title is-3">Type Generation</h2>
+        <div class="content">
+            <p>When enabled, the editor will generate C# type class files from your template data on each save. These generated files provide compile-time type safety when referencing types in code.</p>
+        </div>
+
+        <div class="field">
+            <div class="control has-text-dark">
+                <label class="checkbox">
+                    <input type="checkbox" checked="@_generateTypeFiles" @onchange="OnGenerateTypeFilesChanged" />
+                    Generate Type Classes
+                </label>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Output Path</label>
+            <div class="field has-addons">
+                <div class="control is-expanded">
+                    <input class="input" type="text" value="@_generatedFilePath" @onchange="OnGeneratedFilePathChanged" />
+                </div>
+                <div class="control">
+                    <button class="button" @onclick="BrowseGeneratedFilePath">
+                        <span class="icon"><i class="fas fa-folder-open" aria-hidden="true"></i></span>
+                        <span>Browse</span>
+                    </button>
+                </div>
+            </div>
+            <p class="help">
+                @if (Path.IsPathFullyQualified(_generatedFilePath))
+                {
+                    <span>Absolute path: <code>@_generatedFilePath</code></span>
+                }
+                else
+                {
+                    <span>Relative to project: <code>@EditorState.ProjectContext.ProjectPath/@_generatedFilePath</code></span>
+                }
+            </p>
+        </div>
+
+        <div class="buttons is-right">
+            <button class="button is-primary" @onclick="SaveSettings" disabled="@(!_hasChanges)">
+                <span class="icon"><i class="fas fa-save" aria-hidden="true"></i></span>
+                <span>Save Settings</span>
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _generateTypeFiles;
+    private string _generatedFilePath = "types";
+    private bool _hasChanges;
+    private CompositeDisposable _subs = new();
+
+    protected override void OnInitialized()
+    {
+        LoadProjectSettings();
+        EventBus
+            .Receive<ProjectChangedEvent>()
+            .Subscribe(_ => { LoadProjectSettings(); InvokeAsync(StateHasChanged); })
+            .AddTo(_subs);
+        base.OnInitialized();
+    }
+
+    private void LoadProjectSettings()
+    {
+        if (EditorState.ProjectContext?.Project != null)
+        {
+            _generateTypeFiles = EditorState.ProjectContext.Project.GenerateTypeFiles;
+            _generatedFilePath = EditorState.ProjectContext.Project.GeneratedFilePath;
+            _hasChanges = false;
+        }
+    }
+
+    private async Task SaveSettings()
+    {
+        if (EditorState.ProjectContext?.Project == null) { return; }
+
+        EditorState.ProjectContext.Project.GenerateTypeFiles = _generateTypeFiles;
+        EditorState.ProjectContext.Project.GeneratedFilePath = _generatedFilePath;
+
+        await EditorProjectSaver.SaveProject();
+        _hasChanges = false;
+        await Notifier.ShowNotification("Project settings saved");
+        EventBus.PublishAsync(new ProjectChangedEvent());
+    }
+
+    private void OnGenerateTypeFilesChanged(ChangeEventArgs e)
+    {
+        _generateTypeFiles = (bool)(e.Value ?? false);
+        UpdateHasChanges();
+    }
+
+    private void OnGeneratedFilePathChanged(ChangeEventArgs e)
+    {
+        _generatedFilePath = e.Value?.ToString() ?? "types";
+        UpdateHasChanges();
+    }
+
+    private async Task BrowseGeneratedFilePath()
+    {
+        var startingPath = Path.IsPathFullyQualified(_generatedFilePath)
+            ? _generatedFilePath
+            : EditorState.ProjectContext != null
+                ? Path.Combine(EditorState.ProjectContext.ProjectPath, _generatedFilePath)
+                : null;
+
+        var folder = FileBrowser.BrowseToFolder(startingPath);
+        if (!string.IsNullOrEmpty(folder))
+        {
+            _generatedFilePath = folder;
+            UpdateHasChanges();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void UpdateHasChanges()
+    {
+        if (EditorState.ProjectContext?.Project == null) { return; }
+        _hasChanges = _generateTypeFiles != EditorState.ProjectContext.Project.GenerateTypeFiles
+                      || _generatedFilePath != EditorState.ProjectContext.Project.GeneratedFilePath;
+    }
+
+    public void Dispose()
+    {
+        _subs?.Dispose();
+    }
+}

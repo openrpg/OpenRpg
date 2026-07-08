@@ -26,14 +26,13 @@ namespace OpenRpg.Genres.Fantasy.Combat
             
             var varianceAmount = damage.Value * DamageVariance;
             var randomVariance = Randomizer.Random(-varianceAmount, varianceAmount);
-            damage.Value += randomVariance;
-            return damage;
+            return damage with { Value = damage.Value + randomVariance };
         }
 
         public virtual (float scaledCritRate, float scaledCritMultiplier) GetScaledCriticalRateAndMultiplier(
             EntityStatsVariables stats)
         {
-            return (stats.CriticalDamageChance(), stats.CriticalDamageMultiplier());
+            return (stats.CriticalDamageChance, stats.CriticalDamageMultiplier);
         }
 
         public (bool DidCrit, Damage[] Damages) AttemptToCritical(Damage[] damages, EntityStatsVariables stats)
@@ -44,8 +43,11 @@ namespace OpenRpg.Genres.Fantasy.Combat
             var isCritical = Randomizer.ShouldCritical(scaledCritData.scaledCritRate);
             if (!isCritical) { return (false, damages); }
             
-            damages.ForEach(x => x.Value *= scaledCritData.scaledCritMultiplier);
-            return (true, damages);
+            var newDamages = damages
+                .Select(x => new Damage(x.Type, x.Value * scaledCritData.scaledCritMultiplier))
+                .ToArray();
+            
+            return (true, newDamages);
         }
         
         public virtual Attack GenerateAttack(EntityStatsVariables stats)
@@ -56,21 +58,21 @@ namespace OpenRpg.Genres.Fantasy.Combat
                 .ToArray();
 
             var outcome = AttemptToCritical(damages, stats);
-            return new Attack(outcome.Damages, outcome.DidCrit);
+            return new Attack(outcome.DidCrit, outcome.Damages);
         }
         
         public virtual Attack GenerateAttack(Ability ability, EntityStatsVariables stats)
         {
-            var baseDamage = ability.Template.Variables.Damage();
+            var baseDamage = ability.Template.Variables.Damage;
             return GenerateAttack(baseDamage, stats);
         }
         
         public virtual Attack GenerateAttack(Damage damage, EntityStatsVariables stats)
         {
-            damage.Value += stats.GetDamageFromDamageType(damage.Type);
-            ApplyVariance(damage);
-            var outcome = AttemptToCritical(new[] { damage }, stats);
-            return new Attack(outcome.Damages, outcome.DidCrit);
+            var damageWithAddedType = damage with { Value = damage.Value + stats.GetDamageFromDamageType(damage.Type) };
+            var actualDamage = ApplyVariance(damageWithAddedType);
+            var outcome = AttemptToCritical([actualDamage], stats);
+            return new Attack(outcome.DidCrit, outcome.Damages);
         }
     }
 }

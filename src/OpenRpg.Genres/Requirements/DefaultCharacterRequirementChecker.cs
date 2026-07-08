@@ -1,14 +1,17 @@
+using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Combat.Extensions;
 using OpenRpg.Core.Requirements;
 using OpenRpg.Entities.Extensions;
-using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Extensions;
 using OpenRpg.Genres.Types;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.TradeSkills.Extensions;
+using OpenRpg.Quests;
+using OpenRpg.Quests.Extensions;
 using OpenRpg.Quests.State;
+using OpenRpg.Quests.Types;
 
 namespace OpenRpg.Genres.Requirements
 {
@@ -21,7 +24,7 @@ namespace OpenRpg.Genres.Requirements
                 if (!character.Variables.HasRace())
                 { return false; }
 
-                var race = character.Variables.Race();
+                var race = character.Variables.Race;
                 return race.TemplateId == requirement.Association.AssociatedId;
             }
 
@@ -29,17 +32,17 @@ namespace OpenRpg.Genres.Requirements
             {
                 if (character.Variables.HasClass())
                 {
-                    var classDetails = character.Variables.Class();
+                    var classDetails = character.Variables.Class;
                     if (classDetails.TemplateId == requirement.Association.AssociatedId)
-                    { return classDetails.Variables.Level() >= requirement.Association.AssociatedValue; }
+                    { return classDetails.Variables.Level >= requirement.Association.AssociatedValue; }
                 }
 
                 if (character.Variables.HasMultiClass())
                 {
-                    var multiClass = character.Variables.MultiClass();
+                    var multiClass = character.Variables.MultiClass;
                     var possibleClass = multiClass.GetClass(requirement.Association.AssociatedId);
                     if (possibleClass != null)
-                    { return possibleClass.Variables.Level() >= requirement.Association.AssociatedValue; }
+                    { return possibleClass.Variables.Level >= requirement.Association.AssociatedValue; }
                 }
 
                 return false;
@@ -50,7 +53,7 @@ namespace OpenRpg.Genres.Requirements
                 if (!character.Variables.HasGender())
                 { return false; }
                 
-                return character.Variables.Gender() == requirement.Association.AssociatedId;
+                return character.Variables.Gender == requirement.Association.AssociatedId;
             }
             
             if (requirement.RequirementType == GenreRequirementTypes.EquipmentItemRequirement)
@@ -58,7 +61,7 @@ namespace OpenRpg.Genres.Requirements
                 if (!character.Variables.HasEquipment())
                 { return false; }
 
-                return character.Variables.Equipment().Slots.Values
+                return character.Variables.Equipment.Slots.Values
                     .Any(x => x?.TemplateId == requirement.Association.AssociatedId);
             }
             
@@ -67,7 +70,7 @@ namespace OpenRpg.Genres.Requirements
                 if (!character.Variables.HasTradeSkillState())
                 { return false; }
 
-                var tradeSkills = character.Variables.TradeSkillState();
+                var tradeSkills = character.Variables.TradeSkillState;
                 if (!tradeSkills.ContainsKey(requirement.Association.AssociatedId))
                 { return false; }
 
@@ -79,46 +82,56 @@ namespace OpenRpg.Genres.Requirements
                 if (!character.Variables.HasInventory())
                 { return false; }
 
-                return character.Variables.Inventory()
+                return character.Variables.Inventory
                     .HasItem(requirement.Association.AssociatedId, requirement.Association.AssociatedValue);
             }
 
             if(requirement.RequirementType == GenreRequirementTypes.MaxHealthRequirement)
-            { return character.Stats.MaxHealth() >= requirement.Association.AssociatedValue; }
+            { return character.Stats.MaxHealth >= requirement.Association.AssociatedValue; }
             
             if(requirement.RequirementType == GenreRequirementTypes.MaxStaminaRequirement)
-            { return character.Stats.MaxStamina() >= requirement.Association.AssociatedValue; }
+            { return character.Stats.MaxStamina >= requirement.Association.AssociatedValue; }
             
             if(requirement.RequirementType == GenreRequirementTypes.MovementSpeedRequirement)
-            { return character.Stats.MovementSpeed() >= requirement.Association.AssociatedValue; }
-
+            { return character.Stats.MovementSpeed >= requirement.Association.AssociatedValue; }
+            
             if (requirement.RequirementType == GenreRequirementTypes.ActiveEffectRequirement)
             {
                 if(!character.Variables.HasActiveEffects()) { return false; }
-                return character.Variables.ActiveEffects().HasEffect(requirement.Association.AssociatedId);
+                return character.Variables.ActiveEffects.HasEffect(requirement.Association.AssociatedId);
+            }
+
+            if (requirement.RequirementType == QuestRequirementTypes.FactionStateRequirement)
+            {
+                if (!character.Variables.HasFactionReputation()) { return false; }
+                var factionRep = character.Variables.FactionReputation;
+                if (!factionRep.ContainsKey(requirement.Association.AssociatedId)) { return false; }
+                return factionRep[requirement.Association.AssociatedId] >= requirement.Association.AssociatedValue;
             }
             
             return true;
         }
 
-        public virtual bool IsRequirementMet(IQuestState state, Requirement requirement)
+        public virtual bool IsRequirementMet(IReadOnlyList<QuestData> quests, Requirement requirement)
         {
             if (requirement.RequirementType == GenreRequirementTypes.QuestStateRequirement)
             {
-                var questState = state.GetQuestState(requirement.Association.AssociatedId);
+                var questData = quests.FirstOrDefault(q => q.TemplateId == requirement.Association.AssociatedId);
+                var questState = questData?.State ?? QuestStateTypes.QuestNotStarted;
                 return requirement.Association.AssociatedValue == questState;
             }
             
             return true;
         }
     
-        public virtual bool IsRequirementMet(ITriggerStateVariables state, Requirement requirement)
+        public virtual bool IsRequirementMet(ITriggerState state, Requirement requirement)
         {
             if (requirement.RequirementType == GenreRequirementTypes.TriggerRequirement)
             {
                 var hasTrigger = state.ContainsKey(requirement.Association.AssociatedId);
                 var triggerState = (requirement.Association.AssociatedValue == 1);
                 if(requirement.Association.AssociatedValue == 0 && !hasTrigger) { return true; }
+                if(!hasTrigger) { return false; }
                 
                 return state[requirement.Association.AssociatedId] == triggerState;
             }

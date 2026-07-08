@@ -6,5 +6,6 @@ namespace OpenRpg.Genres.Scifi.Types
     {
         public static int ShipStatsVariables = 200;
         public static int ShipVariables = 201;
+        public static int ShipTemplateVariables = 202;
     }
 }

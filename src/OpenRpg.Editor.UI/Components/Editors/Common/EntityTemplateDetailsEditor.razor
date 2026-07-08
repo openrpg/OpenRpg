@@ -1,0 +1,77 @@
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.UI.Services
+@using OpenRpg.Entities.Classes.Templates
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Entities.Entity.Templates
+@using OpenRpg.Entities.Races.Templates
+
+@inject GenreTypesService GenreTypes
+@inject IRepository Repository
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Gender</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select value="@Template.Variables.Gender"
+                            @onchange="e => Template.Variables.Gender = byte.Parse(e.Value?.ToString())">
+                        @foreach (var genderType in GenreTypes.GenderTypes)
+                        {
+                            <option value="@genderType.Id">@genderType.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Race</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select @bind="Template.Variables.Race.TemplateId">
+                        <option value="0">None</option>
+                        @foreach (var raceTemplate in Repository.GetAll<RaceTemplate>())
+                        {
+                            <option value="@raceTemplate.Id">@raceTemplate.Variables.AssetCode</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Class</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select @bind="Template.Variables.Class.TemplateId">
+                        <option value="0">None</option>
+                        @foreach (var classTemplate in Repository.GetAll<ClassTemplate>())
+                        {
+                            <option value="@classTemplate.Id">@classTemplate.Variables.AssetCode</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EntityTemplate Template { get; set; }
+}

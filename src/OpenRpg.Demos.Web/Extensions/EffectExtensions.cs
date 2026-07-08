@@ -10,7 +10,7 @@ public static class EffectExtensions
     public static int[] PercentageEffectTypeCache = GetAllPercentageEffectTypeIds(typeof(FantasyEffectTypes));
     
     public static string GetPotencySymbol(float potency)
-    { return potency > 0 ? "+" : "-"; }
+    { return potency > 0 ? "+" : ""; }
     
     public static string GeneratePotencyText(this IEffect effect)
     {

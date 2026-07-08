@@ -1,4 +1,4 @@
-@page "/inventory/basic-components"
+@page "/inventory/inventory-components"
 
 @using OpenRpg.Core.Templates
 @using OpenRpg.Demos.Infrastructure.Lookups
@@ -33,16 +33,6 @@
 
 <br />
 <div class="columns">
-    <div class="column ">
-        <CardSection>
-            <div>
-                <h6 class="title is-6 has-text-centered has-text-dark">Inventory</h6>
-                <h6 class="subtitle is-6 has-text-dark has-text-centered">Click the item to drop it</h6>
-            </div>
-            <br />
-            <BasicInventory Inventory="_inventory" OnItemInteraction="RemoveItem" @ref="_inventoryRef" TemplateAccessor="TemplateAccessor"></BasicInventory>
-        </CardSection>
-    </div>
     <div class="column is-one-fifth">
         <CardSection>
             <div>
@@ -65,6 +55,16 @@
             <a @onclick="() => AddItem(_junkPotions)">
                 <ItemIcon Item="_junkPotions"></ItemIcon>
             </a>
+        </CardSection>
+    </div>
+    <div class="column ">
+        <CardSection>
+            <div>
+                <h6 class="title is-6 has-text-centered has-text-dark">Inventory</h6>
+                <h6 class="subtitle is-6 has-text-dark has-text-centered">Click the item to drop it</h6>
+            </div>
+            <br />
+            <BasicInventory Inventory="_inventory" OnItemInteraction="RemoveItem" @ref="_inventoryRef" TemplateAccessor="TemplateAccessor"></BasicInventory>
         </CardSection>
     </div>
 </div>
@@ -107,7 +107,7 @@
         _potionItem = MakePotion();
         _junkPotions = MakeJunkPotion();
         _inventory = new Inventory();
-        _inventory.Variables.MaxSlots(32);
+        _inventory.Variables.MaxSlots = 32;
         base.OnInitialized();
     }
 
@@ -144,14 +144,14 @@
     private Item MakePotion()
     {
         var item = new ItemData { TemplateId = ItemTemplateLookups.HealingPotion };
-        item.Variables.Amount(1);
+        item.Variables.Amount = 1;
         return TemplateAccessor.ToInstance(item);
     }
 
     private Item MakeJunkPotion()
     {
         var item = new ItemData { TemplateId = ItemTemplateLookups.JunkPotion };
-        item.Variables.Amount(3);
+        item.Variables.Amount = 3;
         return TemplateAccessor.ToInstance(item);
     }
 

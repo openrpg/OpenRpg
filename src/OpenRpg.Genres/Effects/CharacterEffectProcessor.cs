@@ -1,14 +1,8 @@
-using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Combat.Extensions;
-using OpenRpg.Core.Associations;
-using OpenRpg.Core.Effects;
 using OpenRpg.Core.Templates;
-using OpenRpg.Core.Templates.Variables;
 using OpenRpg.Entities.Effects.Processors;
 using OpenRpg.Entities.Extensions;
-using OpenRpg.Entities.Procedural;
-using OpenRpg.Entities.Types;
 using OpenRpg.Genres.Characters;
 using OpenRpg.Genres.Requirements;
 using OpenRpg.Items.Extensions;
@@ -16,7 +10,7 @@ using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Genres.Effects
 {
-    public class CharacterEffectProcessor : EffectProcessor<Character>, ICharacterEffectProcessor
+    public class CharacterEffectProcessor : EntityEffectProcessor<Character>, ICharacterEffectProcessor
     {
         public CharacterEffectProcessor(ITemplateAccessor templateAccessor, ICharacterRequirementChecker requirementChecker) : base(templateAccessor, requirementChecker)
         {
@@ -25,13 +19,13 @@ namespace OpenRpg.Genres.Effects
         public void ComputeEffects(ItemData itemData, Character relatedEntity, ComputedEffects computedEffects)
         {
             var itemTemplate = TemplateAccessor.GetItemTemplate(itemData.TemplateId);
-            ComputeEffects(itemTemplate, relatedEntity, computedEffects);
+            ComputeEffects(itemTemplate.Variables.Effects, relatedEntity, computedEffects);
 
             if (itemTemplate.Variables.HasProceduralEffects())
             {
-                var proceduralEffects = itemTemplate.Variables.ProceduralEffects();
-                var associatedEffects = itemData.Variables.ProceduralAssociation();
-                ComputeProceduralEffects(proceduralEffects, associatedEffects, itemTemplate, computedEffects, relatedEntity);
+                var proceduralEffects = itemTemplate.Variables.ProceduralEffects;
+                var associatedEffects = itemData.Variables.ProceduralAssociation;
+                ComputeProceduralEffects(proceduralEffects, associatedEffects, itemTemplate.Variables.Effects, computedEffects, relatedEntity);
             }
 
             if (!itemData.Modifications.Any())
@@ -40,7 +34,7 @@ namespace OpenRpg.Genres.Effects
             foreach (var modification in itemData.Modifications)
             {
                 var modificationTemplate = TemplateAccessor.GetModificationTemplate<ItemModificationTemplate>(modification.TemplateId);
-                ComputeEffects(modificationTemplate, relatedEntity, computedEffects);
+                ComputeEffects(modificationTemplate.Variables.Effects, relatedEntity, computedEffects);
             }
         }
 
@@ -50,7 +44,7 @@ namespace OpenRpg.Genres.Effects
             
             if (entity.Variables.HasEquipment())
             {
-                var equipment = entity.Variables.Equipment();
+                var equipment = entity.Variables.Equipment;
                 var equippedItems = equipment.Slots.Values
                     .Where(x => x != null);
 
@@ -60,8 +54,8 @@ namespace OpenRpg.Genres.Effects
 
             if (entity.Variables.HasActiveEffects())
             {
-                var activeEffects = entity.Variables.ActiveEffects().ActiveEffects
-                    .Where(x => x.IsPassiveEffect())
+                var activeEffects = entity.Variables.ActiveEffects.ActiveEffects
+                    .Where(x => x.IsPassiveEffect)
                     .Select(x => x.ToEffect());
                 
                 foreach(var effect in activeEffects)

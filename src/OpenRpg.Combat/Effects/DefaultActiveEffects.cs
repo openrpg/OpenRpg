@@ -20,7 +20,7 @@ namespace OpenRpg.Combat.Effects
         public IReadOnlyCollection<ActiveEffect> ActiveEffects => InternalActiveEffects.Values;
 
         public IReadOnlyCollection<IEffect> Effects => InternalActiveEffects.Values
-                .Where(x => x.IsPassiveEffect())
+                .Where(x => x.IsPassiveEffect)
                 .Select(x => x.ToEffect())
                 .ToArray();
         

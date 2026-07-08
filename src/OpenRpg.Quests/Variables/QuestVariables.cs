@@ -5,9 +5,9 @@ using OpenRpg.Quests.Types;
 
 namespace OpenRpg.Quests.Variables
 {
-    public class QuestVariables : ObjectVariables, ITemplateVariables
+    public class QuestTemplateVariables : ObjectVariables, ITemplateVariables
     {
-        public QuestVariables(IDictionary<int, object> internalVariables = null) : base(QuestVariableTypes.QuestVariables, internalVariables)
+        public QuestTemplateVariables(IDictionary<int, object> internalVariables = null) : base(QuestVariableTypes.QuestTemplateVariables, internalVariables)
         {
         }
     }

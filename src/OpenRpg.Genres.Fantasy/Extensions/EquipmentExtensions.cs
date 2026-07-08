@@ -1,35 +1,94 @@
 using OpenRpg.Genres.Fantasy.Types;
-using OpenRpg.Items;
 using OpenRpg.Items.Equippables;
-using OpenRpg.Items.Equippables.Slots;
 using OpenRpg.Items.Templates;
 
 namespace OpenRpg.Genres.Fantasy.Extensions
 {
     public static class EquipmentExtensions
     {
-        public static ItemData BackSlot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.BackSlot);
-        public static ItemData FootSlot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.FootSlot);
-        public static ItemData HeadSlot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.HeadSlot);
-        public static ItemData NeckSlot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.NeckSlot);
-        public static ItemData Ring1Slot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.Ring1Slot);
-        public static ItemData Ring2Slot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.Ring2Slot);
-        public static ItemData WristSlot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.WristSlot);
-        public static ItemData OffHandSlot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.OffHandSlot);
-        public static ItemData MainHandSlot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.MainHandSlot);
-        public static ItemData LowerBodySlot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.LowerBodySlot);
-        public static ItemData UpperBodySlot(this Equipment equipment) => equipment.Slots.Get(FantasyEquipmentSlotTypes.UpperBodySlot);
+        public static void PopulateFantasySlots(this Equipment equipment)
+        {
+            var slots = equipment.Slots;
+            slots[FantasyEquipmentSlotTypes.HeadSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.BackSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.UpperBodySlot] =  null;
+            slots[FantasyEquipmentSlotTypes.LowerBodySlot] =  null;
+            slots[FantasyEquipmentSlotTypes.FootSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.MainHandSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.OffHandSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.NeckSlot] =  null;
+            slots[FantasyEquipmentSlotTypes.Ring1Slot] =  null;
+            slots[FantasyEquipmentSlotTypes.Ring2Slot] =  null;
+            slots[FantasyEquipmentSlotTypes.WristSlot] =  null;
+        }
+        
+        extension(Equipment equipment)
+        {
+            public ItemData BackSlot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.BackSlot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.BackSlot] = value;
+            }
 
-        public static void BackSlot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.BackSlot] = itemData;
-        public static void FootSlot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.FootSlot] = itemData;
-        public static void HeadSlot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.HeadSlot] = itemData;
-        public static void NeckSlot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.NeckSlot] = itemData;
-        public static void Ring1Slot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.Ring1Slot] = itemData;
-        public static void Ring2Slot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.Ring2Slot] = itemData;
-        public static void WristSlot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.WristSlot] = itemData;
-        public static void OffHandSlot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.OffHandSlot] = itemData;
-        public static void MainHandSlot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.MainHandSlot] = itemData;
-        public static void LowerBodySlot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.LowerBodySlot] = itemData;
-        public static void UpperBodySlot(this Equipment equipment, ItemData itemData) => equipment.Slots[FantasyEquipmentSlotTypes.UpperBodySlot] = itemData;
+            public ItemData FootSlot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.FootSlot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.FootSlot] = value;
+            }
+
+            public ItemData HeadSlot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.HeadSlot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.HeadSlot] = value;
+            }
+
+            public ItemData NeckSlot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.NeckSlot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.NeckSlot] = value;
+            }
+
+            public ItemData Ring1Slot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.Ring1Slot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.Ring1Slot] = value;
+            }
+
+            public ItemData Ring2Slot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.Ring2Slot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.Ring2Slot] = value;
+            }
+
+            public ItemData WristSlot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.WristSlot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.WristSlot] = value;
+            }
+
+            public ItemData OffHandSlot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.OffHandSlot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.OffHandSlot] = value;
+            }
+
+            public ItemData MainHandSlot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.MainHandSlot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.MainHandSlot] = value;
+            }
+
+            public ItemData LowerBodySlot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.LowerBodySlot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.LowerBodySlot] = value;
+            }
+
+            public ItemData UpperBodySlot
+            {
+                get => equipment.Slots.Get(FantasyEquipmentSlotTypes.UpperBodySlot);
+                set => equipment.Slots[FantasyEquipmentSlotTypes.UpperBodySlot] = value;
+            }
+        }
     }
 }

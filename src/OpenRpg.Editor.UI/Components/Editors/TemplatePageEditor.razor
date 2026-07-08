@@ -82,8 +82,8 @@
         var newTemplate = new TTemplate();
         newTemplate.SetId(newId);
         newTemplate.ListifyProperties();
-        newTemplate.Variables.AssetCode($"{AssetCodePrefix}-{newTemplate.Id}");
-        newTemplate.GenerateLocaleCodes(newTemplate.Variables.AssetCode());
+        newTemplate.Variables.AssetCode = $"{AssetCodePrefix}-{newTemplate.Id}";
+        newTemplate.GenerateLocaleCodes(newTemplate.Variables.AssetCode);
         Repository.Create(newTemplate);
 
         OnTemplateCreated.InvokeAsync(newTemplate);
@@ -102,7 +102,7 @@
     {
         Repository.Delete<TTemplate>(CurrentTemplate.Id);
         OnTemplateRemoved.InvokeAsync(CurrentTemplate);
-        await Notifier.ShowNotification($"Deleted {FriendlyName} Template {CurrentTemplate.Variables.AssetCode()}");
+        await Notifier.ShowNotification($"Deleted {FriendlyName} Template {CurrentTemplate.Variables.AssetCode}");
         SelectDefault();
     }
 
@@ -111,11 +111,11 @@
         var clone = Cloner.Clone(CurrentTemplate);
         clone.SetId(GetNewId());
         clone.ListifyProperties();
-        clone.Variables.AssetCode($"{CurrentTemplate.Variables.AssetCode()}-clone");
-        clone.GenerateLocaleCodes(clone.Variables.AssetCode());
+        clone.Variables.AssetCode = $"{CurrentTemplate.Variables.AssetCode}-clone";
+        clone.GenerateLocaleCodes(clone.Variables.AssetCode);
         Repository.Create(clone);
         
-        await Notifier.ShowNotification($"Cloned {FriendlyName} Template {CurrentTemplate.Variables.AssetCode()}");
+        await Notifier.ShowNotification($"Cloned {FriendlyName} Template {CurrentTemplate.Variables.AssetCode}");
         
         OnTemplateCreated.InvokeAsync(clone);
         CurrentTemplate = clone;

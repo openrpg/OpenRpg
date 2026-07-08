@@ -5,6 +5,11 @@ namespace OpenRpg.Core.Extensions
 {
     public static class CollectionExtensions
     {
+        extension<T>(IReadOnlyCollection<T>)
+        {
+            public static IReadOnlyCollection<T> Empty() => Array.Empty<T>();
+        }
+        
         public static void ForEach<TK, TV>(this IDictionary<TK, TV> dictionary, Action<TK, TV> action)
         {
             foreach(var pair in dictionary)
@@ -31,6 +36,19 @@ namespace OpenRpg.Core.Extensions
                 i++;
             }
             return -1;
+        }
+        
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>
+            (this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            var seenKeys = new HashSet<TKey>();
+            foreach (var element in source)
+            {
+                if (seenKeys.Add(keySelector(element)))
+                {
+                    yield return element;
+                }
+            }
         }
     }
 }

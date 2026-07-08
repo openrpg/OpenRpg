@@ -1,11 +1,10 @@
-﻿@using OpenRpg.Core.Associations
-@using OpenRpg.Core.Utils
-@using OpenRpg.Editor.Infrastructure.Helpers
+﻿@using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Editor.UI.Services
 @using OpenRpg.Quests
 
 <ListEditor Data="Rewards" TItem="Reward">
     <HeaderTemplate>
-        <th>>Reward Type</th>
+        <th>Reward Type</th>
         <th>Reward Chance</th>
         <th>Associated Id</th>
         <th>Associated Value</th>
@@ -14,8 +13,8 @@
         <td>
             <div class="control">
                 <div class="select is-fullwidth">
-                    <select bind="@context.RewardType">
-                        @foreach (var rewardType in TypesHelper.GetRewardTypes)
+                    <select @bind="context.RewardType">
+                        @foreach (var rewardType in GenreTypes.RewardTypes)
                         {
                             <option value=@rewardType.Id>@rewardType.Name</option>
                         }
@@ -25,24 +24,26 @@
         </td>
         <td>
             <div class="control">
-                <input class="input" type="text" placeholder="i.e. 0.1 for 10%" bind="@context.RewardChance" />
+                <input class="input" type="text" placeholder="i.e. 0.1 for 10%" @bind="context.RewardChance" />
             </div>
         </td>
-        <td>
-            <div class="control">
-                <input class="input" type="text" @bind:get="@context.Association.AssociatedId"
-                       @bind:set="id => context.Association = new Association(id, context.Association.AssociatedValue)" />
-            </div>
-        </td>
-        <td>
-            <div class="control">
-                <input class="input" type="text"  @bind:get="@context.Association.AssociatedValue"
-                       @bind:set="value => context.Association = new Association(context.Association.AssociatedId, value)" />
-            </div>
-        </td>
+        @{
+            var idOptions = Resolver.GetOptionsFor(AssociationIdContexts.Reward, context.RewardType);
+        }
+        <AssociationEditor Association="context.Association"
+                          AssociationChanged="a => context.Association = a"
+                          IdOptions="idOptions.Options"
+                          IdDisabled="idOptions.Disabled"
+                          ShowDropdown="idOptions.IsMapped" />
     </RowTemplate>
 </ListEditor>
 
-@functions {
+@code {
+    [Inject]
+    public GenreTypesService GenreTypes { get; set; }
+
+    [Inject]
+    public IAssociationIdResolver Resolver { get; set; }
+
     [Parameter] public List<Reward> Rewards { get; set; }
 }

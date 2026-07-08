@@ -1,0 +1,344 @@
+@page "/templates/{TemplateType}"
+
+@using System.Linq
+@using OpenRpg.Core.Templates
+@using OpenRpg.Data
+@using OpenRpg.Editor.Core.Plugins
+@using OpenRpg.Editor.Core.Services.Notifications
+@using OpenRpg.Editor.Infrastructure.Plugins
+@using OpenRpg.Editor.UI.Services
+@using OpenRpg.Editor.Infrastructure.Helpers
+@using OpenRpg.Localization.Data.Repositories
+
+@inject INotifier Notifier
+@inject IRepository Repository
+@inject ILocaleRepository LocaleRepository
+@inject NavigationManager NavigationManager
+@inject GenreService GenreService
+@inject TemplatePageService TemplateService
+
+<style>
+    .template-link {
+        color: #363636 !important;
+        font-weight: 500;
+    }
+    .template-link:hover {
+        background-color: #f5f5f5;
+        color: #363636 !important;
+    }
+    .template-link.is-active {
+        background-color: #3273dc !important;
+        color: white !important;
+    }
+</style>
+
+<div class="columns">
+    <div class="column is-one-fifth">
+        @if (Descriptor != null)
+        {
+            <Accordion Title="Template Actions" IsExpanded="true" HeaderClasses="is-info is-light">
+                <button class="button is-primary is-fullwidth" @onclick="AddTemplate">
+                    <span class="icon"><i class="fas fa-plus"></i></span>
+                    <span>Add New</span>
+                </button>
+                @if (CurrentTemplate != null)
+                {
+                    <button class="button is-info is-fullwidth mt-2" @onclick="CloneTemplate">
+                        <span class="icon"><i class="fas fa-clone"></i></span>
+                        <span>Clone</span>
+                    </button>
+                    <button class="button is-danger is-fullwidth mt-2" @onclick="ShowDeleteConfirmation">
+                        <span class="icon"><i class="fas fa-trash"></i></span>
+                        <span>Delete</span>
+                    </button>
+                }
+            </Accordion>
+            <div class="box">
+                <p class="menu-label">@Descriptor.Name</p>
+                <div class="field mb-2">
+                    <div class="control">
+                        <input class="input is-small" type="text" placeholder="Filter by asset code..." @bind="SearchTerm" @bind:event="oninput" />
+                    </div>
+                </div>
+                @if (PagedTemplates.Count == 0)
+                {
+                    <div class="notification is-warning is-light py-2 my-2">
+                        No matching templates found.
+                    </div>
+                }
+                else
+                {
+                    <ul class="menu-list">
+                        @foreach (var template in PagedTemplates)
+                        {
+                            <li>
+                                <a class="template-link @(CurrentTemplate == template ? "is-active" : "")" @onclick="() => SelectTemplate(template)">
+                                    <span>@GetAssetCode(template)</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                    @if (TotalPages > 1)
+                    {
+                        <div class="is-flex is-justify-content-center is-align-items-center mt-2 is-size-7">
+                            <button class="button is-small" disabled="@(_currentPage <= 1)" @onclick="() => GoToPage(1)" title="First page">
+                                <span class="icon is-small"><i class="fas fa-angle-double-left"></i></span>
+                            </button>
+                            <button class="button is-small" disabled="@(_currentPage <= 1)" @onclick="() => GoToPage(_currentPage - 1)" title="Previous page">
+                                <span class="icon is-small"><i class="fas fa-angle-left"></i></span>
+                            </button>
+                            <span class="px-2 has-text-weight-medium">@_currentPage / @TotalPages</span>
+                            <button class="button is-small" disabled="@(_currentPage >= TotalPages)" @onclick="() => GoToPage(_currentPage + 1)" title="Next page">
+                                <span class="icon is-small"><i class="fas fa-angle-right"></i></span>
+                            </button>
+                            <button class="button is-small" disabled="@(_currentPage >= TotalPages)" @onclick="() => GoToPage(TotalPages)" title="Last page">
+                                <span class="icon is-small"><i class="fas fa-angle-double-right"></i></span>
+                            </button>
+                        </div>
+                    }
+                    <p class="has-text-grey is-size-7 mt-1">@_filteredTemplates.Count total</p>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="box">
+                <p class="content">Select a template type to edit:</p>
+                @foreach (var type in GetTemplateTypes())
+                {
+                    <button class="button is-fullwidth mb-2 is-align-items-center" @onclick="() => NavigateToType(type.Key)">
+                        <span class="icon mr-2">
+                            <i class="fas fa-file-alt"></i>
+                        </span>
+                        <span>@type.Name</span>
+                    </button>
+                }
+            </div>
+        }
+    </div>
+    <div class="column">
+        @if (CurrentTemplate != null && Descriptor != null && _dynamicEditor != null)
+        {
+            <DynamicComponent Type="@_dynamicEditor" Parameters="@_editorParams" />
+        }
+        else if (Descriptor != null)
+        {
+            <div class="notification is-info">
+                No @Descriptor.Name selected. Click "Add New" above to create one.
+            </div>
+        }
+        else
+        {
+            <div class="notification is-warning">
+                Please select a template type from the left panel.
+            </div>
+        }
+    </div>
+</div>
+
+@if (_showDeleteConfirm)
+{
+    <div class="modal is-active">
+        <div class="modal-background" @onclick="CancelDelete"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Delete @(FriendlyName)</p>
+                <button class="delete" aria-label="close" @onclick="CancelDelete"></button>
+            </header>
+            <section class="modal-card-body has-text-dark">
+                <p>Are you sure you want to delete <strong>@GetAssetCode(CurrentTemplate)</strong>?</p>
+                <p class="mt-2">This action cannot be undone.</p>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-danger" @onclick="ConfirmDelete">Delete</button>
+                <button class="button is-light" @onclick="CancelDelete">Cancel</button>
+            </footer>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string TemplateType { get; set; }
+    
+    public DynamicTemplateHelper TemplateHelper { get; private set; }
+
+    private ITemplateTypeDescriptor Descriptor;
+    private ITemplate CurrentTemplate;
+    private string FriendlyName = "";
+
+    private bool _showDeleteConfirm = false;
+    private string _searchTerm = "";
+    private string SearchTerm
+    {
+        get => _searchTerm;
+        set { _searchTerm = value; _currentPage = 1; }
+    }
+    private int _currentPage = 1;
+    private int _pageSize = 10;
+    private List<ITemplate> _allTemplates = new();
+    private List<ITemplate> _filteredTemplates = new();
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling((double)_filteredTemplates.Count / _pageSize));
+    private List<ITemplate> PagedTemplates =>
+        _filteredTemplates.Skip((_currentPage - 1) * _pageSize).Take(_pageSize).ToList();
+
+    private Type _dynamicEditor;
+    private Dictionary<string, object> _editorParams = new();
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrEmpty(TemplateType))
+        {
+            LoadTemplateType();
+        }
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrEmpty(TemplateType))
+        {
+            LoadTemplateType();
+        }
+        else
+        {
+            Descriptor = null;
+            CurrentTemplate = null;
+            _dynamicEditor = null;
+            _editorParams.Clear();
+        }
+        base.OnParametersSet();
+    }
+    
+    private void LoadTemplateType()
+    {
+        TemplateHelper = TemplateService.CreateHelper(TemplateType, out var descriptor);
+        Descriptor = descriptor;
+
+        if (TemplateHelper == null || Descriptor == null) { return; }
+
+        var templateType = Type.GetType(Descriptor.TemplateTypeName);
+        if (templateType == null) { return; }
+
+        var genericEditorType = typeof(DynamicTemplateEditor<>).MakeGenericType(templateType);
+        _dynamicEditor = genericEditorType;
+
+        FriendlyName = Descriptor.Name;
+
+        RefreshTemplateList();
+        CurrentTemplate = _allTemplates.FirstOrDefault();
+
+        UpdateEditorParams();
+
+        if (CurrentTemplate != null)
+        { TemplateHelper.ListifyProperties(CurrentTemplate); }
+        else
+        { AddTemplate(); }
+    }
+
+    private void UpdateEditorParams()
+    {
+        _editorParams = new Dictionary<string, object>
+        {
+            { "Template", CurrentTemplate },
+            { "AssetCodePrefix", Descriptor.AssetCodePrefix },
+            { "ExternalGroups", TemplateService.GetEditorGroups(Descriptor) }
+        };
+    }
+
+    private IEnumerable<ITemplateTypeDescriptor> GetTemplateTypes()
+    {
+        var registry = GenreService.GetTemplateTypeRegistry();
+        return registry.GetTemplateTypes();
+    }
+
+    private void RefreshTemplateList()
+    {
+        _allTemplates = TemplateHelper?.GetAll()?.ToList() ?? new List<ITemplate>();
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        _filteredTemplates = string.IsNullOrEmpty(_searchTerm)
+            ? new List<ITemplate>(_allTemplates)
+            : _allTemplates
+                .Where(t => GetAssetCode(t).Contains(_searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        if (_currentPage > TotalPages) _currentPage = TotalPages;
+    }
+
+    private string GetAssetCode(ITemplate template)
+        => TemplateService.GetAssetCode(template, Descriptor?.AssetCodePrefix);
+
+    private void GoToPage(int page)
+    {
+        _currentPage = Math.Clamp(page, 1, TotalPages);
+    }
+
+    private void NavigateToType(string type)
+    { NavigationManager.NavigateTo($"/templates/{type}"); }
+    
+    private void AddTemplate()
+    {
+        var newTemplate = TemplateService.CreateTemplate(TemplateHelper, Descriptor.AssetCodePrefix);
+        if (newTemplate == null) { return; }
+
+        RefreshTemplateList();
+        CurrentTemplate = newTemplate;
+        UpdateEditorParams();
+        StateHasChanged();
+    }
+
+    private void SelectTemplate(ITemplate template)
+    {
+        TemplateHelper.ListifyProperties(template);
+        CurrentTemplate = template;
+        UpdateEditorParams();
+        StateHasChanged();
+    }
+    
+    private void ShowDeleteConfirmation()
+    { _showDeleteConfirm = true; }
+
+    private void CancelDelete()
+    { _showDeleteConfirm = false; }
+
+    private async Task ConfirmDelete()
+    {
+        if (CurrentTemplate == null) return;
+
+        _showDeleteConfirm = false;
+
+        TemplateService.DeleteTemplate(TemplateHelper, CurrentTemplate);
+        await Notifier.ShowNotification($"Deleted {FriendlyName} Template");
+
+        RefreshTemplateList();
+        CurrentTemplate = _allTemplates.FirstOrDefault();
+
+        if (CurrentTemplate == null)
+        { AddTemplate(); }
+        else
+        { UpdateEditorParams(); }
+
+        StateHasChanged();
+    }
+
+    private async Task CloneTemplate()
+    {
+        if (CurrentTemplate == null) { return; }
+
+        var clone = TemplateService.CloneTemplate(TemplateHelper, CurrentTemplate);
+        if (clone == null) { return; }
+
+        await Notifier.ShowNotification($"Cloned {FriendlyName} Template");
+
+        RefreshTemplateList();
+        CurrentTemplate = clone;
+        UpdateEditorParams();
+        StateHasChanged();
+    }
+
+
+}

@@ -26,19 +26,19 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators.Partial
 
         public void Populate(EntityStatsVariables stats, ComputedEffects computedEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
-            var bluntModifier = stats.Strength() / 100.0f; 
-            var piercingModifier = stats.Dexterity() / 100.0f;
+            var bluntModifier = stats.Strength / 100.0f; 
+            var piercingModifier = stats.Dexterity / 100.0f;
             var slashingOrUnarmedModifier = (bluntModifier + piercingModifier) / 2;
             
-            stats.BluntDamage(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeAttackBonusAmount, FantasyEffectTypes.AllMeleeAttackBonusPercentage, EffectRelationships.BluntDamageRelationship, bluntModifier));
-            stats.PiercingDamage(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeAttackBonusAmount, FantasyEffectTypes.AllMeleeAttackBonusPercentage, EffectRelationships.PiercingDamageRelationship, piercingModifier));
-            stats.SlashingDamage(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeAttackBonusAmount, FantasyEffectTypes.AllMeleeAttackBonusPercentage, EffectRelationships.SlashingDamageRelationship, slashingOrUnarmedModifier));
-            stats.UnarmedDamage(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeAttackBonusAmount, FantasyEffectTypes.AllMeleeAttackBonusPercentage, EffectRelationships.UnarmedDamageRelationship, slashingOrUnarmedModifier));
+            stats.BluntDamage = CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeAttackBonusAmount, FantasyEffectTypes.AllMeleeAttackBonusPercentage, EffectRelationships.BluntDamageRelationship, bluntModifier);
+            stats.PiercingDamage = CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeAttackBonusAmount, FantasyEffectTypes.AllMeleeAttackBonusPercentage, EffectRelationships.PiercingDamageRelationship, piercingModifier);
+            stats.SlashingDamage = CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeAttackBonusAmount, FantasyEffectTypes.AllMeleeAttackBonusPercentage, EffectRelationships.SlashingDamageRelationship, slashingOrUnarmedModifier);
+            stats.UnarmedDamage = CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeAttackBonusAmount, FantasyEffectTypes.AllMeleeAttackBonusPercentage, EffectRelationships.UnarmedDamageRelationship, slashingOrUnarmedModifier);
             
-            stats.BluntDefense(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.BluntDefenseRelationship, bluntModifier));
-            stats.PiercingDefense(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.PiercingDefenseRelationship, piercingModifier));
-            stats.SlashingDefense(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.SlashingDefenseRelationship, slashingOrUnarmedModifier));
-            stats.UnarmedDefense(CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.UnarmedDefenseRelationship, slashingOrUnarmedModifier));
+            stats.BluntDefense = CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.BluntDefenseRelationship, bluntModifier);
+            stats.PiercingDefense = CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.PiercingDefenseRelationship, piercingModifier);
+            stats.SlashingDefense = CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.SlashingDefenseRelationship, slashingOrUnarmedModifier);
+            stats.UnarmedDefense = CalculateStatsWithModifier(computedEffects, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, FantasyEffectTypes.AllMeleeDefenseBonusPercentage, EffectRelationships.UnarmedDefenseRelationship, slashingOrUnarmedModifier);
         }
     }
 }

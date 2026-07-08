@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using OpenRpg.Core.Effects;
 using OpenRpg.Entities.Effects;
@@ -19,7 +20,7 @@ namespace OpenRpg.Entities.Extensions
             computedEffects.EffectResults[effectType] += potency;
         }
 
-        public static void AddDeferred(this ComputedEffects computedEffects, ScaledEffect effect, IHasEffects context)
+        public static void AddDeferred(this ComputedEffects computedEffects, ScaledEffect effect, IReadOnlyCollection<IEffect> context)
         { computedEffects.DeferredEffects.Add(new DeferredEffect() { ScaledEffect = effect, Context = context }); }
 
         public static float Get(this ComputedEffects computedEffects, int effectType)
@@ -53,32 +54,32 @@ namespace OpenRpg.Entities.Extensions
             return totalAmount + totalBonus;
         }
 
-        public static void ComputeDeferredEffects(this ComputedEffects computedEffects, Entity.Entity relatedEntity)
+        public static void ComputeDeferredEffects(this ComputedEffects computedEffects, Entity.EntityData relatedEntityData)
         {
             foreach (var deferredEffect in computedEffects.DeferredEffects)
             {
-                var result = deferredEffect.ComputeDeferredEffect(relatedEntity);
+                var result = deferredEffect.ComputeDeferredEffect(relatedEntityData);
                 computedEffects.Add(result.EffectType, result.Potency);
             }
         }
         
-        public static (int EffectType, float Potency) ComputeDeferredEffect(this DeferredEffect deferredEffect, Entity.Entity relatedEntity)
+        public static (int EffectType, float Potency) ComputeDeferredEffect(this DeferredEffect deferredEffect, Entity.EntityData relatedEntityData)
         {
             float relatedValue = 0;
             if (deferredEffect.ScaledEffect.ScalingType == CoreEffectScalingTypes.StateIndex)
-            { relatedValue = relatedEntity.State.Get(deferredEffect.ScaledEffect.ScalingIndex); }
+            { relatedValue = relatedEntityData.State.Get(deferredEffect.ScaledEffect.ScalingIndex); }
             if (deferredEffect.ScaledEffect.ScalingType == CoreEffectScalingTypes.StatIndex)
-            { relatedValue = relatedEntity.Stats.Get(deferredEffect.ScaledEffect.ScalingIndex); }
+            { relatedValue = relatedEntityData.Stats.Get(deferredEffect.ScaledEffect.ScalingIndex); }
 
             var potency= deferredEffect.ScaledEffect.PotencyFunction.Plot(relatedValue);
             return (deferredEffect.ScaledEffect.EffectType, potency);
         }
 
-        public static void ProcessDeferredEffects(this ComputedEffects computedEffects, Entity.Entity relatedEntity)
+        public static void ProcessDeferredEffects(this ComputedEffects computedEffects, Entity.EntityData relatedEntityData)
         {
             foreach (var deferredEffect in computedEffects.DeferredEffects)
             {
-                var deferredResult = deferredEffect.ComputeDeferredEffect(relatedEntity);
+                var deferredResult = deferredEffect.ComputeDeferredEffect(relatedEntityData);
                 computedEffects.Add(deferredResult.EffectType, deferredResult.Potency);
             }
             computedEffects.DeferredEffects.Clear();

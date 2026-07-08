@@ -1,0 +1,84 @@
+@using OpenRpg.Data
+@using OpenRpg.Data.Conventions.Extensions
+@using OpenRpg.Editor.Core.Components
+@using OpenRpg.Entities.Entity.Templates
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Items.Extensions
+@using OpenRpg.Items.Loot
+@using OpenRpg.Items.Templates
+
+@inject IRepository Repository;
+
+
+@if (LootTable != null)
+{
+    <Accordion Title="Loot Table" IsExpanded="@(LootTable.AvailableLoot.Count > 0)" BadgeCount="@LootTable.AvailableLoot.Count">
+        <table class="table is-fullwidth is-rounded">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Drop Rate</th>
+                    <th>Unique</th>
+                    <th style="max-width: 6em;">
+                        <a class="tag is-primary" @onclick="AddLootEntry">Add</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (LootTable.AvailableLoot.Count == 0)
+                {
+                    <tr>
+                        <td colspan="10000" class="has-text-centered">
+                            <p>No loot entries defined</p>
+                        </td>
+                    </tr>
+                }
+                @foreach (var entry in LootTable.AvailableLoot.ToList())
+                {
+                    <tr @key="entry">
+                        <td>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select @bind="entry.ItemData.TemplateId">
+                                        <option value="0">None</option>
+                                        @foreach (var itemTemplate in Repository.GetAll<ItemTemplate>())
+                                        {
+                                            <option value="@itemTemplate.Id">@itemTemplate.Variables.AssetCode</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="control">
+                                <input class="input" type="text" value="@entry.Variables.DropRate"
+                                       @onchange='e => entry.Variables.DropRate = float.Parse(e.Value?.ToString() ?? "0")' />
+                            </div>
+                        </td>
+                        <td>
+                            <label class="checkbox">
+                                <input type="checkbox" checked="@entry.Variables.IsUnique"
+                                       @onchange="e => entry.Variables.IsUnique = (bool)(e.Value ?? false)" />
+                            </label>
+                        </td>
+                        <td>
+                            <button class="button is-danger" @onclick="x => LootTable.AvailableLoot.Remove(entry)">X</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </Accordion>
+}
+
+@code {
+    [Parameter]
+    public EntityTemplate Template { get; set; }
+    
+    public LootTableData LootTable => Template.Variables.LootTable;
+    
+    void AddLootEntry()
+    {
+        LootTable.AvailableLoot.Add(new LootTableEntry { ItemData = new ItemData() });
+    }
+}

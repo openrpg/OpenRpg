@@ -1,7 +1,13 @@
+using System.Collections.Generic;
+using System.Linq;
 using OpenRpg.Core.Common;
+using OpenRpg.Core.Effects;
+using OpenRpg.Core.Requirements;
 using OpenRpg.Core.Templates;
-using OpenRpg.Entities.Classes.Templates;
-using OpenRpg.Entities.Races.Templates;
+using OpenRpg.Core.Templates.Variables;
+using OpenRpg.Core.Variables.General;
+using OpenRpg.Entities.Extensions;
+using OpenRpg.Entities.Types;
 using OpenRpg.Items.Templates;
 using OpenRpg.Items.TradeSkills.Templates;
 using OpenRpg.Localization.Data.Extensions;
@@ -14,36 +20,12 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
     {
         public static void GenerateLocaleCodes<T>(this T localeEntity, string newAssetCode) where T : IHasLocaleDescription
         {
-            if (localeEntity is ItemTemplate itemTemplate)
-            {
-                itemTemplate.NameLocaleId = $"{newAssetCode}-name";
-                itemTemplate.DescriptionLocaleId = $"{newAssetCode}-description";
-            }
-            else if (localeEntity is ClassTemplate classTemplate)
-            {
-                classTemplate.NameLocaleId = $"{newAssetCode}-name";
-                classTemplate.DescriptionLocaleId = $"{newAssetCode}-description";
-            }
-            else if (localeEntity is RaceTemplate raceTemplate)
-            {
-                raceTemplate.NameLocaleId = $"{newAssetCode}-name";
-                raceTemplate.DescriptionLocaleId = $"{newAssetCode}-description";
-            }
-            else if (localeEntity is Quest quest)
-            {
-                quest.NameLocaleId = $"{newAssetCode}-name";
-                quest.DescriptionLocaleId = $"{newAssetCode}-description";
-            }
-            else if (localeEntity is ItemCraftingTemplate craftingTemplate)
-            {
-                craftingTemplate.NameLocaleId = $"{newAssetCode}-name";
-                craftingTemplate.DescriptionLocaleId = $"{newAssetCode}-description";
-            }
-            else if (localeEntity is ItemGatheringTemplate gatheringTemplate)
-            {
-                gatheringTemplate.NameLocaleId = $"{newAssetCode}-name";
-                gatheringTemplate.DescriptionLocaleId = $"{newAssetCode}-description";
-            }
+            var type = localeEntity.GetType();
+            var nameUpdaterProperty = type.GetProperty(nameof(IHasLocaleDescription.NameLocaleId));
+            var descriptionUpdaterProperty = type.GetProperty(nameof(IHasLocaleDescription.DescriptionLocaleId));
+            
+            nameUpdaterProperty.SetValue(localeEntity, $"{newAssetCode}-name");
+            descriptionUpdaterProperty.SetValue(localeEntity, $"{newAssetCode}-description");
         }
 
         public static void UpdateLocale<T>(this T localeEntity, string newAssetCode, ILocaleRepository repository)
@@ -68,52 +50,38 @@ namespace OpenRpg.Editor.Infrastructure.Extensions
         
         public static void SetId(this IHasDataId dataObject, int id)
         {
-            if (dataObject is ItemTemplate itemTemplate)
-            { itemTemplate.Id = id; }
-            else if (dataObject is ClassTemplate classTemplate)
-            { classTemplate.Id = id; }
-            else if (dataObject is RaceTemplate raceTemplate)
-            { raceTemplate.Id = id; }
-            else if (dataObject is Quest quest)
-            { quest.Id = id; }
-            else if (dataObject is ItemCraftingTemplate craftingTemplate)
-            { craftingTemplate.Id = id; }
-            else if (dataObject is ItemGatheringTemplate gatheringTemplate)
-            { gatheringTemplate.Id = id; }
+            var dataObjectType = dataObject.GetType();
+            var idProperty = dataObjectType.GetProperty("Id");
+            idProperty.SetValue(dataObject, id);
         }
         
         public static void ListifyProperties(this ITemplate template)
         {
+            var variables = template is IHasVariables<ITemplateVariables> hasVars ? hasVars.Variables : null;
+            if (variables != null)
+            {
+                if (!variables.ContainsKey(CoreTemplateVariableTypes.Effects))
+                { variables[CoreTemplateVariableTypes.Effects] = new List<IEffect>(); }
+                if (!variables.ContainsKey(CoreTemplateVariableTypes.Requirements))
+                { variables[CoreTemplateVariableTypes.Requirements] = new List<Requirement>(); }
+            }
+
             if (template is ItemTemplate itemTemplate)
-            {
-                itemTemplate.Effects = itemTemplate.Effects.AsList();
-                itemTemplate.Requirements = itemTemplate.Requirements.AsList();
-                itemTemplate.ModificationAllowances = itemTemplate.ModificationAllowances.AsList();
-            }
-            else if (template is ClassTemplate classTemplate)
-            {
-                classTemplate.Effects = classTemplate.Effects.AsList();
-                classTemplate.Requirements = classTemplate.Requirements.AsList();
-            }
-            else if (template is RaceTemplate raceTemplate)
-            {
-                raceTemplate.Effects = raceTemplate.Effects.AsList();
-                raceTemplate.Requirements = raceTemplate.Requirements.AsList();
-            }
-            else if (template is Quest quest)
+            { itemTemplate.ModificationAllowances = itemTemplate.ModificationAllowances.AsList(); }
+            else if (template is QuestTemplate quest)
             {
                 quest.Gifts = quest.Gifts.AsList();
                 quest.Objectives = quest.Objectives.AsList();
                 quest.Rewards = quest.Rewards.AsList();
-                quest.Requirements = quest.Requirements.AsList();
             }
             else if (template is ItemCraftingTemplate craftingTemplate)
             {
-                craftingTemplate.Requirements = craftingTemplate.Requirements.AsList();
+                craftingTemplate.InputItems = craftingTemplate.InputItems.AsList();
+                craftingTemplate.OutputItems = craftingTemplate.OutputItems.AsList();
             }
             else if (template is ItemGatheringTemplate gatheringTemplate)
             {
-                gatheringTemplate.Requirements = gatheringTemplate.Requirements.AsList();
+                gatheringTemplate.OutputItems = gatheringTemplate.OutputItems.AsList();
             }
         }
     }

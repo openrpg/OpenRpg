@@ -15,8 +15,9 @@ namespace OpenRpg.Genres.Populators.Entity.Stats
         
         public void Populate(EntityStatsVariables stats, ComputedEffects computedEffects, IReadOnlyCollection<IVariables> relatedVars)
         {
-            stats.Defense(computedEffects.CalculateTotalValueFor(GenreEffectTypes.DefenseBonusAmount,
-                GenreEffectTypes.DefenseBonusPercentage));
+            stats.Defense = computedEffects.CalculateTotalValueFor(
+                GenreEffectTypes.DefenseBonusAmount,
+                GenreEffectTypes.DefenseBonusPercentage);
         }
     }
 }

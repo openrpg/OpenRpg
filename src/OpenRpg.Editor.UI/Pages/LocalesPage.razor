@@ -1,0 +1,36 @@
+@page "/locales"
+
+<h1 class="title is-1">Locale Editor</h1>
+
+<div class="box">
+    <div class="content">
+        <p>Manage locale entries for the current project. Locales are key-value pairs where the key is used in templates and the value is the translated text.</p>
+    </div>
+</div>
+
+<div class="tabs is-boxed">
+    <ul>
+        <li class="@(_activeTab == "browse" ? "is-active" : "")">
+            <a @onclick='() => SwitchTab("browse")'>Browse</a>
+        </li>
+        <li class="@(_activeTab == "compare" ? "is-active" : "")">
+            <a @onclick='() => SwitchTab("compare")'>Compare</a>
+        </li>
+        <li class="@(_activeTab == "missing" ? "is-active" : "")">
+            <a @onclick='() => SwitchTab("missing")'>Missing</a>
+        </li>
+    </ul>
+</div>
+
+@if (_activeTab == "browse") { <LocalesBrowseTab /> }
+else if (_activeTab == "compare") { <LocalesCompareTab /> }
+else if (_activeTab == "missing") { <LocalesMissingTab /> }
+
+@code {
+    private string _activeTab = "browse";
+
+    private void SwitchTab(string tab)
+    {
+        _activeTab = tab;
+    }
+}

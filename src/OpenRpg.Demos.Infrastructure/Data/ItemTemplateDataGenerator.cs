@@ -11,17 +11,23 @@ using OpenRpg.Entities.Requirements;
 using OpenRpg.Genres.Fantasy.Types;
 using OpenRpg.Items.Extensions;
 using OpenRpg.Items.Templates;
+using OpenRpg.Tags;
 
 namespace OpenRpg.Demos.Infrastructure.Data
 {
     public class ItemTemplateDataGenerator : IDataGenerator<ItemTemplate>
     {
+        public const int ArmourTag = 1, WeaponTag = 2, HeavyTag = 3, LightTag = 4, MetalTag = 5, WoodTag = 6, LeatherTag = 7, FireTag = 8, IceTag = 9, ConsumableTag = 10;
+
         public IEnumerable<ItemTemplate> GenerateData()
         {
             return new []
             {
                 MakeRubbishSword(),
                 MakeSuperSword(),
+                MakeChest(),
+                MakeBoots(),
+                MakeHelm(),
                 MakePotion(),
                 MakeJunkPotion(),
                 MakeCopperIngot(),
@@ -40,16 +46,17 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Sword",
                 DescriptionLocaleId = "A really bad looking sword, can slay things though",
                 ItemType = FantasyItemTypes.GenericWeapon,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = new[]
-                {
-                    new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
-                }
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
-            template.Variables.Value(10);
-            template.Variables.AssetCode("sword");
+            template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
+            template.Variables.Value = 10;
+            template.Variables.AssetCode = "sword";
+            template.Variables.MaxStacks = 1;
+            template.Variables.Effects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f }
+            };
+            template.Variables.Tags = new TagList(WeaponTag, HeavyTag, MetalTag);
 
             return template;
         }
@@ -71,13 +78,85 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Super Sword",
                 DescriptionLocaleId = "So fancy it could slice through stone",
                 ItemType = FantasyItemTypes.GenericWeapon,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = swordEffects
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.EpicQuality);
-            template.Variables.Value(10000);
-            template.Variables.AssetCode("sword");
+            template.Variables.QualityType = FantasyItemQualityTypes.LegendaryQuality;
+            template.Variables.Value = 10000;
+            template.Variables.AssetCode = "sword";
+            template.Variables.Effects = swordEffects;
+            template.Variables.Tags = new TagList(WeaponTag, HeavyTag, MetalTag, FireTag);
+            
+            return template;
+        }
+        
+        private ItemTemplate MakeChest()
+        {
+            var chestEffects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 20.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.DexterityBonusAmount, Potency = 1.0f }
+            };
+
+            var template = new ItemTemplate
+            {
+                Id = ItemTemplateLookups.Chest,
+                NameLocaleId = "Generic Chest Piece",
+                DescriptionLocaleId = "Its so generic you cannot ascertain what its made of, but its certainly a chest piece",
+                ItemType = FantasyItemTypes.UpperBodyArmour
+            };
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 100;
+            template.Variables.AssetCode = "chest";
+            template.Variables.Effects = chestEffects;
+            template.Variables.Tags = new TagList(ArmourTag, HeavyTag, LeatherTag);
+            
+            return template;
+        }
+        
+        private ItemTemplate MakeBoots()
+        {
+            var bootsEffects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.DexterityBonusAmount, Potency = 1.0f }
+            };
+
+            var template = new ItemTemplate
+            {
+                Id = ItemTemplateLookups.Boots,
+                NameLocaleId = "Muddy Boots",
+                DescriptionLocaleId = "In a way, the dried mud and clay provides extra defense",
+                ItemType = FantasyItemTypes.FootArmour
+            };
+            template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
+            template.Variables.Value = 10;
+            template.Variables.AssetCode = "boots";
+            template.Variables.Effects = bootsEffects;
+            template.Variables.Tags = new TagList(ArmourTag, LightTag, LeatherTag);
+            
+            return template;
+        }
+        
+        private ItemTemplate MakeHelm()
+        {
+            var helmEffects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f },
+                new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 1.0f }
+            };
+
+            var template = new ItemTemplate
+            {
+                Id = ItemTemplateLookups.Helm,
+                NameLocaleId = "Magic Helmet",
+                DescriptionLocaleId = "Wearing it makes you feel stronger",
+                ItemType = FantasyItemTypes.HeadItem
+            };
+            template.Variables.QualityType = FantasyItemQualityTypes.RareQuality;
+            template.Variables.Value = 50;
+            template.Variables.AssetCode = "helm";
+            template.Variables.Effects = helmEffects;
+            template.Variables.Tags = new TagList(ArmourTag, HeavyTag, MetalTag);
             
             return template;
         }
@@ -90,17 +169,17 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Healing Potion",
                 DescriptionLocaleId = "A sketchy looking potion, lets hope it heals you",
                 ItemType = FantasyItemTypes.Potions,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = new[]
-                {
-                new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = 30.0f }
-            }
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.UncommonQuality);
-            template.Variables.Value(20);
-            template.Variables.MaxStacks(5);
-            template.Variables.AssetCode("potion");
+            template.Variables.QualityType = FantasyItemQualityTypes.UncommonQuality;
+            template.Variables.Value = 20;
+            template.Variables.MaxStacks = 5;
+            template.Variables.AssetCode = "potion";
+            template.Variables.Effects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = 30.0f }
+            };
+            template.Variables.Tags = new TagList(ConsumableTag);
 
             return template;
         }
@@ -113,17 +192,17 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Junk Potion Combi-Deal",
                 DescriptionLocaleId = "Who knows whats in this...",
                 ItemType = FantasyItemTypes.Potions,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = new[]
-                {
-                new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = -5.0f }
-            }
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.JunkQuality);
-            template.Variables.Value(0);
-            template.Variables.MaxStacks(5);
-            template.Variables.AssetCode("potion-2");
+            template.Variables.QualityType = FantasyItemQualityTypes.JunkQuality;
+            template.Variables.Value = 0;
+            template.Variables.MaxStacks = 5;
+            template.Variables.AssetCode = "potion-2";
+            template.Variables.Effects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.HealthRestoreAmount, Potency = -5.0f }
+            };
+            template.Variables.Tags = new TagList(ConsumableTag);
             
             return template;
         }
@@ -136,14 +215,13 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Copper Ingot",
                 DescriptionLocaleId = "A block of refined copper",
                 ItemType = FantasyItemTypes.GenericItem,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<StaticEffect>(),
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
-            template.Variables.Value(5);
-            template.Variables.MaxStacks(20);
-            template.Variables.AssetCode("copper-ingot");
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 5;
+            template.Variables.MaxStacks = 20;
+            template.Variables.AssetCode = "copper-ingot";
+            template.Variables.Tags = new TagList(MetalTag);
             
             return template;
         }
@@ -156,14 +234,13 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Copper Ore",
                 DescriptionLocaleId = "A chunk of raw copper ore",
                 ItemType = FantasyItemTypes.GenericItem,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<StaticEffect>(),
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
-            template.Variables.Value(1);
-            template.Variables.MaxStacks(20);
-            template.Variables.AssetCode("copper-ore");
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 1;
+            template.Variables.MaxStacks = 20;
+            template.Variables.AssetCode = "copper-ore";
+            template.Variables.Tags = new TagList(MetalTag);
             
             return template;
         }
@@ -176,14 +253,13 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Iron Ore",
                 DescriptionLocaleId = "A chunk of raw iron ore",
                 ItemType = FantasyItemTypes.GenericItem,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<StaticEffect>(),
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
-            template.Variables.Value(1);
-            template.Variables.MaxStacks(20);
-            template.Variables.AssetCode("iron-ore");
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 1;
+            template.Variables.MaxStacks = 20;
+            template.Variables.AssetCode = "iron-ore";
+            template.Variables.Tags = new TagList(MetalTag);
             
             return template;
         }
@@ -196,14 +272,13 @@ namespace OpenRpg.Demos.Infrastructure.Data
                 NameLocaleId = "Oak Log",
                 DescriptionLocaleId = "A log cut from an Oak tree",
                 ItemType = FantasyItemTypes.GenericItem,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = Array.Empty<StaticEffect>(),
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
-            template.Variables.Value(1);
-            template.Variables.MaxStacks(20);
-            template.Variables.AssetCode("oak-log");
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 1;
+            template.Variables.MaxStacks = 20;
+            template.Variables.AssetCode = "oak-log";
+            template.Variables.Tags = new TagList(WoodTag);
             
             return template;
         }
@@ -213,20 +288,20 @@ namespace OpenRpg.Demos.Infrastructure.Data
             var template = new ItemTemplate
             {
                 Id = ItemTemplateLookups.CopperSword,
-                NameLocaleId = "A crafted copper sword",
+                NameLocaleId = "Copper Sword",
                 DescriptionLocaleId = "An oak hilt with a copper blade",
                 ItemType = FantasyItemTypes.GenericWeapon,
-                ModificationAllowances = Array.Empty<ModificationAllowance>(),
-                Requirements = Array.Empty<Requirement>(),
-                Effects = new[]
-                {
-                    new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 50 }
-                }
+                ModificationAllowances = Array.Empty<ModificationAllowance>()
             };
-            template.Variables.QualityType(FantasyItemQualityTypes.CommonQuality);
-            template.Variables.Value(50);
-            template.Variables.MaxStacks(1);
-            template.Variables.AssetCode("copper-sword");
+            template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+            template.Variables.Value = 50;
+            template.Variables.MaxStacks = 1;
+            template.Variables.AssetCode = "copper-sword";
+            template.Variables.Effects = new[]
+            {
+                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 50 }
+            };
+            template.Variables.Tags = new TagList(WeaponTag, LightTag, MetalTag);
             
             return template;
         }

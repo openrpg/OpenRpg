@@ -1,17 +1,15 @@
-using System;
-using System.Collections.Generic;
-using OpenRpg.Core.Effects;
 using OpenRpg.Core.Templates;
+using OpenRpg.Entities.Modifications.Variables;
 
 namespace OpenRpg.Entities.Modifications.Templates
 {
-    public class ModificationTemplate : ITemplate, IHasEffects
+    public class ModificationTemplate : ITemplate<ModificationTemplateVariables>
     {
         public int Id { get; set; }
         public string NameLocaleId { get; set; }
         public string DescriptionLocaleId { get; set; }
 
-        public IReadOnlyCollection<IEffect> Effects { get; set; } = Array.Empty<IEffect>();
         public int ModificationType { get; set; }
+        public ModificationTemplateVariables Variables { get; set; } = new ModificationTemplateVariables();
     }
 }

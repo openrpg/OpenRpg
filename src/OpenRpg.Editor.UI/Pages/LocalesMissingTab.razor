@@ -1,0 +1,194 @@
+@using OpenRpg.Editor.Infrastructure.Models
+@using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Localization.Data.Repositories
+
+@inject ILocaleComparisonService ComparisonService
+@inject ILocaleRepository Repository
+
+<div class="box">
+    <h2 class="title is-3">Missing Translations</h2>
+
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Source Locale</label>
+        </div>
+        <div class="field-body">
+            <div class="field has-addons">
+                <div class="control">
+                    <div class="select">
+                        <select @bind="_missingSourceLocale" @bind:after="RefreshMissing">
+                            @foreach (var localeCode in _availableLocaleCodes)
+                            {
+                                <option value="@localeCode">@localeCode</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="control">
+                    <button class="button is-info" @onclick="RefreshMissing">
+                        <span class="icon"><i class="fas fa-search" aria-hidden="true"></i></span>
+                        <span>Find Missing</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">Search</label>
+        <div class="control">
+            <input class="input" type="text" placeholder="Filter by locale ID..." @bind="MissingSearchTerm" @bind:event="oninput"/>
+        </div>
+    </div>
+
+    @if (_missingEntries.Count == 0)
+    {
+        <div class="notification is-success">
+            All entries from <code>@(_missingSourceLocale)</code> exist in every other locale. No missing translations found.
+        </div>
+    }
+    else
+    {
+        var missingFiltered = _missingEntries
+            .Where(r => string.IsNullOrEmpty(_missingSearchTerm) || r.LocaleId.Contains(_missingSearchTerm, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        var missingTotalPages = Math.Max(1, (int)Math.Ceiling((double)missingFiltered.Count / _missingPageSize));
+        var missingPaged = missingFiltered.Skip((_missingCurrentPage - 1) * _missingPageSize).Take(_missingPageSize).ToList();
+
+        <p class="mb-3">
+            Found <strong>@_missingEntries.Count</strong> locale IDs present in <code>@(_missingSourceLocale)</code> but missing from one or more other locales.
+        </p>
+
+        <div class="table-container">
+            <table class="table is-fullwidth is-striped is-bordered">
+                <thead>
+                    <tr>
+                        <th class="is-vcentered">Locale Id</th>
+                        <th class="is-vcentered has-text-centered">Source (<code>@(_missingSourceLocale)</code>)</th>
+                        @foreach (var code in _missingTargetCodes)
+                        {
+                            <th class="has-text-centered is-vcentered">
+                                <code>@(code)</code>
+                                <button class="button is-small is-success is-outlined ml-1"
+                                        title="Fill all missing to @(code)"
+                                        @onclick="() => FillAllMissingTo(code)">
+                                    <span class="icon is-small"><i class="fas fa-fill-drip"></i></span>
+                                    <span>Fill All</span>
+                                </button>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in missingPaged)
+                    {
+                        var sourceEntry = row.Entries.FirstOrDefault(e => e.LocaleCode == _missingSourceLocale);
+                        <tr>
+                            <td class="is-vcentered"><code>@(row.LocaleId)</code></td>
+                            <td class="is-vcentered">@sourceEntry?.LocaleText</td>
+                            @foreach (var entry in row.Entries.Where(e => e.LocaleCode != _missingSourceLocale))
+                            {
+                                <td class="is-vcentered has-text-centered">
+                                    @if (entry.Exists)
+                                    {
+                                        <span class="tag is-success">@entry.LocaleText</span>
+                                    }
+                                    else
+                                    {
+                                        <div class="is-flex is-justify-content-center is-align-items-center">
+                                            <span class="tag is-danger mr-1">Missing</span>
+                                            <button class="button is-small is-success"
+                                                    title="Fill from @_missingSourceLocale"
+                                                    @onclick="() => FillSingleMissing(entry.LocaleCode, row.LocaleId)">
+                                                <span class="icon is-small"><i class="fas fa-fill-drip"></i></span>
+                                            </button>
+                                        </div>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (missingTotalPages > 1)
+        {
+            <div class="is-flex is-justify-content-center is-align-items-center mt-2 is-size-7">
+                <button class="button is-small" disabled="@(_missingCurrentPage <= 1)" @onclick="() => { _missingCurrentPage = 1; StateHasChanged(); }" title="First page">
+                    <span class="icon is-small"><i class="fas fa-angle-double-left"></i></span>
+                </button>
+                <button class="button is-small" disabled="@(_missingCurrentPage <= 1)" @onclick="() => { _missingCurrentPage--; StateHasChanged(); }" title="Previous page">
+                    <span class="icon is-small"><i class="fas fa-angle-left"></i></span>
+                </button>
+                <span class="px-2 has-text-weight-medium">@_missingCurrentPage / @missingTotalPages</span>
+                <button class="button is-small" disabled="@(_missingCurrentPage >= missingTotalPages)" @onclick="() => { _missingCurrentPage++; StateHasChanged(); }" title="Next page">
+                    <span class="icon is-small"><i class="fas fa-angle-right"></i></span>
+                </button>
+                <button class="button is-small" disabled="@(_missingCurrentPage >= missingTotalPages)" @onclick="() => { _missingCurrentPage = missingTotalPages; StateHasChanged(); }" title="Last page">
+                    <span class="icon is-small"><i class="fas fa-angle-double-right"></i></span>
+                </button>
+            </div>
+        }
+        <p class="has-text-grey is-size-7 mt-1">@missingFiltered.Count matching entries</p>
+    }
+</div>
+
+@code {
+    private string _missingSourceLocale = "en-gb";
+    private List<CrossLocaleEntry> _missingEntries = new();
+    private List<string> _missingTargetCodes = new();
+    private string _missingSearchTerm = "";
+    private string MissingSearchTerm
+    {
+        get => _missingSearchTerm;
+        set { _missingSearchTerm = value; _missingCurrentPage = 1; }
+    }
+    private int _missingCurrentPage = 1;
+    private int _missingPageSize = 10;
+    private List<string> _availableLocaleCodes = new();
+
+    protected override void OnInitialized()
+    {
+        _missingSourceLocale = Repository.CurrentLocaleCode;
+        LoadAvailableLocales();
+        LoadMissing();
+    }
+
+    private void LoadAvailableLocales()
+    {
+        _availableLocaleCodes = Repository.DataSource.GetLocaleCodes().OrderBy(x => x).ToList();
+        if (!_availableLocaleCodes.Contains(_missingSourceLocale))
+        {
+            _missingSourceLocale = _availableLocaleCodes.FirstOrDefault() ?? "en-gb";
+        }
+    }
+
+    private void LoadMissing()
+    {
+        _missingEntries = ComparisonService.GetMissingTranslations(_missingSourceLocale);
+        _missingTargetCodes = _availableLocaleCodes.Where(c => c != _missingSourceLocale).ToList();
+    }
+
+    private void RefreshMissing()
+    {
+        _missingCurrentPage = 1;
+        LoadAvailableLocales();
+        LoadMissing();
+        StateHasChanged();
+    }
+
+    private void FillSingleMissing(string targetLocaleCode, string localeId)
+    {
+        ComparisonService.CopyToLocale(_missingSourceLocale, targetLocaleCode, new[] { localeId });
+        LoadMissing();
+        StateHasChanged();
+    }
+
+    private void FillAllMissingTo(string targetLocaleCode)
+    {
+        ComparisonService.FillAllMissing(_missingSourceLocale, targetLocaleCode);
+        LoadMissing();
+        StateHasChanged();
+    }
+}

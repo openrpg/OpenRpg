@@ -10,38 +10,50 @@ namespace OpenRpg.Entities.Extensions
     {
         public static bool HasGender(this EntityVariables vars) 
         { return vars.ContainsKey(CoreEntityVariableTypes.Gender); }
-        
-        public static byte Gender(this EntityVariables vars)
-        { return vars.GetByteOrDefault(CoreEntityVariableTypes.Gender, 0); }
 
-        public static void Gender(this EntityVariables vars, byte gender)
-        { vars[CoreEntityVariableTypes.Gender] = gender; }
+        extension(EntityVariables vars)
+        {
+            public byte Gender
+            {
+                get => vars.GetByteOrDefault(CoreEntityVariableTypes.Gender, 0);
+                set => vars[CoreEntityVariableTypes.Gender] = value;
+            }
+        }
         
         public static bool HasRace(this EntityVariables vars) 
         { return vars.ContainsKey(CoreEntityVariableTypes.Race); }
         
-        public static RaceData Race(this EntityVariables vars)
-        { return vars.GetAs<RaceData>(CoreEntityVariableTypes.Race); }
-
-        public static void Race(this EntityVariables vars, RaceData raceDataData)
-        { vars[CoreEntityVariableTypes.Race] = raceDataData; }
+        extension(EntityVariables vars)
+        {
+            public RaceData Race
+            {
+                get => vars.GetAsOrDefaultAndSet(CoreEntityVariableTypes.Race, () => new RaceData());
+                set => vars[CoreEntityVariableTypes.Race] = value;
+            }
+        }
         
         public static bool HasClass(this EntityVariables vars) 
         { return vars.ContainsKey(CoreEntityVariableTypes.Class); }
         
-        public static ClassData Class(this EntityVariables vars)
-        { return vars.GetAs<ClassData>(CoreEntityVariableTypes.Class); }
-
-        public static void Class(this EntityVariables vars, ClassData classDataData)
-        { vars[CoreEntityVariableTypes.Class] = classDataData; }
+        extension(EntityVariables vars)
+        {
+            public ClassData Class
+            {
+                get => vars.GetAsOrDefaultAndSet(CoreEntityVariableTypes.Class, () => new ClassData());
+                set => vars[CoreEntityVariableTypes.Class] = value;
+            }
+        }
         
         public static bool HasMultiClass(this EntityVariables vars) 
         { return vars.ContainsKey(CoreEntityVariableTypes.MultiClasses); }
         
-        public static MultiClasses MultiClass(this EntityVariables vars)
-        { return vars.GetAs<MultiClasses>(CoreEntityVariableTypes.MultiClasses); }
-
-        public static void MultiClass(this EntityVariables vars, MultiClasses multiClasses)
-        { vars[CoreEntityVariableTypes.MultiClasses] = multiClasses; }
+        extension(EntityVariables vars)
+        {
+            public MultiClasses MultiClass
+            {
+                get => vars.GetAsOrDefaultAndSet(CoreEntityVariableTypes.MultiClasses,  () => new MultiClasses());
+                set => vars[CoreEntityVariableTypes.MultiClasses] = value;
+            }
+        }
     }
 }

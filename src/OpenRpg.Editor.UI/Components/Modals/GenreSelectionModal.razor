@@ -1,0 +1,71 @@
+@using OpenRpg.Editor.Core.Plugins
+@using OpenRpg.Editor.UI.Models
+
+<div class="box">
+    <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+        <p class="title is-4 mb-0">Select Genres</p>
+        <button class="delete" aria-label="close" @onclick="() => OnCancelled.InvokeAsync()"></button>
+    </div>
+    <p class="content has-text-dark">Choose the genre plugins to enable for this project:</p>
+    @if (Genres.Any())
+    {
+        @foreach (var genre in Genres)
+        {
+            <div class="control has-text-dark">
+                <label class="checkbox">
+                    <input type="checkbox" @bind="_selectedGenres[genre.PluginId]" />
+                    @genre.Name (@genre.Version)
+                </label>
+                <p class="help">@genre.Description</p>
+            </div>
+        }
+
+        <hr />
+
+        <div class="control has-text-dark">
+            <label class="checkbox">
+                <input type="checkbox" @bind="_generateTypeFiles" />
+                Generate Type Classes
+            </label>
+            <p class="help">Generate C# type classes from template data for compile-time type safety.</p>
+        </div>
+    }
+    else
+    {
+        <div class="notification is-warning">
+            <p>No genre plugins found. Place genre DLLs in the Plugins folder.</p>
+            <p class="content">You can download genre plugins and place them in the <code>Plugins/</code> folder.</p>
+        </div>
+    }
+    <div class="buttons is-right mt-4">
+        <button class="button is-primary" @onclick="Confirm">Create Project</button>
+        <button class="button" @onclick="() => OnCancelled.InvokeAsync()">Cancel</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<EditorPluginInfo> Genres { get; set; }
+
+    [Parameter]
+    public EventCallback<GenreSelectionResult> OnConfirmed { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelled { get; set; }
+
+    public Dictionary<string, bool> _selectedGenres = new();
+    private bool _generateTypeFiles = true;
+
+    protected override void OnParametersSet()
+    {
+        _selectedGenres = Genres.ToDictionary(g => g.PluginId, g => g.IsDefault);
+        base.OnParametersSet();
+    }
+
+    private async Task Confirm()
+    {
+        var enabledGenreIds = _selectedGenres.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
+        var result = new GenreSelectionResult(enabledGenreIds, _generateTypeFiles);
+        await OnConfirmed.InvokeAsync(result);
+    }
+}

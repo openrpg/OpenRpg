@@ -25,10 +25,18 @@ namespace OpenRpg.Localization.Data.DataSources
         {}
 
         public string Get(string localeCode, string id) => LocaleDatasets[localeCode].LocaleData[id];
-        public void Create(string localeCode, string id, string text) => LocaleDatasets[localeCode].LocaleData.Add(id, text);
-        public void Update(string localeCode, string id, string text) => LocaleDatasets[localeCode].LocaleData[id] = text;
+        public void Create(string localeCode, string id, string text) => GetOrCreateDataset(localeCode).LocaleData.Add(id, text);
+        public void Update(string localeCode, string id, string text) => GetOrCreateDataset(localeCode).LocaleData[id] = text;
         public bool Delete(string localeCode, string id) => LocaleDatasets[localeCode].LocaleData.Remove(id);
-        public bool Exists(string localeCode, string id) => LocaleDatasets[localeCode].LocaleData.ContainsKey(id);
-        public LocaleDataset GetLocaleDataset(string localeCode) => LocaleDatasets[localeCode];
+        public bool Exists(string localeCode, string id) => LocaleDatasets.TryGetValue(localeCode, out var dataset) && dataset.LocaleData.ContainsKey(id);
+        public LocaleDataset GetLocaleDataset(string localeCode) => GetOrCreateDataset(localeCode);
+        public IEnumerable<string> GetLocaleCodes() => LocaleDatasets.Keys;
+
+        private LocaleDataset GetOrCreateDataset(string localeCode)
+        {
+            if (!LocaleDatasets.ContainsKey(localeCode))
+            { LocaleDatasets[localeCode] = new LocaleDataset { LocaleCode = localeCode }; }
+            return LocaleDatasets[localeCode];
+        }
     }
 }

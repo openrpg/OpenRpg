@@ -9,8 +9,8 @@ namespace OpenRpg.Genres.Types
         public static readonly int DamageBonusPercentage = 2;
         public static readonly int CriticalRateBonusAmount = 3;
         public static readonly int CriticalRateBonusPercentage = 4;
-        static readonly int CriticalDamageBonusAmount = 5;
-        static readonly int CriticalDamageBonusPercentage = 6;
+        public static readonly int CriticalDamageBonusAmount = 5;
+        public static readonly int CriticalDamageBonusPercentage = 6;
         
         // Pure Defense Types
         public static readonly int DefenseBonusAmount = 21;
@@ -41,6 +41,8 @@ namespace OpenRpg.Genres.Types
         public static readonly int HealthRegenRateBonusPercentage = 73;
         public static readonly int StaminaRegenRateBonusAmount = 74;
         public static readonly int StaminaRegenRateBonusPercentage = 75;
+        public static readonly int LifeRestoreAmount = 76;
+        public static readonly int LifeRestorePercentage = 77;
 
         
         // Ability Related

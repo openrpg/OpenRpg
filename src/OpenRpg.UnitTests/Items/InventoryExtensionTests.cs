@@ -34,13 +34,13 @@ public class InventoryExtensionTests
     {
         var existingItemTemplate = new ItemTemplate { Id = 1 };
         var existingItem = new ItemData() { TemplateId = existingItemTemplate.Id };
-        existingItem.Variables.Amount(startingAmount);
+        existingItem.Variables.Amount = startingAmount;
         
         var inventory = new Inventory();
         inventory.Items.Add(existingItem);
 
         var itemToCheck = new ItemData() { TemplateId = existingItemTemplate.Id };
-        itemToCheck.Variables.Amount(requestAmount);
+        itemToCheck.Variables.Amount = requestAmount;
         var actualThroughAgnosticMethod = inventory.HasItem(itemToCheck);
         var actualFromDirectMethod = inventory.HasItem(existingItemTemplate.Id, requestAmount);
 

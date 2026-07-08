@@ -1,0 +1,475 @@
+@page "/combat/modifier-pipeline"
+
+@using OpenRpg.Combat.Attacks
+@using OpenRpg.Combat.Processors.Attacks.Entity
+@using OpenRpg.Combat.Processors.Modifiers
+@using OpenRpg.Core.Templates
+@using OpenRpg.Core.Utils
+@using OpenRpg.Entities.Entity.Populators.Stats
+@using OpenRpg.Entities.Stats.Variables
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Effects
+@using OpenRpg.Genres.Fantasy.Combat.Modifiers
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Localization.Data.Extensions
+@using OpenRpg.Localization.Data.Repositories
+
+@inject DemoCharacterBuilder CharacterBuilder
+@inject IEntityAttackGenerator AttackGenerator
+@inject IRandomizer Randomizer
+@inject IEntityStatPopulator StatPopulator
+@inject ICharacterEffectProcessor EffectProcessor
+@inject ILocaleRepository LocaleRepository
+@inject ITemplateAccessor TemplateAccessor
+
+<PageTitle>Combat Modifier Pipeline</PageTitle>
+
+<Markdown>
+    ## Combat Modifier Pipeline
+
+    The library ships an `IAttackModifier` interface for "in flight" attack
+    transformations, but deliberately does **not** include a default consumer
+    that chains them. The interface and two built-in implementations exist
+    in `OpenRpg.Combat` and `OpenRpg.Genres.Fantasy.Combat.Modifiers`; it is
+    the caller's job to compose and run them. This page demonstrates the
+    full workflow: the contract, the built-ins, the chain composition, and
+    the step-by-step diff so you can see exactly what each modifier does
+    to the attack as it flows through.
+</Markdown>
+
+<br />
+
+<Markdown>
+    ### The `IAttackModifier` contract
+
+    An `IAttackModifier` has two methods:
+
+    ```csharp
+    public interface IAttackModifier
+    {
+        bool ShouldApply(Attack attack);
+        Attack ModifyValue(Attack attack);
+    }
+    ```
+
+    `ShouldApply(Attack)` is the short-circuit hook. A modifier can opt
+    out per-attack (e.g. "only apply if the attack is critical"). The
+    built-ins always return `true`, but the contract supports conditional
+    application.
+
+    `ModifyValue(Attack)` returns a **new** `Attack`. `Attack` is a record
+    (`public record Attack(bool IsCritical, IReadOnlyList&lt;Damage&gt; Damages)`)
+    so it is immutable. You must use the `with` expression to build a
+    modified copy.
+</Markdown>
+
+<br />
+
+<Markdown>
+    ### The built-in modifiers
+
+    Two implementations ship with the library:
+
+    #### `AddAttackRandomnessModifier` (`OpenRpg.Combat`)
+    Multiplies every `Damage.Value` by a random factor in `[0.75, 1.0]`.
+    Useful for giving attacks some swing without rewriting the generator.
+    Constructor: `AddAttackRandomnessModifier(IRandomizer randomizer)`.
+
+    #### `RemoveDamageTypeModifier` (`OpenRpg.Genres.Fantasy`)
+    Strips a single damage type out of the attack's damage list. Useful
+    for "nullified magic zone" scenarios, anti-magic shields, or
+    light-damage-as-healing-when-typed-as-damage situations.
+    Constructor: `RemoveDamageTypeModifier(int damageType)`.
+
+    > **Note:** `FantasyAttackGenerator` already does its own 5% variance
+    > and critical-hit handling internally (see `ApplyVariance` and
+    > `AttemptToCritical`). Although as with everything you are free
+    > to mix and match functionality as you want to.
+</Markdown>
+
+<br />
+
+<div class="columns">
+    <div class="column is-half">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark">Character (drives the base attack)</h4>
+            <a class="button is-info is-small" @onclick="RandomizeCharacter">Randomize Character</a>
+            <div class="mt-2">
+                <BasicCharacter Character="_attacker" TemplateAccessor="TemplateAccessor" />
+            </div>
+        </CardSection>
+    </div>
+    <div class="column is-half">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark">Modifier Chain</h4>
+            <p class="has-text-grey is-size-7 mb-1">
+                <strong>Active:</strong> @_chainEntries.Count(e => e.IsEnabled) of @_chainEntries.Count
+                &nbsp;<strong>Order:</strong> @ChainOrderSummary
+            </p>
+            <p class="has-text-grey is-size-7 mb-2">
+                Drag a row by its handle to reorder. Uncheck to skip.
+            </p>
+            @foreach (var entry in _chainEntries)
+            {
+                <div class="modifier-row" draggable="true"
+                     @ondragstart="() => OnDragStart(entry)"
+                     @ondragover:preventDefault
+                     @ondrop="() => OnDrop(entry)"
+                     style="padding: 0.4rem; margin-bottom: 0.3rem; border: 1px solid #dbdbdb; border-radius: 4px; background: @(entry.IsEnabled ? "#fff" : "#f5f5f5");">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="cursor: grab; color: #999;">&#9776;</span>
+                        <label style="flex: 1; cursor: pointer;">
+                            <input type="checkbox" @bind="entry.IsEnabled" @bind:after="RebuildPipeline" style="margin-right: 0.4rem;">
+                            <span class="@(entry.IsEnabled ? "has-text-dark" : "has-text-grey")">
+                                <strong>@entry.Name</strong>
+                            </span>
+                            <br />
+                            <span class="has-text-grey is-size-7">@entry.Description</span>
+                        </label>
+                    </div>
+                </div>
+            }
+            <a class="button is-light is-small mt-2" @onclick="ResetChain">Reset to default order</a>
+        </CardSection>
+        
+        <CardSection>
+            <h4 class="title is-5 has-text-dark">Attack Output (after the modifier chain)</h4>
+            <a class="button is-info is-small" @onclick="GenerateAttack">Generate New Attack</a>
+            @if (_finalAttack != null)
+            {
+                <p class="has-text-dark mt-3 mb-1"><strong>IsCritical:</strong> @_finalAttack.IsCritical</p>
+                <p class="has-text-grey is-size-7 mb-1"><strong>Damages:</strong></p>
+                <ul>
+                    @foreach (var damage in _finalAttack.Damages)
+                    {
+                        <li class="has-text-dark">@damage.Value.ToString("F1") @GetDamageTypeName(damage.Type)</li>
+                    }
+                </ul>
+                <p class="has-text-dark mt-2">
+                    <strong>Total damage:</strong> @_finalAttack.Damages.Sum(d => d.Value).ToString("F1")
+                </p>
+            }
+            else
+            {
+                <p class="has-text-grey mt-2">Click "Generate New Attack" to roll a fresh base attack and run the chain.</p>
+            }
+        </CardSection>
+    </div>
+</div>
+
+<br />
+
+<CardSection>
+    <h4 class="title is-5 has-text-dark">Step-by-step diff</h4>
+    <p class="has-text-grey is-size-7 mb-2">
+        Each row shows the state of the attack after one modifier in
+        the chain has run. Removed damages fade out, scaled damages
+        show before/after, and skipped modifiers are marked.
+    </p>
+    @if (_steps == null || _steps.Count == 0)
+    {
+        <p class="has-text-grey">No base attack yet. Click "Generate New Attack" in the Attack Output section above.</p>
+    }
+    else
+    {
+        <div class="table-container">
+            <table class="table is-fullwidth is-striped is-narrow">
+                <thead>
+                    <tr>
+                        <th>Step</th>
+                        <th>Modifier</th>
+                        <th>Status</th>
+                        <th>Damage Type</th>
+                        <th>Before</th>
+                        <th>After</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var stepIndex = 0;
+                    }
+                    @foreach (var step in _steps)
+                    {
+                        var prevStep = stepIndex == 0 ? null : _steps[stepIndex - 1];
+                        var damages = step.Snapshot.Damages.ToList();
+                        var prevDamages = prevStep?.Snapshot.Damages.ToList() ?? new List<Damage>();
+                        var rowCount = damages.Count == 0 ? 1 : damages.Count;
+
+                        @if (damages.Count == 0)
+                        {
+                            <tr>
+                                <td>@stepIndex</td>
+                                <td>@(step.Modifier?.GetType().Name ?? "Base")</td>
+                                <td>@(step.WasApplied ? "applied" : "skipped")</td>
+                                <td class="has-text-grey is-italic">no damages</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        }
+                        else
+                        {
+                            var dmgIndex = 0;
+                            @foreach (var damage in damages)
+                            {
+                                var prevMatch = prevDamages.FirstOrDefault(p => p.Type == damage.Type);
+                                var beforeText = prevDamages.Count == 0
+                                    ? "\u2014"
+                                    : (prevMatch.Type == 0
+                                        ? "removed"
+                                        : prevMatch.Value.ToString("F1"));
+                                var beforeColor = prevMatch.Type == 0
+                                    ? "has-text-danger"
+                                    : "has-text-dark";
+
+                                <tr>
+                                    @if (dmgIndex == 0)
+                                    {
+                                        <td rowspan="@rowCount">@stepIndex</td>
+                                        <td rowspan="@rowCount">@(step.Modifier?.GetType().Name ?? "Base")</td>
+                                        <td rowspan="@rowCount">@(step.WasApplied ? "applied" : "skipped")</td>
+                                    }
+                                    <td>@GetDamageTypeName(damage.Type)</td>
+                                    <td class="@beforeColor">@beforeText</td>
+                                    <td><strong>@damage.Value.ToString("F1")</strong></td>
+                                </tr>
+                                dmgIndex++;
+                            }
+                        }
+                        stepIndex++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</CardSection>
+
+<br />
+
+<Markdown>
+    ### Writing your own modifier
+
+    The simplest conditional modifier is one that only fires on critical
+    hits. The custom modifier below gates on `ShouldApply` and is included
+    in the chain above:
+
+    ```csharp
+    public class DoubleDamageIfCriticalModifier : IAttackModifier
+    {
+        public bool ShouldApply(Attack attack) =&gt; attack.IsCritical;
+
+        public Attack ModifyValue(Attack attack)
+        {
+            var doubled = attack.Damages
+                .Select(d =&gt; d with { Value = d.Value * 2f })
+                .ToList();
+            return attack with { Damages = doubled };
+        }
+    }
+    ```
+
+    Drop it into the chain and the step-by-step diff will show it skip
+    every non-critical attack and double the damages on critical ones.
+</Markdown>
+
+<br />
+
+<Markdown>
+    ### The chain helper
+
+    `OpenRpg.Combat.Processors.Modifiers.AttackModifierPipeline` is a small
+    reusable class that runs a list of modifiers in order, respecting each
+    modifier's `ShouldApply` short-circuit:
+
+    ```csharp
+    var modifiers = new IAttackModifier[]
+    {
+        new AddAttackRandomnessModifier(randomizer),
+        new RemoveDamageTypeModifier(FantasyDamageTypes.FireDamage),
+        new DoubleDamageIfCriticalModifier()
+    };
+
+    var pipeline = new AttackModifierPipeline(modifiers);
+    var finalAttack = pipeline.Apply(baseAttack);
+
+    // Or for a per-step diff:
+    var steps = pipeline.ApplyModifiers(baseAttack);
+    foreach (var step in steps)
+    {
+        Console.WriteLine($"{step.Modifier?.GetType().Name ?? "Base"}: {step.WasApplied}");
+    }
+    ```
+
+    `ApplyModifiers` returns `IReadOnlyList&lt;AttackModifierStep&gt;` where
+    each `AttackModifierStep` carries the snapshot, the modifier that
+    produced it (null for the base), and a `WasApplied` flag.
+</Markdown>
+
+<br />
+
+<Markdown>
+    ### Why `IAttackProcessor` doesnt use Modifiers
+
+    The library deliberately leaves chaining to the caller. There is no
+    `IAttackProcessor` implementation that takes a list of modifiers, and
+    that is by design: the modifier chain is a place where game-specific
+    decisions live.
+
+    - **Ordering matters.** `RemoveDamageTypeModifier(Fire)` runs before or
+      after `AddAttackRandomnessModifier` and you get different outcomes.
+    - **Conditional application is per-game.** A "double damage on crit"
+      modifier is useful in some games, useless in others.
+    - **Scope varies.** A modifier chain might apply to PvP only, or to
+      raid bosses only, or to a specific quest. Hardcoding a single
+      pipeline into `IAttackProcessor` would force every consumer to
+      decide these things the same way.
+
+    If you want a fixed pipeline, wrap it in your own
+    `IAttackProcessor` decorator that internally runs the chain before
+    delegating to `DefaultAttackProcessor`. The `IAttackProcessor` does
+    the math; your decorator decides what shape of attack reaches it.
+</Markdown>
+
+@code {
+    public Character _attacker;
+    public Attack _baseAttack;
+    public Attack _finalAttack;
+    public IReadOnlyList<AttackModifierStep> _steps = new List<AttackModifierStep>();
+    public List<ChainEntry> _chainEntries = new();
+    public AttackModifierPipeline _pipeline;
+
+    public string ChainOrderSummary
+    {
+        get
+        {
+            var activeNames = _chainEntries
+                .Where(e => e.IsEnabled)
+                .Select(e => e.Name)
+                .ToList();
+            return activeNames.Count == 0
+                ? "(no active modifiers)"
+                : string.Join(", ", activeNames);
+        }
+    }
+
+    private ChainEntry _draggedEntry;
+
+    public class ChainEntry
+    {
+        public IAttackModifier Modifier { get; init; }
+        public string Name { get; init; }
+        public string Description { get; init; }
+        public bool IsEnabled { get; set; } = true;
+    }
+
+    public class DoubleDamageIfCriticalModifier : IAttackModifier
+    {
+        public bool ShouldApply(Attack attack) => attack.IsCritical;
+        public Attack ModifyValue(Attack attack) =>
+            attack with
+            {
+                Damages = attack.Damages
+                    .Select(d => d with { Value = d.Value * 2f })
+                    .ToList()
+            };
+    }
+
+    protected override void OnInitialized()
+    {
+        _attacker = CharacterBuilder.CreateNew().Build();
+        var effects = EffectProcessor.ComputeEffects(_attacker);
+        StatPopulator.Populate(_attacker.Stats, effects, null);
+        _baseAttack = AttackGenerator.GenerateAttack(_attacker.Stats);
+
+        _chainEntries = new List<ChainEntry>
+        {
+            new()
+            {
+                Modifier = new AddAttackRandomnessModifier(Randomizer),
+                Name = "Add Attack Randomness",
+                Description = "Multiplies every damage by a random factor in [0.75, 1.0]."
+            },
+            new()
+            {
+                Modifier = new RemoveDamageTypeModifier(FantasyDamageTypes.FireDamage),
+                Name = "Remove Fire Damage",
+                Description = "Strips Fire damage from the attack."
+            },
+            new()
+            {
+                Modifier = new RemoveDamageTypeModifier(FantasyDamageTypes.DarkDamage),
+                Name = "Remove Dark Damage",
+                Description = "Strips Dark damage from the attack."
+            },
+            new()
+            {
+                Modifier = new DoubleDamageIfCriticalModifier(),
+                Name = "Double Damage If Critical",
+                Description = "Skipped on non-crit attacks. Doubles all damages on crits."
+            }
+        };
+
+        RebuildPipeline();
+        base.OnInitialized();
+    }
+
+    public void RandomizeCharacter()
+    {
+        _attacker = CharacterBuilder.CreateNew().Build();
+        var effects = EffectProcessor.ComputeEffects(_attacker);
+        StatPopulator.Populate(_attacker.Stats, effects, null);
+        GenerateAttack();
+    }
+
+    public void GenerateAttack()
+    {
+        _baseAttack = AttackGenerator.GenerateAttack(_attacker.Stats);
+        RebuildPipeline();
+    }
+
+    public void ResetChain()
+    {
+        OnInitialized();
+    }
+
+    public void RebuildPipeline()
+    {
+        var activeModifiers = _chainEntries
+            .Where(e => e.IsEnabled)
+            .Select(e => e.Modifier)
+            .ToList();
+        _pipeline = new AttackModifierPipeline(activeModifiers);
+
+        if (_baseAttack == null)
+        {
+            _steps = new List<AttackModifierStep>();
+            _finalAttack = null;
+            return;
+        }
+
+        _steps = _pipeline.ApplyModifiers(_baseAttack);
+        _finalAttack = _pipeline.Apply(_baseAttack);
+    }
+
+    public void OnDragStart(ChainEntry entry)
+    {
+        _draggedEntry = entry;
+    }
+
+    public void OnDrop(ChainEntry target)
+    {
+        if (_draggedEntry == null || _draggedEntry == target) { return; }
+        var from = _chainEntries.IndexOf(_draggedEntry);
+        var to = _chainEntries.IndexOf(target);
+        if (from < 0 || to < 0) { return; }
+        _chainEntries.RemoveAt(from);
+        _chainEntries.Insert(to, _draggedEntry);
+        _draggedEntry = null;
+        RebuildPipeline();
+    }
+
+    public string GetDamageTypeName(int damageType)
+    {
+        var damageLocaleKey = LocaleDataGenerator.GetKeyFor(LocaleDataGenerator.DamageTypesTextKey, damageType);
+        return LocaleRepository.Get(damageLocaleKey);
+    }
+}

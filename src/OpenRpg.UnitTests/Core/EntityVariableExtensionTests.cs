@@ -15,9 +15,9 @@ public class EntityVariableExtensionTests
         Assert.False(entityVars.HasGender());
         
         var dummyGender = (byte)1;
-        entityVars.Gender(dummyGender);
+        entityVars.Gender = dummyGender;
         Assert.True(entityVars.HasGender());
-        Assert.Equal(entityVars.Gender(), dummyGender);
+        Assert.Equal(entityVars.Gender, dummyGender);
     }
     
     [Fact]
@@ -27,11 +27,20 @@ public class EntityVariableExtensionTests
         Assert.False(entityVars.HasRace());
         
         var dummyRace = new RaceData();
-        entityVars.Race(dummyRace);
+        entityVars.Race = dummyRace;
         Assert.True(entityVars.HasRace());
-        Assert.Equal(entityVars.Race(), dummyRace);
+        Assert.Equal(entityVars.Race, dummyRace);
     }
-    
+
+    [Fact]
+    public void should_use_same_race_instance_on_subsequent_access()
+    {
+        var entityVars = new EntityVariables();
+        var race = entityVars.Race;
+        race.TemplateId = 42;
+        Assert.Equal(42, entityVars.Race.TemplateId);
+    }
+
     [Fact]
     public void should_correctly_handle_class_on_entity()
     {
@@ -39,11 +48,20 @@ public class EntityVariableExtensionTests
         Assert.False(entityVars.HasClass());
         
         var dummyClass = new ClassData();
-        entityVars.Class(dummyClass);
+        entityVars.Class = dummyClass;
         Assert.True(entityVars.HasClass());
-        Assert.Equal(entityVars.Class(), dummyClass);
+        Assert.Equal(entityVars.Class, dummyClass);
     }
-    
+
+    [Fact]
+    public void should_use_same_class_instance_on_subsequent_access()
+    {
+        var entityVars = new EntityVariables();
+        var classData = entityVars.Class;
+        classData.TemplateId = 99;
+        Assert.Equal(99, entityVars.Class.TemplateId);
+    }
+
     [Fact]
     public void should_correctly_handle_multiclass_on_entity()
     {
@@ -51,8 +69,17 @@ public class EntityVariableExtensionTests
         Assert.False(entityVars.HasMultiClass());
         
         var dummyMultiClass = new MultiClasses();
-        entityVars.MultiClass(dummyMultiClass);
+        entityVars.MultiClass = dummyMultiClass;
         Assert.True(entityVars.HasMultiClass());
-        Assert.Equal(entityVars.MultiClass(), dummyMultiClass);
+        Assert.Equal(entityVars.MultiClass, dummyMultiClass);
+    }
+
+    [Fact]
+    public void should_use_same_multiclass_instance_on_subsequent_access()
+    {
+        var entityVars = new EntityVariables();
+        var multiClass = entityVars.MultiClass;
+        multiClass.Classes.Add(new ClassData());
+        Assert.Single(entityVars.MultiClass.Classes);
     }
 }

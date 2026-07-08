@@ -1,216 +1,334 @@
 @page "/items/item-modifications"
 
-@using OpenRpg.Core.Associations
+@using System
+@using System.Collections.Generic
+@using System.Linq
 @using OpenRpg.Core.Effects
-@using OpenRpg.Core.Requirements
 @using OpenRpg.Core.Templates
-@using OpenRpg.Core.Utils
-@using OpenRpg.Demos.Infrastructure.Extensions
-@using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Demos.Infrastructure.Data
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Extensions
-@using OpenRpg.Entities.Requirements
-@using OpenRpg.Genres.Characters
+@using OpenRpg.Entities.Modifications
+@using OpenRpg.Entities.Modifications.Templates
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
+@using OpenRpg.Localization.Data.Repositories
 
-@inject DemoCharacterBuilder CharacterBuilder;
-@inject ITemplateAccessor TemplateAccessor;
+@inject ITemplateAccessor TemplateAccessor
+@inject ILocaleRepository LocaleRepository
 
 <Markdown>
-    ## Modifications In General
-    Modifications allow more effects to be added to an item via a pla
-    - Characters data
-    - Game State data
+    ## Item Modifications
+    Modifications allow items to be customised at runtime by adding gems, enchantments, or runes to modification slots.
+    Each modification adds its own effects which are aggregated into the item's total stats.
 
-    So for example lets say you have a sword that the player can only use once he has beaten a boss or got to a certain level.
-    You would need to be able to verify these requirements against the characters data as well as the game state data. As
-    in some cases you may have multiple characters in party based games, so while you would only have 1 game state tied to the
-    player, each character can have different class/race/level/stat data etc.
-
-    So for now lets ignore game state data, as we will cover that in quests and instead look at requirements that the character
-    may or may not meet.
+    The system has three parts:
+    1. **`ModificationAllowances`** on the item template: defines which modification types and how many can be applied (the "sockets")
+    2. **`ItemModificationData`** on the item instance: stores which modifications have been applied
+    3. **`ItemModificationTemplate`**: defines the effects each modification provides
 </Markdown>
 <br />
+
 <CardSection>
     <Markdown Containerless="true">
-        ## Random Character vs Item Requirements
-        So in this scenario here we will let you randomly generate a character (As we have already covered how to make and manage characters),
-        and have 2 items to see how the item requirements are met/failed based upon the characters data.
+        ### Modification Allowances
+        An item template declares its modification slots via `ModificationAllowances`. Each slot specifies a
+        `ModificationType` (gem, enchantment, rune) and how many of that type are allowed.
+    </Markdown>
+    <div class="columns">
+        <div class="column">
+            <h5 class="title is-5 has-text-dark">Sword With Slots</h5>
+            <p class="has-text-dark">This sword has 2 gem slots and 1 enchantment slot:</p>
+            <div class="tags mt-2">
+                <span class="tag is-success">Gem × 2</span>
+                <span class="tag is-info">Enchantment × 1</span>
+            </div>
+        </div>
+        <div class="column">
+            <h5 class="title is-5 has-text-dark">Basic Sword</h5>
+            <p class="has-text-dark">This sword has no modification slots:</p>
+            <div class="tags mt-2">
+                <span class="tag is-dark">No slots</span>
+            </div>
+        </div>
+    </div>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Interactive Demo: Apply Modifications
+        Click a modification below to apply it to an available slot on the sword. Click an applied modification to remove it.
+        Watch how the effects change as modifications are added and removed.
     </Markdown>
     <br />
-    <a class="button is-info" @onclick="RandomizeCharacter">Regenerate Character</a>
-</CardSection>
+    <div class="columns">
+        <div class="column is-half">
+            <h5 class="title is-5 has-text-dark has-text-centered">@_swordTemplate.NameLocaleId</h5>
+            <div class="has-text-centered mb-3">
+                <figure class="image is-64x64 item-border with-rounding item-quality-@(_swordQuality)" style="display:inline-block">
+                    <img src="images/items/@(_swordTemplate.Variables.AssetCode).png" alt="Sword">
+                </figure>
+            </div>
 
-<br />
-<div class="columns">
-    <div class="column">
-        <BasicCharacter Character="@_randomCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
+            <h6 class="title is-6 has-text-dark">Base Effects</h6>
+            <EffectList Effects="_baseEffects"></EffectList>
+
+            @if (_appliedModifications.Any())
+            {
+                <h6 class="title is-6 has-text-dark mt-3">Modification Effects</h6>
+                @foreach (var mod in _appliedModifications)
+                {
+                    var modTemplate = GetModificationTemplate(mod.TemplateId);
+                    <div class="notification is-light is-success py-1 px-2 mb-1">
+                        <span class="has-text-weight-semibold">@(modTemplate?.NameLocaleId ?? "Unknown"):</span>
+                        @foreach (var effect in modTemplate?.Variables.Effects?.OfType<StaticEffect>() ?? Enumerable.Empty<StaticEffect>())
+                        {
+                            <span class="tag is-small is-success is-light ml-1">@FormatEffect(effect)</span>
+                        }
+                        <span class="delete is-pulled-right" style="cursor:pointer;top:8px;" @onclick="() => RemoveModification(mod)"></span>
+                    </div>
+                }
+            }
+
+            <h6 class="title is-6 has-text-dark mt-3">Total Effects (@_totalEffects.Count())</h6>
+            <EffectList Effects="_totalEffects"></EffectList>
+        </div>
+        <div class="column is-half">
+            <h6 class="title is-6 has-text-dark">Available Modifications</h6>
+            <div class="tags">
+                @foreach (var mod in _allModificationTemplates)
+                {
+                    var isApplied = _appliedModifications.Any(a => a.TemplateId == mod.Id);
+                    var canApply = !isApplied && CanApplyModification(mod);
+                    <span class="tag @(isApplied ? "is-success" : canApply ? "is-info is-light" : "is-dark is-light")"
+                          style="cursor:@(canApply ? "pointer" : "not-allowed")"
+                          title="@(mod.DescriptionLocaleId)"
+                          @onclick="() => { if(canApply) ApplyModification(mod); }">
+                        @(mod.NameLocaleId)
+                    </span>
+                }
+            </div>
+
+            <h6 class="title is-6 has-text-dark mt-4">Available Slots</h6>
+            <div class="tags">
+                @foreach (var slot in _swordTemplate.ModificationAllowances)
+                {
+                    var typeName = GetModificationTypeName(slot.ModificationType);
+                    var appliedCount = _appliedModifications.Count(a => GetModificationTemplate(a.TemplateId)?.ModificationType == slot.ModificationType);
+                    <span class="tag @(appliedCount >= slot.AmountAllowed ? "is-warning" : "is-success")">
+                        @typeName: @appliedCount / @slot.AmountAllowed used
+                    </span>
+                }
+            </div>
+        </div>
     </div>
-    <div class="column">
-        <ItemTemplateDetails Item="_item1WithRequirement" Character="_randomCharacter"></ItemTemplateDetails>
-        <br />
-        <ItemTemplateDetails Item="_item2WithRequirements" Character="_randomCharacter"></ItemTemplateDetails>
-    </div>
-</div>
+</CardSection>
 <br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### A Basic Sword (No Slots)
+        Not all items support modifications. This sword has no `ModificationAllowances` so nothing can be applied.
+    </Markdown>
+    <br />
+    <div class="columns">
+        <div class="column is-half">
+            <h5 class="title is-5 has-text-dark has-text-centered">@_basicSwordTemplate.NameLocaleId</h5>
+            <div class="has-text-centered mb-3">
+                <figure class="image is-64x64 item-border with-rounding item-quality-@(_basicSwordQuality)" style="display:inline-block">
+                    <img src="images/items/@(_basicSwordTemplate.Variables.AssetCode).png" alt="Basic Sword">
+                </figure>
+            </div>
+            <h6 class="title is-6 has-text-dark">Effects</h6>
+            <EffectList Effects="_basicSwordEffects.ToArray()"></EffectList>
+        </div>
+        <div class="column is-half">
+            <h6 class="title is-6 has-text-dark">Modification Slots</h6>
+            <div class="tags">
+                <span class="tag is-dark">None</span>
+            </div>
+            <p class="has-text-grey mt-2">This item has no modification slots. It cannot be customised.</p>
+        </div>
+    </div>
+</CardSection>
+<br />
+
 <Markdown>
-    ## The Requirements Checking
-    So we have 2 bits of code running here, one is:
+    ## How It Works In Code
 
+    #### Defining modification slots on an item template
     ```csharp
-    var areRequirementsMet = RequirementsChecker.AreRequirementsMet(Character, Item.Template);
+    var swordTemplate = new ItemTemplate
+    {
+        ModificationAllowances = new[]
+        {
+            new ModificationAllowance { ModificationType = FantasyModificationTypes.GemModification, AmountAllowed = 2 },
+            new ModificationAllowance { ModificationType = FantasyModificationTypes.EnchantmentModification, AmountAllowed = 1 }
+        }
+    };
     ```
 
-    This is an extension method that checks the item templates requirements against the character and if not met you get the red
-    border and background, then at the requirement level there is:
-
+    #### Applying a modification to an item instance
     ```csharp
-    var isRequirementMet = RequirementsChecker.IsRequirementMet(Character, requirement);
+    var itemData = new ItemData { TemplateId = swordTemplate.Id };
+    var modifications = new List&lt;ItemModificationData&gt;
+    {
+        new ItemModificationData(fireGemTemplate.Id)
+    };
+    itemData.Modifications = modifications;
     ```
 
-    This checks an individial requirement and colours it red or green on the item requirement listing.
-
-    As almost anything can have requirements applied, be it races, classes, items, quests, modifications, effects etc you can really
-    customize how the player can make use of and unlock certain items via progression/stats etc. We didn't cover one of the other parts
-    of requirements checking which is quest related, but we will do that later when we learn more about quests.
+    #### Resolving total effects
+    ```csharp
+    // Aggregates base effects + procedural effects + modification effects
+    var allEffects = itemData.GetEffects(templateAccessor);
+    ```
 </Markdown>
-<br />
-<CardSection>
-    <Markdown Containerless="true">
-        ## Effect Requirements
-        Just to really show some of the configurability here lets also add in an effect based requirement, so the item
-        has a basic requirement at item level, but also has some effects which are locked until requirements are met.
-        
-        In this instance you could potentially use the item but have some of the effects locked out.
-        
-        > You may notice the characters stats are not changing as the item is not equipped on the character so its not
-        factoring those details into the characters stats at all.
-    </Markdown>
-    <br />
-    <a class="button is-info" @onclick="RandomizeCharacter">Regenerate Character</a>
-</CardSection>
 
-<br />
-<div class="columns">
-    <div class="column">
-        <BasicCharacter Character="@_randomCharacter" TemplateAccessor="TemplateAccessor"></BasicCharacter>
-    </div>
-    <div class="column">
-        <ItemTemplateDetails Item="_item3WithEffectRequirements" Character="_randomCharacter"/>
-    </div>
-</div>
 @code {
-    private Character _randomCharacter;
-    private ItemTemplate _item1WithRequirement, _item2WithRequirements, _item3WithEffectRequirements;
+    private ItemTemplate _swordTemplate;
+    private ItemTemplate _basicSwordTemplate;
+    private List<ItemModificationData> _appliedModifications = new();
+    private IReadOnlyCollection<ItemModificationTemplate> _allModificationTemplates;
+    private IReadOnlyCollection<IEffect> _baseEffects = [];
+    private IReadOnlyCollection<IEffect> _totalEffects = [];
+    private IReadOnlyCollection<IEffect> _basicSwordEffects = [];
+    private int _swordQuality;
+    private int _basicSwordQuality;
 
     protected override void OnInitialized()
     {
-        RandomizeCharacter();
-        _item1WithRequirement = MakeItem1WithRequirement();
-        _item2WithRequirements = MakeItem2WithRequirement();
-        _item3WithEffectRequirements = MakeItem3WithRequirement();
+        _allModificationTemplates = TemplateAccessor.GetAll<ItemModificationTemplate>().ToList();
 
-        base.OnInitialized();
+        _swordTemplate = MakeSwordWithSlots();
+        _basicSwordTemplate = MakeBasicSword();
+
+        _swordQuality = _swordTemplate.Variables.QualityType;
+        _basicSwordQuality = _basicSwordTemplate.Variables.QualityType;
+
+        RecalculateEffects();
+        _basicSwordEffects = _basicSwordTemplate.Variables.Effects.GetStaticEffects();
     }
 
-    private ItemTemplate MakeItem1WithRequirement()
+    private ItemTemplate MakeSwordWithSlots()
     {
         var template = new ItemTemplate
         {
-            Id = 1,
-            NameLocaleId = "Staff Of Hitting",
-            DescriptionLocaleId = "A staff for hitting things, got gold bits on but still looks rubbish",
+            Id = 9001,
+            NameLocaleId = "Socketed Sword",
+            DescriptionLocaleId = "A finely crafted sword with magical sockets for gems and enchantments",
             ItemType = FantasyItemTypes.GenericWeapon,
-            Requirements = new[]
+            ModificationAllowances = new[]
             {
-                new Requirement {RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 10) }
-                },
-            Effects = new[]
-            {
-                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 30.0f },
-                new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 3.0f }
+                new ModificationAllowance { ModificationType = FantasyModificationTypes.GemModification, AmountAllowed = 2 },
+                new ModificationAllowance { ModificationType = FantasyModificationTypes.EnchantmentModification, AmountAllowed = 1 }
             }
         };
-        template.Variables.QualityType(FantasyItemQualityTypes.UncommonQuality);
-        template.Variables.Value(150);
-        template.Variables.AssetCode("staff");
-
+        template.Variables.QualityType = FantasyItemQualityTypes.RareQuality;
+        template.Variables.Value = 500;
+        template.Variables.AssetCode = "sword";
+        template.Variables.Effects = new[]
+        {
+            new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 45.0f },
+            new StaticEffect { EffectType = FantasyEffectTypes.StrengthBonusAmount, Potency = 3.0f }
+        };
         return template;
     }
 
-    private ItemTemplate MakeItem2WithRequirement()
+    private ItemTemplate MakeBasicSword()
     {
         var template = new ItemTemplate
         {
-            Id = 1,
-            NameLocaleId = "Wizardy Wand",
-            DescriptionLocaleId = "A super special wand with some gem on the end that can only be used by the strongest of wizardy woos",
+            Id = 9002,
+            NameLocaleId = "Iron Sword",
+            DescriptionLocaleId = "A plain iron sword with no magical sockets",
             ItemType = FantasyItemTypes.GenericWeapon,
-            Requirements = new Requirement[]
-            {
-                new Requirement { RequirementType = FantasyRequirementTypes.ClassRequirement, Association = new Association(ClassTypeLookups.Mage, 3) },
-            },
-            Effects = new[]
-            {
-                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 15.0f },
-                new StaticEffect { EffectType = FantasyEffectTypes.DarkDamageAmount, Potency = 30.0f },
-                new StaticEffect { EffectType = FantasyEffectTypes.IntelligenceBonusAmount, Potency = 5.0f },
-                new StaticEffect { EffectType = FantasyEffectTypes.ManaBonusAmount, Potency = 40.0f }
-            }
+            ModificationAllowances = Array.Empty<ModificationAllowance>()
         };
-        template.Variables.QualityType(FantasyItemQualityTypes.RareQuality);
-        template.Variables.Value(300);
-        template.Variables.AssetCode("wand");
-
-        return template;
-    }
-
-    private ItemTemplate MakeItem3WithRequirement()
-    {
-        var template = new ItemTemplate
+        template.Variables.QualityType = FantasyItemQualityTypes.CommonQuality;
+        template.Variables.Value = 50;
+        template.Variables.AssetCode = "sword";
+        template.Variables.Effects = new[]
         {
-            Id = 1,
-            NameLocaleId = "Sword For The Strong",
-            DescriptionLocaleId = "A sword that can only unlock its full power for those with high strength",
-            ItemType = FantasyItemTypes.GenericWeapon,
-            Requirements = new[]
-            {
-                new Requirement { RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 8) },
-            },
-            Effects = new[]
-            {
-                new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 20 },
-                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 5.0f, Requirements = new []
-            {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 9)}
-                }},
-                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 7.5f, Requirements = new []
-            {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 10) }
-                }},
-                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 10.0f, Requirements = new []
-            {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 11)}
-                }},
-                new StaticEffect { EffectType = FantasyEffectTypes.DefenseBonusAmount, Potency = 12.5f, Requirements = new []
-            {
-                    new Requirement{RequirementType = FantasyRequirementTypes.StrengthRequirement, Association = new Association(0, 12)}
-                }},
-            }
+            new StaticEffect { EffectType = FantasyEffectTypes.DamageBonusAmount, Potency = 20.0f }
         };
-        template.Variables.QualityType(FantasyItemQualityTypes.EpicQuality);
-        template.Variables.Value(1000);
-        template.Variables.AssetCode("sword");
-
         return template;
     }
 
-    public void RandomizeCharacter()
+    private void ApplyModification(ItemModificationTemplate modTemplate)
     {
-        _randomCharacter = CharacterBuilder.CreateNew().Build();
-        StateHasChanged();
+        var modData = new ItemModificationData(modTemplate.Id);
+        _appliedModifications.Add(modData);
+        RecalculateEffects();
     }
 
+    private void RemoveModification(ItemModificationData modData)
+    {
+        _appliedModifications.Remove(modData);
+        RecalculateEffects();
+    }
+
+    private bool CanApplyModification(ItemModificationTemplate modTemplate)
+    {
+        var matchingSlot = _swordTemplate.ModificationAllowances
+            .FirstOrDefault(s => s.ModificationType == modTemplate.ModificationType);
+        if (matchingSlot == null) return false;
+
+        var currentCount = _appliedModifications.Count(a =>
+            GetModificationTemplate(a.TemplateId)?.ModificationType == modTemplate.ModificationType);
+        return currentCount < matchingSlot.AmountAllowed;
+    }
+
+    private void RecalculateEffects()
+    {
+        _baseEffects = _swordTemplate.Variables.Effects.GetStaticEffects();
+
+        var modEffects = new List<IEffect>();
+        foreach (var mod in _appliedModifications)
+        {
+            var modTemplate = GetModificationTemplate(mod.TemplateId);
+            if (modTemplate?.Variables?.Effects != null)
+            {
+                modEffects.AddRange(modTemplate.Variables.Effects);
+            }
+        }
+
+        _totalEffects = _baseEffects.Concat(modEffects).ToList();
+    }
+
+    private ItemModificationTemplate GetModificationTemplate(int templateId)
+    {
+        return _allModificationTemplates.FirstOrDefault(t => t.Id == templateId);
+    }
+
+    private string GetModificationTypeName(int modificationType)
+    {
+        if (modificationType == FantasyModificationTypes.GemModification) return "Gem";
+        if (modificationType == FantasyModificationTypes.EnchantmentModification) return "Enchantment";
+        if (modificationType == FantasyModificationTypes.RuneModification) return "Rune";
+        return "Unknown";
+    }
+
+    private string FormatEffect(StaticEffect effect)
+    {
+        var effectType = effect.EffectType;
+        string effectName;
+
+        if (effectType == FantasyEffectTypes.DamageBonusAmount) effectName = "Damage";
+        else if (effectType == FantasyEffectTypes.StrengthBonusAmount) effectName = "STR";
+        else if (effectType == FantasyEffectTypes.DexterityBonusAmount) effectName = "DEX";
+        else if (effectType == FantasyEffectTypes.IntelligenceBonusAmount) effectName = "INT";
+        else if (effectType == FantasyEffectTypes.ConstitutionBonusAmount) effectName = "CON";
+        else if (effectType == FantasyEffectTypes.FireDamageAmount) effectName = "Fire Damage";
+        else if (effectType == FantasyEffectTypes.IceDamageAmount) effectName = "Ice Damage";
+        else if (effectType == FantasyEffectTypes.EarthDamageAmount) effectName = "Earth Damage";
+        else if (effectType == FantasyEffectTypes.WindDamageAmount) effectName = "Wind Damage";
+        else if (effectType == FantasyEffectTypes.LightDamageAmount) effectName = "Light Damage";
+        else if (effectType == FantasyEffectTypes.DarkDamageAmount) effectName = "Dark Damage";
+        else effectName = $"Effect-{effectType}";
+
+        return $"+{effect.Potency:F0} {effectName}";
+    }
 }

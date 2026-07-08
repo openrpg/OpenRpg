@@ -37,13 +37,14 @@ namespace OpenRpg.Items.Extensions
         public static LootTableEntry GenerateLootTableEntry(this ItemData itemData, float dropRate = 1, bool isUnique = false, IReadOnlyCollection<Requirement> requirements = null)
         {
             var variables = new LootTableEntryVariables();
-            variables.DropRate(dropRate);
-            variables.IsUnique(isUnique);
+            variables.DropRate = dropRate;
+            variables.IsUnique = isUnique;
+            if(requirements is not null)
+            { variables.Requirements = requirements; }
 
             return new LootTableEntry
             {
                 ItemData = itemData,
-                Requirements = requirements ?? Array.Empty<Requirement>(),
                 Variables = variables
             };
         }

@@ -1,49 +1,509 @@
 ﻿@page "/combat/damages"
+
+@using OpenRpg.Combat.Attacks
+@using OpenRpg.Combat.Processors.Attacks
+@using OpenRpg.Entities.Stats.Variables
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Fantasy.Types
+
+@inject IAttackProcessor<EntityStatsVariables> AttackProcessor
+
 <Markdown>
     ## Damages, Attacks & Defenses
 
-    Before we wade into combat its worth quickly covering what damages/defenses are and how they work as well as how they relate to attacks, 
-    as the combat system is heavily based upon the concept of damages and attacks.
-</Markdown>
-<br/>
-<Markdown>
-    ### `Damage` component
-    This is quite a simple object and purely contains the type of damage with the value of the damage.
+    The combat system is built on three small records. A `Damage` is `(int Type, float Value)`: a
+    damage type id and an amount. An `Attack` is `(bool IsCritical, IReadOnlyList&lt;Damage&gt; Damages)`:
+    a multi-type bundle that may deal several kinds of damage in one hit (e.g. a flaming sword deals
+    slashing + fire). "Defense" is not an object; it is a per-type float on the target's
+    `EntityStatsVariables` (e.g. `FireDefense`, `IceDefense`).
 
-    The concept behind it is that an overall attack can be broken down into various types of damage which may be from different
-    sources. For example lets say you have a flaming sword, rather than just do a blanket 10 damage you may do 8 slashing damage
-    and 2 fire damage.
-
-    > As with most examples we are drawing off the pre-made example damage types which can be found within the [OpenRpg.Fantasy](https://github.com/openrpg/OpenRpg.Fantasy/blob/master/src/OpenRpg.Genres.Fantasy/Types/DamageTypes.cs) repo.
-
-    You are free to have as few or many damage types as you want, as ultimately its just an `int` describing the type of the damage
-    then the amount of associated damage that goes with that.
-    
-    The damage is just the start of the combat journey though as damage itself is just seen as the raw damage you have output,
-    it needs to be processed further down the line against a potential target to see how much of that damage is actually applied.
+    The library ships a single `IAttackProcessor&lt;T&gt;` that takes an `Attack` and the defender's
+    stats and returns a `ProcessedAttack` with the damage done and damage defended per type. The
+    defence model is **subtractive**: each `Defense` stat is subtracted from the incoming
+    `Damage`, clamped at 0. There is no built-in type-vs-type effectiveness multiplier (Fire 2x
+    vs Earth etc.); that is a *what-if* layer you could add on top, and Section 3 below visualises
+    it without claiming it is library behaviour.
 </Markdown>
-<br/>
-<Markdown>
-    ### `Attack` component
-    The Attack object contains all the applicable damage types and their amounts via the `Damage` object.
+<br />
 
-    The idea is that you generate an `Attack` for a character which can then be applied to 1-N sources, so this way you may
-    have your flaming sword dealing 8 slashing and 2 fire damage as an AoE to 3 targets who are in range, however each of 
-    those 3 targets may have different defense so after its all been processed you may do far less damage to each of the 
-    targets.
-    
-    > We will cover attacks more in the next section as we need to discuss `IAttackGenerator` and `IAttackProcessor` which
-    will give us some insight into how you can create your own damage handling mechanics.
-</Markdown>
-<br/>
-<Markdown>
-    ### `Defenses`
-    So now we have the notion of `Damage` and `Attack` object and we can see how we generate an attack from someone, however
-    we also need the notion of `Defenses` which act as the mitigation amount of a specific damage.
-    
-    Given the previous example you may have an attack with 8 slashing and 2 fire damage, but you may have 5 fire defense 
-    and 3 slashing defense meaning once the mitigation has been applied you would only take 5 slashing damage and 0 fire damage.
-</Markdown>
+<CardSection>
+    <div class="columns">
+        <div class="column is-one-third">
+            <h4 class="title is-5 has-text-black">Attack</h4>
+            <div class="field">
+                <label class="label is-small">Preset</label>
+                <div class="control">
+                    <div class="select is-small is-fullwidth">
+                        <select @bind="_selectedAttackPreset" @bind:after="ApplyAttackPreset">
+                            <option value="fireball">Fireball (30 Fire)</option>
+                            <option value="meteor-strike">Meteor Strike (20 Fire + 10 Earth)</option>
+                            <option value="blizzard">Blizzard (20 Ice + 5 Wind)</option>
+                            <option value="custom">Custom...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="checkbox is-small">
+                    <input type="checkbox" @bind="_customAttackMode" @bind:after="SyncCustomAttackRows" />
+                    Edit rows manually
+                </label>
+            </div>
+
+            @if (_customAttackMode)
+            {
+                <div class="field">
+                    <label class="label is-small">Damage rows</label>
+                    @for (var i = 0; i < _customAttackRows.Count; i++)
+                    {
+                        var rowIndex = i;
+                        <div class="field has-addons mb-1">
+                            <div class="control is-expanded">
+                                <div class="select is-small is-fullwidth">
+                                    <select @bind="_customAttackRows[rowIndex].Type" @bind:after="RecomputeAll">
+                                        @foreach (var typeId in _elementalTypeIds)
+                                        {
+                                            <option value="@typeId">@NameFor(typeId)</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <input class="input is-small" type="number" step="0.5" min="0" @bind="_customAttackRows[rowIndex].Value" @bind:after="RecomputeAll" />
+                            </div>
+                            <div class="control">
+                                <button type="button" class="button is-small is-danger is-light" @onclick="() => RemoveAttackRow(rowIndex)">x</button>
+                            </div>
+                        </div>
+                    }
+                    <button type="button" class="button is-small is-light" @onclick="AddAttackRow">+ Add damage row</button>
+                </div>
+            }
+
+            <div class="field">
+                <label class="checkbox is-small">
+                    <input type="checkbox" @bind="_isCritical" @bind:after="RecomputeAll" />
+                    Critical hit
+                </label>
+            </div>
+        </div>
+
+        <div class="column is-one-third">
+            <h4 class="title is-5 has-text-black">Target Defenses</h4>
+            <div class="field">
+                <label class="label is-small">Preset</label>
+                <div class="control">
+                    <div class="select is-small is-fullwidth">
+                        <select @bind="_selectedTargetPreset" @bind:after="ApplyTargetPreset">
+                            <option value="unarmored">Unarmored (all 0s)</option>
+                            <option value="iron-golem">Iron Golem (high Earth, low others)</option>
+                            <option value="frost-wyrm">Frost Wyrm (high Ice, low Fire)</option>
+                            <option value="custom">Custom...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label is-small">Per-type defense (elemental)</label>
+                @foreach (var slot in _elementalDefenseSlots)
+                {
+                    <div class="field has-addons mb-1">
+                        <div class="control">
+                            <span class="button is-small is-static">@slot.Name</span>
+                        </div>
+                        <div class="control is-expanded">
+                            <input class="input is-small" type="number" step="0.5" min="0" @bind="slot.Value" @bind:after="RecomputeAll" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="column">
+            <h4 class="title is-5 has-text-black">Library Result</h4>
+            <div class="table-container">
+                <table class="table is-fullwidth is-narrow is-striped">
+                    <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th class="has-text-right">Input</th>
+                        <th class="has-text-right">Defended</th>
+                        <th class="has-text-right">Damage Done</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var row in _libraryRows)
+                    {
+                        <tr>
+                            <td>@row.TypeName</td>
+                            <td class="has-text-right">@row.Input.ToString("0.##")</td>
+                            <td class="has-text-right">@row.Defended.ToString("0.##")</td>
+                            <td class="has-text-right has-text-weight-semibold @(_libraryTotal > 0 ? "has-text-danger" : "")">@row.DamageDone.ToString("0.##")</td>
+                        </tr>
+                    }
+                    <tr class="has-background-light">
+                        <td class="has-text-weight-bold">Total</td>
+                        <td class="has-text-right">@_libraryInputTotal.ToString("0.##")</td>
+                        <td class="has-text-right">@_libraryDefendedTotal.ToString("0.##")</td>
+                        <td class="has-text-right has-text-weight-bold has-text-danger">@_libraryTotal.ToString("0.##")</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <Markdown Containerless="true">
+        > The same idea applies to physical damage types (Slashing, Blunt, Piercing, Unarmed) and the generic `Damage` type. They are all just integer ids with the same shape, and `DefaultAttackProcessor` treats them identically. The elemental types are the focus here because they have the more interesting interaction story.
+    </Markdown>
+</CardSection>
+<br />
+
+<CardSection>
+    <h3 class="title is-5 has-text-black">Elemental Effectiveness (what-if layer)</h3>
+    <p class="subtitle is-7 has-text-grey">
+        The library does not model type-vs-type matchup multipliers. The grid below is a *what-if* layer
+        you could stack on top of the subtractive defense above. Click a cell to cycle:
+        <code>0.5x &rarr; 1x &rarr; 2x &rarr; 0.5x</code>. All cells start at 1x.
+    </p>
+
+    <div class="table-container">
+        <table class="table is-fullwidth is-bordered is-narrow">
+            <thead>
+                <tr>
+                    <th>Attacker \ Defender</th>
+                    @foreach (var defenderType in _elementalTypeIds)
+                    {
+                        <th class="has-text-centered">@NameFor(defenderType)</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var attackerType in _elementalTypeIds)
+                {
+                    <tr>
+                        <th>@NameFor(attackerType)</th>
+                        @foreach (var defenderType in _elementalTypeIds)
+                        {
+                            var multiplier = _multipliers[attackerType][defenderType];
+                            var cellClass = multiplier < 1.0f ? "has-background-danger is-light" :
+                                            multiplier > 1.0f ? "has-background-success is-light" : "";
+                            <td class="has-text-centered @cellClass" style="cursor: pointer; min-width: 3.5rem;"
+                                @onclick="() => CycleMultiplier(attackerType, defenderType)">
+                                <strong>@multiplier.ToString("0.##")x</strong>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <h4 class="title is-6 mt-4 has-text-black">If multipliers were applied</h4>
+    <p class="subtitle is-7 has-text-grey">
+        Takes the attack from the playground above, multiplies each <code>Damage</code> by the
+        matrix entry for its type, then re-runs the library's defense pipeline.
+    </p>
+    <div class="table-container">
+        <table class="table is-fullwidth is-narrow is-striped">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th class="has-text-right">Original</th>
+                    <th class="has-text-right">Multiplier</th>
+                    <th class="has-text-right">After Multiplier</th>
+                    <th class="has-text-right">After Defense</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in _whatIfRows)
+                {
+                    <tr>
+                        <td>@row.TypeName</td>
+                        <td class="has-text-right">@row.Original.ToString("0.##")</td>
+                        <td class="has-text-right @row.MultiplierClass">@row.MultiplierText</td>
+                        <td class="has-text-right">@row.AfterMultiplier.ToString("0.##")</td>
+                        <td class="has-text-right has-text-weight-semibold @(_whatIfTotal > 0 ? "has-text-danger" : "")">@row.AfterDefense.ToString("0.##")</td>
+                    </tr>
+                }
+                <tr class="has-background-light">
+                    <td class="has-text-weight-bold">Total</td>
+                    <td class="has-text-right">@_whatIfOriginalTotal.ToString("0.##")</td>
+                    <td></td>
+                    <td class="has-text-right">@_whatIfAfterMultiplierTotal.ToString("0.##")</td>
+                    <td class="has-text-right has-text-weight-bold has-text-danger">@_whatIfTotal.ToString("0.##")</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</CardSection>
+<br />
 
 @code {
+    private record DamageTypeName(int Id, string Name);
+
+    private class AttackRow
+    {
+        public int Type { get; set; }
+        public float Value { get; set; }
+        public AttackRow() { }
+        public AttackRow(int type, float value) { Type = type; Value = value; }
+    }
+
+    private class DefenseSlot
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public float Value { get; set; }
+        public DefenseSlot() { }
+        public DefenseSlot(int id, string name, float value) { Id = id; Name = name; Value = value; }
+    }
+
+    private record LibraryRow(int TypeId, string TypeName, float Input, float Defended, float DamageDone);
+
+    private record WhatIfRow(int TypeId, string TypeName, float Original, float Multiplier, float AfterMultiplier, float AfterDefense)
+    {
+        public string MultiplierText => Multiplier == 1.0f ? "1x" : Multiplier + "x";
+        public string MultiplierClass => Multiplier < 1.0f ? "has-text-danger" : Multiplier > 1.0f ? "has-text-success" : "";
+    }
+
+    private static readonly int[] _elementalTypeIds =
+    {
+        FantasyDamageTypes.FireDamage,
+        FantasyDamageTypes.IceDamage,
+        FantasyDamageTypes.EarthDamage,
+        FantasyDamageTypes.WindDamage,
+        FantasyDamageTypes.LightDamage,
+        FantasyDamageTypes.DarkDamage,
+    };
+
+    private readonly List<DamageTypeName> _allDamageTypeNames = new()
+    {
+        new(FantasyDamageTypes.FireDamage, "Fire"),
+        new(FantasyDamageTypes.IceDamage, "Ice"),
+        new(FantasyDamageTypes.EarthDamage, "Earth"),
+        new(FantasyDamageTypes.WindDamage, "Wind"),
+        new(FantasyDamageTypes.LightDamage, "Light"),
+        new(FantasyDamageTypes.DarkDamage, "Dark"),
+    };
+
+    private string NameFor(int typeId) => _allDamageTypeNames.FirstOrDefault(e => e.Id == typeId)?.Name ?? $"#{typeId}";
+
+    private string _selectedAttackPreset = "flaming-sword";
+    private bool _customAttackMode;
+    private bool _isCritical;
+    private List<AttackRow> _customAttackRows = new();
+
+    private string _selectedTargetPreset = "unarmored";
+    private List<DefenseSlot> _elementalDefenseSlots = new();
+
+    private Dictionary<int, Dictionary<int, float>> _multipliers = new();
+    private static readonly float[] _multiplierCycle = { 0.5f, 1.0f, 2.0f };
+
+    private List<LibraryRow> _libraryRows = new();
+    private float _libraryInputTotal;
+    private float _libraryDefendedTotal;
+    private float _libraryTotal;
+
+    private List<WhatIfRow> _whatIfRows = new();
+    private float _whatIfOriginalTotal;
+    private float _whatIfAfterMultiplierTotal;
+    private float _whatIfTotal;
+    private float _multiplierDelta;
+
+    protected override void OnInitialized()
+    {
+        InitMultipliers();
+        ApplyAttackPreset();
+        ApplyTargetPreset();
+    }
+
+    private void InitMultipliers()
+    {
+        _multipliers.Clear();
+        foreach (var attacker in _elementalTypeIds)
+        {
+            var row = new Dictionary<int, float>();
+            foreach (var defender in _elementalTypeIds) { row[defender] = 1.0f; }
+            _multipliers[attacker] = row;
+        }
+    }
+
+    private void CycleMultiplier(int attacker, int defender)
+    {
+        var current = _multipliers[attacker][defender];
+        var index = Array.IndexOf(_multiplierCycle, current);
+        var next = _multiplierCycle[(index + 1) % _multiplierCycle.Length];
+        _multipliers[attacker][defender] = next;
+        RecomputeAll();
+    }
+
+    private void ApplyAttackPreset()
+    {
+        if (_selectedAttackPreset == "fireball")
+        {
+            _customAttackMode = false;
+            _customAttackRows = new() { new(FantasyDamageTypes.FireDamage, 30f) };
+        }
+        else if (_selectedAttackPreset == "meteor-strike")
+        {
+            _customAttackMode = false;
+            _customAttackRows = new()
+            {
+                new(FantasyDamageTypes.FireDamage, 20f),
+                new(FantasyDamageTypes.EarthDamage, 10f),
+            };
+        }
+        else if (_selectedAttackPreset == "blizzard")
+        {
+            _customAttackMode = false;
+            _customAttackRows = new()
+            {
+                new(FantasyDamageTypes.IceDamage, 20f),
+                new(FantasyDamageTypes.WindDamage, 5f),
+            };
+        }
+        else
+        {
+            _customAttackMode = true;
+            if (_customAttackRows.Count == 0)
+            {
+                _customAttackRows = new() { new(FantasyDamageTypes.FireDamage, 10f) };
+            }
+        }
+        RecomputeAll();
+    }
+
+    private void SyncCustomAttackRows() => RecomputeAll();
+
+    private void AddAttackRow()
+    {
+        _customAttackRows.Add(new(FantasyDamageTypes.FireDamage, 5f));
+        RecomputeAll();
+    }
+
+    private void RemoveAttackRow(int index)
+    {
+        if (index >= 0 && index < _customAttackRows.Count)
+        {
+            _customAttackRows.RemoveAt(index);
+            RecomputeAll();
+        }
+    }
+
+    private void ApplyTargetPreset()
+    {
+        if (_selectedTargetPreset == "custom")
+        {
+            if (_elementalDefenseSlots.Count == 0) { _elementalDefenseSlots = MakeDefaultDefenseSlots(0f); }
+        }
+        else if (_selectedTargetPreset == "unarmored")
+        {
+            _elementalDefenseSlots = MakeDefaultDefenseSlots(0f);
+        }
+        else if (_selectedTargetPreset == "iron-golem")
+        {
+            _elementalDefenseSlots = MakeDefaultDefenseSlots(0f);
+            SetDefense(FantasyDamageTypes.EarthDamage, 15f);
+            SetDefense(FantasyDamageTypes.FireDamage, 2f);
+            SetDefense(FantasyDamageTypes.IceDamage, 2f);
+            SetDefense(FantasyDamageTypes.WindDamage, 2f);
+            SetDefense(FantasyDamageTypes.LightDamage, 1f);
+            SetDefense(FantasyDamageTypes.DarkDamage, 1f);
+        }
+        else if (_selectedTargetPreset == "frost-wyrm")
+        {
+            _elementalDefenseSlots = MakeDefaultDefenseSlots(0f);
+            SetDefense(FantasyDamageTypes.IceDamage, 12f);
+            SetDefense(FantasyDamageTypes.WindDamage, 5f);
+            SetDefense(FantasyDamageTypes.FireDamage, 0f);
+            SetDefense(FantasyDamageTypes.EarthDamage, 3f);
+            SetDefense(FantasyDamageTypes.LightDamage, 4f);
+            SetDefense(FantasyDamageTypes.DarkDamage, 4f);
+        }
+        RecomputeAll();
+    }
+
+    private List<DefenseSlot> MakeDefaultDefenseSlots(float v) => new()
+    {
+        new(FantasyDamageTypes.FireDamage, "Fire", v),
+        new(FantasyDamageTypes.IceDamage, "Ice", v),
+        new(FantasyDamageTypes.EarthDamage, "Earth", v),
+        new(FantasyDamageTypes.WindDamage, "Wind", v),
+        new(FantasyDamageTypes.LightDamage, "Light", v),
+        new(FantasyDamageTypes.DarkDamage, "Dark", v),
+    };
+
+    private void SetDefense(int type, float value)
+    {
+        var idx = _elementalDefenseSlots.FindIndex(s => s.Id == type);
+        if (idx >= 0)
+        {
+            _elementalDefenseSlots[idx].Value = value;
+        }
+    }
+
+    private void RecomputeAll()
+    {
+        var attack = BuildAttack();
+        var defenseStats = BuildDefenseStats();
+
+        var processed = AttackProcessor.ProcessAttack(attack, defenseStats);
+        var inputByType = attack.Damages.ToDictionary(d => d.Type, d => d.Value);
+        var defendedByType = processed.DamageDefended.ToDictionary(d => d.Type, d => d.Value);
+        var doneByType = processed.DamageDone.ToDictionary(d => d.Type, d => d.Value);
+
+        _libraryRows = inputByType.Keys
+            .OrderBy(t => t)
+            .Select(t => new LibraryRow(t, NameFor(t), inputByType[t], defendedByType.GetValueOrDefault(t, 0f), doneByType.GetValueOrDefault(t, 0f)))
+            .ToList();
+        _libraryInputTotal = _libraryRows.Sum(r => r.Input);
+        _libraryDefendedTotal = _libraryRows.Sum(r => r.Defended);
+        _libraryTotal = _libraryRows.Sum(r => r.DamageDone);
+
+        var multipliedDamages = attack.Damages
+            .Select(d => new Damage(d.Type, _multipliers.TryGetValue(d.Type, out var row) && row.TryGetValue(d.Type, out var m) ? d.Value * m : d.Value))
+            .ToList();
+        var multipliedAttack = new Attack(_isCritical, multipliedDamages);
+        var multipliedProcessed = AttackProcessor.ProcessAttack(multipliedAttack, defenseStats);
+        var multipliedByType = multipliedAttack.Damages.ToDictionary(d => d.Type, d => d.Value);
+        var multipliedDefendedByType = multipliedProcessed.DamageDefended.ToDictionary(d => d.Type, d => d.Value);
+        var multipliedDoneByType = multipliedProcessed.DamageDone.ToDictionary(d => d.Type, d => d.Value);
+
+        _whatIfRows = attack.Damages
+            .Select(d => d.Type)
+            .Distinct()
+            .OrderBy(t => t)
+            .Select(t =>
+            {
+                var original = inputByType[t];
+                var mult = _multipliers.TryGetValue(t, out var row) && row.TryGetValue(t, out var m) ? m : 1.0f;
+                var afterMult = multipliedByType.GetValueOrDefault(t, 0f);
+                var afterDef = multipliedDoneByType.GetValueOrDefault(t, 0f);
+                return new WhatIfRow(t, NameFor(t), original, mult, afterMult, afterDef);
+            })
+            .ToList();
+        _whatIfOriginalTotal = _whatIfRows.Sum(r => r.Original);
+        _whatIfAfterMultiplierTotal = _whatIfRows.Sum(r => r.AfterMultiplier);
+        _whatIfTotal = _whatIfRows.Sum(r => r.AfterDefense);
+        _multiplierDelta = _whatIfTotal - _libraryTotal;
+    }
+
+    private Attack BuildAttack() => new(_isCritical, _customAttackRows.Select(r => new Damage(r.Type, r.Value)).ToList());
+
+    private EntityStatsVariables BuildDefenseStats()
+    {
+        var stats = new EntityStatsVariables();
+        foreach (var slot in _elementalDefenseSlots)
+        {
+            if (slot.Id == FantasyDamageTypes.FireDamage) { stats.FireDefense = slot.Value; }
+            else if (slot.Id == FantasyDamageTypes.IceDamage) { stats.IceDefense = slot.Value; }
+            else if (slot.Id == FantasyDamageTypes.EarthDamage) { stats.EarthDefense = slot.Value; }
+            else if (slot.Id == FantasyDamageTypes.WindDamage) { stats.WindDefense = slot.Value; }
+            else if (slot.Id == FantasyDamageTypes.LightDamage) { stats.LightDefense = slot.Value; }
+            else if (slot.Id == FantasyDamageTypes.DarkDamage) { stats.DarkDefense = slot.Value; }
+        }
+        return stats;
+    }
 }

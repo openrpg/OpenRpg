@@ -23,20 +23,20 @@ public class TradeSkillInventoryExtensionsTests
         var dummyItemTemplate2 = new ItemTemplate() { Id = 345 };
 
         var inputItem1 = new TradeSkillItemEntry() { TemplateId = dummyItemTemplate1.Id };
-        inputItem1.Variables.Amount(5);
+        inputItem1.Variables.Amount = 5;
 
         var inputItem2 = new TradeSkillItemEntry() { TemplateId = dummyItemTemplate2.Id };
-        inputItem2.Variables.Amount(2);
+        inputItem2.Variables.Amount = 2;
 
         var inputItems = new List<TradeSkillItemEntry>() { inputItem1, inputItem2 };
         
         var craftingTemplate = new ItemCraftingTemplate() { Id = 1, InputItems = inputItems, OutputItems = new List<TradeSkillItemEntry>() };
 
         var itemInInventory1 = new ItemData() { TemplateId = dummyItemTemplate1.Id };
-        itemInInventory1.Variables.Amount(5);
+        itemInInventory1.Variables.Amount = 5;
         
         var itemInInventory2 = new ItemData() { TemplateId = dummyItemTemplate2.Id };
-        itemInInventory2.Variables.Amount(2);
+        itemInInventory2.Variables.Amount = 2;
 
         var inventory = new Inventory()
         {
@@ -54,17 +54,17 @@ public class TradeSkillInventoryExtensionsTests
         var dummyItemTemplate2 = new ItemTemplate() { Id = 345 };
 
         var inputItem1 = new TradeSkillItemEntry() { TemplateId = dummyItemTemplate1.Id };
-        inputItem1.Variables.Amount(5);
+        inputItem1.Variables.Amount = 5;
 
         var inputItem2 = new TradeSkillItemEntry() { TemplateId = dummyItemTemplate2.Id };
-        inputItem2.Variables.Amount(2);
+        inputItem2.Variables.Amount = 2;
 
         var inputItems = new List<TradeSkillItemEntry>() { inputItem1, inputItem2 };
         
         var craftingTemplate = new ItemCraftingTemplate() { Id = 1, InputItems = inputItems, OutputItems = new List<TradeSkillItemEntry>() };
 
         var itemInInventory1 = new ItemData() { TemplateId = dummyItemTemplate1.Id };
-        itemInInventory1.Variables.Amount(5);
+        itemInInventory1.Variables.Amount = 5;
 
         var inventory = new Inventory()
         {
@@ -84,28 +84,28 @@ public class TradeSkillInventoryExtensionsTests
         var dummyItemTemplate4 = new ItemTemplate() { Id = 789 };
 
         var inputItem1 = new TradeSkillItemEntry() { TemplateId = dummyItemTemplate1.Id };
-        inputItem1.Variables.Amount(5);
+        inputItem1.Variables.Amount = 5;
 
         var inputItem2 = new TradeSkillItemEntry() { TemplateId = dummyItemTemplate2.Id };
-        inputItem2.Variables.Amount(2);
+        inputItem2.Variables.Amount = 2;
 
         var inputItems = new List<TradeSkillItemEntry>() { inputItem1, inputItem2 };
         
         var outputItem1 = new TradeSkillItemEntry() { TemplateId = dummyItemTemplate3.Id };
-        outputItem1.Variables.Amount(1);
+        outputItem1.Variables.Amount = 1;
 
         var outputItem2 = new TradeSkillItemEntry() { TemplateId = dummyItemTemplate4.Id };
-        outputItem2.Variables.Amount(10);
+        outputItem2.Variables.Amount = 10;
         
         var outputItems = new List<TradeSkillItemEntry>() { outputItem1, outputItem2 };
 
         var craftingTemplate = new ItemCraftingTemplate() { Id = 1, InputItems = inputItems, OutputItems = outputItems };
 
         var itemInInventory1 = new ItemData() { TemplateId = dummyItemTemplate1.Id };
-        itemInInventory1.Variables.Amount(5);
+        itemInInventory1.Variables.Amount = 5;
         
         var itemInInventory2 = new ItemData() { TemplateId = dummyItemTemplate2.Id };
-        itemInInventory2.Variables.Amount(2);
+        itemInInventory2.Variables.Amount = 2;
 
         var inventory = new Inventory()
         {
@@ -140,10 +140,10 @@ public class TradeSkillInventoryExtensionsTests
 
         Assert.True(inventory.HasItem((dummyItemTemplate3.Id)));
         var craftedItem1 = inventory.Items.Single(x => x.TemplateId == dummyItemTemplate3.Id);
-        Assert.Equal(outputItem1.Variables.Amount(), craftedItem1.Variables.Amount());
+        Assert.Equal(outputItem1.Variables.Amount, craftedItem1.Variables.Amount);
 
         Assert.True(inventory.HasItem((dummyItemTemplate4.Id)));
         var craftedItem2 = inventory.Items.Single(x => x.TemplateId == dummyItemTemplate4.Id);
-        Assert.Equal(outputItem2.Variables.Amount(), craftedItem2.Variables.Amount());
+        Assert.Equal(outputItem2.Variables.Amount, craftedItem2.Variables.Amount);
     }
 }

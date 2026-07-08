@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "pluginId": "fantasy",
+  "name": "Fantasy Genre Plugin",
+  "version": "1.0.0",
+  "description": "Classic fantasy RPG types and mechanics",
+  "isDefault": true,
+  "typeSources": {
+    "itemTypes": "OpenRpg.Genres.Fantasy.Types.FantasyItemTypes, OpenRpg.Genres.Fantasy",
+    "itemQualityTypes": "OpenRpg.Genres.Fantasy.Types.FantasyItemQualityTypes, OpenRpg.Genres.Fantasy",
+    "requirementTypes": "OpenRpg.Genres.Fantasy.Types.FantasyRequirementTypes, OpenRpg.Genres.Fantasy",
+    "effectTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEffectTypes, OpenRpg.Genres.Fantasy",
+    "rewardTypes": "OpenRpg.Genres.Fantasy.Types.FantasyRewardTypes, OpenRpg.Genres.Fantasy",
+    "modificationTypes": "OpenRpg.Genres.Fantasy.Types.FantasyModificationTypes, OpenRpg.Genres.Fantasy",
+    "objectiveTypes": "OpenRpg.Genres.Types.GenresObjectiveTypes, OpenRpg.Genres",
+    "effectScalingType": "OpenRpg.Entities.Types.CoreEffectScalingTypes, OpenRpg.Entities",
+    "statTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEntityStatsVariableTypes, OpenRpg.Genres.Fantasy",
+    "stateTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEntityStateVariableTypes, OpenRpg.Genres.Fantasy",
+    "craftingSkillTypes": "OpenRpg.Genres.Fantasy.Types.FantasyTradeSkillTypes, OpenRpg.Genres.Fantasy",
+    "gatheringSkillTypes": "OpenRpg.Genres.Fantasy.Types.FantasyTradeSkillTypes, OpenRpg.Genres.Fantasy",
+    "damageTypes": "OpenRpg.Genres.Fantasy.Types.FantasyDamageTypes, OpenRpg.Genres.Fantasy",
+    "itemSlotTypes": "OpenRpg.Genres.Fantasy.Types.FantasyEquipmentSlotTypes, OpenRpg.Genres.Fantasy"
+  }
+}

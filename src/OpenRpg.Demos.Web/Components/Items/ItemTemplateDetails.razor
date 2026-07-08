@@ -1,11 +1,7 @@
 @using OpenRpg.Core.Effects
-@using OpenRpg.Core.Templates
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
-@using OpenRpg.Items.Types
-@using OpenRpg.Demos.Infrastructure.Extensions
-@using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Extensions
@@ -15,7 +11,6 @@
 
 @inject ILocaleRepository LocaleRepository;
 @inject ICharacterRequirementChecker RequirementsChecker
-@inject ITemplateAccessor TemplateAccessor
 
 <CardSection customClasses="@cardClasses">
     <h4 class="title is-4 has-text-centered item-quality-@(_itemQualityTypeId)">@(ItemTemplate.NameLocaleId ?? "Unnamed Item")</h4>
@@ -26,18 +21,18 @@
     <div class="columns">
         <div class="column">
             <figure class="image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
-                <img src="images/items/@(ItemTemplate.Variables.AssetCode()).png">
+                <img src="images/items/@(ItemTemplate.Variables.AssetCode).png" alt="@($"{ItemTemplate.NameLocaleId ?? "Unnamed Item"} Image")">
             </figure>
         </div>
         <div class="column">
             @if (IsWeapon)
             {
-                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType == FantasyEffectTypes.DamageBonusAmount).Sum(x => x.Potency))</h4>
+                <h4 class="title is-4 has-text-dark has-text-centered">@(SumDamage())</h4>
                 <h6 class="subtitle is-7 has-text-dark has-text-centered">Damage</h6>
             }
             @if (IsArmour)
             {
-                <h4 class="title is-4 has-text-dark has-text-centered">@(ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType == FantasyEffectTypes.DefenseBonusAmount).Sum(x => x.Potency))</h4>
+                <h4 class="title is-4 has-text-dark has-text-centered">@(SumDefense())</h4>
                 <h6 class="subtitle is-7 has-text-dark has-text-centered">Defense</h6>
             }
         </div>
@@ -56,11 +51,11 @@
             <EffectList Effects="DisplayEffects.ToArray()" Character="@Character"></EffectList>
         </div>
     }
-    @if (ItemTemplate.Requirements.Any())
+    @if (ItemTemplate.Variables.HasRequirements())
     {
         <h5 class="title is-5 has-text-centered has-text-dark mb-1 mt-3">Requirements</h5>
         <div>
-            <RequirementList Requirements="@ItemTemplate.Requirements.ToArray()" Character="@Character"></RequirementList>
+            <RequirementList Requirements="@ItemTemplate.Variables.Requirements" Character="@Character"></RequirementList>
         </div>
     }
 </CardSection>
@@ -75,6 +70,22 @@
 
     private bool IsWeapon => ItemTemplate.ItemType == FantasyItemTypes.GenericWeapon;
 
+    public int SumDamage()
+    {
+        return (int)ItemTemplate.Variables.Effects
+            .GetStaticEffects()
+            .Where(x => x.EffectType == FantasyEffectTypes.DamageBonusAmount)
+            .Sum(x => x.Potency);
+    }
+
+    public int SumDefense()
+    {
+        return (int)ItemTemplate.Variables.Effects
+            .GetStaticEffects()
+            .Where(x => x.EffectType == FantasyEffectTypes.DefenseBonusAmount)
+            .Sum(x => x.Potency);
+    }
+    
     private bool IsArmour
     {
         get
@@ -93,9 +104,9 @@
     {
         get
         {
-            if (IsWeapon) { return ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType != FantasyEffectTypes.DamageBonusAmount); }
-            if (IsArmour) { return ItemTemplate.Effects.GetStaticEffects().Where(x => x.EffectType != FantasyEffectTypes.DefenseBonusAmount); }
-            return ItemTemplate.Effects.GetStaticEffects();
+            if (IsWeapon) { return ItemTemplate.Variables.Effects.GetStaticEffects().Where(x => x.EffectType != FantasyEffectTypes.DamageBonusAmount); }
+            if (IsArmour) { return ItemTemplate.Variables.Effects.GetStaticEffects().Where(x => x.EffectType != FantasyEffectTypes.DefenseBonusAmount); }
+            return ItemTemplate.Variables.Effects.GetStaticEffects();
         }
     }
 
@@ -105,7 +116,7 @@
     protected override void OnParametersSet()
     {
 
-        var areRequirementsMet = RequirementsChecker.AreRequirementsMet(Character, ItemTemplate);
+        var areRequirementsMet = RequirementsChecker.AreRequirementsMet(Character, ItemTemplate.Variables.Requirements);
         var requirementsClass = !areRequirementsMet ? "has-background-danger-light" : "";
         cardClasses = $"item-border item-quality-{_itemQualityTypeId} {requirementsClass}";
 
@@ -114,8 +125,8 @@
 
     protected override void OnInitialized()
     {
-        if (ItemTemplate.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
-        { _itemQualityTypeId = ItemTemplate.Variables.QualityType(); }
+        if (ItemTemplate.Variables.HasQualityType())
+        { _itemQualityTypeId = ItemTemplate.Variables.QualityType; }
 
     }
 

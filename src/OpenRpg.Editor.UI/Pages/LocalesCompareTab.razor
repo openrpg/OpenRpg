@@ -1,0 +1,124 @@
+@using OpenRpg.Editor.Infrastructure.Models
+@using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Localization.Data.Repositories
+
+@inject ILocaleComparisonService ComparisonService
+@inject ILocaleRepository Repository
+
+<div class="box">
+    <h2 class="title is-3">Cross-Locale Comparison</h2>
+
+    <div class="field">
+        <label class="label">Search for a locale key</label>
+        <div class="control">
+            <input class="input" type="text" placeholder="Type a locale ID..." @bind="CompareSearchTerm" @bind:event="oninput" />
+        </div>
+    </div>
+
+    @if (_compareSearchResults.Count > 0)
+    {
+        <div class="box" style="max-height: 240px; overflow-y: auto; padding: 0.5rem;">
+            @foreach (var id in _compareSearchResults)
+            {
+                <div class="field mb-1">
+                    <label class="radio is-flex is-align-items-center" style="cursor: pointer; padding: 0.25rem 0.5rem;"
+                           @onclick="() => SelectCompareKey(id)">
+                        <input type="radio" name="compare-key" checked="@(_selectedCompareLocaleId == id)"
+                               @onclick:stopPropagation />
+                        <code class="ml-1">@(id)</code>
+                    </label>
+                </div>
+            }
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(_compareSearchTerm))
+    {
+        <div class="notification is-warning">
+            No locale keys match your search.
+        </div>
+    }
+
+    @if (_selectedCompareEntries.Count > 0)
+    {
+        <h3 class="title is-4 mt-4">Translations for <code>@(_selectedCompareLocaleId)</code></h3>
+        <table class="table is-fullwidth is-striped">
+            <thead>
+                <tr>
+                    <th>Locale Code</th>
+                    <th>Locale Text</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in _selectedCompareEntries)
+                {
+                    <tr>
+                        <td class="is-vcentered"><code>@(entry.LocaleCode)</code></td>
+                        <td class="is-vcentered">
+                            <input class="input @(entry.Exists ? "is-success" : "is-warning")"
+                                   type="text"
+                                   value="@entry.LocaleText"
+                                   @onchange='(ChangeEventArgs e) => OnSelectedEntryChanged(entry, e.Value?.ToString())' />
+                        </td>
+                        <td class="is-vcentered">
+                            @if (entry.Exists)
+                            { <span class="tag is-success">Exists</span> }
+                            else
+                            { <span class="tag is-warning">New</span> }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else if (_selectedCompareLocaleId == null && string.IsNullOrEmpty(_compareSearchTerm))
+    {
+        <div class="notification is-info">
+            Search for a locale key above to view its translations across all locale codes.
+        </div>
+    }
+</div>
+
+@code {
+    private string _compareSearchTerm = "";
+    private string CompareSearchTerm
+    {
+        get => _compareSearchTerm;
+        set { _compareSearchTerm = value; FilterCompareResults(); }
+    }
+    private List<string> _compareSearchResults = new();
+    private string _selectedCompareLocaleId;
+    private List<LocaleEntry> _selectedCompareEntries = new();
+
+    private void FilterCompareResults()
+    {
+        if (string.IsNullOrEmpty(_compareSearchTerm))
+        { _compareSearchResults = new List<string>(); }
+        else
+        {
+            var allIds = ComparisonService.GetAllLocaleIds();
+            _compareSearchResults = allIds
+                .Where(id => id.Contains(_compareSearchTerm, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(x => x)
+                .Take(50)
+                .ToList();
+        }
+    }
+
+    private void SelectCompareKey(string localeId)
+    {
+        _selectedCompareLocaleId = localeId;
+        _selectedCompareEntries = Repository.DataSource.GetLocaleCodes()
+            .OrderBy(x => x)
+            .Select(lc => ComparisonService.GetEntryFor(lc, localeId))
+            .ToList();
+    }
+
+    private void OnSelectedEntryChanged(LocaleEntry entry, string newValue)
+    {
+        if (newValue == null) return;
+        entry.LocaleText = newValue;
+        ComparisonService.SaveEntry(entry);
+        StateHasChanged();
+    }
+}

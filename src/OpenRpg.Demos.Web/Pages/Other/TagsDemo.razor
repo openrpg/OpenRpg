@@ -1,0 +1,389 @@
+@page "/other/tags"
+
+@using OpenRpg.Core.Extensions
+@using OpenRpg.Core.Templates
+@using OpenRpg.Core.Variables
+@using OpenRpg.Demos.Infrastructure.Data
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Items.Templates
+@using OpenRpg.Tags
+@using OpenRpg.Tags.Data
+@using OpenRpg.Tags.Extensions
+
+@inject ITagRegistry TagRegistry
+@inject ITemplateAccessor TemplateAccessor
+
+<Markdown>
+    ## Tags & Weighted Scoring
+
+    The tag system provides a lightweight way to categorise and relate entities using integer IDs.
+    Tags are stored in a `TagList` (extends `List&lt;int&gt;`) at variable key 9001 on every entity,
+    template, and data object in the system; they are universally inherited.
+
+    The real power comes from `TagRegistry`, which defines weighted relationships between tags.
+    This lets you express semantic similarity. For example, "armour" correlates positively with
+    "metal" and "leather", but negatively with "wood". The scoring pipeline uses these relationships
+    to rank how well an entity matches a set of source tags.
+</Markdown>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ## Items & Their Tags
+
+        Each item below has tags assigned. These are stored on the template's `Variables` using the
+        universal `Tags` property (key 9001).
+    </Markdown>
+    <div class="columns is-multiline">
+        @foreach (var item in _items)
+        {
+            <div class="column is-4">
+                <div class="box">
+                    <h6 class="title is-6 has-text-dark">@item.NameLocaleId</h6>
+                    <p class="is-size-7 has-text-grey mb-3">@item.DescriptionLocaleId</p>
+                    <div class="tags">
+                        @foreach (var tagId in GetItemTags(item))
+                        {
+                            <span class="tag @GetTagClass(tagId)">@GetTagName(tagId)</span>
+                        }
+                        @if (!GetItemTags(item).Any())
+                        {
+                            <span class="tag is-light">No tags</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ## Tag Relationships
+
+        The `TagRegistry` defines weighted relationships between tags. A positive weight means the
+        tags are semantically similar (e.g., Armour +0.6 Leather), while a negative weight means
+        they are opposed (e.g., Heavy -0.3 Leather). Select a source tag to see its relationships.
+    </Markdown>
+    <div class="field">
+        <label class="label">Select Source Tag</label>
+        <div class="control">
+            <div class="select is-fullwidth">
+                <select @onchange="OnSourceTagChanged">
+                    <option value="0">-- Select a tag --</option>
+                    @foreach (var tagId in _allTagIds)
+                    {
+                        <option value="@tagId">@GetTagName(tagId)</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    @if (_selectedSourceTag > 0)
+    {
+        var related = TagRegistry.GetRelatedTags(_selectedSourceTag).OrderByDescending(x => x.Weight).ToArray();
+        <div class="tags" style="margin-top: 1rem;">
+            @foreach (var rel in related)
+            {
+                var weightClass = rel.Weight > 0 ? "is-success" : rel.Weight < 0 ? "is-danger" : "is-light";
+                <span class="tag @weightClass is-medium">
+                    @GetTagName(rel.Tag): @(rel.Weight >= 0 ? "+" : "")@rel.Weight.ToString("F2")
+                </span>
+            }
+            @if (!related.Any())
+            {
+                <span class="tag is-light">No relationships defined</span>
+            }
+        </div>
+    }
+</CardSection>
+<br />
+
+<Markdown>
+    ## Interactive Filtering
+
+    Select one or more tags to filter items. Uses the `ContainingTags` extension method which
+    returns only items that contain **all** of the selected tags.
+</Markdown>
+<br />
+
+<div class="columns">
+    <div class="column">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark has-text-centered">Filter by Tags</h4>
+            <br />
+
+            <div class="field">
+                <label class="label">Select Tags</label>
+                <div class="tags">
+                    @foreach (var tagId in _allTagIds)
+                    {
+                        var isSelected = _selectedFilterTags.Contains(tagId);
+                        <button class="tag @(isSelected ? "is-link" : "is-light") is-medium"
+                                style="cursor: pointer; border: none;"
+                                @onclick="() => ToggleFilterTag(tagId)">
+                            @GetTagName(tagId)
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <button class="button is-link" @onclick="FilterItems" disabled="@(!_selectedFilterTags.Any())">
+                        Filter Items
+                    </button>
+                    <button class="button is-light" @onclick="ClearFilter" style="margin-left: 0.5rem;">
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            @if (_filteredItems.Any())
+            {
+                <h6 class="title is-6 has-text-dark" style="margin-top: 1rem;">Matching Items (@_filteredItems.Count)</h6>
+                @foreach (var item in _filteredItems)
+                {
+                    <div class="box" style="margin-bottom: 0.5rem;">
+                        <div class="columns is-vcentered">
+                            <div class="column">
+                                <strong>@item.NameLocaleId</strong>
+                                <div class="tags" style="margin-top: 0.25rem;">
+                                    @foreach (var tagId in GetItemTags(item))
+                                    {
+                                        var isFilterTag = _selectedFilterTags.Contains(tagId);
+                                        <span class="tag @(isFilterTag ? "is-link" : "is-light") is-small">@GetTagName(tagId)</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else if (_hasFiltered)
+            {
+                <div class="notification is-warning" style="margin-top: 1rem;">
+                    No items match the selected tags.
+                </div>
+            }
+        </CardSection>
+    </div>
+
+    <div class="column">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark has-text-centered">Weighted Scoring</h4>
+            <h5 class="subtitle is-6 has-text-dark has-text-centered">Uses the same tag selection to rank items by score</h5>
+            <br />
+
+            @if (_scoredResults.Any())
+            {
+                <h6 class="title is-6 has-text-dark">Ranked Results</h6>
+                @foreach (var result in _scoredResults)
+                {
+                    var item = _items.FirstOrDefault(i => i.Id == (int)result.ContextualTags.Context);
+                    var scoreClass = result.Score > 0.5 ? "is-success" : result.Score > 0 ? "is-info" : "is-light";
+                    <div class="box" style="margin-bottom: 0.5rem;">
+                        <div class="columns is-vcentered">
+                            <div class="column">
+                                <strong>@item?.NameLocaleId</strong>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="tag @scoreClass is-medium">
+                                    Score: @result.Score.ToString("F2")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else if (_hasFiltered)
+            {
+                <div class="notification is-warning" style="margin-top: 1rem;">
+                    No scored results. Try selecting tags that items have.
+                </div>
+            }
+            else
+            {
+                <div class="notification is-light" style="margin-top: 1rem;">
+                    Select tags on the left and click "Filter Items" to see scored results.
+                </div>
+            }
+        </CardSection>
+    </div>
+</div>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ## Depth Traversal
+
+        `GetRelatedTags(tags, depth)` walks the relationship graph N levels deep. At depth 1, it
+        finds direct relationships. At depth 2, it follows those to find indirect connections.
+        Using **Fire** as the source tag shows this clearly: it only has 2 direct relationships,
+        but deeper traversal discovers Metal, Wood, and Leather through intermediate hops.
+    </Markdown>
+    <div class="field">
+        <label class="label">Source Tag</label>
+        <div class="tags">
+            <span class="tag is-danger is-medium">@GetTagName(_depthSourceTag)</span>
+        </div>
+    </div>
+
+    <div class="columns">
+        @for (var depth = 1; depth <= 3; depth++)
+        {
+            var results = TagRegistry.GetRelatedTags(new[] { _depthSourceTag }, depth).OrderByDescending(x => x.Weight).ToArray();
+            <div class="column">
+                <h6 class="title is-6 has-text-dark">Depth @depth</h6>
+                @if (depth == 1)
+                {
+                    <p class="is-size-7 has-text-grey mb-2">Direct relationships only</p>
+                }
+                else if (depth == 2)
+                {
+                    <p class="is-size-7 has-text-grey mb-2">Follows depth 1 tags one more hop</p>
+                }
+                else
+                {
+                    <p class="is-size-7 has-text-grey mb-2">Three levels of indirection</p>
+                }
+                <div class="tags">
+                    @foreach (var rel in results)
+                    {
+                        var weightClass = rel.Weight > 0 ? "is-success" : rel.Weight < 0 ? "is-danger" : "is-light";
+                        <span class="tag @weightClass is-medium">
+                            @GetTagName(rel.Tag): @(rel.Weight >= 0 ? "+" : "")@rel.Weight.ToString("F2")
+                        </span>
+                    }
+                    @if (!results.Any())
+                    {
+                        <span class="tag is-light">None</span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</CardSection>
+<br />
+
+<Markdown>
+    ### How It Works
+
+    ```csharp
+    // Tags are stored on any variable container
+    var itemTags = itemTemplate.Variables.Tags; // TagList : List&lt;int&gt;
+
+    // Define weighted relationships in a TagRegistry
+    var registry = new TagRegistry();
+    registry.AddRelationship(armourTag, metalTag, 0.4f);
+    registry.AddRelationship(armourTag, leatherTag, 0.6f);
+
+    // Get related tags (averages weights across source tags)
+    var related = registry.GetRelatedTags(armourTag, heavyTag);
+
+    // Get related tags traversing 2 levels deep
+    var deepRelated = registry.GetRelatedTags(tags, depth: 2);
+
+    // Score items against source tags
+    var contextualTags = items.Select(i => new ContextualTags(i.Id, i.Variables.Tags));
+    var scored = registry.GetTaggedScoresFor(contextualTags, armourTag, heavyTag);
+
+    // Filter items containing specific tags
+    var matching = contextualTags.ContainingTags(armourTag, metalTag);
+    ```
+</Markdown>
+
+@code {
+    private List<ItemTemplate> _items = new();
+    private List<int> _allTagIds = new();
+    private HashSet<int> _selectedFilterTags = new();
+    private List<ItemTemplate> _filteredItems = new();
+    private bool _hasFiltered = false;
+    private List<ScoredTags> _scoredResults = new();
+
+    private int _selectedSourceTag = 0;
+
+    private int _depthSourceTag = 8; // Fire
+
+    private readonly Dictionary<int, string> _tagNames = new()
+    {
+        { 1, "Armour" }, { 2, "Weapon" }, { 3, "Heavy" }, { 4, "Light" },
+        { 5, "Metal" }, { 6, "Wood" }, { 7, "Leather" }, { 8, "Fire" },
+        { 9, "Ice" }, { 10, "Consumable" }
+    };
+
+    protected override void OnInitialized()
+    {
+        _items = TemplateAccessor.GetAll<ItemTemplate>().ToList();
+        _allTagIds = _tagNames.Keys.OrderBy(x => x).ToList();
+        base.OnInitialized();
+    }
+
+    private string GetTagName(int tagId) => _tagNames.TryGetValue(tagId, out var name) ? name : $"Tag {tagId}";
+
+    private TagList GetItemTags(ItemTemplate item)
+    {
+        return ((IVariables<object>)item.Variables).GetAsOrDefaultAndSet(9001, () => new TagList());
+    }
+
+    private string GetTagClass(int tagId)
+    {
+        return tagId switch
+        {
+            1 => "is-info",      // Armour
+            2 => "is-danger",    // Weapon
+            3 => "is-dark",      // Heavy
+            4 => "is-link",      // Light
+            5 => "is-link",      // Metal
+            6 => "is-warning",   // Wood
+            7 => "is-success",   // Leather
+            8 => "is-danger",    // Fire
+            9 => "is-info",      // Ice
+            10 => "is-success",  // Consumable
+            _ => "is-light"
+        };
+    }
+
+    private void OnSourceTagChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var tagId))
+        {
+            _selectedSourceTag = tagId;
+        }
+    }
+
+    private void ToggleFilterTag(int tagId)
+    {
+        if (_selectedFilterTags.Contains(tagId))
+            _selectedFilterTags.Remove(tagId);
+        else
+            _selectedFilterTags.Add(tagId);
+    }
+
+    private void FilterItems()
+    {
+        _hasFiltered = true;
+        var tagArray = _selectedFilterTags.ToArray();
+        var contextualTags = _items.Select(i => new ContextualTags(i.Id, GetItemTags(i)));
+
+        _filteredItems = contextualTags
+            .ContainingTags(tagArray)
+            .Select(ct => _items.First(i => i.Id == (int)ct.Context))
+            .ToList();
+
+        _scoredResults = TagRegistry
+            .GetTaggedScoresFor(contextualTags, tagArray)
+            .OrderByDescending(x => x.Score)
+            .ToList();
+    }
+
+    private void ClearFilter()
+    {
+        _selectedFilterTags.Clear();
+        _filteredItems.Clear();
+        _scoredResults.Clear();
+        _hasFiltered = false;
+    }
+}

@@ -16,7 +16,7 @@ public class ActiveEffectExtensionsTests
         var dummyTimedEffect = new TimedStaticEffect() { Frequency = effectFrequency };
         var dummyActiveEffect = new ActiveEffect(dummyTimedEffect);
         
-        Assert.Equal(shouldBePassive, dummyActiveEffect.IsPassiveEffect());
+        Assert.Equal(shouldBePassive, dummyActiveEffect.IsPassiveEffect);
     }
     
     [Theory]
@@ -28,7 +28,7 @@ public class ActiveEffectExtensionsTests
     {
         var dummyTimedEffect = new TimedStaticEffect() { Potency = potency, MaxStack = stacks };
         var dummyActiveEffect = new ActiveEffect(dummyTimedEffect) { Stacks = stacks };
-        var actualPotency = dummyActiveEffect.GetStackedPotency();
+        var actualPotency = dummyActiveEffect.StackedPotency;
         Assert.Equal(expectedPotency, actualPotency);
     }
     
@@ -41,7 +41,7 @@ public class ActiveEffectExtensionsTests
     {
         var dummyTimedEffect = new TimedStaticEffect() { Frequency = frequency};
         var dummyActiveEffect = new ActiveEffect(dummyTimedEffect) { ActiveTime = activeTime };
-        var actualTicks = dummyActiveEffect.TicksSoFar();
+        var actualTicks = dummyActiveEffect.TicksSoFar;
         Assert.Equal(expectedTicks, actualTicks);
     }
 }

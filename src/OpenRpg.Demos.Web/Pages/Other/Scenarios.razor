@@ -1,0 +1,92 @@
+﻿@page "/other/scenarios"
+
+<Markdown>
+    ## Game/Genre Scenarios
+
+    As mentioned throughout these examples, this framework is meant to provide the building blocks to be able to express almost any kind of RPG game, so with that in mind lets look at some common types of RPG games and the sort of high level view of how we would express those games with this library.
+</Markdown>
+<br />
+<div class="columns">
+    <div class="column is-half">
+        <Markdown>
+            ### Action RPG - i.e Diablo, Torchlight
+            
+            These sort of games are generally about looting procedural items and fighting somewhat procedural enemies, the combat revolves around damage derived from ability/item synergies based on affixes/powers on powerful items.
+            
+            #### Overall Approach
+            - Games often ignore notion of `Race`
+            - Unique Player `Class` templates, scaling damage/defense effects off given attributes
+            - Paragon board is collection of `Effects` with `Requirements` for previous nodes tracked against `Entity`
+            - `Enemy` templates use `Procedural Effects` for level scaling
+            - `Classes` has access to various `Abilities` but can only actively use X amount
+            - `Items` are generally procedural with unique `Effect Types` to provide affix/powers
+            - `Items` can use `Modifications Allowances` to support adding Gems, which wrap `Effects`
+            - `Inventory` is slot based with fixed slots with additional `Size` metadata, also added to `Item Templates`
+            - `Equipment` generally matches that of `Fantasy Genre` equipment slots
+            - `Quests` can express repeatable dynamic events
+            - `Attacks` are often `Ability` based with `Cooldowns`
+        </Markdown>
+    </div>
+    <div class="column is-half">
+        <Markdown>
+            ###  CRPG - i.e Baldur's Gate, Pillars of Eternity
+            
+            These sort of games are generally more about story and characters, the combat often split into melee or spell based abilities with party based mechanics.
+            
+            #### Overall Approach
+            - `Race` should be used and provide unique bonuses
+            - `Class` templates have fixed `Effects` and can often use `MultiClass` functionality
+            - Notion of Feats/Perks can be expressed via unique `Effects` tracked against `Entity`
+            - `Enemy` templates use `Scaled Effects` for level scaling
+            - `Abilities` are often fixed per `Class`
+            - `Item Templates` are generally static
+            - `Inventory` is weight based
+            - `Quests` are unique and main focus of the narrative drive
+            - `Factions` are important as part of narrative decisions
+            - `Attacks` are a mix of base attacks and `Ability` with custom `Usage` counts metadata
+        </Markdown>
+    </div>
+</div>
+<div class="columns">
+    <div class="column is-half">
+        <Markdown>
+            ###  JRPG - i.e Wild Arms, Grandia
+            
+            Like CPRGs they are more story based but often have simpler `Character` mechanics often have more of a fixed
+            
+            #### Overall Approach
+            - Games often ignore notion of `Race`
+            - `Class` templates have fixed `Effects` and can often use `MultiClass` functionality
+            - Notion of Feats/Perks can be expressed via unique `Effects` tracked against `Entity`
+            - `Enemy` templates use `Scaled Effects` for level scaling
+            - `Abilities` are often fixed per `Class` and known as Spells/Skills
+            - `Item Templates` are generally static
+            - `Inventory` is unlimited
+            - Games often ignore notion of `Quests` but likely tracks game trigger/progress via `GameState`
+            - `Attacks` are a mix of base attacks and `Ability` with Mana Cost
+        </Markdown>
+    </div>
+    <div class="column is-half">
+        <Markdown>
+            ###  Souls-like - i.e Dark Souls, Elden Ring
+            
+            Like CPRGs they are more story based but often have simpler `Character` mechanics often have more of a fixed
+            
+            #### Overall Approach
+            - Games often ignore notion of `Race`
+            - Games often ignore notion of `Class`
+            - Level up attributes are custom `Effects` tracked against `Entity` 
+            - `Enemy` templates are generally static
+            - `Items` would scale damage/defense `Effects` based on attributes
+            - Spells would be expressed as `Abilities`
+            - `Item Templates` are generally static
+            - `Inventory` has no limit
+            - Games often ignore notion of `Quests` but likely tracks game trigger/progress via `GameState`
+        </Markdown>
+    </div>
+</div>
+<br />
+
+@code {
+
+}

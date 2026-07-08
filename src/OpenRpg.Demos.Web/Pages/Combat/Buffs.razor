@@ -206,16 +206,16 @@
 
    public void OnEffectTriggered(ActiveEffect activeEffect)
    {
-      var effectTypeText = activeEffect.IsBeneficialEffect() ? "healing" : "damage";
-      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(),
-         $"Triggered <span class=\"has-text-info\">{activeEffect.StaticEffect.NameLocaleId}</span> with {activeEffect.GetStackedPotency()} {effectTypeText}");
+      var effectTypeText = activeEffect.IsBeneficialEffect ? "healing" : "damage";
+      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect, activeEffect.IsPassiveEffect,
+         $"Triggered <span class=\"has-text-info\">{activeEffect.StaticEffect.NameLocaleId}</span> with {activeEffect.StackedPotency} {effectTypeText}");
       
       LogOutput.Add(logEntry);
    }
 
    public void OnEffectExpired(ActiveEffect activeEffect)
    {
-      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(), 
+      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect, activeEffect.IsPassiveEffect, 
          $"Expired <span class=\"has-text-info\">{activeEffect.StaticEffect.NameLocaleId}</span>");
       
       LogOutput.Add(logEntry);
@@ -223,7 +223,7 @@
    
    public void OnEffectAdded(ActiveEffect activeEffect)
    {
-      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect(), activeEffect.IsPassiveEffect(), 
+      var logEntry = new LogEntry(activeEffect.IsBeneficialEffect, activeEffect.IsPassiveEffect, 
          $"Added <span class=\"has-text-info\">{activeEffect.StaticEffect.NameLocaleId}</span>");
       
       LogOutput.Add(logEntry);
@@ -237,7 +237,7 @@
 
       if (alreadyContainsEffect)
       {
-         var logEntry = new LogEntry(effectToApply.IsBeneficialEffect(), effectToApply.IsPassiveEffect(), 
+         var logEntry = new LogEntry(effectToApply.IsBeneficialEffect, effectToApply.IsPassiveEffect, 
             $"Stacked/Reset <span class=\"has-text-info\">{effectToApply.NameLocaleId}</span>");
          
          LogOutput.Add(logEntry);

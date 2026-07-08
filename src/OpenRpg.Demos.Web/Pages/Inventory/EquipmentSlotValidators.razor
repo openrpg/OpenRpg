@@ -1,0 +1,381 @@
+@page "/inventory/slot-validators"
+
+@using OpenRpg.Genres.Fantasy.Equippables.Validators
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Genres.Scifi.Equippables.CharacterSlots
+@using OpenRpg.Genres.Scifi.Equippables.ShipSlots
+@using OpenRpg.Genres.Scifi.Types
+@using OpenRpg.Genres.Types
+@using OpenRpg.Items.Equippables.Slots
+@using OpenRpg.Items.Templates
+
+<PageTitle>Equipment Slot Validators</PageTitle>
+
+<Markdown>
+    ## Equipment Slot Validators
+
+    `IEquipmentSlotValidator` is the **policy object** that answers one question: *"can an item of
+    type **I** go into a slot of type **S**?"* It's a single method, returning a `bool`:
+
+    ```csharp
+    public interface IEquipmentSlotValidator
+    {
+        bool CanEquipItemType(int slotType, int itemType);
+    }
+    ```
+
+    That's the whole interface. The equipment system itself (`Equipment.Slots`, `AttemptEquipSlot`,
+    `AttemptUnequipSlot`) knows nothing about fantasy armour, sci-fi weapons, or ship engines; it
+    just consults whichever `IEquipmentSlotValidator` you've registered. The knowledge of *which
+    items belong in which slots* lives in the validator, not the equipment code.
+</Markdown>
+<br />
+
+<Markdown>
+    ### The Two Use Cases
+
+    The validator is the same one method, but it shows up in two distinct places:
+
+    **1. Hard gate inside `EquipmentExtensions.AttemptEquipSlot`** the equip operation vetoes
+    itself if the (slot, item) pair is invalid:
+
+    ```csharp
+    public static bool AttemptEquipSlot(this Equipment equipment, IEquipmentSlotValidator slotValidator,
+                                        int slotType, ItemData itemData, ItemTemplate template)
+    {
+        if (!equipment.HasSlot(slotType)) { return false; }
+        if (equipment.HasItemEquipped(slotType)) { return false; }
+        if (!slotValidator.CanEquipItemType(slotType, template.ItemType)) { return false; } // (the gate)
+        equipment.Slots[slotType] = itemData;
+        return true;
+    }
+    ```
+
+    **2. Soft filter for UI ("show me what I can equip here")** given an empty slot, filter the
+    inventory by asking the validator which items it would accept. This is the
+    `EquipmentService.GetCandidateItems` pattern from the Battler demo:
+
+    ```csharp
+    foreach (var itemData in inventory)
+    {
+        var template = dataSource.GetItemTemplate(itemData.TemplateId);
+        if (template == null) continue;
+        if (slotValidator.CanEquipItemType(slotType, template.ItemType)) // (same call)
+            candidates.Add((itemData, template));
+    }
+    ```
+
+    The interactive below demonstrates use case #2: pick a validator, pick a slot, and watch the
+    same inventory get filtered through three different policies.
+</Markdown>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Interactive: Same Inventory, Three Policies
+
+        Pick a validator on the tabs below. The slot list on the left and the candidate filter on
+        the right update to reflect the active policy. The inventory items never change only the
+        filter does.
+
+        > Click a slot in the list to filter the inventory through the active policy.
+    </Markdown>
+    <br />
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+        @for (var i = 0; i < _validators.Count; i++)
+        {
+            var index = i;
+            var isActive = _activeValidatorIndex == index;
+            <button type="button"
+                    @onclick="() => SetValidator(index)"
+                    style="@(isActive
+                        ? "padding: 0.5em 1em; border: 1px solid #363636; background: #363636; color: #fff; border-radius: 0.25em; cursor: pointer; font: inherit;"
+                        : "padding: 0.5em 1em; border: 1px solid #dbdbdb; background: #fff; color: #363636; border-radius: 0.25em; cursor: pointer; font: inherit;")">
+                @_validators[index].TabLabel
+            </button>
+        }
+    </div>
+    <p class="has-text-grey is-size-7">
+        Active policy: <code>@_validators[_activeValidatorIndex].ClassName</code> &mdash;
+        <em>@_validators[_activeValidatorIndex].DesignNote</em>
+    </p>
+    <br />
+    <div class="columns">
+        <div class="column is-one-third">
+            <h6 class="title is-6 has-text-dark">Slots for active policy</h6>
+            <div class="table-container">
+                <table class="table is-fullwidth is-narrow is-hoverable">
+                    <thead>
+                        <tr>
+                            <th>Slot</th>
+                            <th>Accepts item type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var slot in _validators[_activeValidatorIndex].Slots)
+                        {
+                            var captured = slot;
+                            <tr class="@(_activeSlot == captured.SlotType ? "is-selected" : "")"
+                                style="cursor: pointer;"
+                                @onclick="() => SetSlot(captured.SlotType)">
+                                <td>
+                                    <strong>@captured.FriendlyName</strong>
+                                    <br />
+                                    <span class="has-text-grey is-size-7">id: @captured.SlotType</span>
+                                </td>
+                                <td>
+                                    <span class="tag is-light">@captured.AcceptedItemTypeName</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="column">
+            <h6 class="title is-6 has-text-dark">Sandbox inventory: Filtered by active slot</h6>
+            <p class="has-text-grey is-size-7">
+                @AcceptedSummaryText()
+            </p>
+            <div class="table-container">
+                <table class="table is-fullwidth is-narrow is-striped">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Item type</th>
+                            <th>Accepted?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var entry in _sandboxItems)
+                        {
+                            var accepts = _validators[_activeValidatorIndex].Validator
+                                .CanEquipItemType(_activeSlot, entry.ItemType);
+                            <tr>
+                                <td>
+                                    <strong>@entry.Name</strong>
+                                </td>
+                                <td>
+                                    <code>@entry.ItemType</code>
+                                    <span class="has-text-grey is-size-7">
+                                        &mdash; @ItemTypeName(entry.ItemType)
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (accepts)
+                                    {
+                                        <span class="tag is-success is-light">&#x2713; accepts</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="tag is-danger is-light">&#x2717; rejects</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</CardSection>
+<br />
+
+<CardSection>
+    <Markdown Containerless="true">
+        ### Write Your Own
+
+        The interface is one method. Here's a skeleton for, say, a monster RPG with a single body
+        slot that accepts any wearable item:
+
+        ```csharp
+        public class MonsterEquipmentSlotValidator : IEquipmentSlotValidator
+        {
+            public bool CanEquipItemType(int slotType, int itemType)
+            {
+                if (slotType != MonsterSlotTypes.BodySlot) return false;
+                return itemType switch
+                {
+                    FantasyItemTypes.HeadItem        =&gt; true,
+                    FantasyItemTypes.UpperBodyArmour =&gt; true,
+                    FantasyItemTypes.LowerBodyArmour =&gt; true,
+                    FantasyItemTypes.FootArmour      =&gt; true,
+                    FantasyItemTypes.WristItem       =&gt; true,
+                    _ =&gt; false
+                };
+            }
+        }
+        ```
+
+        Register it the same way as any other service:
+
+        ```csharp
+        services.AddSingleton&lt;IEquipmentSlotValidator, MonsterEquipmentSlotValidator&gt;();
+        ```
+
+        > The rest of the equipment system &mdash; `Equipment`, `EquipmentSlots`, the
+        > `AttemptEquipSlot` extension &mdash; doesn't need to know you made a swap. That's the
+        > whole point of the policy object.
+    </Markdown>
+</CardSection>
+
+@code {
+    private int _activeValidatorIndex;
+    private int _activeSlot;
+    private List<ValidatorEntry> _validators = new();
+    private List<SandboxItem> _sandboxItems = new();
+
+    protected override void OnInitialized()
+    {
+        _validators = new List<ValidatorEntry>
+        {
+            new ValidatorEntry(
+                TabLabel: "Fantasy Character",
+                ClassName: nameof(FantasyCharacterEquipmentSlotValidator),
+                DesignNote: "Each slot accepts exactly one item type",
+                Validator: new FantasyCharacterEquipmentSlotValidator(),
+                Slots: new List<SlotEntry>
+                {
+                    new SlotEntry(FantasyEquipmentSlotTypes.HeadSlot,       "Head",       OwnItemTypeName(FantasyItemTypes.HeadItem,        "Fantasy")),
+                    new SlotEntry(FantasyEquipmentSlotTypes.BackSlot,       "Back",       OwnItemTypeName(FantasyItemTypes.BackArmour,      "Fantasy")),
+                    new SlotEntry(FantasyEquipmentSlotTypes.UpperBodySlot,  "Upper Body", OwnItemTypeName(FantasyItemTypes.UpperBodyArmour, "Fantasy")),
+                    new SlotEntry(FantasyEquipmentSlotTypes.LowerBodySlot,  "Lower Body", OwnItemTypeName(FantasyItemTypes.LowerBodyArmour, "Fantasy")),
+                    new SlotEntry(FantasyEquipmentSlotTypes.WristSlot,      "Wrists",     OwnItemTypeName(FantasyItemTypes.WristItem,       "Fantasy")),
+                    new SlotEntry(FantasyEquipmentSlotTypes.NeckSlot,       "Neck",       OwnItemTypeName(FantasyItemTypes.NeckItem,        "Fantasy")),
+                    new SlotEntry(FantasyEquipmentSlotTypes.MainHandSlot,   "Main Hand",  OwnItemTypeName(FantasyItemTypes.GenericWeapon,    "Shared")),
+                    new SlotEntry(FantasyEquipmentSlotTypes.OffHandSlot,    "Off Hand",   OwnItemTypeName(FantasyItemTypes.OffhandItem,      "Fantasy")),
+                    new SlotEntry(FantasyEquipmentSlotTypes.Ring1Slot,      "Ring 1",     OwnItemTypeName(FantasyItemTypes.RingItem,        "Fantasy")),
+                    new SlotEntry(FantasyEquipmentSlotTypes.Ring2Slot,      "Ring 2",     OwnItemTypeName(FantasyItemTypes.RingItem,        "Fantasy")),
+                    new SlotEntry(FantasyEquipmentSlotTypes.FootSlot,       "Feet",       OwnItemTypeName(FantasyItemTypes.FootArmour,       "Fantasy"))
+                }),
+            new ValidatorEntry(
+                TabLabel: "SciFi Character",
+                ClassName: nameof(SciFiCharacterEquipmentSlotValidator),
+                DesignNote: "Two broad slots, each accepts a single broad item type",
+                Validator: new SciFiCharacterEquipmentSlotValidator(),
+                Slots: new List<SlotEntry>
+                {
+                    new SlotEntry(ScifiEntityEquipmentSlotTypes.WeaponSlot, "Weapon", OwnItemTypeName(ScifiItemTypes.GenericWeapon, "Shared")),
+                    new SlotEntry(ScifiEntityEquipmentSlotTypes.ArmourSlot, "Armour", OwnItemTypeName(ScifiItemTypes.Armour,         "SciFi"))
+                }),
+            new ValidatorEntry(
+                TabLabel: "SciFi Ship",
+                ClassName: nameof(SciFiShipEquipmentSlotValidator),
+                DesignNote: "Six weapon slots and four misc slots, each sharing the same item type",
+                Validator: new SciFiShipEquipmentSlotValidator(),
+                Slots: new List<SlotEntry>
+                {
+                    new SlotEntry(ShipEquipmentSlotTypes.EngineSlot,      "Engine",     OwnItemTypeName(ShipItemTypes.Engine,        "Ship")),
+                    new SlotEntry(ShipEquipmentSlotTypes.HullArmourSlot,  "Hull Armour",OwnItemTypeName(ShipItemTypes.HullArmour,    "Ship")),
+                    new SlotEntry(ShipEquipmentSlotTypes.ShieldSlot,      "Shield",     OwnItemTypeName(ShipItemTypes.Shield,        "Ship")),
+                    new SlotEntry(ShipEquipmentSlotTypes.WingsSlot,       "Wings",      OwnItemTypeName(ShipItemTypes.Wings,         "Ship")),
+                    new SlotEntry(ShipEquipmentSlotTypes.WeaponSlot1,     "Weapon 1",   OwnItemTypeName(ShipItemTypes.GenericWeapon, "Shared")),
+                    new SlotEntry(ShipEquipmentSlotTypes.WeaponSlot2,     "Weapon 2",   OwnItemTypeName(ShipItemTypes.GenericWeapon, "Shared")),
+                    new SlotEntry(ShipEquipmentSlotTypes.WeaponSlot3,     "Weapon 3",   OwnItemTypeName(ShipItemTypes.GenericWeapon, "Shared")),
+                    new SlotEntry(ShipEquipmentSlotTypes.WeaponSlot4,     "Weapon 4",   OwnItemTypeName(ShipItemTypes.GenericWeapon, "Shared")),
+                    new SlotEntry(ShipEquipmentSlotTypes.WeaponSlot5,     "Weapon 5",   OwnItemTypeName(ShipItemTypes.GenericWeapon, "Shared")),
+                    new SlotEntry(ShipEquipmentSlotTypes.WeaponSlot6,     "Weapon 6",   OwnItemTypeName(ShipItemTypes.GenericWeapon, "Shared")),
+                    new SlotEntry(ShipEquipmentSlotTypes.MiscSlot1,       "Misc 1",     OwnItemTypeName(ShipItemTypes.Misc,          "Ship")),
+                    new SlotEntry(ShipEquipmentSlotTypes.MiscSlot2,       "Misc 2",     OwnItemTypeName(ShipItemTypes.Misc,          "Ship")),
+                    new SlotEntry(ShipEquipmentSlotTypes.MiscSlot3,       "Misc 3",     OwnItemTypeName(ShipItemTypes.Misc,          "Ship")),
+                    new SlotEntry(ShipEquipmentSlotTypes.MiscSlot4,       "Misc 4",     OwnItemTypeName(ShipItemTypes.Misc,          "Ship"))
+                })
+        };
+
+        _sandboxItems = new List<SandboxItem>
+        {
+            new SandboxItem("Rusted Sword",     FantasyItemTypes.GenericWeapon),
+            new SandboxItem("Iron Helm",        FantasyItemTypes.HeadItem),
+            new SandboxItem("Leather Chest",    FantasyItemTypes.UpperBodyArmour),
+            new SandboxItem("Cloth Trousers",   FantasyItemTypes.LowerBodyArmour),
+            new SandboxItem("Tattered Cape",    FantasyItemTypes.BackArmour),
+            new SandboxItem("Worn Boots",       FantasyItemTypes.FootArmour),
+            new SandboxItem("Leather Bracers",  FantasyItemTypes.WristItem),
+            new SandboxItem("Copper Amulet",    FantasyItemTypes.NeckItem),
+            new SandboxItem("Silver Ring",      FantasyItemTypes.RingItem),
+            new SandboxItem("Wooden Shield",    FantasyItemTypes.OffhandItem),
+            new SandboxItem("Plasma Rifle",     ScifiItemTypes.GenericWeapon),
+            new SandboxItem("Titanium Plating", ScifiItemTypes.Armour),
+            new SandboxItem("Mk3 Engine",       ShipItemTypes.Engine),
+            new SandboxItem("Hull Plate",       ShipItemTypes.HullArmour),
+            new SandboxItem("Deflector Shield", ShipItemTypes.Shield),
+            new SandboxItem("Stealth Wings",    ShipItemTypes.Wings),
+            new SandboxItem("Laser Cannon",     ShipItemTypes.GenericWeapon),
+            new SandboxItem("Holo Emitter",     ShipItemTypes.Misc)
+        };
+
+        _activeSlot = _validators[_activeValidatorIndex].Slots[0].SlotType;
+    }
+
+    private void SetValidator(int index)
+    {
+        _activeValidatorIndex = index;
+        _activeSlot = _validators[index].Slots[0].SlotType;
+    }
+
+    private void SetSlot(int slotType) => _activeSlot = slotType;
+
+    private string AcceptedSummaryText()
+    {
+        var slot = _validators[_activeValidatorIndex].Slots
+            .FirstOrDefault(s => s.SlotType == _activeSlot);
+        var acceptsCount = _sandboxItems.Count(entry =>
+            _validators[_activeValidatorIndex].Validator.CanEquipItemType(_activeSlot, entry.ItemType));
+        var slotName = slot?.FriendlyName ?? $"slot #{_activeSlot}";
+        return $"{acceptsCount} of {_sandboxItems.Count} items in your inventory can be equipped into {slotName}.";
+    }
+
+    private static readonly List<(int Id, string Name, string Source)> ItemTypeNameEntries = new()
+    {
+        (GenresItemTypes.GenericWeapon,    "GenericWeapon",    "Shared"),
+        (GenresItemTypes.GenericItem,      "GenericItem",      "Shared"),
+        (GenresItemTypes.QuestItem,        "QuestItem",        "Shared"),
+        (FantasyItemTypes.HeadItem,        "HeadItem",         "Fantasy"),
+        (FantasyItemTypes.UpperBodyArmour, "UpperBodyArmour",  "Fantasy"),
+        (FantasyItemTypes.LowerBodyArmour, "LowerBodyArmour",  "Fantasy"),
+        (FantasyItemTypes.BackArmour,      "BackArmour",       "Fantasy"),
+        (FantasyItemTypes.FootArmour,      "FootArmour",       "Fantasy"),
+        (FantasyItemTypes.WristItem,       "WristItem",        "Fantasy"),
+        (FantasyItemTypes.NeckItem,        "NeckItem",         "Fantasy"),
+        (FantasyItemTypes.RingItem,        "RingItem",         "Fantasy"),
+        (FantasyItemTypes.OffhandItem,     "OffhandItem",      "Fantasy"),
+        (FantasyItemTypes.Potions,         "Potions",          "Fantasy"),
+        (ScifiItemTypes.Armour,            "Armour",           "SciFi"),
+        (ScifiItemTypes.Consumable,        "Consumable",       "SciFi"),
+        (ShipItemTypes.Wings,              "Wings",            "Ship"),
+        (ShipItemTypes.HullArmour,         "HullArmour",       "Ship"),
+        (ShipItemTypes.Shield,             "Shield",           "Ship"),
+        (ShipItemTypes.Engine,             "Engine",           "Ship"),
+        (ShipItemTypes.Misc,               "Misc",             "Ship"),
+        (ShipItemTypes.Consumable,         "Consumable",       "Ship")
+    };
+
+    private static string ItemTypeName(int itemType)
+    {
+        var matches = ItemTypeNameEntries
+            .Where(e => e.Id == itemType)
+            .Select(e => $"{e.Name} ({e.Source})")
+            .ToList();
+
+        return matches.Count == 0 ? $"#{itemType}" : string.Join(" / ", matches);
+    }
+
+    private static string OwnItemTypeName(int itemType, string source)
+    {
+        var match = ItemTypeNameEntries.FirstOrDefault(e => e.Id == itemType && e.Source == source);
+        if (match == default) { return $"#{itemType}"; }
+        var isShared = ItemTypeNameEntries.Any(e => e.Id == itemType && e.Source != source);
+        return isShared ? $"{match.Name} (Shared)" : match.Name;
+    }
+
+    private record ValidatorEntry(
+        string TabLabel,
+        string ClassName,
+        string DesignNote,
+        IEquipmentSlotValidator Validator,
+        List<SlotEntry> Slots);
+
+    private record SlotEntry(int SlotType, string FriendlyName, string AcceptedItemTypeName);
+
+    private record SandboxItem(string Name, int ItemType);
+}

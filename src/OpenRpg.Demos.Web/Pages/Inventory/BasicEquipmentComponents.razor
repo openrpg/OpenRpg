@@ -1,0 +1,237 @@
+@page "/inventory/equipment-components"
+
+@using OpenRpg.Core.Templates
+@using OpenRpg.Demos.Infrastructure.Lookups
+@using OpenRpg.Demos.Web.Components.Equipment
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Genres.Populators.Entity
+@using OpenRpg.Items
+@using OpenRpg.Items.Equippables
+@using OpenRpg.Items.Equippables.Slots
+@using OpenRpg.Items.Extensions
+@using Inventory = OpenRpg.Items.Inventories.Inventory
+@using OpenRpg.Items.Templates
+
+@inject IJSRuntime JSRuntime
+@inject ITemplateAccessor TemplateAccessor
+@inject IEquipmentSlotValidator EquipmentSlotValidator;
+@inject DemoCharacterBuilder CharacterBuilder;
+@inject ICharacterPopulator CharacterPopulator;
+
+<Markdown>
+    ## Basic Equipment Components
+    Most RPG games have the notion of equipment, be it simple things like a weapon you have equipped, or a whole plethora of attire with different effects.
+    
+    It also may not even be a character as such, in Sci-Fi settings you may have your ship equipped with different weapons/wings/armour etc.
+    
+    So to support all these use cases we expose a flexible equipment system which focuses on the notion of `Slots` which can support various item types which have `IEquipmentSlotValidators` setup to gate what can/cant be equipped in each slot.
+
+</Markdown>
+<br />
+<Markdown>
+    ## Example Equipment
+    Like the `Inventory` example, let have a quick example of how equipment can look/function in action then we can discuss whats going on.
+    
+    At the heart of it we express the slots we want the user to be able to equip into, in this example we have head, chest, main hand, off hand and feet.
+    
+    We can then click on items in the inventory and have them be equipped into the slots we have defined, or if we click on the equipped items they will be unequipped.
+    
+    > We are using the `Fantasy` Genre slot types here, which also support shoulders, rings, back, lower body slots etc, but you don't have to use all those slots
+    > you can also use different slot types for custom scenarios, or more advanced setups. Ultimately the `EquipmentSlots` are just a `IVariable` like everything else
+    > so expose whatever extensions you want on there.
+</Markdown>
+
+<br />
+<div class="columns">
+    <div class="column is-two-fifths">
+        <CardSection>
+            <div>
+                <h6 class="title is-6 has-text-centered has-text-dark">Inventory</h6>
+                <h6 class="subtitle is-6 has-text-dark has-text-centered">Click the item to equip it</h6>
+            </div>
+            <br />
+            <BasicInventory Inventory="_character.Variables.Inventory" OnItemInteraction="AttemptEquip" 
+                            @ref="_inventoryRef" TemplateAccessor="TemplateAccessor" SlotsPerRow="4" />
+        </CardSection>
+    </div>
+    <div class="column is-one-fifth">
+        <CardSection>
+            <div>
+                <h6 class="title is-6 has-text-centered has-text-dark">Equipment</h6>
+                <h6 class="subtitle is-6 has-text-dark has-text-centered">Click the item to unequip it</h6>
+            </div>
+            <br />
+            <BasicEquipment Equipment="_character.Variables.Equipment" OnItemInteraction="AttemptUnequip" 
+                            @ref="_equipmentRef" TemplateAccessor="TemplateAccessor" />
+            <br />
+            <div>
+                <h6 class="subtitle is-6 has-text-dark has-text-centered">Check the character stats/effects to see how equipping items changes things.</h6>
+            </div>
+        </CardSection>
+    </div>
+    <div class="column is-two-fifths">
+        <CardSection>
+            <BasicCharacter Character="@_character" TemplateAccessor="TemplateAccessor" />
+        </CardSection>
+    </div>
+</div>
+<br />
+<Markdown>
+    ## Equipment Setup
+    It is all driven by the `Equipment` object, which is available on the characters variables (i.e `character.Variables.Equipment`).
+    
+    This `Equipment` object provides a:
+    - `Slots` property which is a dictionary of `ItemData` objects, which are keyed off of the slot type.
+    - `Variables` property which is just like any other variables object and you can store what you want here
+    
+    The main idea is that you would decide what slots you want to support then add them i.e:
+    
+    ```csharp
+    // Add a head and foot slot
+    Equipment.Slots[FantasyEquipmentSlotTypes.HeadSlot] =  null;
+    Equipment.Slots[FantasyEquipmentSlotTypes.FootSlot] =  null;
+    ```
+    
+    > As mentioned before we are using the `Fantasy` Genre for a lot of the existing types, but you can use whatever you want, there is also a premade `Equipment.PopulateFantasySlots()` extension which will auto populate all fantasy slots for you.
+</Markdown>
+<Markdown>
+    ## Equipping and Unequipping
+
+    Once we have setup whatever equipment slots we need, we can then start equipping and unequipping items, out the box we have extension methods that let us do this but to use them you also need to implement `IEquipmentSlotValidator` which provides a high level way to verify is a slot can receive an item of a given type etc.
+    
+    > This validator is not the *only* thing that decides if something can be equipped, this just checks to see if the item type matches is applicable, but there can also be things such as `Requirements` or other custom logic that will stop an item being equipped using the out the box logic.
+    
+    As an example of showing all this code together we can do something like:
+    
+    ```csharp
+    var equipment = new Equipment();    // Make equipment object
+    equipment.PopulateFantasySlots();   // Populate slots for Fantasy scenario
+    
+    var itemToEquip = new ItemData { TemplateId = ItemTemplateLookups.Sword };  // Make item to equip
+    var itemTemplate = TemplateAccessor.GetTemplate(itemToEquip.TemplateId);    // Get its template
+    
+    var equipmentSlotValidator = new FantasyCharacterEquipmentSlotValidator();  // Create a Fantasy flavour slot validator
+    
+    // This will return true if the item could be equipped/false if not (there is also an overload that takes IRequirementChecker and Context)
+    var success = equipment.AttemptEquipSlot(equipmentSlotValidator, FantasyEquipmentSlotTypes.MainHandSlot, itemToEquip, itemTemplate);
+    
+    // unequippedItem will be null if it couldnt be de-equipped or there was nothing in the slot to begin with
+    var unequippedItem = equipment.AttemptUnequipSlot(FantasyEquipmentSlotTypes.MainHandSlot);
+    ```
+    
+    You can completely side step this and make your own suite of methods for handing equipment, but this shows a bare bones way of handling it without much effort.
+    
+    In more complex scenarios where you may be going over domain boundries i.e asking a server if they can equip something etc you would possibly need to wrap some of this logic with your own, but as with everything we try to give a reasonable out the box solution to the problem.
+    
+    > It is not shown in the above but the assumption is that you would probably have an `Inventory` in scope on the `Character` or whatever to put the unequipped items in or take them from, its up to you how you manage your items etc, the equipment just cares that you provide it the data it requires, see the source code of the interactive example above for how to handle this sort of scenario on the `Character` directly.
+</Markdown>
+@code {
+    private Item _rubbishSwordItem, _superSwordItem, _chestArmorItem, _bootsItem, _helmItem;
+    private Character _character;
+    private BasicInventory _inventoryRef;
+    private BasicEquipment _equipmentRef;
+
+    protected override void OnInitialized()
+    {
+        _rubbishSwordItem = MakeRubbishSword();
+        _superSwordItem = MakeSuperSword();
+        _chestArmorItem = MakeChest();
+        _bootsItem = MakeBoots();
+        _helmItem = MakeHelm();
+        
+        var inventory = new Inventory();
+        inventory.Variables.MaxSlots = 16;
+        inventory.Items.Add(_rubbishSwordItem.Data);
+        inventory.Items.Add(_superSwordItem.Data);
+        inventory.Items.Add(_chestArmorItem.Data);
+        inventory.Items.Add(_bootsItem.Data);
+        inventory.Items.Add(_helmItem.Data);
+
+        _character = CharacterBuilder.CreateNew().Build();
+        _character.Variables.Inventory = inventory;
+        _character.Variables.Equipment = new Equipment();
+        _character.Variables.Equipment.PopulateFantasySlots();
+        
+        base.OnInitialized();
+    }
+
+    private Item MakeRubbishSword()
+    {
+        var item = new ItemData { TemplateId = ItemTemplateLookups.Sword };
+        return TemplateAccessor.ToInstance(item);
+    }
+
+    private Item MakeSuperSword()
+    {
+        var item = new ItemData { TemplateId = ItemTemplateLookups.SuperSword };
+        return TemplateAccessor.ToInstance(item);
+    }
+
+    private Item MakeChest()
+    {
+        var item = new ItemData { TemplateId = ItemTemplateLookups.Chest };
+        return TemplateAccessor.ToInstance(item);
+    }
+
+    private Item MakeHelm()
+    {
+        var item = new ItemData { TemplateId = ItemTemplateLookups.Helm };
+        return TemplateAccessor.ToInstance(item);
+    }
+
+    private Item MakeBoots()
+    {
+        var item = new ItemData { TemplateId = ItemTemplateLookups.Boots };
+        return TemplateAccessor.ToInstance(item);
+    }
+
+    public void AttemptEquip(Item itemToEquip)
+    {
+        var itemSlotType = GetItemSlotFor(itemToEquip);
+        if(_character.Variables.Equipment.HasItemEquipped(itemSlotType))
+        { AttemptUnequip(itemSlotType); }
+        
+        var hasEquipped = _character.Variables.Equipment.AttemptEquipSlot(EquipmentSlotValidator, itemSlotType, itemToEquip.Data, itemToEquip.Template);
+        if (hasEquipped)
+        { _character.Variables.Inventory.AttemptRemoveItem(itemToEquip.Data); }
+
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        CharacterPopulator.Populate(_character);
+        
+        _inventoryRef.Refresh();
+        _equipmentRef.Refresh();
+    }
+    
+    public void AttemptUnequip(Item itemToEquip)
+    {
+        var itemSlotType = GetItemSlotFor(itemToEquip);
+        AttemptUnequip(itemSlotType);
+    }
+    
+    public void AttemptUnequip(int slotType)
+    {
+        var unequippedItemData = _character.Variables.Equipment.AttemptUnequipSlot(slotType);
+
+        var unequippedItem = TemplateAccessor.ToInstance(unequippedItemData);
+        if (unequippedItemData != null)
+        { _character.Variables.Inventory.AttemptAddItem(unequippedItem); }
+
+        Refresh();
+    }
+
+    public int GetItemSlotFor(Item item)
+    {
+        var itemType = item.Template.ItemType;
+        if(itemType == FantasyItemTypes.HeadItem) { return FantasyEquipmentSlotTypes.HeadSlot; }
+        if(itemType == FantasyItemTypes.UpperBodyArmour) { return FantasyEquipmentSlotTypes.UpperBodySlot; }
+        if(itemType == FantasyItemTypes.GenericWeapon) { return FantasyEquipmentSlotTypes.MainHandSlot; }
+        if(itemType == FantasyItemTypes.FootArmour) { return FantasyEquipmentSlotTypes.FootSlot; }
+        return FantasyEquipmentSlotTypes.UnknownSlot;
+    }
+}

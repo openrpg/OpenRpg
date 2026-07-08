@@ -21,27 +21,36 @@ namespace OpenRpg.Items.TradeSkills.Extensions
             };
 
             if (tradeSkillItemEntry.Variables.HasAmount())
-            { wrapperItem.Variables.Amount(tradeSkillItemEntry.Variables.Amount()); }
+            { wrapperItem.Variables.Amount = tradeSkillItemEntry.Variables.Amount; }
 
             if (wrapperItem.Variables.HasWeight())
-            { wrapperItem.Variables.Weight(tradeSkillItemEntry.Variables.Weight()); }
+            { wrapperItem.Variables.Weight = tradeSkillItemEntry.Variables.Weight; }
 
             return wrapperItem;
         }
         
         public static bool HasAmount(this TradeSkillItemEntryVariables variables)
         { return variables.ContainsKey(TradeSkillItemEntryVariableTypes.Amount); }
-        
-        public static int Amount(this TradeSkillItemEntryVariables variables)
-        { return variables.GetIntOrDefault(TradeSkillItemEntryVariableTypes.Amount, 1); }
 
-        public static void Amount(this TradeSkillItemEntryVariables variables, int value)
-        { variables[TradeSkillItemEntryVariableTypes.Amount] = value; }
+        extension(TradeSkillItemEntryVariables vars)
+        {
+            public int Amount
+            {
+                get => vars.GetIntOrDefault(TradeSkillItemEntryVariableTypes.Amount, 1);
+                set => vars[TradeSkillItemEntryVariableTypes.Amount] = value;
+            }
+        }
 
         public static bool HasWeight(this TradeSkillItemEntryVariables variables)
         { return variables.ContainsKey(TradeSkillItemEntryVariableTypes.Weight); }
         
-        public static float Weight(this TradeSkillItemEntryVariables variables) => variables.GetFloat(TradeSkillItemEntryVariableTypes.Weight);
-        public static void Weight(this TradeSkillItemEntryVariables variables, float value) => variables[TradeSkillItemEntryVariableTypes.Weight] = value;
+        extension(TradeSkillItemEntryVariables vars)
+        {
+            public float Weight
+            {
+                get => vars.GetFloat(TradeSkillItemEntryVariableTypes.Weight);
+                set => vars[TradeSkillItemEntryVariableTypes.Weight] = value;
+            }
+        }
     }
 }

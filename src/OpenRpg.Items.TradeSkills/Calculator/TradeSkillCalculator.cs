@@ -11,9 +11,9 @@ namespace OpenRpg.Items.TradeSkills.Calculator
     public class TradeSkillCalculator : ITradeSkillCalculator
     {
         /// <summary>
-        /// This is the gated minimum threshold of the 0-1 plot check, defaults to 0.5f
+        /// This is the gated minimum threshold of the 0-1 plot check, defaults to 0.1f
         /// </summary>
-        public float MinimumPointThreshold { get; set; } = 0.5f;
+        public float MinimumPointThreshold { get; set; } = 0.1f;
         
         /// <summary>
         /// This is the multiplier added to the resulting value post randomness calculations, defaults to 1.0f
@@ -41,15 +41,8 @@ namespace OpenRpg.Items.TradeSkills.Calculator
         /// <param name="curveFunction">The optional curve function to apply, by default uses inverse linear</param>
         public TradeSkillCalculator(IRandomizer randomizer, ICurveFunction curveFunction = null)
         {
-            SkillPointCurve = new ScalingFunction(curveFunction ?? PresetCurves.InverseLinear, 0, 1, 0, MaximumSkillDifference);
+            SkillPointCurve = new ScalingFunction(curveFunction ?? PresetCurves.InverseLinear, new RangeF(0, 1), new RangeF(0, MaximumSkillDifference));
             Randomizer = randomizer;
-        }
-
-        public bool CanUseSkill(int skillScore, int skillDifficulty)
-        {
-            var skillDifference = skillDifficulty - skillScore;
-            var absoluteScore = Math.Abs(skillDifference);
-            return absoluteScore <= MaximumSkillDifference;
         }
     
         public int CalculateSkillUpPointsFor(int skillScore, int skillDifficulty)
@@ -60,8 +53,9 @@ namespace OpenRpg.Items.TradeSkills.Calculator
 
             var result = SkillPointCurve.Plot(absoluteScore);
             var randomVariance = Randomizer.Random(-RandomnessVariance, RandomnessVariance);
-            if (result < MinimumPointThreshold) { return 0; }
-            return (int)Math.Round((result + randomVariance) * PointMultiplier);
+            var totalResult = result + randomVariance;
+            if (totalResult <= MinimumPointThreshold) { return 0; }
+            return (int)Math.Ceiling(totalResult * PointMultiplier);
         }
     }
 }

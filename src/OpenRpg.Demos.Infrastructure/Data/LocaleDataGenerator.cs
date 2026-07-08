@@ -27,7 +27,10 @@ namespace OpenRpg.Demos.Infrastructure.Data
         public static readonly string CardTypesTextKey = "types-cards-";
         public static readonly string UtilityTypesTextKey = "types-ai-utility-";
         public static readonly string AdviceTypesTextKey = "types-ai-advice-";
-        
+        public static readonly string TradeSkillTypesTextKey = "types-trade-skill-";
+        public static readonly string FactionNameTextKey = "factions-name-";
+        public static readonly string FactionDescTextKey = "factions-desc-";
+
         public IEnumerable<LocaleDataset> GenerateData()
         {
             var localeDataset = new LocaleDataset { LocaleCode = "en-gb" };
@@ -44,6 +47,9 @@ namespace OpenRpg.Demos.Infrastructure.Data
             GenerateCardTypeLocaleText(localeDataset);
             GenerateUtilityTypeLocaleText(localeDataset);
             GenerateAdviceTypeLocaleText(localeDataset);
+            GenerateTradeSkillTypeLocaleText(localeDataset);
+            GenerateFactionLocaleText(localeDataset);
+            GenerateAbilityLocaleText(localeDataset);
 
             return new[] { localeDataset };
         }
@@ -131,6 +137,44 @@ namespace OpenRpg.Demos.Infrastructure.Data
         {
             GetTypeFieldsDictionary<AdviceVariableTypes>()
                 .ForEach((key, value) => localeDataset.LocaleData.Add(GetKeyFor(AdviceTypesTextKey, key), value));
+        }
+        
+        public void GenerateTradeSkillTypeLocaleText(LocaleDataset localeDataset)
+        {
+            GetTypeFieldsDictionary<FantasyTradeSkillTypes>()
+                .ForEach((key, value) => localeDataset.LocaleData.Add(GetKeyFor(TradeSkillTypesTextKey, key), value));
+        }
+
+        public void GenerateFactionLocaleText(LocaleDataset localeDataset)
+        {
+            localeDataset.LocaleData.Add(GetKeyFor(FactionNameTextKey, FactionDataGenerator.MerchantsGuildId), "Merchants Guild");
+            localeDataset.LocaleData.Add(GetKeyFor(FactionDescTextKey, FactionDataGenerator.MerchantsGuildId), "A powerful trade organisation that controls most commerce in the region.");
+            localeDataset.LocaleData.Add(GetKeyFor(FactionNameTextKey, FactionDataGenerator.CityGuardId), "City Guard");
+            localeDataset.LocaleData.Add(GetKeyFor(FactionDescTextKey, FactionDataGenerator.CityGuardId), "The official law enforcement arm of the city.");
+            localeDataset.LocaleData.Add(GetKeyFor(FactionNameTextKey, FactionDataGenerator.ThievesGuildId), "Thieves Guild");
+            localeDataset.LocaleData.Add(GetKeyFor(FactionDescTextKey, FactionDataGenerator.ThievesGuildId), "A shadowy network of rogues and smugglers operating in the underbelth.");
+        }
+
+        public void GenerateAbilityLocaleText(LocaleDataset localeDataset)
+        {
+            var pairs = new (string Key, string Name, string Description)[]
+            {
+                ("ability-slash", "Slash", "A sweeping strike that hits multiple front-row enemies."),
+                ("ability-power-strike", "Power Strike", "A powerful overhand strike that deals heavy damage."),
+                ("ability-chi-blast", "Chi Blast", "A burst of inner energy that strikes all enemies."),
+                ("ability-focus-strike", "Focus Strike", "A precise, focused blow that deals massive damage."),
+                ("ability-backstab", "Backstab", "A vicious strike from the shadows."),
+                ("ability-poison-blade", "Poison Blade", "A venomous slash that poisons the target."),
+                ("ability-fire-bolt", "Fire Bolt", "A bolt of searing fire."),
+                ("ability-ice-storm", "Ice Storm", "A freezing storm that assails all enemies."),
+                ("ability-cure", "Cure", "Heals a single ally for a moderate amount of HP."),
+                ("ability-cura", "Cura", "Heals the entire party for a small amount of HP."),
+            };
+            foreach (var pair in pairs)
+            {
+                localeDataset.LocaleData.Add(pair.Key, pair.Name);
+                localeDataset.LocaleData.Add(pair.Key + "-desc", pair.Description);
+            }
         }
     }
 }

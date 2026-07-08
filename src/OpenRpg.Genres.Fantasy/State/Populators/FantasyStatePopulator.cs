@@ -19,9 +19,9 @@ namespace OpenRpg.Genres.Fantasy.State.Populators
             if(statsVars == null) { return; }
 
             var entityStats = statsVars as EntityStatsVariables;
-            state.Health(entityStats.MaxHealth());
-            state.Stamina(entityStats.MaxStamina());
-            state.Mana(entityStats.MaxMana());
+            state.Health = entityStats.MaxHealth;
+            state.Stamina = entityStats.MaxStamina;
+            state.Mana = entityStats.MaxMana;
         }
     }
 }

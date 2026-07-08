@@ -1,0 +1,66 @@
+@using OpenRpg.Core.Associations
+@using OpenRpg.Editor.Core.Plugins
+@using OpenRpg.Editor.Infrastructure.Services
+
+<td>
+    <div class="control">
+        @if (IdOptions is { Length: > 0 } || ShowDropdown)
+        {
+            <div class="select is-fullwidth">
+                <select value="@AssociatedId" @onchange="OnIdChanged">
+                    <option value="0">Select...</option>
+                    @foreach (var option in IdOptions)
+                    {
+                        <option value="@option.Id">@option.Name</option>
+                    }
+                </select>
+            </div>
+        }
+        else if (IdDisabled)
+        {
+            <input class="input" type="text" value="@AssociatedId" disabled style="background-color: #f5f5f5;" />
+        }
+        else
+        {
+            <input class="input" type="text" value="@AssociatedId" @onchange="OnIdChanged" />
+        }
+    </div>
+</td>
+<td>
+    <div class="control">
+        <input class="input" type="text" value="@AssociatedValue" @onchange="OnValueChanged" />
+    </div>
+</td>
+
+@code {
+    [Parameter]
+    public Association Association { get; set; }
+
+    [Parameter]
+    public EventCallback<Association> AssociationChanged { get; set; }
+
+    [Parameter]
+    public OptionData[] IdOptions { get; set; }
+
+    [Parameter]
+    public bool IdDisabled { get; set; }
+
+    [Parameter]
+    public bool ShowDropdown { get; set; }
+
+    int AssociatedId => Association.AssociatedId;
+
+    int AssociatedValue => Association.AssociatedValue;
+
+    void OnIdChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var id))
+            AssociationChanged.InvokeAsync(new Association(id, Association.AssociatedValue));
+    }
+
+    void OnValueChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var value))
+            AssociationChanged.InvokeAsync(new Association(Association.AssociatedId, value));
+    }
+}

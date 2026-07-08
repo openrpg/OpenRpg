@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using OpenRpg.Core.Associations;
 using OpenRpg.Core.Extensions;
@@ -10,21 +11,26 @@ namespace OpenRpg.Entities.Extensions
     {
         public static bool HasLevel(this ITemplateDataVariables vars)
             => vars.ContainsKey(CoreTemplateDataVariableTypes.Level);
-        
-        public static int Level(this ITemplateDataVariables vars)
-            => vars.GetIntOrDefault(CoreTemplateDataVariableTypes.Level, 1);
-        
-        public static void Level(this ITemplateDataVariables vars, int level)
-            => vars[CoreTemplateDataVariableTypes.Level] = level;
+
+        extension(ITemplateDataVariables vars)
+        {
+            public int Level
+            {
+                get => vars.GetIntOrDefault(CoreTemplateDataVariableTypes.Level, 1);
+                set => vars[CoreTemplateDataVariableTypes.Level] = value;
+            }
+        }
         
         public static bool HasProceduralAssociation(this ITemplateDataVariables vars)
             => vars.ContainsKey(CoreTemplateDataVariableTypes.ProceduralAssociations);
         
-        public static IReadOnlyCollection<Association> ProceduralAssociation(this ITemplateDataVariables vars)
-            => vars.GetAsOrDefault(CoreTemplateDataVariableTypes.ProceduralAssociations, () => new List<Association>());
-        
-        public static void ProceduralAssociation(this ITemplateDataVariables vars, IReadOnlyCollection<Association> effectAssociations)
-            => vars[CoreTemplateDataVariableTypes.ProceduralAssociations] = effectAssociations;
-
+        extension(ITemplateDataVariables vars)
+        {
+            public IReadOnlyCollection<Association> ProceduralAssociation
+            {
+                get => vars.GetAsOrDefaultAndSet(CoreTemplateDataVariableTypes.ProceduralAssociations, () => new List<Association>());
+                set => vars[CoreTemplateDataVariableTypes.ProceduralAssociations] = value;
+            }
+        }
     }
 }

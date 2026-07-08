@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using OpenRpg.Entities.Stats.Variables;
 using OpenRpg.Genres.Fantasy.Types;
 
@@ -6,67 +5,190 @@ namespace OpenRpg.Genres.Fantasy.Extensions
 {
     public static class EntityStatVariableExtensions
     {
-        public static int Strength(this EntityStatsVariables stats) => (int)stats.Get(FantasyEntityStatsVariableTypes.Strength);
-        public static int Dexterity(this EntityStatsVariables stats) => (int)stats.Get(FantasyEntityStatsVariableTypes.Dexterity);
-        public static int Constitution(this EntityStatsVariables stats) => (int)stats.Get(FantasyEntityStatsVariableTypes.Constitution);
-        public static int Intelligence(this EntityStatsVariables stats) => (int)stats.Get(FantasyEntityStatsVariableTypes.Intelligence);
-        public static int Wisdom(this EntityStatsVariables stats) => (int)stats.Get(FantasyEntityStatsVariableTypes.Wisdom);
-        public static int Charisma(this EntityStatsVariables stats) => (int)stats.Get(FantasyEntityStatsVariableTypes.Charisma);
-        public static void Strength(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.Strength] = value;
-        public static void Dexterity(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.Dexterity] = value;
-        public static void Constitution(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.Constitution] = value;
-        public static void Intelligence(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.Intelligence] = value;
-        public static void Wisdom(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.Wisdom] = value;
-        public static void Charisma(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.Charisma] = value;
+        extension(EntityStatsVariables stats)
+        {
+            public int Strength
+            {
+                get => (int)stats.Get(FantasyEntityStatsVariableTypes.Strength);
+                set => stats[FantasyEntityStatsVariableTypes.Strength] = value;
+            }
+            
+            public int Dexterity
+            {
+                get => (int)stats.Get(FantasyEntityStatsVariableTypes.Dexterity);
+                set => stats[FantasyEntityStatsVariableTypes.Dexterity] = value;
+            }
+            
+            public int Constitution
+            {
+                get => (int)stats.Get(FantasyEntityStatsVariableTypes.Constitution);
+                set => stats[FantasyEntityStatsVariableTypes.Constitution] = value;
+            }
+            
+            public int Intelligence
+            {
+                get => (int)stats.Get(FantasyEntityStatsVariableTypes.Intelligence);
+                set => stats[FantasyEntityStatsVariableTypes.Intelligence] = value;
+            }
+            
+            public int Wisdom
+            {
+                get => (int)stats.Get(FantasyEntityStatsVariableTypes.Wisdom);
+                set => stats[FantasyEntityStatsVariableTypes.Wisdom] = value;
+            }
+            
+            public int Charisma
+            {
+                get => (int)stats.Get(FantasyEntityStatsVariableTypes.Charisma);
+                set => stats[FantasyEntityStatsVariableTypes.Charisma] = value;
+            }
+        }
 
-        public static void MaxMana(this EntityStatsVariables stats, int value) => stats[FantasyEntityStatsVariableTypes.MaxMana] = value;
-        public static int MaxMana(this EntityStatsVariables stats) => (int)stats.Get(FantasyEntityStatsVariableTypes.MaxMana);
+        extension(EntityStatsVariables stats)
+        {
+            public float MaxMana
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.MaxMana);
+                set => stats[FantasyEntityStatsVariableTypes.MaxMana] = value;
+            }
+            
+            public float ManaRegen
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.ManaRegen);
+                set => stats[FantasyEntityStatsVariableTypes.ManaRegen] = value;
+            }
+            
+            public float ManaRegenRate
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.ManaRegenRate);
+                set => stats[FantasyEntityStatsVariableTypes.ManaRegenRate] = value;
+            }
+        }
         
-        public static void ManaRegen(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.ManaRegen] = value;
-        public static float ManaRegen(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.ManaRegen);
-        public static float ManaRegenRate(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.ManaRegenRate);
-        public static void ManaRegenRate(this EntityStatsVariables stats, float regenRate) => stats[FantasyEntityStatsVariableTypes.ManaRegenRate] = regenRate;
-
-        public static float IceDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.IceDamage);
-        public static float FireDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.FireDamage);
-        public static float WindDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.WindDamage);
-        public static float EarthDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.EarthDamage);
-        public static float LightDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.LightDamage);
-        public static float DarkDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.DarkDamage);
-        public static float SlashingDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.SlashingDamage);
-        public static float BluntDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.BluntDamage);
-        public static float PiercingDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.PiercingDamage);
-        public static float UnarmedDamage(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.UnarmedDamage);
-        public static void IceDamage(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.IceDamage] = value;
-        public static void FireDamage(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.FireDamage] = value;
-        public static void WindDamage(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.WindDamage] = value;
-        public static void EarthDamage(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.EarthDamage] = value;
-        public static void LightDamage(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.LightDamage] = value;
-        public static void DarkDamage(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.DarkDamage] = value;
-        public static void SlashingDamage(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.SlashingDamage] = value;
-        public static void BluntDamage(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.BluntDamage] = value;
-        public static void PiercingDamage(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.PiercingDamage] = value;
-        public static void UnarmedDamage(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.UnarmedDamage] = value;
+        extension(EntityStatsVariables stats)
+        {
+            public float IceDamage
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.IceDamage);
+                set => stats[FantasyEntityStatsVariableTypes.IceDamage] = value;
+            }
+            
+            public float FireDamage
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.FireDamage);
+                set => stats[FantasyEntityStatsVariableTypes.FireDamage] = value;
+            }
+            
+            public float WindDamage
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.WindDamage);
+                set => stats[FantasyEntityStatsVariableTypes.WindDamage] = value;
+            }
+            
+            public float EarthDamage
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.EarthDamage);
+                set => stats[FantasyEntityStatsVariableTypes.EarthDamage] = value;
+            }
+            
+            public float LightDamage
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.LightDamage);
+                set => stats[FantasyEntityStatsVariableTypes.LightDamage] = value;
+            }
+            
+            public float DarkDamage
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.DarkDamage);
+                set => stats[FantasyEntityStatsVariableTypes.DarkDamage] = value;
+            }
+            
+            public float SlashingDamage
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.SlashingDamage);
+                set => stats[FantasyEntityStatsVariableTypes.SlashingDamage] = value;
+            }
+            
+            public float BluntDamage
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.BluntDamage);
+                set => stats[FantasyEntityStatsVariableTypes.BluntDamage] = value;
+            }
+            
+            public float PiercingDamage
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.PiercingDamage);
+                set => stats[FantasyEntityStatsVariableTypes.PiercingDamage] = value;
+            }
+            
+            public float UnarmedDamage
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.UnarmedDamage);
+                set => stats[FantasyEntityStatsVariableTypes.UnarmedDamage] = value;
+            }
+        }
         
-        public static float IceDefense(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.IceDefense);
-        public static float FireDefense(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.FireDefense);
-        public static float WindDefense(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.WindDefense);
-        public static float EarthDefense(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.EarthDefense);
-        public static float LightDefense(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.LightDefense);
-        public static float DarkDefense(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.DarkDefense);
-        public static float SlashingDefense(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.SlashingDefense);
-        public static float BluntDefense(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.BluntDefense);
-        public static float PiercingDefense(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.PiercingDefense);
-        public static float UnarmedDefense(this EntityStatsVariables stats) => stats.Get(FantasyEntityStatsVariableTypes.UnarmedDefense);
-        public static void IceDefense(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.IceDefense] = value;
-        public static void FireDefense(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.FireDefense] = value;
-        public static void WindDefense(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.WindDefense] = value;
-        public static void EarthDefense(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.EarthDefense] = value;
-        public static void LightDefense(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.LightDefense] = value;
-        public static void DarkDefense(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.DarkDefense] = value;
-        public static void SlashingDefense(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.SlashingDefense] = value;
-        public static void BluntDefense(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.BluntDefense] = value;
-        public static void PiercingDefense(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.PiercingDefense] = value;
-        public static void UnarmedDefense(this EntityStatsVariables stats, float value) => stats[FantasyEntityStatsVariableTypes.UnarmedDefense] = value;
+        extension(EntityStatsVariables stats)
+        {
+            public float IceDefense
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.IceDefense);
+                set => stats[FantasyEntityStatsVariableTypes.IceDefense] = value;
+            }
+            
+            public float FireDefense
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.FireDefense);
+                set => stats[FantasyEntityStatsVariableTypes.FireDefense] = value;
+            }
+            
+            public float WindDefense
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.WindDefense);
+                set => stats[FantasyEntityStatsVariableTypes.WindDefense] = value;
+            }
+            
+            public float EarthDefense
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.EarthDefense);
+                set => stats[FantasyEntityStatsVariableTypes.EarthDefense] = value;
+            }
+            
+            public float LightDefense
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.LightDefense);
+                set => stats[FantasyEntityStatsVariableTypes.LightDefense] = value;
+            }
+            
+            public float DarkDefense
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.DarkDefense);
+                set => stats[FantasyEntityStatsVariableTypes.DarkDefense] = value;
+            }
+            
+            public float SlashingDefense
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.SlashingDefense);
+                set => stats[FantasyEntityStatsVariableTypes.SlashingDefense] = value;
+            }
+            
+            public float BluntDefense
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.BluntDefense);
+                set => stats[FantasyEntityStatsVariableTypes.BluntDefense] = value;
+            }
+            
+            public float PiercingDefense
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.PiercingDefense);
+                set => stats[FantasyEntityStatsVariableTypes.PiercingDefense] = value;
+            }
+            
+            public float UnarmedDefense
+            {
+                get => stats.Get(FantasyEntityStatsVariableTypes.UnarmedDefense);
+                set => stats[FantasyEntityStatsVariableTypes.UnarmedDefense] = value;
+            }
+        }
     }
 }

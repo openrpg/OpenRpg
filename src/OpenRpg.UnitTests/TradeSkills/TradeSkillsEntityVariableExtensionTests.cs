@@ -14,8 +14,17 @@ public class TradeSkillsEntityVariableExtensionTests
         Assert.False(entityVars.HasTradeSkillState());
         
         var tradeSkillState = new TradeSkillState();
-        entityVars.TradeSkillState(tradeSkillState);
+        entityVars.TradeSkillState = tradeSkillState;
         Assert.True(entityVars.HasTradeSkillState());
-        Assert.Equal(entityVars.TradeSkillState(), tradeSkillState);
+        Assert.Equal(entityVars.TradeSkillState, tradeSkillState);
+    }
+
+    [Fact]
+    public void should_use_same_trade_skill_state_instance_on_subsequent_access()
+    {
+        var entityVars = new EntityVariables();
+        var state = entityVars.TradeSkillState;
+        state[999] = 5;
+        Assert.Equal(5, entityVars.TradeSkillState[999]);
     }
 }

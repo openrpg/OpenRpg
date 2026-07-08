@@ -1,0 +1,266 @@
+@page "/quests/faction-reputation"
+
+@using OpenRpg.Core.Associations
+@using OpenRpg.Core.Requirements
+@using OpenRpg.Data
+@using OpenRpg.Demos.Infrastructure.Data
+@using OpenRpg.Entities.Extensions
+@using OpenRpg.Genres.Characters
+@using OpenRpg.Genres.Extensions
+@using OpenRpg.Genres.Requirements
+@using OpenRpg.Localization.Data.Repositories
+@using OpenRpg.Quests
+@using OpenRpg.Quests.Extensions
+@using OpenRpg.Quests.Factions
+@using OpenRpg.Quests.State
+@using OpenRpg.Quests.Types
+
+@inject DemoCharacterBuilder CharacterBuilder
+@inject ICharacterRequirementChecker RequirementChecker
+@inject ILocaleRepository LocaleRepository
+@inject IDataSource DataSource
+
+<Markdown>
+    ## Factions & Reputation
+
+    The faction system allows you to track how an entity is perceived by different organisations in the world.
+    Each faction is a `DefaultFaction` template with an ID, name, and description. An entity's standing with
+    each faction is stored as a reputation score in a `FactionReputation` dictionary (faction ID → reputation int).
+
+    Reputation is accessed via `EntityVariables.FactionReputation` (entity variable key 40) and mutated
+    with the `AddReputation()` extension method. You can gate quests, dialogue, or content behind faction
+    reputation thresholds using `FactionStateRequirement` (requirement type 62).
+</Markdown>
+<br />
+
+<Markdown>
+    ## Reputation Tiers
+
+    Reputation scores can range from negative (hostile) to positive (allied). A common convention:
+
+    - **-100 to -51**: Hostile. Attacks on sight.
+    - **-50 to -11**: Unfriendly. Higher prices, limited services.
+    - **-10 to 10**: Neutral. Default standing.
+    - **11 to 50**: Friendly. Discounts, access to faction quests.
+    - **51 to 100**: Allied. Full trust, unique rewards.
+</Markdown>
+<br />
+
+<Markdown>
+    ## Interactive Faction Demo
+
+    Below is a character with three factions. Use the buttons to gain or lose reputation, then test
+    whether the character meets a reputation threshold using the requirement checker.
+</Markdown>
+<br />
+
+<div class="columns">
+    <div class="column">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark has-text-centered">Character Standing</h4>
+            <h5 class="subtitle is-6 has-text-dark has-text-centered">@_character.NameLocaleId</h5>
+            <br />
+
+            @foreach (var faction in _factions)
+            {
+                var rep = GetReputation(faction.Id);
+                var repClass = GetReputationClass(rep);
+                var factionVar = faction;
+
+                <div class="box">
+                    <div class="columns is-vcentered">
+                        <div class="column">
+                            <h6 class="title is-6 has-text-dark">@faction.NameLocaleId</h6>
+                            <p class="is-size-7 has-text-grey">@faction.DescriptionLocaleId</p>
+                        </div>
+                        <div class="column is-narrow has-text-right">
+                            <span class="tag @repClass is-medium">@rep</span>
+                        </div>
+                    </div>
+                    <div class="field is-grouped is-grouped-centered" style="margin-top: 0.5rem;">
+                        <div class="control">
+                            <button class="button is-success is-small" @onclick="() => AddReputation(factionVar.Id, 10)">+10</button>
+                        </div>
+                        <div class="control">
+                            <button class="button is-danger is-small" @onclick="() => AddReputation(factionVar.Id, -10)">-10</button>
+                        </div>
+                        <div class="control">
+                            <button class="button is-small" @onclick="() => ResetReputation(factionVar.Id)">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </CardSection>
+    </div>
+
+    <div class="column">
+        <CardSection>
+            <h4 class="title is-5 has-text-dark has-text-centered">Requirement Checker</h4>
+            <h5 class="subtitle is-6 has-text-dark has-text-centered">Test if the character meets a faction reputation requirement</h5>
+            <br />
+
+            <div class="field">
+                <label class="label">Faction</label>
+                <div class="control">
+                    <div class="select is-fullwidth">
+                        <select @bind="_selectedFactionId">
+                            @foreach (var faction in _factions)
+                            {
+                                <option value="@faction.Id">@faction.NameLocaleId</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label">Minimum Reputation Required</label>
+                <div class="control">
+                    <input class="input" type="number" @bind="_requiredReputation" />
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <button class="button is-link" @onclick="CheckRequirement">Check Requirement</button>
+                </div>
+            </div>
+
+            @if (_requirementResult.HasValue)
+            {
+                <div class="notification @(_requirementResult.Value ? "is-success" : "is-danger")" style="margin-top: 1rem;">
+                    <strong>@(_requirementResult.Value ? "Requirement Met" : "Requirement Not Met")</strong>
+                    <p class="is-size-7">
+                        Faction: @_factions.First(f => f.Id == _selectedFactionId).NameLocaleId |
+                        Required: >= @_requiredReputation |
+                        Current: @GetReputation(_selectedFactionId)
+                    </p>
+                </div>
+            }
+        </CardSection>
+
+        <CardSection>
+            <h4 class="title is-5 has-text-dark has-text-centered">Quest with Faction Gate</h4>
+            <h5 class="subtitle is-6 has-text-dark has-text-centered">This quest requires Friendly standing with the Merchants Guild</h5>
+            <br />
+
+            <div class="box">
+                <h6 class="title is-6 has-text-dark">Special Trade Discount</h6>
+                <p class="has-text-grey is-size-7">The Merchants Guild offers a special discount to trusted allies.</p>
+                <br />
+                <p class="is-size-7">
+                    <strong>Requirement:</strong> Merchants Guild reputation >= 30
+                </p>
+                <p class="is-size-7">
+                    <strong>Your standing:</strong>
+                    <span class="tag @GetReputationClass(GetReputation(FactionDataGenerator.MerchantsGuildId))">
+                        @GetReputation(FactionDataGenerator.MerchantsGuildId)
+                    </span>
+                </p>
+                <br />
+                <button class="button @(_canAcceptGuildQuest ? "is-success" : "is-danger") is-small" disabled>
+                    @(_canAcceptGuildQuest ? "Quest Available" : "Quest Locked")
+                </button>
+            </div>
+        </CardSection>
+    </div>
+</div>
+<br />
+
+<Markdown>
+    ### How It Works
+
+    ```csharp
+    // Access faction reputation on an entity
+    var factionRep = character.Variables.FactionReputation;
+
+    // Add reputation (starts at 0 for new factions)
+    factionRep.AddReputation(FactionDataGenerator.MerchantsGuildId, 10);
+
+    // Check current reputation
+    var rep = factionRep[FactionDataGenerator.MerchantsGuildId]; // 10
+
+    // Create a faction requirement
+    var requirement = new Requirement
+    {
+        RequirementType = QuestRequirementTypes.FactionStateRequirement,
+        Association = new Association(FactionDataGenerator.MerchantsGuildId, 30)
+    };
+
+    // Check if character meets the requirement
+    var met = RequirementChecker.IsRequirementMet(character, requirement);
+    ```
+</Markdown>
+<br />
+
+<Markdown>
+    ### Key Types
+
+    #### DefaultFaction
+    Faction template: holds Id, NameLocaleId, and DescriptionLocaleId. Stored in `IDataSource` and loaded at startup.
+
+    #### FactionReputation
+    A `Variables&lt;int&gt;` dictionary mapping faction ID to reputation score. Accessed via `EntityVariables.FactionReputation` (entity variable key 40).
+
+    #### FactionReputationExtensions
+    Provides `AddReputation(factionId, amount)` for convenient reputation mutation. Delegates to `AddValue()` under the hood.
+
+    #### QuestRequirementTypes.FactionStateRequirement
+    Requirement type ID 62. Uses `AssociatedId` as the faction ID and `AssociatedValue` as the minimum reputation threshold.
+</Markdown>
+
+@code {
+    private Character _character;
+    private List<DefaultFaction> _factions = new();
+    private int _selectedFactionId = FactionDataGenerator.MerchantsGuildId;
+    private int _requiredReputation = 30;
+    private bool? _requirementResult;
+
+    private bool _canAcceptGuildQuest => GetReputation(FactionDataGenerator.MerchantsGuildId) >= 30;
+
+    protected override void OnInitialized()
+    {
+        _character = CharacterBuilder.CreateNew().Build();
+        _factions = DataSource.GetAll<DefaultFaction>().ToList();
+        base.OnInitialized();
+    }
+
+    private int GetReputation(int factionId)
+    {
+        if (!_character.Variables.HasFactionReputation()) return 0;
+        var rep = _character.Variables.FactionReputation;
+        if (!rep.ContainsKey(factionId)) return 0;
+        return rep[factionId];
+    }
+
+    private void AddReputation(int factionId, int amount)
+    {
+        _character.Variables.FactionReputation.AddReputation(factionId, amount);
+        StateHasChanged();
+    }
+
+    private void ResetReputation(int factionId)
+    {
+        _character.Variables.FactionReputation[factionId] = 0;
+        StateHasChanged();
+    }
+
+    private void CheckRequirement()
+    {
+        var requirement = new Requirement
+        {
+            RequirementType = QuestRequirementTypes.FactionStateRequirement,
+            Association = new Association(_selectedFactionId, _requiredReputation)
+        };
+        _requirementResult = RequirementChecker.IsRequirementMet(_character, requirement);
+    }
+
+    private string GetReputationClass(int rep)
+    {
+        if (rep < -50) return "is-danger";
+        if (rep < -10) return "is-warning";
+        if (rep <= 10) return "is-light";
+        if (rep <= 50) return "is-info";
+        return "is-success";
+    }
+}

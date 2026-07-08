@@ -15,5 +15,6 @@ namespace OpenRpg.Entities.Types
         public static int RaceVariables = 7;
         public static int ModificationTemplateVariables = 8;
         public static int ModificationVariables = 9;
+        public static int EntityTemplateVariables = 10;
     }
 }

@@ -60,7 +60,10 @@
         {
             var itemData = (Card as EquipmentCard).Data.Data;
             var itemTemplate = TemplateAccessor.GetItemTemplate(itemData.TemplateId);
-            return itemTemplate.Effects.GetStaticEffects().OrderByDescending(x => x.Potency).FirstOrDefault();
+            return itemTemplate.Variables.Effects
+                .GetStaticEffects()
+                .OrderByDescending(x => x.Potency)
+                .FirstOrDefault();
         }
     }
 

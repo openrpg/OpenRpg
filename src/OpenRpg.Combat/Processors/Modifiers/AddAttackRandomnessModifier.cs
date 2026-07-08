@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using OpenRpg.Combat.Attacks;
 using OpenRpg.Core.Utils;
 
@@ -17,10 +18,14 @@ namespace OpenRpg.Combat.Processors.Modifiers
 
         public Attack ModifyValue(Attack attack)
         {
+            var damages = new List<Damage>();
             foreach (var damage in attack.Damages)
-            { damage.Value = GenerateRandomFrom(damage.Value); }
-
-            return attack;
+            {
+                var newValue = GenerateRandomFrom(damage.Value);
+                if(newValue >= 0)
+                { damages.Add(damage with { Value = newValue }); }
+            }
+            return attack with { Damages = damages };
         }
     }
 }

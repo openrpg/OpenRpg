@@ -17,6 +17,8 @@ namespace OpenRpg.Genres.Fantasy.Stats.Populators
                 new FantasyVitalsStatPopulator(),
                 new FantasyMeleeStatPopulator(),
                 new FantasyElementalStatPopulator(),
+                new DamageStatPopulator(),
+                new DefenseStatPopulator(),
                 new AbilityStatPopulator(),
                 new CriticalStatPopulator()
             };

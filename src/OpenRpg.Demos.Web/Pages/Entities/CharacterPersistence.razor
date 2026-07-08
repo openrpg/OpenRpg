@@ -87,7 +87,7 @@
         _jsonSettings = new JsonSerializerSettings()
         {
             TypeNameHandling = TypeNameHandling.Auto,
-            ContractResolver = new IgnorePropertiesResolver(new[] { nameof(Entity.Stats) })
+            ContractResolver = new IgnorePropertiesResolver(new[] { nameof(EntityData.Stats) })
         };
         
         RandomizeCharacter();

@@ -5,7 +5,7 @@
 @using OpenRpg.Items
 @using OpenRpg.Items.Inventories
 
-@for (var i = 0; i < Inventory.Variables.MaxSlots(); i+=SlotsPerRow)
+@for (var i = 0; i < Inventory.Variables.MaxSlots; i+=SlotsPerRow)
 {
     <div class="columns">
         @for (var row = 0; row < SlotsPerRow; row++)
@@ -20,7 +20,7 @@
     </div>
 }
 <div class="subtitle has-text-dark has-text-right">
-    @(Inventory.Items.Count) @(Inventory.Variables.ContainsKey(InventoryVariableTypes.MaxSlots) ? $"/ {Inventory.Variables.MaxSlots()}" : "") Items
+    @(Inventory.Items.Count) @(Inventory.Variables.ContainsKey(InventoryVariableTypes.MaxSlots) ? $"/ {Inventory.Variables.MaxSlots}" : "") Items
 </div>
 
 @code {

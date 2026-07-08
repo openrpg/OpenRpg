@@ -1,7 +1,6 @@
 ﻿@page "/trade-skills/crafting"
 
 @using OpenRpg.Core.Templates
-@using OpenRpg.Items.TradeSkills
 @using OpenRpg.Demos.Infrastructure.Lookups
 @using OpenRpg.Items.TradeSkills.Extensions
 @using OpenRpg.Genres.Characters
@@ -10,7 +9,9 @@
 @using OpenRpg.Items.TradeSkills.Calculator
 @using OpenRpg.Items.TradeSkills.Templates
 @using OpenRpg.Core.Utils
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.Templates
 @using OpenRpg.Items.TradeSkills.State
@@ -47,21 +48,9 @@
                 
                 In this case we want to craft `Copper Ingots` which require 5x`Copper Ore` per ingot.
             </Markdown>
-            <div class="columns">
-                @foreach (var inputItem in CopperIngotCraftingTemplate.InputItems)
-                {
-                    <div class="column">
-                        <TradeSkillItemIcon Item="inputItem" ItemTemplate="TemplateAccessor.GetItemTemplate(inputItem.TemplateId)"/>
-                    </div>
-                }
-                <div class="column"><span class="tag is-success">Makes</span></div>
-                @foreach (var outputItem in CopperIngotCraftingTemplate.OutputItems)
-                {
-                    <div class="column">
-                        <TradeSkillItemIcon Item="outputItem" ItemTemplate="TemplateAccessor.GetItemTemplate(outputItem.TemplateId)"/>
-                    </div>
-                }
-            </div>
+            <br />
+            <ItemCraftingTemplateDetails ItemCraftingTemplate="CopperIngotCraftingTemplate" TemplateAccessor="TemplateAccessor" />
+            <br/>
             <div class="field">
                 <div class="control">
                     <button class="button @(CanCraftCopperIngot ? "is-success" : "is-danger")" @onclick="StartCraftingCopperIngot">Craft Copper Ingots</button>
@@ -79,21 +68,9 @@
                 so click the buttons below to give yourself some `Copper Ingots` and `Oak Logs` and keep leveling your smithing
                 skill to 10.
             </Markdown>
-            <div class="columns">
-                @foreach (var inputItem in CopperSwordCraftingTemplate.InputItems)
-                {
-                    <div class="column">
-                        <TradeSkillItemIcon Item="inputItem" ItemTemplate="TemplateAccessor.GetItemTemplate(inputItem.TemplateId)"/>
-                    </div>
-                }
-                <div class="column"><span class="tag is-success">Makes</span></div>
-                @foreach (var outputItem in CopperSwordCraftingTemplate.OutputItems)
-                {
-                    <div class="column">
-                        <TradeSkillItemIcon Item="outputItem" ItemTemplate="TemplateAccessor.GetItemTemplate(outputItem.TemplateId)"/>
-                    </div>
-                }
-            </div>
+            <br />
+            <ItemCraftingTemplateDetails ItemCraftingTemplate="CopperSwordCraftingTemplate" TemplateAccessor="TemplateAccessor" />
+            <br />
             <div class="field">
                 <div class="control">
                     <button class="button is-success" @onclick="() => GiveCopperOre()">Give Copper Ore</button>
@@ -123,7 +100,7 @@
         <CardSection>
             <div class="field">
                 <div class="control">
-                    <TagLabel Label="Smithing Skill" Content="@TradeSkillState.Smithing().ToString()"></TagLabel>
+                    <TagLabel Label="Smithing Skill" Content="@TradeSkillState.Smithing.ToString()"></TagLabel>
                 </div>
             </div>
             @if (IsCrafting)
@@ -154,7 +131,7 @@
     public bool IsCrafting { get; set; }
     public ItemCraftingTemplate CurrentTemplate { get; set; }
     
-    public float CurrentGatherTime => (CurrentTemplate?.TimeToComplete / 2 ?? 0.0f);
+    public float CurrentGatherTime => (CurrentTemplate?.Variables.TimeToAction / 2 ?? 0.0f);
     public string CurrentCraftName
     {
         get
@@ -166,9 +143,9 @@
 
     public bool CanCraftCopperIngot => CraftingInventory.HasItemsRequiredFor(CopperIngotCraftingTemplate);
     public bool HasMatsForCopperSword => CraftingInventory.HasItemsRequiredFor(CopperSwordCraftingTemplate);
-    public bool HasSkillsForCopperSword => RequirementsChecker.AreRequirementsMet(DummyCharacter, CopperSwordCraftingTemplate);
+    public bool HasSkillsForCopperSword => RequirementsChecker.AreRequirementsMet(DummyCharacter, CopperSwordCraftingTemplate.Variables.Requirements);
 
-    public TradeSkillState TradeSkillState => DummyCharacter.Variables.TradeSkillState();
+    public TradeSkillState TradeSkillState => DummyCharacter.Variables.TradeSkillState;
     
     protected override void OnInitialized()
     {
@@ -177,11 +154,11 @@
         CopperSwordCraftingTemplate = TemplateAccessor.GetItemCraftingTemplate(ItemCraftingTemplateLookups.CopperSword);
         CopperIngotCraftingTemplate = TemplateAccessor.GetItemCraftingTemplate(ItemCraftingTemplateLookups.CopperIngot);
         
-        CraftingInventory.Variables.MaxSlots(50);
+        CraftingInventory.Variables.MaxSlots = 50;
         GiveCopperOre(10);
         
-        DummyCharacter.Variables.TradeSkillState(new TradeSkillState());
-        TradeSkillState.Smithing(1);
+        DummyCharacter.Variables.TradeSkillState = new TradeSkillState();
+        TradeSkillState.Smithing = 1;
         
         base.OnInitialized();
     }
@@ -189,7 +166,7 @@
     public void GiveCopperOre(int amount = 20)
     {
         var copperOreItem = TemplateAccessor.ToInstance(new ItemData { TemplateId = ItemTemplateLookups.CopperOre });
-        copperOreItem.Data.Variables.Amount(amount);
+        copperOreItem.Data.Variables.Amount = amount;
         CraftingInventory.AttemptAddItem(copperOreItem);
         CraftingInventoryRef?.Refresh();
     }
@@ -197,7 +174,7 @@
     public void GiveOakLog(int amount = 1)
     {
         var oakLog = TemplateAccessor.ToInstance(new ItemData { TemplateId = ItemTemplateLookups.OakLog });
-        oakLog.Data.Variables.Amount(amount);
+        oakLog.Data.Variables.Amount = amount;
         CraftingInventory.AttemptAddItem(oakLog);
         CraftingInventoryRef.Refresh();
     }
@@ -226,8 +203,9 @@
         CurrentTemplate.CraftFrom(CraftingInventory, TemplateAccessor);
         ActionBarRef?.Reset();
         
-        var currentSkill = TradeSkillState.Smithing();
-        var tradeSkillPoints = TradeSkillCalculator.CalculateSkillUpPointsFor(currentSkill, CurrentTemplate.SkillDifficulty);
+        var currentSkillScore = TradeSkillState.Smithing;
+        var skillDifficulty = CurrentTemplate.Variables.Requirements.GetTradeSkillRequirementValue(FantasyTradeSkillTypes.Smithing);
+        var tradeSkillPoints = TradeSkillCalculator.CalculateSkillUpPointsFor(currentSkillScore, skillDifficulty);
         TradeSkillState.AddSmithing(tradeSkillPoints);
         
         CraftingInventoryRef.Refresh();

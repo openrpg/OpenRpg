@@ -15,11 +15,12 @@ namespace OpenRpg.Items.Extensions
         {
             var template = templateAccessor.GetItemTemplate(itemData.TemplateId);
             
-            var effects = new List<IEffect>(template.Effects);
+            var effects = new List<IEffect>(template.Variables.Effects);
             if (itemData.Variables.HasProceduralAssociation())
             {
-                var proceduralEffects = template.Variables.ProceduralEffects();
-                foreach (var proceduralEffect in itemData.Variables.ProceduralAssociation())
+                var proceduralEffects = template.Variables.ProceduralEffects;
+                var proceduralAssociations = itemData.Variables.ProceduralAssociation;
+                foreach (var proceduralEffect in proceduralAssociations)
                 {
                     var effect = proceduralEffects.Effects[proceduralEffect.AssociatedId];
                     if (effect.ScalingType == CoreEffectScalingTypes.Value)
@@ -44,7 +45,7 @@ namespace OpenRpg.Items.Extensions
         public static IEnumerable<IEffect> GetEffects(this ItemModificationData modificationData, ITemplateAccessor templateAccessor)
         {
             var template = templateAccessor.GetItemModificationTemplate(modificationData.TemplateId);
-            return template.Effects;
+            return template.Variables.Effects;
         }
 
         public static IEnumerable<IEffect> GetEffects(this Equipment equipment, ITemplateAccessor templateAccessor)

@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using OpenRpg.Core.Requirements;
+﻿using System.Collections.Generic;
 using OpenRpg.Core.Templates;
-using OpenRpg.Entities.Requirements;
 using OpenRpg.Items.TradeSkills.Variables;
 
 namespace OpenRpg.Items.TradeSkills.Templates
 {
-    public class ItemGatheringTemplate : ITemplate<ItemGatheringTemplateVariables>, ITradeSkillData, IHasRequirements
+    public class ItemGatheringTemplate : ITemplate<ItemGatheringTemplateVariables>
     {
         /// <inheritdoc />
         public int Id { get; set; }
@@ -17,18 +14,6 @@ namespace OpenRpg.Items.TradeSkills.Templates
         
         /// <inheritdoc />
         public string DescriptionLocaleId { get; set; }
-        
-        /// <inheritdoc />
-        public float TimeToComplete { get; set; } = 1.0f;
-
-        /// <inheritdoc />
-        public int SkillType { get; set; }
-    
-        /// <inheritdoc />
-        public int SkillDifficulty { get; set; }
-
-        /// <inheritdoc />
-        public IReadOnlyCollection<Requirement> Requirements { get; set; } = Array.Empty<Requirement>();
 
         /// <inheritdoc />
         public ItemGatheringTemplateVariables Variables { get; set; } = new ItemGatheringTemplateVariables();

@@ -67,12 +67,25 @@ namespace OpenRpg.Core.Extensions
         
         public static T GetAs<T>(this IVariables<object> vars, int variableKey) where T : class
         { return vars.Get(variableKey) as T; }
-
+        
         public static T GetAsOrDefault<T>(this IVariables<object> vars, int variableKey, Func<T> defaultValueFactory) where T : class
         {
             if (vars.ContainsKey(variableKey))
             { return vars.GetAs<T>(variableKey) ?? defaultValueFactory(); }
-            return  defaultValueFactory();
+            return defaultValueFactory();
+        }
+        
+        public static T GetAsOrDefaultAndSet<T>(this IVariables<object> vars, int variableKey, Func<T> defaultValueFactory) where T : class
+        {
+            if (vars.ContainsKey(variableKey))
+            {
+                var result = vars.GetAs<T>(variableKey);
+                if(result is not null) { return result; }
+            }
+            
+            var instance = defaultValueFactory();
+            vars[variableKey] = instance;
+            return instance;
         }
     }
 }

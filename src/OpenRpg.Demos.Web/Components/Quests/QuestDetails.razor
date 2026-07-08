@@ -1,4 +1,5 @@
 @using OpenRpg.Core.Templates
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items
@@ -13,12 +14,12 @@
         <h2 class="title is-6 has-text-dark">@(Quest.NameLocaleId ?? "Unnamed Quest")</h2>
         <h2 class="subtitle is-6 has-text-dark">@(Quest.DescriptionLocaleId ?? "No Description")</h2>
     </div>
-    @if (Quest.Requirements.Any())
+    @if (Quest.Variables.HasRequirements())
     {
         <br />
         <div class="has-text-centered">
             <h2 class="title is-6 has-text-dark">Requirements</h2>
-            <RequirementList Requirements="Quest.Requirements.ToArray()" Character="Character"></RequirementList>
+            <RequirementList Requirements="Quest.Variables.Requirements" Character="Character"></RequirementList>
         </div>
     }
     @if (Quest.Gifts.Any())
@@ -80,7 +81,7 @@
 </CardSection>
 
 @code {
-    [Parameter] public Quest Quest { get; set; }
+    [Parameter] public QuestTemplate Quest { get; set; }
     [Parameter] public Character Character { get; set; }
     [Parameter] public ITemplateAccessor TemplateAccessor { get; set; }
 
@@ -91,7 +92,7 @@
             TemplateId = itemTemplateId,
             Variables = new ItemVariables()
         };
-        item.Variables.Amount(itemAmount);
+        item.Variables.Amount = itemAmount;
         return TemplateAccessor.ToInstance(item);
     }
 }

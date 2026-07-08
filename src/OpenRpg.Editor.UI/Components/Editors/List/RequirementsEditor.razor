@@ -1,8 +1,6 @@
-﻿@using OpenRpg.Core.Associations
-@using OpenRpg.Core.Requirements
-@using OpenRpg.Core.Utils
-@using OpenRpg.Editor.Infrastructure.Helpers
-@using OpenRpg.Entities.Requirements
+﻿@using OpenRpg.Core.Requirements
+@using OpenRpg.Editor.Infrastructure.Services
+@using OpenRpg.Editor.UI.Services
 
 <ListEditor Data="Requirements" TItem="Requirement">
     <HeaderTemplate>
@@ -15,7 +13,7 @@
             <div class="control">
                 <div class="select is-fullwidth">
                     <select @bind="context.RequirementType">
-                        @foreach (var requirementType in TypesHelper.GetRequirementTypes)
+                        @foreach (var requirementType in GenreTypes.RequirementTypes)
                         {
                             <option value=@requirementType.Id>@requirementType.Name</option>
                         }
@@ -23,22 +21,24 @@
                 </div>
             </div>
         </td>
-        <td>
-            <div class="control">
-                <input class="input" type="text" @bind:get="@context.Association.AssociatedId"
-                       @bind:set="id => context.Association = new Association(id, context.Association.AssociatedValue)" />
-            </div>
-        </td>
-        <td>
-            <div class="control">
-                <input class="input" type="text"  @bind:get="@context.Association.AssociatedValue"
-                       @bind:set="value => context.Association = new Association(context.Association.AssociatedId, value)" />
-            </div>
-        </td>
+        @{
+            var idOptions = Resolver.GetOptionsFor(AssociationIdContexts.Requirement, context.RequirementType);
+        }
+        <AssociationEditor Association="context.Association"
+                          AssociationChanged="a => context.Association = a"
+                          IdOptions="idOptions.Options"
+                          IdDisabled="idOptions.Disabled"
+                          ShowDropdown="idOptions.IsMapped" />
     </RowTemplate>
 </ListEditor>
 
-@functions {
+@code {
+    [Inject]
+    public GenreTypesService GenreTypes { get; set; }
+
+    [Inject]
+    public IAssociationIdResolver Resolver { get; set; }
+
     [Parameter]
     public List<Requirement> Requirements { get; set; }
 }

@@ -1,0 +1,394 @@
+@page "/procedural/pattern-generated-items"
+
+@using OpenRpg.Core.Utils
+@using OpenRpg.CurveFunctions
+@using OpenRpg.CurveFunctions.Scaling
+@using OpenRpg.Demos.Infrastructure.Extensions
+@using OpenRpg.Demos.Infrastructure.Templates
+@using OpenRpg.Demos.Web.Pages.Procedural.Patterns
+@using OpenRpg.Entities.Effects
+@using OpenRpg.Entities.Procedural.Effects.Builders
+@using OpenRpg.Entities.Procedural.Patterns
+@using OpenRpg.Entities.Types
+@using OpenRpg.Genres.Fantasy.Types
+@using OpenRpg.Items.TradeSkills.Templates
+@using OpenRpg.Items.Templates
+
+@inject IRandomizer Randomizer;
+
+<Markdown>
+    ## Pattern Generation
+    This is still experimental, but you can generate templates with a given pattern like so
+</Markdown>
+
+<br />
+
+<h3 class="is-size-3">Generated Item Templates</h3>
+<Accordion Title="Ores" IsExpanded="true">
+    <div class="fixed-grid has-3-cols">
+        <div class="grid">
+            @foreach (var itemTemplate in _ores)
+            {
+                <div class="cell">
+                    <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+                </div>
+            }
+        </div>    
+    </div>
+</Accordion>
+
+<Accordion Title="Ingots" IsExpanded="true">
+    <div class="fixed-grid has-3-cols">
+        <div class="grid">
+            @foreach (var itemTemplate in _ingots)
+            {
+                <div class="cell">
+                    <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+                </div>
+            }
+        </div>    
+    </div>
+</Accordion>
+
+<Accordion Title="Swords" IsExpanded="true">
+    <div class="fixed-grid has-3-cols">
+        <div class="grid">
+            @foreach (var itemTemplate in _swords)
+            {
+                <div class="cell">
+                    <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+                </div>
+            }
+        </div>    
+    </div>
+</Accordion>
+
+<Accordion Title="Armour" IsExpanded="true">
+    <div class="fixed-grid has-3-cols">
+        <div class="grid">
+            @foreach (var itemTemplate in _armours)
+            {
+                <div class="cell">
+                    <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+                </div>
+            }
+        </div>    
+    </div>
+</Accordion>
+
+<Accordion Title="Logs" IsExpanded="true">
+    <div class="fixed-grid has-3-cols">
+        <div class="grid">
+            @foreach (var itemTemplate in _logs)
+            {
+                <div class="cell">
+                    <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+                </div>
+            }
+        </div>    
+    </div>
+</Accordion>
+
+<Accordion Title="Lumber" IsExpanded="true">
+    <div class="fixed-grid has-3-cols">
+        <div class="grid">
+            @foreach (var itemTemplate in _lumber)
+            {
+                <div class="cell">
+                    <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+                </div>
+            }
+        </div>    
+    </div>
+</Accordion>
+
+<Accordion Title="Bows" IsExpanded="true">
+    <div class="fixed-grid has-3-cols">
+        <div class="grid">
+            @foreach (var itemTemplate in _bows)
+            {
+                <div class="cell">
+                    <ItemTemplateDetails ItemTemplate="@itemTemplate"></ItemTemplateDetails>
+                </div>
+            }
+        </div>    
+    </div>
+</Accordion>
+
+<h3 class="is-size-3">Crafting Templates</h3>
+
+<Accordion Title="Crafting Ingots" IsExpanded="true">
+    <div class="fixed-grid has-3-cols">
+        <div class="grid">
+            @foreach (var craftingTemplate in _ingotCrafting)
+            {
+                <div class="cell">
+                    <ItemCraftingTemplateDetails ItemCraftingTemplate="@craftingTemplate" TemplateAccessor="TemplateAccessor"/>
+                </div>
+            }
+        </div>    
+    </div>
+</Accordion>
+
+<Accordion Title="Crafting Swords" IsExpanded="true">
+    <div class="fixed-grid has-3-cols">
+        <div class="grid">
+            @foreach (var craftingTemplate in _swordCrafting)
+            {
+                <div class="cell">
+                    <ItemCraftingTemplateDetails ItemCraftingTemplate="@craftingTemplate" TemplateAccessor="TemplateAccessor"/>
+                </div>
+            }
+        </div>    
+    </div>
+</Accordion>
+
+<Accordion Title="Crafting Armour" IsExpanded="true">
+    <div class="fixed-grid has-3-cols">
+        <div class="grid">
+            @foreach (var craftingTemplate in _armourCrafting)
+            {
+                <div class="cell">
+                    <ItemCraftingTemplateDetails ItemCraftingTemplate="@craftingTemplate" TemplateAccessor="TemplateAccessor"/>
+                </div>
+            }
+        </div>    
+    </div>
+</Accordion>
+
+@code {
+
+    private ItemTemplatePatternGenerator _itemTemplatePatternGenerator;
+    private CraftingTemplatePatternGenerator _craftingTemplatePatternGenerator;
+    private IReadOnlyCollection<ItemTemplate> _ores, _ingots, _swords, _armours, _logs, _lumber, _bows;
+    private IReadOnlyCollection<ItemCraftingTemplate> _ingotCrafting, _swordCrafting, _armourCrafting, _lumberCrafting;
+    public ManualTemplateAccessor TemplateAccessor = new ();
+
+    public interface ItemPatternTypes
+    {
+        public static int Unknown = 0;
+
+        public static int Ore = 1;
+        public static int Ingot = 2;
+        public static int Sword = 3;
+        public static int Armour = 4;
+        public static int Bows = 5;
+
+        public static int Log = 10;
+        public static int Lumber = 11;
+    }
+    
+    public interface MetalItemPatternLookups
+    {
+        public static int Unknown = 0;
+    
+        public static int Copper = 1;
+        public static int Bronze = 2;
+        public static int Silver = 3;
+        public static int Gold = 4;
+        public static int Iron = 5;
+        public static int Steel = 6;
+        public static int Mythril = 7;
+    }
+    
+    public interface WoodItemPatternLookups
+    {
+        public static int Unknown = 0;
+    
+        public static int Maple = 1;
+        public static int Ash = 2;
+        public static int Elm = 3;
+        public static int Oak = 4;
+    }
+
+    public static Dictionary<int, string> MetalLookups = typeof(MetalItemPatternLookups).GetTypeFieldsDictionary();
+    public static Dictionary<int, string> WoodLookups = typeof(WoodItemPatternLookups).GetTypeFieldsDictionary();
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _itemTemplatePatternGenerator = new ItemTemplatePatternGenerator();
+        _craftingTemplatePatternGenerator = new CraftingTemplatePatternGenerator(TemplateAccessor);
+        
+        GenerateMetalItemTemplates();
+        GenerateWoodItemTemplates();
+        GenerateItemCraftingTemplates();
+    }
+
+    private void GenerateMetalItemTemplates()
+    {
+        var patternIds = MetalLookups.Keys.ToArray();
+        var localeGenerator = new FixedPatternLocaleGenerator() { NamePattern = "{0} {1}", DescriptionPattern = "{0} {1}", PatternNames = MetalLookups };
+
+        _ores = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig()
+        {
+            PatternIds = patternIds,
+            PatternTypeId = ItemPatternTypes.Ore,
+            LocaleGenerator = localeGenerator,
+            TypeCode = "Ore",
+            StartingId = 0,
+            ItemType = FantasyItemTypes.GenericItem
+        });
+        TemplateAccessor.AddTemplates(_ores);
+        
+        _ingots = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig()
+        {
+            PatternIds = patternIds,
+            PatternTypeId = ItemPatternTypes.Ingot,
+            LocaleGenerator = localeGenerator,
+            TypeCode = "Ingot",
+            StartingId = 20,
+            ItemType = FantasyItemTypes.GenericItem
+        });
+        TemplateAccessor.AddTemplates(_ingots);
+        
+
+        var swordEffects = ProceduralEffectsBuilder.Create()
+            .WithPrimaryEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.DamageBonusAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 100), new RangeF(0, patternIds.Length)),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .Build();
+        
+        _swords = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig()
+        {
+            PatternIds = patternIds,
+            PatternTypeId = ItemPatternTypes.Sword,
+            LocaleGenerator = localeGenerator,
+            TypeCode = "Sword",
+            StartingId = 40,
+            ItemType = FantasyItemTypes.GenericWeapon,
+            Effects = swordEffects
+        });
+        TemplateAccessor.AddTemplates(_swords);
+        
+        var armourEffects = ProceduralEffectsBuilder.Create()
+            .WithPrimaryEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.DefenseBonusAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 100), new RangeF(0, patternIds.Length)),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .WithPrimaryEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.HealthBonusAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 20), new RangeF(4, patternIds.Length)),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .Build();
+        
+        _armours = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig()
+        {
+            PatternIds = patternIds, 
+            PatternTypeId = ItemPatternTypes.Armour, 
+            LocaleGenerator = localeGenerator, 
+            TypeCode = "Armor", 
+            StartingId = 60, 
+            ItemType = FantasyItemTypes.UpperBodyArmour,
+            Effects = armourEffects
+        });
+        TemplateAccessor.AddTemplates(_armours);
+    }
+    
+    private void GenerateWoodItemTemplates()
+    {
+        var patternIds = WoodLookups.Keys.ToArray();
+        var localeGenerator = new FixedPatternLocaleGenerator() { NamePattern = "{0} {1}", DescriptionPattern = "{0} {1}", PatternNames = WoodLookups };
+        
+        _logs = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig()
+        {
+            PatternIds = patternIds,
+            PatternTypeId = ItemPatternTypes.Log,
+            LocaleGenerator = localeGenerator,
+            TypeCode = "Log",
+            StartingId = 100,
+            ItemType = FantasyItemTypes.GenericItem
+        });
+        TemplateAccessor.AddTemplates(_logs);
+        
+        _lumber = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig()
+        {
+            PatternIds = patternIds,
+            PatternTypeId = ItemPatternTypes.Lumber,
+            LocaleGenerator = localeGenerator,
+            TypeCode = "Lumber",
+            StartingId = 120,
+            ItemType = FantasyItemTypes.GenericItem
+        });
+        TemplateAccessor.AddTemplates(_lumber);
+        
+        var bowEffects = ProceduralEffectsBuilder.Create()
+            .WithPrimaryEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.DamageBonusAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.Linear, new RangeF(10, 100), new RangeF(0, patternIds.Length)),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .Build();
+        
+        _bows = _itemTemplatePatternGenerator.Generate(new ItemTemplatePatternGeneratorConfig()
+        {
+            PatternIds = patternIds,
+            PatternTypeId = ItemPatternTypes.Bows,
+            LocaleGenerator = localeGenerator,
+            TypeCode = "Bow",
+            StartingId = 140,
+            ItemType = FantasyItemTypes.GenericWeapon,
+            Effects = bowEffects
+        });
+        TemplateAccessor.AddTemplates(_bows);
+        
+    }
+
+    private void GenerateItemCraftingTemplates()
+    {
+        var patternIds = MetalLookups.Keys.ToArray();
+        var metalLocaleGenerator = new FixedPatternLocaleGenerator() { NamePattern = "{0} {1}", DescriptionPattern = "{0} {1}", PatternNames = MetalLookups };
+        
+        _ingotCrafting = _craftingTemplatePatternGenerator.Generate(new ItemCraftingTemplatePatternGeneratorConfig()
+        {
+            PatternIds = patternIds,
+            StartingId = 0,
+            SkillType = FantasyTradeSkillTypes.Smelting,
+            SkillScore = new ScalingFunction(PresetCurves.Linear, new RangeF(0, 200), new RangeF(0, patternIds.Length)),
+            AmountRequired = 5,
+            InputPatternTypeId = ItemPatternTypes.Ore,
+            AmountOutput = 1,
+            OutputPatternTypeId = ItemPatternTypes.Ingot,
+            PatternTypeId = ItemPatternTypes.Ingot,
+            LocaleGenerator = metalLocaleGenerator
+        });
+                
+        _swordCrafting = _craftingTemplatePatternGenerator.Generate(new ItemCraftingTemplatePatternGeneratorConfig()
+        {
+            PatternIds = patternIds,
+            StartingId = 20,
+            SkillType = FantasyTradeSkillTypes.Smithing,
+            SkillScore = new ScalingFunction(PresetCurves.Linear, new RangeF(0, 200), new RangeF(0, patternIds.Length)),
+            AmountRequired = 4,
+            InputPatternTypeId = ItemPatternTypes.Ingot,
+            AmountOutput = 1,
+            OutputPatternTypeId = ItemPatternTypes.Sword,
+            PatternTypeId = ItemPatternTypes.Sword,
+            LocaleGenerator = metalLocaleGenerator
+        });                
+        
+        _armourCrafting = _craftingTemplatePatternGenerator.Generate(new ItemCraftingTemplatePatternGeneratorConfig()
+        {
+            PatternIds = patternIds,
+            StartingId = 40,
+            SkillType = FantasyTradeSkillTypes.Smithing,
+            SkillScore = new ScalingFunction(PresetCurves.Linear, new RangeF(0, 200), new RangeF(0, patternIds.Length)),
+            AmountRequired = 4,
+            InputPatternTypeId = ItemPatternTypes.Ingot,
+            AmountOutput = 1,
+            OutputPatternTypeId = ItemPatternTypes.Armour,
+            PatternTypeId = ItemPatternTypes.Armour,
+            LocaleGenerator = metalLocaleGenerator
+        });
+    }
+
+}

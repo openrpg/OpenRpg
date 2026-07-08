@@ -2,9 +2,7 @@
 @using OpenRpg.Core.Templates
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items.Extensions
-@using OpenRpg.Items.Templates
 @using OpenRpg.Items.Types
-@using OpenRpg.Demos.Infrastructure.Extensions
 @using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Characters
 @using OpenRpg.Genres.Extensions
@@ -27,7 +25,7 @@
     <div class="columns">
         <div class="column">
             <figure class="image is-64x64 item-border with-rounding item-quality-@(_itemQualityTypeId)">
-                <img src="images/items/@(Item.Template.Variables.AssetCode()).png">
+                <img src="images/items/@(Item.Template.Variables.AssetCode).png">
             </figure>
         </div>
         <div class="column">
@@ -57,11 +55,11 @@
             <EffectList Effects="DisplayEffects.ToArray()" Character="@Character"></EffectList>
         </div>
     }
-    @if (Item.Template.Requirements.Any())
+    @if (Item.Template.Variables.HasRequirements())
     {
         <h5 class="title is-5 has-text-centered has-text-dark mb-1 mt-3">Requirements</h5>
         <div>
-            <RequirementList Requirements="@Item.Template.Requirements.ToArray()" Character="@Character"></RequirementList>
+            <RequirementList Requirements="@Item.Template.Variables.Requirements.ToArray()" Character="@Character"></RequirementList>
         </div>
     }
 </CardSection>
@@ -97,11 +95,11 @@
     }
 
     public float TotalDamage => Effects.GetStaticEffects()
-        .Where(x => x.IsDamagingEffect() || x.EffectType == FantasyEffectTypes.DamageBonusAmount)
+        .Where(x => x.IsDamagingEffect || x.EffectType == FantasyEffectTypes.DamageBonusAmount)
         .Sum(x => x.Potency);
 
     public float TotalDefense => Effects.GetStaticEffects()
-        .Where(x => x.IsDefensiveEffect() || x.EffectType == FantasyEffectTypes.DefenseBonusAmount)
+        .Where(x => x.IsDefensiveEffect || x.EffectType == FantasyEffectTypes.DefenseBonusAmount)
         .Sum(x => x.Potency);
 
     
@@ -120,14 +118,14 @@
 
     protected override void OnParametersSet()
     {
-        var areRequirementsMet = RequirementsChecker.AreRequirementsMet(Character, Item.Template);
+        var areRequirementsMet = RequirementsChecker.AreRequirementsMet(Character, Item.Template.Variables.Requirements);
         var requirementsClass = !areRequirementsMet ? "has-background-danger-light" : "";
         cardClasses = $"item-border item-quality-{_itemQualityTypeId} {requirementsClass}";
 
         Effects = Item.Data.GetEffects(OverriddenTemplateAccessor != null ? OverriddenTemplateAccessor : TemplateAccessor).ToArray();
         
         if (Item.Template.Variables.ContainsKey(ItemTemplateVariableTypes.QualityType))
-        { _itemQualityTypeId = Item.Template.Variables.QualityType(); }
+        { _itemQualityTypeId = Item.Template.Variables.QualityType; }
         
         base.OnParametersSet();
     }

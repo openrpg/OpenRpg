@@ -10,9 +10,12 @@
 @using OpenRpg.Items.TradeSkills.Calculator
 @using OpenRpg.Items.TradeSkills.Templates
 @using OpenRpg.Core.Utils
+@using OpenRpg.Entities.Extensions
 @using OpenRpg.Genres.Fantasy.Extensions
+@using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items.Extensions
 @using OpenRpg.Items.TradeSkills.State
+@using OpenRpg.Items.TradeSkills.Types
 
 @using Inventory = OpenRpg.Items.Inventories.Inventory;
 
@@ -115,7 +118,7 @@
                 > To make it quicker to test we have disabled the gathering time so you gather immediately unlike previous example
             </Markdown>
             <div class="container">
-                <TagLabel Label="Mining Skill" Content="@TradeSkillState.Mining().ToString()"></TagLabel>
+                <TagLabel Label="Mining Skill" Content="@TradeSkillState.Mining.ToString()"></TagLabel>
             </div>
             <div class="columns">
                 <div class="column">
@@ -180,7 +183,7 @@
     public bool IsGathering { get; set; }
     public ItemGatheringTemplate CurrentTemplate { get; set; }
     
-    public float CurrentGatherTime => (CurrentTemplate?.TimeToComplete ?? 0.0f);
+    public float CurrentGatherTime => (CurrentTemplate?.Variables.TimeToAction ?? 0.0f);
     public string CurrentGatherName
     {
         get
@@ -190,25 +193,25 @@
         }
     }
 
-    public bool CanMineIron => RequirementsChecker.AreRequirementsMet(DummyCharacter, IronOreGatheringTemplate);
+    public bool CanMineIron => RequirementsChecker.AreRequirementsMet(DummyCharacter, IronOreGatheringTemplate.Variables.Requirements);
 
     public TradeSkillItemEntry CopperOreTradeSkillItemEntry => CopperOreGatheringTemplate.OutputItems.First();
     public TradeSkillItemEntry OakLogTradeSkillItemEntry => OakLogGatheringTemplate.OutputItems.First();
     public TradeSkillItemEntry IronOreTradeSkillItemEntry => IronOreGatheringTemplate.OutputItems.First();
-    public TradeSkillState TradeSkillState => DummyCharacter.Variables.TradeSkillState();
+    public TradeSkillState TradeSkillState => DummyCharacter.Variables.TradeSkillState;
     
     protected override void OnInitialized()
     {
-        TradeSkillCalculator = new TradeSkillCalculator(Randomizer) { RandomnessVariance = 0.2f };
+        TradeSkillCalculator = new TradeSkillCalculator(Randomizer) { RandomnessVariance = 0.2f, MaximumSkillDifference = 20 };
         
-        Example1Inventory.Variables.MaxSlots(10);
-        Example2Inventory.Variables.MaxSlots(10);
+        Example1Inventory.Variables.MaxSlots = 10;
+        Example2Inventory.Variables.MaxSlots = 10;
         CopperOreGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.CopperOre);
         OakLogGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.OakLog);
         IronOreGatheringTemplate = TemplateAccessor.GetItemGatheringTemplate(ItemGatheringTemplateLookups.IronOre);
 
-        DummyCharacter.Variables.TradeSkillState(new TradeSkillState());
-        TradeSkillState.Mining(1);
+        DummyCharacter.Variables.TradeSkillState = new TradeSkillState();
+        TradeSkillState.Mining = 1;
         
         base.OnInitialized();
     }
@@ -228,8 +231,9 @@
         CurrentTemplate.GatherInto(Example2Inventory, TemplateAccessor);
         Example2InventoryRef.Refresh();
 
-        var currentMiningSkill = TradeSkillState.Mining();
-        var tradeSkillPoints = TradeSkillCalculator.CalculateSkillUpPointsFor(currentMiningSkill, CurrentTemplate.SkillDifficulty);
+        var currentSkillScore = TradeSkillState.Mining;
+        var skillDifficulty = CurrentTemplate.Variables.Requirements.GetTradeSkillRequirementValue(FantasyTradeSkillTypes.Mining);
+        var tradeSkillPoints = TradeSkillCalculator.CalculateSkillUpPointsFor(currentSkillScore, skillDifficulty);
         TradeSkillState.AddMining(tradeSkillPoints);
         
         InvokeAsync(StateHasChanged);

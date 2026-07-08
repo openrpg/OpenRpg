@@ -22,13 +22,19 @@ namespace OpenRpg.Genres.Fantasy.Combat
                 { continue; }
 
                 float defendedAmount;
+                var incomingDamage = damageLookups[applicableDefense.StatType];
                 
-                if(damageLookups[applicableDefense.StatType] > applicableDefense.StatValue)
-                { defendedAmount = applicableDefense.StatValue; }
+                if(incomingDamage > applicableDefense.StatValue)
+                {
+                    defendedAmount = applicableDefense.StatValue;
+                    damageLookups[applicableDefense.StatType] = incomingDamage - defendedAmount;
+                }
                 else
-                { defendedAmount = applicableDefense.StatValue - damageLookups[applicableDefense.StatType]; }
+                {
+                    defendedAmount = incomingDamage;
+                    damageLookups[applicableDefense.StatType] = 0;
+                }
                 
-                damageLookups[applicableDefense.StatType] -= defendedAmount;
                 resultingDefenses.Add(new Damage(applicableDefense.StatType, defendedAmount));
             }
 

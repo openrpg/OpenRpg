@@ -17,19 +17,19 @@ namespace OpenRpg.Genres.Scifi.Combat
                 .Select(x => new Damage(x.StatType, x.StatValue))
                 .ToArray();
 
-            return new Attack(damages);
+            return new Attack(false, damages);
         }
 
         public Attack GenerateAttack(Ability ability, ShipStatsVariables stats)
         {
-            var baseDamage = ability.Template.Variables.Damage();
+            var baseDamage = ability.Template.Variables.Damage;
             return GenerateAttack(baseDamage, stats);
         }
 
         public Attack GenerateAttack(Damage damage, ShipStatsVariables stats)
         {
-            damage.Value += stats.GetDamageFor(damage.Type);
-            return new Attack(new[] { damage });
+            var actualDamage = damage with { Value = damage.Value + stats.GetDamageFor(damage.Type)};
+            return new Attack(false, [actualDamage]);
         }
     }
 }

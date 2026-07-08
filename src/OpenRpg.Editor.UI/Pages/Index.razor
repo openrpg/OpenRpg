@@ -1,23 +1,28 @@
 ﻿@page "/"
 
-@using OpenRpg.CurveFunctions
+@using OpenRpg.Editor.Core.Components.Modal
 @using OpenRpg.Editor.Core.Models
+@using OpenRpg.Editor.Core.Plugins
 @using OpenRpg.Editor.Core.Services.Events.Bus
 @using OpenRpg.Editor.Core.Services.FileSystem
+@using OpenRpg.Editor.Core.Services.Modal
 @using OpenRpg.Editor.Infrastructure.Events
 @using OpenRpg.Editor.Infrastructure.Persistence
+@using OpenRpg.Editor.Infrastructure.Plugins
+@using OpenRpg.Editor.UI.Components.Modals
 @using OpenRpg.Editor.UI.Models
 
 @inject IFileBrowser FileBrowser
 @inject EditorState EditorState
-@inject CreateProjectExecutor CreateProjectExecutor;
-@inject LoadProjectExecutor LoadProjectExecutor;
-@inject IEventBus EventBus; 
+@inject ProjectCreator ProjectCreator
+@inject EditorDataLoader EditorDataLoader
+@inject IEventBus EventBus
+@inject GenreService GenreService
 
 <h1 class="title is-1">OpenRpg Data Editor</h1>
 
 <div class="box">
-    @if (EditorState.CurrentProject == null)
+    @if (EditorState.ProjectContext == null)
     {
         <p class="content">Please create or load an existing project.</p>
         <div class="field">
@@ -36,20 +41,43 @@
     }
     else
     {
-        <p class="content">Using Project: <span class="tag">@EditorState.CurrentProject.ProjectPath</span></p>
+        <p class="content">Using Project: <span class="tag">@EditorState.ProjectContext.ProjectPath</span></p>
     }
 </div>
 
+<ModalContent Id="genre-selection" @ref="GenreSelectionRef">
+    <GenreSelectionModal Genres="GenreService.AvailablePlugins"
+                         OnConfirmed="ConfirmCreateProject"
+                         OnCancelled="() => ModalService.CloseModal()" />
+</ModalContent>
 
 @code 
 {
+    [CascadingParameter]
+    public IModalInteractionService ModalService { get; set; }
+
+    public ModalElementReference GenreSelectionRef { get; set; }
+
     public async Task CreateProject()
     {
-        var projectFolder = FileBrowser.BrowseToFolder();
-        if(string.IsNullOrEmpty(projectFolder)) { return; }
+        GenreService.RefreshPlugins();
+        ModalService.ShowModal(GenreSelectionRef.Reference);
+    }
 
-        var newProject = await CreateProjectExecutor.Execute(projectFolder);
-        EditorState.CurrentProject = newProject;
+    private async Task ConfirmCreateProject(GenreSelectionResult result)
+    {
+        var projectFolder = FileBrowser.BrowseToFolder();
+        if (string.IsNullOrEmpty(projectFolder)) { return; }
+
+        var newProject = await ProjectCreator.CreateProjectAt(projectFolder, result.EnabledGenreIds, result.GenerateTypeFiles);
+        EditorState.ProjectContext = newProject;
+        
+        foreach (var genreId in result.EnabledGenreIds)
+        {
+            GenreService.EnablePlugin(genreId);
+        }
+        
+        ModalService.CloseModal();
         EventBus.PublishAsync(new ProjectChangedEvent());
     }
     
@@ -58,7 +86,16 @@
         var projectFile = FileBrowser.BrowseToOpenFile(filterList: "*.json");
         if(string.IsNullOrEmpty(projectFile)) { return; }
 
-        await LoadProjectExecutor.Execute(projectFile);
+        var project = await EditorDataLoader.Load(projectFile);
+        
+        if (EditorState.ProjectContext?.Project?.Plugins != null)
+        {
+            foreach (var plugin in EditorState.ProjectContext.Project.Plugins)
+            {
+                GenreService.EnablePlugin(plugin.Id);
+            }
+        }
+        
         EventBus.PublishAsync(new ProjectChangedEvent());
     }
 }

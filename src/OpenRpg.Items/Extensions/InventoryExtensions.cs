@@ -32,7 +32,7 @@ namespace OpenRpg.Items.Extensions
         {
             var itemAmounts= inventory.Items
                 .Where(x => x.TemplateId == itemTemplateId)
-                .Sum(x => x.Variables.Amount());
+                .Sum(x => x.Variables.Amount);
             
             return itemAmounts >= amount;
         }
@@ -50,8 +50,8 @@ namespace OpenRpg.Items.Extensions
             var itemWeights= inventory.Items
                 .Where(x => x.TemplateId == itemTemplateId)
                 .Sum(x => x.Variables.HasAmount() 
-                    ? x.Variables.Weight() * x.Variables.Amount()
-                    : x.Variables.Weight());
+                    ? x.Variables.Weight * x.Variables.Amount
+                    : x.Variables.Weight);
             
             return itemWeights >= weight;
         }
@@ -65,10 +65,10 @@ namespace OpenRpg.Items.Extensions
         public static bool HasItem(this Inventory inventory, ItemData itemData)
         {
             if (itemData.Variables.HasAmount())
-            { return inventory.HasItem(itemData.TemplateId, itemData.Variables.Amount()); }
+            { return inventory.HasItem(itemData.TemplateId, itemData.Variables.Amount); }
 
             if (itemData.Variables.HasWeight())
-            { return inventory.HasItem(itemData.TemplateId, itemData.Variables.Weight()); }
+            { return inventory.HasItem(itemData.TemplateId, itemData.Variables.Weight); }
 
             return inventory.HasItem(itemData.TemplateId);
         }
@@ -87,7 +87,7 @@ namespace OpenRpg.Items.Extensions
             if (!inventory.Variables.HasMaxSlots())
             { return true; }
 
-            return inventory.Items.Count + slotsRequired < inventory.Variables.MaxSlots();
+            return inventory.Items.Count + slotsRequired < inventory.Variables.MaxSlots;
         }
         
         public static bool HasWeightCapacity(this Inventory inventory, float weightToAdd)
@@ -95,8 +95,8 @@ namespace OpenRpg.Items.Extensions
             if (!inventory.Variables.ContainsKey(InventoryVariableTypes.MaxWeight))
             { return true; }
 
-            var proposedWeight = inventory.Items.Sum(x => x.Variables.Weight()) + weightToAdd;
-            return proposedWeight < inventory.Variables.MaxWeight();
+            var proposedWeight = inventory.Items.Sum(x => x.Variables.Weight) + weightToAdd;
+            return proposedWeight < inventory.Variables.MaxWeight;
         }
         
         /// <summary>
@@ -129,7 +129,7 @@ namespace OpenRpg.Items.Extensions
             { return AttemptAddAmountItem(inventory, item); }
 
             if (item.Data.Variables.HasWeight())
-            { return HasWeightCapacity(inventory, item.Template.Variables.Weight()) && AttemptAddWeightedItem(inventory, item); }
+            { return HasWeightCapacity(inventory, item.Template.Variables.Weight) && AttemptAddWeightedItem(inventory, item); }
 
             if (!HasSlotCapacity(inventory))
             { return false; }
@@ -140,22 +140,22 @@ namespace OpenRpg.Items.Extensions
 
         public static bool AttemptAddAmountItem(Inventory inventory, Item item)
         {
-            var requiredAmount = item.Data.Variables.Amount();
-            var stackSize = item.Template.Variables.MaxStacks();
+            var requiredAmount = item.Data.Variables.Amount;
+            var stackSize = item.Template.Variables.MaxStacks;
             
             var existingItemsWithSpace = inventory.Items
-                .Where(x => x.TemplateId == item.Data.TemplateId && (stackSize == 0 || x.Variables.Amount() <= stackSize))
-                .OrderByDescending(x => x.Variables.Amount())
+                .Where(x => x.TemplateId == item.Data.TemplateId && (stackSize == 0 || x.Variables.Amount <= stackSize))
+                .OrderByDescending(x => x.Variables.Amount)
                 .ToArray();
 
-            var maxSlots = inventory.Variables.MaxSlots();
+            var maxSlots = inventory.Variables.MaxSlots;
             if (maxSlots > 0)
             {
                 var currentSlots = inventory.Items.Count;
                 
                 if (stackSize > 0)
                 {
-                    var availableSpace = existingItemsWithSpace.Sum(x => stackSize - x.Variables.Amount());
+                    var availableSpace = existingItemsWithSpace.Sum(x => stackSize - x.Variables.Amount);
                     var overflowAmount = requiredAmount - availableSpace;
                     var stacksRequired = (int)Math.Ceiling((float)overflowAmount / stackSize);
                     if(currentSlots + stacksRequired > maxSlots)
@@ -182,7 +182,7 @@ namespace OpenRpg.Items.Extensions
                 }
 
                 var existingAmount = itemDataHasWithSpace.Variables.HasAmount()
-                    ? itemDataHasWithSpace.Variables.Amount()
+                    ? itemDataHasWithSpace.Variables.Amount
                     : 0;
                 
                 if (stackSize > 0)
@@ -190,21 +190,20 @@ namespace OpenRpg.Items.Extensions
                     var spaceLeft = stackSize - existingAmount;
                     if (amountLeft < spaceLeft)
                     {
-                        itemDataHasWithSpace.Variables.Amount(existingAmount + amountLeft);
+                        itemDataHasWithSpace.Variables.Amount = existingAmount + amountLeft;
                         amountLeft = 0;
                     }
                     else
                     {
-                        itemDataHasWithSpace.Variables.Amount(existingAmount + spaceLeft);
+                        itemDataHasWithSpace.Variables.Amount = existingAmount + spaceLeft;
                         amountLeft -= spaceLeft;
                     }
                 }
                 else
                 {
-                    itemDataHasWithSpace.Variables.Amount(existingAmount + amountLeft);
+                    itemDataHasWithSpace.Variables.Amount = existingAmount + amountLeft;
                     amountLeft = 0;
                 }
-                
 
                 index++;
             }
@@ -242,13 +241,13 @@ namespace OpenRpg.Items.Extensions
                 return true;
             }
 
-            var amountToTake = itemData.Variables.Amount();
+            var amountToTake = itemData.Variables.Amount;
             var applicableItems = inventory.Items
                 .Where(x => x.TemplateId == itemData.TemplateId)
-                .OrderByDescending(x => x.Variables.Amount())
+                .OrderByDescending(x => x.Variables.Amount)
                 .ToArray();
 
-            var maxAvailable = applicableItems.Sum(x => x.Variables.Amount());
+            var maxAvailable = applicableItems.Sum(x => x.Variables.Amount);
             if (maxAvailable < amountToTake)
             { return false; }
 
@@ -256,7 +255,7 @@ namespace OpenRpg.Items.Extensions
             while (amountToTake > 0)
             {
                 var currentItem = applicableItems[index];
-                var itemAmount = currentItem.Variables.Amount();
+                var itemAmount = currentItem.Variables.Amount;
                 if (amountToTake >= itemAmount)
                 {
                     inventory.Items.Remove(currentItem);
@@ -264,7 +263,7 @@ namespace OpenRpg.Items.Extensions
                 }
                 else
                 {
-                    currentItem.Variables.Amount(itemAmount - amountToTake);
+                    currentItem.Variables.Amount = itemAmount - amountToTake;
                     amountToTake -= itemAmount;
                 }
                 index++;

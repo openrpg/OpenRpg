@@ -1,4 +1,5 @@
 @page "/procedural/procedural-items"
+
 @using Newtonsoft.Json
 @using OpenRpg.Core.Utils
 @using OpenRpg.CurveFunctions
@@ -6,12 +7,11 @@
 @using OpenRpg.Demos.Infrastructure.Templates
 @using OpenRpg.Entities.Effects
 @using OpenRpg.Entities.Extensions
-@using OpenRpg.Entities.Procedural
+@using OpenRpg.Entities.Procedural.Effects.Builders
 @using OpenRpg.Entities.Types
 @using OpenRpg.Genres.Fantasy.Types
 @using OpenRpg.Items
 @using OpenRpg.Items.Extensions
-@using Range = OpenRpg.Core.Utils.Range
 @using OpenRpg.Items.Templates
 
 @inject IRandomizer Randomizer;
@@ -37,21 +37,46 @@
             
             To start with we need to setup our `ProceduralEffects` configuration, here is an example:
             ```csharp
-            var possibleEffects = new List&lt;GroupedEffect&gt;
-            {
-            new() { GroupType = CoreProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.BluntDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { GroupType = CoreProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.PiercingDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { EffectType = FantasyEffectTypes.StrengthBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { EffectType = FantasyEffectTypes.DexterityBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { EffectType = FantasyEffectTypes.FireDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { EffectType = FantasyEffectTypes.WindDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            };
-
-            var proceduralEffects = new ProceduralEffects()
-            {
-            EffectAmount = new Range(1, 3),
-            Effects = possibleEffects,
-            };
+            var proceduralEffects = ProceduralEffectsBuilder
+                .Create()
+                .WithPrimaryEffect(new ScaledEffect()
+                {
+                    EffectType = FantasyEffectTypes.BluntDamageAmount,
+                    PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred),
+                    ScalingType = CoreEffectScalingTypes.Value
+                })
+                .WithPrimaryEffect(new ScaledEffect()
+                {
+                    EffectType = FantasyEffectTypes.PiercingDamageAmount,
+                    PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred),
+                    ScalingType = CoreEffectScalingTypes.Value
+                })
+                .WithOptionalEffect(new ScaledEffect()
+                {
+                    EffectType = FantasyEffectTypes.StrengthBonusAmount,
+                    PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred),
+                    ScalingType = CoreEffectScalingTypes.Value
+                })
+                .WithOptionalEffect(new ScaledEffect()
+                {
+                    EffectType = FantasyEffectTypes.DexterityBonusAmount,
+                    PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred),
+                    ScalingType = CoreEffectScalingTypes.Value
+                })
+                .WithOptionalEffect(new ScaledEffect()
+                {
+                    EffectType = FantasyEffectTypes.FireDamageAmount,
+                    PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred),
+                    ScalingType = CoreEffectScalingTypes.Value
+                })
+                .WithOptionalEffect(new ScaledEffect()
+                {
+                    EffectType = FantasyEffectTypes.WindDamageAmount,
+                    PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred),
+                    ScalingType = CoreEffectScalingTypes.Value
+                })
+                .WithEffectAmount(1, 3)
+                .Build();
             ```
             
             I know its a lot of code but its quite simple in whats going on, its making 2 `Primary` effects to choose from, which means you will ALWAYS get 1 of them
@@ -66,11 +91,14 @@
             ```csharp
             var proceduralTemplate = new ItemTemplate()
             {
-            Id = 1,
-            NameLocaleId = "Magical Random Sword",
-            ItemType = FantasyItemTypes.GenericWeapon
+                Id = 1,
+                NameLocaleId = "Magical Random Sword",
+                ItemType = FantasyItemTypes.GenericWeapon
             };
             proceduralTemplate.Variables.ProceduralEffects(proceduralEffects);
+            
+            // Then we call
+            var proceduralItemData = proceduralItemTemplate.GenerateProceduralInstance(Randomizer);
             ```
             
             Now we have done that, we can call `proceduralTemplate.GenerateProceduralInstance(Randomizer)` which will use the procedural config to randomly
@@ -144,23 +172,49 @@
     protected override void OnInitialized()
     {
         TemplateAccessor = new ManualTemplateAccessor();
-        var possibleEffects = new List<GroupedEffect> 
-        {
-            new() { GroupType = CoreProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.BluntDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { GroupType = CoreProceduralGroupTypes.Primary, EffectType = FantasyEffectTypes.PiercingDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { EffectType = FantasyEffectTypes.StrengthBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { EffectType = FantasyEffectTypes.DexterityBonusAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { EffectType = FantasyEffectTypes.FireDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-            new() { EffectType = FantasyEffectTypes.WindDamageAmount, PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred), ScalingType = CoreEffectScalingTypes.Value },
-        };
-
-        BluntScalingFunction = possibleEffects[0].PotencyFunction;
         
-        var proceduralEffects = new ProceduralEffects()
-        {
-            EffectAmount = new Range(1, 3),
-            Effects = possibleEffects,
-        };
+        var proceduralEffects = ProceduralEffectsBuilder
+            .Create()
+            .WithPrimaryEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.BluntDamageAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .WithPrimaryEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.PiercingDamageAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .WithOptionalEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.StrengthBonusAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .WithOptionalEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.DexterityBonusAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 3), RangeF.ZeroToOneHundred),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .WithOptionalEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.FireDamageAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .WithOptionalEffect(new ScaledEffect()
+            {
+                EffectType = FantasyEffectTypes.WindDamageAmount,
+                PotencyFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(1, 5), RangeF.ZeroToOneHundred),
+                ScalingType = CoreEffectScalingTypes.Value
+            })
+            .WithEffectAmount(1, 3)
+            .Build();
+        
+        BluntScalingFunction = new ScalingFunction(PresetCurves.BellCurve, new RangeF(20, 30), RangeF.ZeroToOneHundred);
 
         proceduralItemTemplate = new ItemTemplate()
         {
@@ -168,9 +222,9 @@
             NameLocaleId = "Magical Random Sword",
             ItemType = FantasyItemTypes.GenericWeapon
         };
-        proceduralItemTemplate.Variables.AssetCode("sword");
-        proceduralItemTemplate.Variables.ProceduralEffects(proceduralEffects);
-        proceduralItemTemplate.Variables.QualityType(FantasyItemQualityTypes.EpicQuality);
+        proceduralItemTemplate.Variables.AssetCode = "sword";
+        proceduralItemTemplate.Variables.ProceduralEffects = proceduralEffects;
+        proceduralItemTemplate.Variables.QualityType = FantasyItemQualityTypes.EpicQuality;
         TemplateAccessor.AddTemplate(proceduralItemTemplate);
 
         RefreshProceduralItem();

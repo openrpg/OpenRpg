@@ -22,16 +22,26 @@ namespace OpenRpg.Data.InMemory
         protected InMemoryDataSource()
         {}
 
+        private Dictionary<object, object> GetOrCreateStore(Type type)
+        {
+            if (!Database.TryGetValue(type, out var dict))
+            {
+                dict = new Dictionary<object, object>();
+                Database[type] = dict;
+            }
+            return dict;
+        }
+
         public T Get<T>(object id) => (T)Database[typeof(T)][id];
-        public IEnumerable<T> GetAll<T>() => Database[typeof(T)].Values.Cast<T>();
-        public void Update<T>(T data, object id) => Database[typeof(T)][id] = data;
-        public bool Delete<T>(object id) => Database[typeof(T)].Remove(id);
-        public bool Exists<T>(object id) => Database[typeof(T)].ContainsKey(id);
+        public IEnumerable<T> GetAll<T>() => GetOrCreateStore(typeof(T)).Values.Cast<T>();
+        public void Update<T>(T data, object id) => GetOrCreateStore(typeof(T))[id] = data;
+        public bool Delete<T>(object id) => Database.TryGetValue(typeof(T), out var dict) && dict.Remove(id);
+        public bool Exists<T>(object id) => Database.TryGetValue(typeof(T), out var dict) && dict.ContainsKey(id);
         
         public void Create<T>(T data, object id = null)
         {
             if(id == null) { throw new ArgumentNullException(nameof(id), "In Memory DB Requires explicit keys on creation"); }
-            Database[typeof(T)].Add(id, data);
+            GetOrCreateStore(typeof(T)).Add(id, data);
         }
 
         public void Dispose()

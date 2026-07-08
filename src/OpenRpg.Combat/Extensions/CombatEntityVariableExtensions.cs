@@ -1,7 +1,6 @@
-using System.Collections.Generic;
-using OpenRpg.Combat.Abilities;
 using OpenRpg.Combat.Effects;
 using OpenRpg.Combat.Types;
+using OpenRpg.Core.Extensions;
 using OpenRpg.Entities.Entity.Variables;
 
 namespace OpenRpg.Combat.Extensions
@@ -13,11 +12,14 @@ namespace OpenRpg.Combat.Extensions
     {
         public static bool HasActiveEffects(this EntityVariables vars) 
         { return vars.ContainsKey(CombatEntityVariableTypes.ActiveEffects); }
-        
-        public static IActiveEffects ActiveEffects(this EntityVariables vars)
-        { return vars[CombatEntityVariableTypes.ActiveEffects] as IActiveEffects; }
 
-        public static void ActiveEffects(this EntityVariables vars, IActiveEffects activeEffects)
-        { vars[CombatEntityVariableTypes.ActiveEffects] = activeEffects; }
+        extension(EntityVariables vars)
+        {
+            public IActiveEffects ActiveEffects
+            {
+                get => vars.GetAsOrDefaultAndSet(CombatEntityVariableTypes.ActiveEffects, () => new DefaultActiveEffects());
+                set => vars[CombatEntityVariableTypes.ActiveEffects] = value;
+            }
+        }
     }
 }

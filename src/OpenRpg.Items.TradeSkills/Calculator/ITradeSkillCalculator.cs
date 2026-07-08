@@ -6,7 +6,6 @@
         float PointMultiplier { get; set; }
         float MaximumSkillDifference { get; set; }
         
-        bool CanUseSkill(int skillScore, int skillDifficulty);
         int CalculateSkillUpPointsFor(int skillScore, int skillDifficulty);
     }
 }
